@@ -3,14 +3,14 @@ import React from 'react';
 import './style.scss';
 import { MdNavigateNext } from 'react-icons/md';
 
-const contentStyle: React.CSSProperties = {
-    margin: 0,
-    height: '160px',
-    color: '#fff',
-    lineHeight: '160px',
-    textAlign: 'center',
-    background: '#364d79',
-};
+// const contentStyle: React.CSSProperties = {
+//     margin: 0,
+//     height: '160px',
+//     color: '#fff',
+//     lineHeight: '160px',
+//     textAlign: 'center',
+//     background: '#364d79',
+// };
 const getPosById = (i: number) => {
     switch(i){
         case 1: return '--first'
