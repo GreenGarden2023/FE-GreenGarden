@@ -1,0 +1,27 @@
+@import './variable.scss';
+
+* {
+    text-decoration: none;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+    color: #000;
+    font-size: $font-default;
+}
+body {
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #fff;
+}
+p{
+    margin: 0;
+}
+button{
+    outline: none;
+    border-radius: 5px;
+    border: none;
+    padding: 5px 10px;
+    color: #000;
+    cursor: pointer;
+}

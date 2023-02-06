@@ -1,0 +1,39 @@
+@import '../../styles/variable.scss';
+
+.product-content{
+    max-width: $max-width-container;
+    margin: 50px auto;
+    .title{
+        position: relative;
+        margin-top: 50px;
+        color: #52403c;
+        font-size: $font-extra;
+        font-weight: 700;
+        width: fit-content;
+        padding-bottom: 30px;
+        &::before{
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 3px;
+            width: 30%;
+            background-color: #52403c;
+        }
+    }
+    .product-header{
+        margin-top: 20px;
+    }
+    .--items{
+        display: flex;
+        margin-top: 50px;
+        .product-detail{
+            border: 1px solid #D0D0D0;
+            border-radius: 5px;
+            cursor: pointer;
+            img{
+                border-radius: 5px;  
+            }
+        }
+    }
+}

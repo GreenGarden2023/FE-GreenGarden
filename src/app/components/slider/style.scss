@@ -1,0 +1,69 @@
+@import '../../styles/variable.scss';
+
+$padding-height-slider: 50px;
+
+
+.slider-container{
+    background-color: #097969;
+    padding: $padding-height-slider 10px;
+    .slider__item{
+        display: flex!important;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        .item__detail{
+            background-color: #fff;
+            padding: 20px;
+            width: 300px;
+            .title{
+                text-transform: uppercase;
+                font-weight: 700;
+            }
+            .content{
+                margin-top: 10px;
+            }
+            .show-more-btn{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-top: 10px;
+                background-color: #0096FF;
+                p{
+                    color: #fff;
+                }
+                .icon-next{
+                    fill: #fff;
+                }
+            }
+            &.--first{
+                .title{
+                    color: #000;
+                }
+                .content{
+                    color: #000;
+                }
+            }
+            &.--second{
+                background-color: #023020;
+                .title{
+                    color: #fff;
+                }
+                .content{
+                    color: #fff;
+                }
+            }
+            &.--thirt{
+                background-color: 	#355E3B;
+                .title{
+                    color: #fff;
+                }
+                .content{
+                    color: #fff;
+                }
+            }
+        }
+    }
+    .slick-dots.slick-dots-bottom{
+        bottom: calc(#{$padding-height-slider} / 2 * -1);
+    }
+}

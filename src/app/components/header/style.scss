@@ -1,0 +1,40 @@
+@import '../../styles/variable.scss';
+
+.landing-header{
+    background-color: $header-background-color;
+    .header__top{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        img{
+            width: 100px;
+            padding: 10px;
+        }
+        p{
+            color: #fff;
+            padding: 10px;
+        }
+    }
+    .header__bottom{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        padding: 10px;
+        .header__item{
+            p{
+                font-weight: 600;
+                font-size: 18px;
+                text-transform: uppercase;
+                color: #b1b1b1;
+                &.active{
+                    color: #fff;
+                }
+                &:hover{
+                    color: #fff;
+                }
+            }
+        }
+    }
+}
