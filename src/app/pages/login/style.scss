@@ -1,0 +1,50 @@
+@import '../../styles/variable.scss';
+
+.sign-in-wrapper{
+    width: 900px;
+    background-color: #fff;
+    border-radius: 20px;
+    padding: 5rem;
+    margin: 100px auto 0 auto;
+    h2{
+        display: flex;
+        width: 50%;
+        margin-left: auto;
+        margin-bottom: 33px;
+    }
+    .sign-up-box{
+        display: flex;
+        flex-direction: row-reverse;
+        .left{
+            width: 50%;
+            .register-msg{
+                a{
+                    margin-left: 7px;
+                    color: inherit;
+                    font-size: $font-small;
+                    text-decoration: underline;
+                    opacity: 0.8;
+                    &:hover{
+                        opacity: 1;
+                        color: $color-link;
+                    }
+                }
+            }
+            
+            .btn-box{
+                display: flex;
+                .btn-submit{
+                    color: #fff;
+                    margin-right: 10px;
+                }
+                .btn-login{
+                    display: flex;
+                    align-items: center;
+                }
+            }
+        }
+        .right{
+            flex: 1;
+        }
+    }
+}

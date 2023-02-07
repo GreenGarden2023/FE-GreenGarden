@@ -1,10 +1,19 @@
 import { createSlice, PayloadAction, CaseReducer } from '@reduxjs/toolkit';
 
-const initialState: string = '';
+interface NotifiProps{
+  type: "success" | "info" | "warning" | "error",
+  message: string;
+  description?: string;
+}
 
-type CR<T> = CaseReducer<string, PayloadAction<T>>;
+const initialState: NotifiProps = {
+  type: 'success',
+  message: ''
+};
 
-const setNotiCR: CR<string> = (_, action) => (action.payload);
+type CR<T> = CaseReducer<NotifiProps, PayloadAction<T>>;
+
+const setNotiCR: CR<NotifiProps> = (_, action) => (action.payload);
 
 const slice = createSlice({
     name: 'notification/slice',

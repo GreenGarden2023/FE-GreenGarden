@@ -11,6 +11,7 @@ const store = configureStore({
       ...appReducers,
     },
     middleware,
+    devTools: true
 });
 
 export type AppDispatch = typeof store.dispatch;

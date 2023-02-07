@@ -1,6 +1,31 @@
 @import '../../styles/variable.scss';
 
 .main-content{
+    margin-top: 100px;
+    .banner-content{
+        background-image: url('../../../../public/assets/banner-1.jpg');
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        .content{
+            min-height: 512px;
+            position: relative;
+            .title{
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: #fff;
+                h1{
+                    font-size: 88px;
+                }
+                h3{
+                    font-size: 48px;
+                    text-align: center;
+                }
+            }
+        }
+    }
     .body-content{
         padding: 50px;
         .introduce{

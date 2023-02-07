@@ -1,46 +1,42 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React from 'react';
 import './style.scss';
+import { AiOutlineShoppingCart } from 'react-icons/ai';
+import { Link } from 'react-router-dom';
+import { Badge } from 'antd';
+import { FaUserCircle } from 'react-icons/fa';
 
 const LandingHeader: React.FC = () =>{
-    const [scrollPosition, setScrollPosition] = useState(0);
-    const handleScroll = () => {
-        const position = window.pageYOffset;
-        setScrollPosition(position);
-    };
-
-    useEffect(() => {
-        window.addEventListener('scroll', handleScroll, { passive: true });
-    
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, []);
-    
-    const FixedHeader = useMemo((): React.CSSProperties | undefined =>{
-        return scrollPosition > 135 ? {
-            position: 'fixed',
-            width: '100%',
-            backgroundColor: '#061524',
-            top: 0,
-            zIndex: 16
-        } : undefined
-    }, [scrollPosition])
 
     return (
-        <header className='landing-header' style={FixedHeader ? {paddingBottom: '41px'} : undefined}>
-            <div className="header__top">
-                <img src={`${process.env.PUBLIC_URL}/main-logo.png`} alt="" />
-                <p>Green Garden Shop</p>
-            </div>
-            <div className="header__bottom" style={FixedHeader}>
-                <div className="header__item">
-                    <p className='active'>Home</p>
+        <header className='landing-header'>
+            <div className='container-wrapper' >
+                <div className="left">
+                    <Link to='/' >
+                        <img src="/assets/logo.jpg" alt="/" />
+                    </Link>
                 </div>
-                <div className="header__item">
-                    <p>About us</p>
-                </div>
-                <div className="header__item">
-                    <p>Login</p>
+                <div className="right">
+                    <div className="cart-box">
+                        <Link to='/cart' >
+                            <Badge count={5} >
+                                <AiOutlineShoppingCart size={30} />
+                            </Badge>
+                        </Link>
+                    </div>
+                    <div className="register-login-infor-box">
+                        {/* <Link to='/register' >
+                            <AiOutlineUserAdd size={20} />
+                            <span>Regsiter</span>
+                        </Link>
+                        <Link to='/login' >
+                            <GiExitDoor size={20} />
+                            <span>Login</span>
+                        </Link> */}
+                        <div className='user-infor-box'>
+                            <FaUserCircle size={20} />
+                            <span>Admin</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>

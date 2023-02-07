@@ -1,5 +1,5 @@
-import axios, { AxiosHeaders } from "axios";
-import { STORAGE } from "./constant";
+import axios, { AxiosHeaders, AxiosResponse } from "axios";
+import CONSTANT from "./constant";
 
 const golbalAxios = axios.create({
     baseURL: process.env.API_ENDPOINT,
@@ -10,7 +10,7 @@ const golbalAxios = axios.create({
 })
 
 golbalAxios.interceptors.request.use((config) =>{
-    const token = getToken(STORAGE.ACCESS_TOKEN);
+    const token = getToken(CONSTANT.STORAGE.ACCESS_TOKEN);
     if(token){
         (config.headers as AxiosHeaders).set('Authorization', `Bearer ${token}`)
     }
@@ -18,16 +18,16 @@ golbalAxios.interceptors.request.use((config) =>{
 }, (error) =>{
     return Promise.reject(error)
 })
-golbalAxios.interceptors.response.use((res) =>{
-    return res.data
+golbalAxios.interceptors.response.use((res: AxiosResponse) =>{
+    return res
 }, async error =>{
     if(error.response.status === 401){
         try{
-            const refreshToken = getToken(STORAGE.REFRESH_TOKEN);
-            const result = await golbalAxios.post('auth/refreh-token', {
-                refreshToken
-            })
-            console.log('result--------', result)
+            // const refreshToken = getToken(CONSTANT.STORAGE.REFRESH_TOKEN);
+            // const result = await golbalAxios.post('auth/refreh-token', {
+            //     refreshToken
+            // })
+            // console.log('result--------', result)
             // localStorage.setItem('access_token', data.access_token);
             // instance.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`;
             // return instance(error.config);
