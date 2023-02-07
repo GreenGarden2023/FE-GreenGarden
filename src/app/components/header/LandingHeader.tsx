@@ -1,9 +1,10 @@
 import React from 'react';
 import './style.scss';
-import { AiOutlineShoppingCart } from 'react-icons/ai';
+import { AiOutlineShoppingCart, AiOutlineUserAdd } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 import { Badge } from 'antd';
-import { FaUserCircle } from 'react-icons/fa';
+// import { FaUserCircle } from 'react-icons/fa';
+import { GiExitDoor } from 'react-icons/gi'
 
 const LandingHeader: React.FC = () =>{
 
@@ -24,18 +25,18 @@ const LandingHeader: React.FC = () =>{
                         </Link>
                     </div>
                     <div className="register-login-infor-box">
-                        {/* <Link to='/register' >
+                        <Link to='/register' >
                             <AiOutlineUserAdd size={20} />
                             <span>Regsiter</span>
                         </Link>
                         <Link to='/login' >
                             <GiExitDoor size={20} />
                             <span>Login</span>
-                        </Link> */}
-                        <div className='user-infor-box'>
+                        </Link>
+                        {/* <div className='user-infor-box'>
                             <FaUserCircle size={20} />
                             <span>Admin</span>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>
