@@ -26,6 +26,7 @@ const defaultValues: UserRegister = {
   confirmPassword: '',
   isAgreeTerm: false,
 }
+/* eslint-disable no-useless-escape */
 const schema = yup.object().shape({
   userName: yup.string().required('username is required').min(5, 'username is greater than 5 characters').max(30, 'username is less than 30 characters'),
   password: yup.string().required('password is required').min(6, 'password is greater than 6 characters').max(30, 'password is less than 30 characters'),
@@ -45,7 +46,7 @@ const Register: React.FC = () => {
   const [viewPassword, setViewPassword] = useState(false);
   const [viewConPassword, setViewConPassword] = useState(false);
 
-  const { handleSubmit, formState: { errors, isSubmitting }, control, setError, } = useForm<UserRegister>({
+  const { handleSubmit, formState: { errors, isSubmitting }, control, } = useForm<UserRegister>({
     defaultValues,
     resolver: yupResolver(schema)
   })
