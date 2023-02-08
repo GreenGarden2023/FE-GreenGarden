@@ -2,7 +2,7 @@ import axios, { AxiosHeaders, AxiosResponse } from "axios";
 import CONSTANT from "./constant";
 
 const golbalAxios = axios.create({
-    baseURL: process.env.API_ENDPOINT,
+    baseURL: process.env.REACT_APP_API_END_POINT,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -10,7 +10,7 @@ const golbalAxios = axios.create({
 })
 
 golbalAxios.interceptors.request.use((config) =>{
-    const token = getToken(CONSTANT.STORAGE.ACCESS_TOKEN);
+    const token = localStorage.getItem(CONSTANT.STORAGE.ACCESS_TOKEN);
     if(token){
         (config.headers as AxiosHeaders).set('Authorization', `Bearer ${token}`)
     }
@@ -37,7 +37,5 @@ golbalAxios.interceptors.response.use((res: AxiosResponse) =>{
     }
     return Promise.reject(error)
 })
-
-const getToken = (tokenType: string) => localStorage.getItem(tokenType)
 
 export default golbalAxios;

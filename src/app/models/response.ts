@@ -1,6 +1,7 @@
 export interface Response<T>{
     code: number;
-    result: T;
+    data: T;
     message: string;
     responseFail: string;
+    isSuccess: boolean;
 }

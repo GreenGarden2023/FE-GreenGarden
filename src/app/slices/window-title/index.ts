@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction, CaseReducer } from '@reduxjs/toolkit';
 
-const initialState: string = '';
-
 type CR<T> = CaseReducer<string, PayloadAction<T>>;
+
+const initialState: string = '';
 
 const setTitleCR: CR<string> = (_, action) => (action.payload);
 

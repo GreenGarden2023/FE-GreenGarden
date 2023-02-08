@@ -14,7 +14,6 @@ const LandingPage: React.FC = () =>{
     useEffect(() =>{
         dispatch(setTitle(CONSTANT.APP_NAME))
     }, [dispatch])
-
     
     return (
         <div>

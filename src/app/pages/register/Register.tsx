@@ -14,6 +14,8 @@ import { AiFillCaretDown } from 'react-icons/ai';
 import CONSTANT from '../../utils/constant';
 import useDispatch from '../../hooks/use-dispatch';
 import { setTitle } from '../../slices/window-title';
+import authService from '../../services/auth.service';
+import { setNoti } from '../../slices/notification';
 
 const defaultValues: UserRegister = {
   userName: '',
@@ -46,7 +48,7 @@ const Register: React.FC = () => {
   const [viewPassword, setViewPassword] = useState(false);
   const [viewConPassword, setViewConPassword] = useState(false);
 
-  const { handleSubmit, formState: { errors, isSubmitting }, control, } = useForm<UserRegister>({
+  const { handleSubmit, formState: { errors, isSubmitting }, control, setError } = useForm<UserRegister>({
     defaultValues,
     resolver: yupResolver(schema)
   })
@@ -69,19 +71,19 @@ const Register: React.FC = () => {
   
   const handleSubmitForm = async (data: UserRegister) =>{
     try{
-      console.log(isSubmitting)
+      const res = await authService.register(data)
+      if(res.isSuccess){
+        dispatch(setNoti({type: 'success', message: 'Create account successfully'}))
+        navigate('/login')
+        return;
+      }
+      setError('userName', {
+        type: 'pattern',
+        message: 'Account existed'
+      })
     }catch(err){
-      
+      dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
     }
-    // setError('mail', {
-    //   message: 'sai òi',
-    //   type: 'pattern'
-    // })
-    // try{
-
-    // }catch(err){
-
-    // }
   }
 
   return (

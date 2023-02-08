@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import ErrorMessage from '../../components/message.tsx/ErrorMessage';
 import useDispatch from '../../hooks/use-dispatch';
+import authService from '../../services/auth.service';
+import { setUser } from '../../slices/user-infor';
 import { setTitle } from '../../slices/window-title';
 import CONSTANT from '../../utils/constant';
 import './style.scss';
@@ -24,8 +26,17 @@ const Login: React.FC = () => {
     setSubmitting(true)
 
     try{
-    }catch(err){
+      const { username, password } = values
+      const res = await authService.login(username, password)
+      if(res.isSuccess){
+        dispatch(setUser(res.data))
+        localStorage.setItem(CONSTANT.STORAGE.ACCESS_TOKEN, res.data.token)
+        navigate('/')
+        return;
+      }
       setErrorLogin('Username or Password are not correct')
+    }catch(err){
+      
     }
     setSubmitting(false)
   }

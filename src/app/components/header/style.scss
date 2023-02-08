@@ -42,7 +42,7 @@
                         color: $color-link;
                     }
                 }
-                .user-infor-box{
+                .user-infor-box, .log-out{
                     display: flex;
                     align-items: center;
                     gap: 5px;
@@ -53,6 +53,15 @@
                     }
                 }
             }
+        }
+    }
+}
+.form-infor-header{
+    .btn-box{
+        display: flex;
+        justify-content: flex-end;
+        .btn-cancel{
+            margin-right: 10px;
         }
     }
 }
