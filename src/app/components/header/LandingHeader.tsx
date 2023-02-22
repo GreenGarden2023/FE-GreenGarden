@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import './style.scss';
-import { AiFillCaretDown, AiOutlineShoppingCart, AiOutlineUserAdd } from 'react-icons/ai';
-import { Link } from 'react-router-dom';
-import { Badge, Button, Col, Form, Input, Modal, Row, Select } from 'antd';
-import { GiExitDoor } from 'react-icons/gi'
-import useSelector from '../../hooks/use-selector';
-import { FaUserCircle } from 'react-icons/fa';
-import CONSTANT from '../../utils/constant';
-import useDispatch from '../../hooks/use-dispatch';
-import { setEmptyUser } from '../../slices/user-infor';
-import { useForm, Controller } from 'react-hook-form';
-import { UserUpdate } from '../../models/user';
-import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup';
-import ErrorMessage from '../message.tsx/ErrorMessage';
+import { Badge, Button, Col, Form, Input, Modal, Row, Select } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { AiFillCaretDown, AiOutlineShoppingCart, AiOutlineUserAdd } from 'react-icons/ai';
+import { FaUserCircle } from 'react-icons/fa';
+import { GiExitDoor } from 'react-icons/gi';
+import { Link, useLocation } from 'react-router-dom';
+import * as yup from 'yup';
+import useDispatch from '../../hooks/use-dispatch';
+import useSelector from '../../hooks/use-selector';
+import { UserUpdate } from '../../models/user';
 import { setNoti } from '../../slices/notification';
+import { setEmptyUser } from '../../slices/user-infor';
+import CONSTANT from '../../utils/constant';
+import ErrorMessage from '../message.tsx/ErrorMessage';
+import './style.scss';
 
 /* eslint-disable no-useless-escape */
 const schema = yup.object().shape({
@@ -27,6 +27,9 @@ const schema = yup.object().shape({
 
 const LandingHeader: React.FC = () =>{
     const dispatch = useDispatch();
+    const location = useLocation()
+
+    
     const [openModalUserInfor, setOpenModalInfor] = useState(false);
     
     const userState = useSelector(state => state.userInfor);
@@ -42,7 +45,6 @@ const LandingHeader: React.FC = () =>{
         }
 
         const { id, fullName, address, phone, mail, favorite } = userState
-        console.log(favorite)
         setValue('id', id);
         setValue('fullName', fullName);
         setValue('address', address);
@@ -87,34 +89,39 @@ const LandingHeader: React.FC = () =>{
                             </Link>
                         </div>
                         <div className="register-login-infor-box">
-                            {
-                                userState.token ? 
-                                <>
-                                    <div className='user-infor-box' onClick={handleViewInfor}>
-                                        <FaUserCircle size={20} />
-                                        <span>{userState.fullName}</span>
-                                    </div>
-                                    <div className="log-out" onClick={handleLogout}>
-                                        <GiExitDoor size={20} />
-                                        <span>Logout</span>
-                                    </div>
-                                </> :
-                                <>
-                                <Link to='/register' >
-                                    <AiOutlineUserAdd size={20} />
-                                    <span>Regsiter</span>
-                                </Link>
-                                <Link to='/login' >
-                                    <GiExitDoor size={20} />
-                                    <span>Login</span>
-                                </Link>
-                                </>
-                            }
+                          {
+                            !userState.loading && 
+                            <>
+                              {
+                                  userState.token ? 
+                                  <>
+                                      <div className='user-infor-box' onClick={handleViewInfor}>
+                                          <FaUserCircle size={20} />
+                                          <span>{userState.fullName}</span>
+                                      </div>
+                                      <div className="log-out" onClick={handleLogout}>
+                                          <GiExitDoor size={20} />
+                                          <span>Logout</span>
+                                      </div>
+                                  </> :
+                                  <>
+                                  <Link to='/register' >
+                                      <AiOutlineUserAdd size={20} />
+                                      <span>Regsiter</span>
+                                  </Link>
+                                  <Link to='/login' state={{history: location.pathname}} >
+                                      <GiExitDoor size={20} />
+                                      <span>Login</span>
+                                  </Link>
+                                  </>
+                              }
+                            </>
+                          }
                         </div>
                     </div>
                 </div>
             </header>
-            <Modal title='User information' open={openModalUserInfor} footer={null} onCancel={() => setOpenModalInfor(false)}>
+            <Modal width={800} title='User information' open={openModalUserInfor} footer={null} onCancel={() => setOpenModalInfor(false)}>
                 <Form
                     layout='vertical'
                     onFinish={handleSubmit(handleSubmitForm)}

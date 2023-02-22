@@ -1,8 +1,9 @@
-@import '../../styles/variable.scss';
+@import 'app/styles/variable.scss';
 
 .main-content{
     margin-top: 100px;
     .banner-content{
+        // background-image: url('/ass');
         background-image: url('../../../../public/assets/banner-1.jpg');
         background-position: center center;
         background-repeat: no-repeat;

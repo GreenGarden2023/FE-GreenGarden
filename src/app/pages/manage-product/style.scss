@@ -1,0 +1,42 @@
+@import '../../styles/variable.scss';
+
+.mp-wrapper{
+    .mp-infor{
+        h1{
+            font-size: 30px;
+            color: $default-green;
+        }
+    }
+    .mp-search-wrapper{
+        // margin-top: 10px;
+        .mp-btn-wrapper{
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+            .btn-create{
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                font-weight: 500;
+                color: #fff;
+                background-color: #5cb9d8;
+                border: none;
+                border-radius: 5px;
+                height: 40px;
+                padding: 0 16px;
+                cursor: pointer;
+            }
+        }
+    }
+    // .mp-content-wrapper{
+    //     // margin-top: 10px;
+    // }
+}
+.mp-option{
+    img{
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        margin-right: 5px;
+    }
+}

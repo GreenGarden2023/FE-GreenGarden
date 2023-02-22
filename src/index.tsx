@@ -5,17 +5,17 @@ import store from './app/store';
 import reportWebVitals from './reportWebVitals';
 import App from './app';
 import 'antd/dist/reset.css';
-import './app/styles/global.scss';
+import 'app/styles/global.scss';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
 
 root.render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <Provider store={store}>
       <App />
     </Provider>
-  </React.StrictMode>
+  // </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

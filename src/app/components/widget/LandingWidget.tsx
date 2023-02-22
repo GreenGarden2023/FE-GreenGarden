@@ -5,9 +5,10 @@ import './style.scss';
 
 interface LandingWidgetProps{
     index: number;
+    url: string;
 }
 
-const LandingWidget: React.FC<LandingWidgetProps> = ({ index }) => {
+const LandingWidget: React.FC<LandingWidgetProps> = ({ index, url }) => {
   return (
     <section className='widget-wrapper'>
         <div className="widget-box container-wrapper">
@@ -15,7 +16,7 @@ const LandingWidget: React.FC<LandingWidgetProps> = ({ index }) => {
                 <div className="content">
                     <h1>Dịch vụ cho thuê cây</h1>
                     <div className="divider"></div>
-                    <Link to='/'>
+                    <Link to={url}>
                         <span>Xem Thêm</span>
                         <MdNavigateNext size={20} />
                     </Link>

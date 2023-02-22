@@ -14,6 +14,9 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+h1, h2, h3, h4, h5, p{
+    margin: 0;
+}
 h2{
     line-height: 1.66;
     margin: 0;
@@ -21,9 +24,6 @@ h2{
     font-weight: 700;
     color: #222;
     font-size: 36px;
-}
-p{
-    margin: 0;
 }
 // button{
 //     outline: none;
@@ -33,13 +33,11 @@ p{
 //     color: #000;
 //     cursor: pointer;
 // }
-span{
-    // line-height: 22px;
-}
 
 // global class css
 .container-wrapper{
     max-width: $max-width-container;
+    margin: auto;
 }
 .pointer{
     cursor: pointer;
@@ -48,4 +46,53 @@ span{
 // overide antd
 :where(.css-dev-only-do-not-override-ixblex).ant-form-item{
     margin-bottom: 15px;
+}
+.ant-notification-notice-message{
+    margin-bottom: 0!important;
+}
+
+// btn in table
+.btn-actions-wrapper{
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    .btn-icon{
+        font-size: 25px;
+        cursor: pointer;
+        color: $default-green;
+    }
+}
+// btn in form
+.btn-form-wrapper{
+    display: flex;
+    justify-content: flex-end;
+    .btn-cancel{
+        margin-right: 10px;
+    }
+}
+// upload img in form
+.form-upload-box{
+    border: 1px dashed #8a7676;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    cursor: pointer;
+}
+// layout for client
+.main-content-not-home{
+    margin-top: 135px;
+}
+// element layout default
+.default-layout{
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    &:first-child{
+        margin-top: 0;
+    }
+    &:last-child{
+        margin-bottom: 10px;
+    }
 }

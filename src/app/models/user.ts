@@ -10,6 +10,8 @@ export interface User{
 }
 export interface UserLogin extends User{
     token: string;
+    role: string;
+    loading: boolean;
 }
 export interface UserUpdate{
     id: string;

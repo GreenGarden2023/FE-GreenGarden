@@ -1,6 +1,7 @@
 import { Button, Form, Input } from 'antd';
-import React, { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom';
+import { setNoti } from 'app/slices/notification';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import ErrorMessage from '../../components/message.tsx/ErrorMessage';
 import useDispatch from '../../hooks/use-dispatch';
 import authService from '../../services/auth.service';
@@ -12,6 +13,7 @@ import './style.scss';
 const Login: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   
   const [errorLogin, setErrorLogin] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -29,19 +31,34 @@ const Login: React.FC = () => {
       const { username, password } = values
       const res = await authService.login(username, password)
       if(res.isSuccess){
-        dispatch(setUser(res.data))
+        const roleName = authService.decodeToken(res.data.token).rolename
+        dispatch(setUser({...res.data, role: roleName}))
         localStorage.setItem(CONSTANT.STORAGE.ACCESS_TOKEN, res.data.token)
+        if(location.state && location.state['history']) return navigate(location.state['history'])
         navigate('/')
-        return;
       }
       setErrorLogin('Username or Password are not correct')
     }catch(err){
-      
+      dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
     }
     setSubmitting(false)
   }
+
+  const isLogged = useMemo(() =>{
+    const accessToken = localStorage.getItem(CONSTANT.STORAGE.ACCESS_TOKEN)
+    if(!accessToken) return false
+
+    const jwtDecode = authService.decodeToken(accessToken)
+    const dateNow = new Date();
+    if(!jwtDecode.rolename || !jwtDecode.username || jwtDecode.exp * 1000 < dateNow.getTime()) return false
+
+    return true
+  }, [])
+
   return (
     <div>
+      {
+        isLogged ? <Navigate to='/' /> :
         <div className='sign-in-wrapper'>
             <h2>Sign up</h2>
             <div className="sign-up-box">
@@ -88,6 +105,7 @@ const Login: React.FC = () => {
                 </div>
             </div> */}
         </div>
+      }
     </div>
   )
 }

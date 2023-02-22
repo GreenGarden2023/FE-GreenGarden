@@ -1,12 +1,34 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 // import useSelector from '../hooks/use-selector';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
+import authService from '../services/auth.service';
+import CONSTANT, { Role } from '../utils/constant';
 
-const AuthGuard: React.FC = () =>{
-    // const state = useSelector(state => state.notification);
-    const isLogged = true;
+
+
+interface AuthGuardProps{
+    rolesAuth: Role[];
+    children: any;
+}
+
+const AuthGuard: React.FC<AuthGuardProps> = ({rolesAuth, children}) =>{
+    const isLogged = useMemo(() =>{
+        const accessToken = localStorage.getItem(CONSTANT.STORAGE.ACCESS_TOKEN)
+        if(!accessToken) return false
+    
+        const jwtDecode = authService.decodeToken(accessToken)
+        const dateNow = new Date();
+        if(!rolesAuth.includes(jwtDecode.rolename as Role) || jwtDecode.exp * 1000 < dateNow.getTime()) return false
+
+        return true
+    }, [rolesAuth])
+
     return (
-        isLogged ? <Outlet /> : <Navigate to="/" />
+        isLogged ? 
+        <>
+        {children}
+        </>
+          : <Navigate to="/file-not-found" />
     );
 }
 

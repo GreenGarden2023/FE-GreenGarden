@@ -18,9 +18,13 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "baseUrl": "./src",
+    "paths": {
+      // "@/hooks/*": ["src/app/hooks/*"],
+      // "@/services-category": ["src/app/services/category.service.ts"]
+      // "styles/variable": ["app/styles/variable.scss"]
+    }
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }

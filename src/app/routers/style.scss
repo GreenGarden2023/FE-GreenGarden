@@ -1,0 +1,47 @@
+@import '../styles/variable.scss';
+
+.admin-layout{
+    .admin-header{
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        width: 100%;
+        padding: 0;
+        background-color: #fff;
+        box-shadow: 0 20px 25px -5px #0000001a, 0 8px 10px -6px #0000001a;
+        .left{
+            width: 200px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            .box-collapsed{
+                border: 2px solid $default-green;
+                color: $default-green;
+                height: 30px;
+                width: 40px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+        }
+    }
+    .admin-layout-inside{
+        .admin-sider{
+            background-color: #fff;
+            .admin-menu{
+                background-color: #fff;
+                .ant-menu-item-selected{
+                    background-color: $default-green;
+                    color: #fff;
+                }
+                .ant-menu-item-active:hover{
+                    background-color: $default-green;
+                    color: #fff;
+                }
+            }
+        }
+    }
+}

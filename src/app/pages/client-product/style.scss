@@ -1,0 +1,80 @@
+@import 'app/styles/variable.scss';
+
+.cp-wrapper{
+    .cp-bread{
+        margin-bottom: 10px;
+    }
+    .cp-product-infor{
+        background-color: #fff;
+        border-radius: 5px;
+        padding: 10px;
+        text-align: center;
+        h1{
+            font-size: 48px;
+            color: #000;
+        }
+        .cp-tree-type{
+            margin-top: 5px;
+            span{
+                font-size: 23px;
+                font-weight: 500;
+                padding: 0 33px;
+                color: #82939b;
+                cursor: pointer;
+                &.active{
+                    color: $default-green;
+                    font-weight: 700;
+                }
+            }
+            .cp-for-sale{
+                position: relative;
+                &::before{
+                    content: '';
+                    position: absolute;
+                    top: 10px;
+                    left: 0;
+                    width: 1px;
+                    height: 16px;
+                    background-color: #82939b;
+                }
+            }
+        }
+    }
+    .cp-box{
+        background-color: #fff;
+        border-radius: 5px;
+        padding: 10px;
+        margin-top: 10px;
+        .cp-item{
+            padding: 10px;
+            border: 1px solid $default-green;
+            border-radius: 5px;
+            display: flex;
+            gap: 20px;
+            color: #000;
+            .left{
+                width: 40%;
+                img{
+                    width: 220px;
+                    height: 220px;
+                    object-fit: cover;
+                }
+            }
+            .right{
+                .name{
+                    font-size: 24px;
+                    margin-bottom: 16px;
+                }
+                .description{
+                    margin-bottom: 10px;
+                }
+                flex: 1;
+            }
+        }
+        .cp-pagination{
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+    }
+}
