@@ -1,20 +1,20 @@
 import { Col, Row } from 'antd';
-import useDispatch from 'app/hooks/use-dispatch';
-import React, { useEffect, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom';
+// import useDispatch from 'app/hooks/use-dispatch';
+import React from 'react'
+// import { useNavigate, useSearchParams } from 'react-router-dom';
 import CurrencyFormat from 'react-currency-format';
 import './style.scss';
-import { Product } from 'app/models/product';
-import { setNoti } from 'app/slices/notification';
-import CONSTANT from 'app/utils/constant';
-import productServcie from 'app/services/product.service';
+// import { Product } from 'app/models/product';
+// import { setNoti } from 'app/slices/notification';
+// import CONSTANT from 'app/utils/constant';
+// import productServcie from 'app/services/product.service';
 
 const ManageProductItem: React.FC = () => {
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
+    // const dispatch = useDispatch();
+    // const navigate = useNavigate();
+    // const [searchParams] = useSearchParams();
 
-    const [products, setProducts] = useState<Product[]>([])
+    // const [products, setProducts] = useState<Product[]>([])
 
     // useEffect(() =>{
     //     const init = async () =>{
