@@ -3,6 +3,7 @@ import LandingFooter from 'app/components/footer/LandingFooter';
 import LandingHeader from 'app/components/header/LandingHeader';
 import useDispatch from 'app/hooks/use-dispatch';
 import { Category } from 'app/models/category';
+import { TypeOfSale } from 'app/models/general-type';
 import { Paging } from 'app/models/paging';
 import { Product } from 'app/models/product';
 import productServcie from 'app/services/product.service';
@@ -22,7 +23,7 @@ const ClientProduct: React.FC = () => {
     const [products, setProducts] = useState<Product[]>([])
     const [paging, setPaging] = useState<Paging>();
     const [category, setCategory] = useState<Category>();
-    const [isRent, setIsRent] = useState(true)
+    const [isRent, setIsRent] = useState<TypeOfSale>('rent')
 
     useEffect(() =>{
       const currentPage = searchParams.get('page');
@@ -33,7 +34,7 @@ const ClientProduct: React.FC = () => {
 
       const init = async () =>{
         try{
-          const res = await productServcie.getAllProduct({curPage: Number(currentPage), pageSize: CONSTANT.PAGING_ITEMS.CLIENT_PRODUCT}, categoryId, 'Active')
+          const res = await productServcie.getAllProduct({curPage: Number(currentPage), pageSize: CONSTANT.PAGING_ITEMS.CLIENT_PRODUCT}, categoryId, 'active', isRent)
           setProducts(res.data.result)
           setPaging(res.data.paging)
           setCategory(res.data.category)
@@ -42,7 +43,7 @@ const ClientProduct: React.FC = () => {
         }
       }
       init();
-    }, [searchParams, navigate, categoryId, dispatch])
+    }, [searchParams, navigate, categoryId, dispatch, isRent])
     
     return (
       <div>
@@ -65,8 +66,8 @@ const ClientProduct: React.FC = () => {
             <section className="cp-product-infor">
               <h1>Reference list</h1>
               <div className="cp-tree-type">
-                <span className={`cp-for-rent ${isRent ? 'active' : ''}`} onClick={() => setIsRent(true)}>For Rent</span>
-                <span className={`cp-for-sale ${!isRent ? 'active' : ''}`} onClick={() => setIsRent(false)}>For Sale</span>
+                <span className={`cp-for-rent ${isRent === 'rent' ? 'active' : ''}`} onClick={() => setIsRent('rent')}>For Rent</span>
+                <span className={`cp-for-sale ${isRent === 'sale' ? 'active' : ''}`} onClick={() => setIsRent('sale')}>For Sale</span>
               </div>
             </section>
             <section className="cp-box">
@@ -85,8 +86,12 @@ const ClientProduct: React.FC = () => {
                               {product.description}
                             </p>
                             <div className="tags-box">
-                              <Tag color='#87d068' >For Rent</Tag>
-                              <Tag color='#108ee9' >For Sale</Tag>
+                              {
+                                product.isForRent && <Tag color='#87d068' >For Rent</Tag>
+                              }
+                              {
+                                product.isForSale && <Tag color='#108ee9' >For Sale</Tag>
+                              }
                             </div>
                           </div>
                         </Link>

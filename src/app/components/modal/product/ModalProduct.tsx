@@ -1,4 +1,4 @@
-import { Button, Form, Input, Modal, Upload, UploadProps } from 'antd';
+import { Button, Col, Form, Input, Modal, Row, Switch, Upload, UploadProps } from 'antd';
 import { RcFile, UploadChangeParam, UploadFile } from 'antd/es/upload';
 import ErrorMessage from 'app/components/message.tsx/ErrorMessage';
 import { Action } from 'app/models/general-type';
@@ -49,12 +49,15 @@ const ModalProduct: React.FC<ModalProductProps> = ({ categoryId, product, action
         setValue('categoryId', categoryId)
 
         if(!product) return;
-        const { id, name, description, imgUrl, status } = product
+        const { id, name, description, imgUrl, status, isForRent, isForSale } = product
         setValue('id', id)
         setValue('name', name)
         setValue('description', description)
         setValue('imgUrl', imgUrl)
         setValue('status', status)
+        setValue('isForRent', isForRent)
+        setValue('isForSale', isForSale)
+
     }, [product, setValue, categoryId])
 
     const handleCloseModal = () =>{
@@ -76,13 +79,15 @@ const ModalProduct: React.FC<ModalProductProps> = ({ categoryId, product, action
         }else if(action === 'Update'){
             try{
                 await productServcie.updateProduct(data)
+                const { id, name, description, imgUrl, status, isForRent, isForSale } = data
                 const p: Product = {
-                    id: data.id || '',
-                    name: data.name,
+                    id: id || '',
+                    name: name,
                     categoryId,
-                    description: data.description,
-                    imgUrl: data.imgUrl || '',
-                    status: product?.status || 'Active'
+                    description: description,
+                    imgUrl: imgUrl || '',
+                    status: status || 'Active',
+                    isForRent, isForSale
                 }
                 onSubmit(p, action)
                 reset()
@@ -130,6 +135,26 @@ const ModalProduct: React.FC<ModalProductProps> = ({ categoryId, product, action
                     />
                     {errors.description && <ErrorMessage message={errors.description.message} />}
                 </Form.Item>
+                <Row gutter={24}>
+                    <Col span={12}>
+                        <Form.Item label='For sale'>
+                            <Controller
+                                control={control}
+                                name='isForSale'
+                                render={({ field: { value, onChange} }) => <Switch checked={value} onChange={onChange} />}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item label='For rent'>
+                            <Controller
+                                control={control}
+                                name='isForRent'
+                                render={({ field: { value, onChange} }) => <Switch checked={value} onChange={onChange} />}
+                            />
+                        </Form.Item>
+                    </Col>
+                </Row>
                 <Form.Item label='Thumbnail' required>
                     <Controller
                         control={control}

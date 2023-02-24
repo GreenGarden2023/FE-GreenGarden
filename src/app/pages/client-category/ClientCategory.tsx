@@ -26,7 +26,7 @@ const ClientCategory: React.FC = () => {
 
         const init = async () =>{
             try{
-                const res = await categoryService.getAllCategoryByStatus({curPage: Number(currentPage), pageSize: CONSTANT.PAGING_ITEMS.CLIENT_CATEGORY}, 'Active')
+                const res = await categoryService.getAllCategoryByStatus({curPage: Number(currentPage), pageSize: CONSTANT.PAGING_ITEMS.CLIENT_CATEGORY}, 'active')
                 setCategories(res.data.result)
                 setPaging(res.data.paging)
             }catch(err){

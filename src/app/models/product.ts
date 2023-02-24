@@ -9,6 +9,8 @@ export interface Product{
     imgUrl: string;
     quantity?: number;
     status: Status;
+    isForRent: boolean;
+    isForSale: boolean;
 }
 
 export interface ProductHandle{
@@ -19,4 +21,6 @@ export interface ProductHandle{
     imgFile?: RcFile | undefined;
     categoryId: string;
     status: Status;
+    isForRent: boolean;
+    isForSale: boolean;
 }

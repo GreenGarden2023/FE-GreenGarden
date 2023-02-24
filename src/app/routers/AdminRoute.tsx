@@ -9,7 +9,8 @@ import { setCollapsedHeader } from '../slices/admin-layout';
 import { Link, useLocation } from 'react-router-dom';
 import { BiCategoryAlt } from 'react-icons/bi';
 import { MdOutlineInventory2 } from 'react-icons/md'
-import CONSTANT, { Role } from 'app/utils/constant';
+import CONSTANT from 'app/utils/constant';
+import { Role } from 'app/models/general-type';
 
 const { Header, Content, Footer, Sider } = Layout;
 

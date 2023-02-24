@@ -1,5 +1,5 @@
 import { Category } from "app/models/category";
-import { Status } from "app/models/general-type";
+import { Status, TypeOfSale } from "app/models/general-type";
 import { Paging } from "app/models/paging";
 import { Product, ProductHandle } from "app/models/product";
 import { Response } from "app/models/response";
@@ -12,23 +12,26 @@ interface GetData{
     result: Product[]
 }
 
-const getAllProduct = async (pagingProps: Partial<Paging>, categoryId: string, status?: Status): Promise<Response<GetData>> =>{
+const getAllProduct = async (pagingProps: Partial<Paging>, categoryId: string, status?: Status, typeOfSale?: TypeOfSale): Promise<Response<GetData>> =>{
     const params = {
         ...pagingProps,
         categoryId,
-        status: status ? status.toLowerCase() : undefined
+        status: status ? status.toLowerCase() : undefined,
+        rentSale: typeOfSale
     }
     const result = await golbalAxios.get<Response<GetData>>(`/product/get-products-by-category-status?${queryString.stringify(params)}`);
     return result.data
 }
 
 const createProduct = async (product: ProductHandle): Promise<Response<Product>> =>{
-    const { categoryId, name, description, imgFile } = product
+    const { categoryId, name, description, imgFile, isForRent, isForSale } = product
     const productCreate = {
         Name: name,
         Description: description,
         CategoryId: categoryId,
-        ImgFile: imgFile
+        ImgFile: imgFile,
+        IsForRent: isForRent,
+        IsForSale: isForSale,
     }
     const result = await golbalAxios.post<Response<Product>>(`/product/create-product`, productCreate, {
         headers: {
@@ -38,14 +41,16 @@ const createProduct = async (product: ProductHandle): Promise<Response<Product>>
     return result.data
 }
 const updateProduct = async (product: ProductHandle) =>{
-    const { categoryId, name, description, imgFile, id, status } = product
+    const { categoryId, name, description, imgFile, id, status, isForRent, isForSale } = product
     const productUpdate = {
         ID: id,
         Name: name,
         Description: description,
         CategoryId: categoryId,
         Image: imgFile,
-        Status: status
+        Status: status,
+        IsForRent: isForRent,
+        IsForSale: isForSale,
     }
     const result = await golbalAxios.post(`/product/update-product`, productUpdate, {
         headers: {
@@ -59,7 +64,9 @@ const toggleProduct = async (product: Product, status: Status) =>{
         ID: product.id,
         Name: product.name,
         Status: status,
-        CategoryId: product.categoryId
+        CategoryId: product.categoryId,
+        IsForSale: product.isForSale,
+        IsForRent: product.isForRent
     }
     const result = await golbalAxios.post(`/product/update-product`, productToggle, {
         headers: {

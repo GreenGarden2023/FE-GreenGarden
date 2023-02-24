@@ -1,3 +1,5 @@
+import { Role } from "app/models/general-type"
+
 const APP_NAME = 'Green Garden'
 const STORAGE = {
     ACCESS_TOKEN: 'access-token',
@@ -20,6 +22,7 @@ const PAGING_ITEMS = {
     CLIENT_CATEGORY: 20,
     PRODUCT: 5,
     CLIENT_PRODUCT: 20,
+    PRODUCT_ITEM: 20
 }
 const STATUS = {
     ACTIVE: 'Active',
@@ -37,7 +40,7 @@ const SIZES = {
 }
 const SUPPORT_FORMATS = ['image/png', 'image/jpg', 'image/jpeg']
 
-export type Role = 'Customer' | 'Admin' | 'Staff'
+
 
 const MANAGE_CATEGORY: Role[] = ['Admin', 'Staff']
 const MANAGE_PRODUCT: Role[] = ['Admin', 'Staff']

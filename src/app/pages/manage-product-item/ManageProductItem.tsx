@@ -1,65 +1,105 @@
-import { Col, Row } from 'antd';
-// import useDispatch from 'app/hooks/use-dispatch';
-import React from 'react'
-// import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Col, Row, Tag } from 'antd';
+import useDispatch from 'app/hooks/use-dispatch';
+import React, { useEffect, useState } from 'react'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import CurrencyFormat from 'react-currency-format';
 import './style.scss';
-// import { Product } from 'app/models/product';
-// import { setNoti } from 'app/slices/notification';
-// import CONSTANT from 'app/utils/constant';
+import { setNoti } from 'app/slices/notification';
+import CONSTANT from 'app/utils/constant';
 // import productServcie from 'app/services/product.service';
+import { ProductItem } from 'app/models/product-item';
+import productItemService from 'app/services/product-item.service';
+import pagingPath from 'app/utils/paging-path';
+import { Paging } from 'app/models/paging';
+import { IoCreateOutline } from 'react-icons/io5';
+import ModalProductItem from 'app/components/modal/product-item/ModalProductItem';
+import { Action } from 'app/models/general-type';
 
 const ManageProductItem: React.FC = () => {
-    // const dispatch = useDispatch();
-    // const navigate = useNavigate();
-    // const [searchParams] = useSearchParams();
+    const { productId } = useParams()
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
-    // const [products, setProducts] = useState<Product[]>([])
+    const [productItems, setProductItems] = useState<ProductItem[]>([])
+    const [paging, setPaging] = useState<Paging>();
+    const [action, setAction] = useState<Action>('');
+    console.log(paging)
+    useEffect(() =>{
+        const currentPage = searchParams.get('page');
+        if(!productId){
+            return navigate('/panel/manage-product')
+        }
+        if(!pagingPath.isValidPaging(currentPage) || !productId){
+            navigate(`/panel/manage-product-item/${productId}?page=1`)
+            return;
+        }
 
-    // useEffect(() =>{
-    //     const init = async () =>{
-    //         try{
-    //             const res = await productServcie.getAllProduct()
-    //         }catch(err){
-    //             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
-    //         }
-    //     }
-    //     init();
-    // }, [dispatch])
+        const init = async () =>{
+            try{
+                const res = await productItemService.getAllProductItem({curPage: Number(currentPage), pageSize: CONSTANT.PAGING_ITEMS.PRODUCT_ITEM}, {productID: productId})
+                setProductItems(res.data.productItems)
+                setPaging(res.data.paging)
+            }catch(err){
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
+            }
+        }
+        init();
+    }, [dispatch, navigate, searchParams, productId])
+
+    const handleCreateProduct = () =>{
+        setAction('Create')
+    }
+
+    const handleCloseModal = () =>{
+        setAction('')
+    }
 
     return (
         <div className="mpi-wrapper">
-            <section className="mpi-product-infor">
+            <section className="mpi-product-infor default-layout">
                 <h1>Hoa giấy</h1>
             </section>
-            <section className="mpi-search-wrapper">
-
+            <section className="mpi-search-wrapper default-layout">
+                <div className="mpi-btn-wrapper">
+                    <button onClick={handleCreateProduct} className='btn-create'>
+                        <IoCreateOutline size={20} />
+                        Create a product item
+                    </button>
+                </div>
             </section>
-            <section className="mpi-box">
+            <section className="mpi-box default-layout">
                 <Row gutter={[12, 12]}>
                     {
-                        [...Array(8)].map((_, index) => (
+                        productItems.map((pt, index) => (
                             <Col xs={24} xl={6} key={index}>
                                 <div className="mpi-item">
-                                    <img src="/assets/inventory-empty.png" alt="/" />
+                                    <img src={pt.imgURLs[0]} alt="/" />
                                     <div className="mpi-item-infor">
-                                        <p className="name">Hoa giấy {index + 1}</p>
+                                        <p className="name">{pt.name}</p>
                                         <div className="size-quantiy-box">
                                             <div className='size'>
                                                 <span>Size:</span>
-                                                <span>Small</span>
+                                                <Tag color='#108ee9' title='Small' >Small</Tag>
                                             </div>
                                             <div className="quantity">
                                                 <span>Quantity:</span>
-                                                <span>300</span>
+                                                <Tag color='#108ee9' title='Small' >{pt.quantity}</Tag>
                                             </div>
                                         </div>
                                         <div className="price-box">
-                                            <span>Price:</span>
-                                            <span>
-                                                <CurrencyFormat value={500000} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
-                                                {/* {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(100000000)} */}
-                                            </span>
+                                            <div className="sale-price">
+                                                <span>Sale price:</span>
+                                                <span>
+                                                    <CurrencyFormat value={pt.salePrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
+                                                </span>
+                                            </div>
+                                            <div className="rent-price">
+                                                <span>Rent price:</span>
+                                                <span>
+                                                    <CurrencyFormat value={pt.rentPrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
+                                                </span>
+                                            </div>
                                         </div>
                                         <div className="btn-box">
                                             <button className='btn-detail'>Detail</button>
@@ -72,6 +112,12 @@ const ManageProductItem: React.FC = () => {
                     }
                 </Row>
             </section>
+            <ModalProductItem 
+                action={action}
+                open={action !== ''}
+                onClose={handleCloseModal}
+                productIdSelected={productId || ''}
+            />
         </div>
     )
 }

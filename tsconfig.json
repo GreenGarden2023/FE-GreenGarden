@@ -26,5 +26,5 @@
       // "styles/variable": ["app/styles/variable.scss"]
     }
   },
-  "include": ["src"]
+  "include": ["src"],
 }

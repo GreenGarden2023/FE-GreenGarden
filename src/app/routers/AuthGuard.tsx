@@ -1,8 +1,9 @@
+import { Role } from 'app/models/general-type';
 import React, { useMemo } from 'react';
 // import useSelector from '../hooks/use-selector';
 import { Navigate } from 'react-router-dom';
 import authService from '../services/auth.service';
-import CONSTANT, { Role } from '../utils/constant';
+import CONSTANT from '../utils/constant';
 
 
 

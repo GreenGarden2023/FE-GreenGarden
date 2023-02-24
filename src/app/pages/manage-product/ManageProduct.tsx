@@ -1,4 +1,4 @@
-import { Image, Select, Switch } from 'antd';
+import { Image, Select, Switch, Tag } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 import ModalProduct from 'app/components/modal/product/ModalProduct';
 import useDispatch from 'app/hooks/use-dispatch';
@@ -60,11 +60,14 @@ const ManageProduct: React.FC = () => {
   }, [searchParams, categories, navigate])
 
   useEffect(() =>{
-    if(!categoryIdSelected || categories.length === 0 || categories.findIndex(x => x.id === categoryIdSelected) < 0) return;
+    const currentPage = searchParams.get('page')
+    const currentCategory = searchParams.get('category')
+    
+    if(!currentPage || !currentCategory || categories.length === 0 || categories.findIndex(x => x.id === categoryIdSelected) < 0) return;
     const init = async () =>{
       setLoading(true)
       try{
-        const res = await productServcie.getAllProduct({curPage: Number(searchParams.get('page')), pageSize: CONSTANT.PAGING_ITEMS.PRODUCT}, categoryIdSelected)
+        const res = await productServcie.getAllProduct({curPage: Number(currentPage), pageSize: CONSTANT.PAGING_ITEMS.PRODUCT}, categoryIdSelected)
         setProducts(res.data.result)
         setPaging(res.data.paging)
         // setCategories(res.data.result)
@@ -82,6 +85,12 @@ const ManageProduct: React.FC = () => {
       title: 'Name',
       key: 'name',
       dataIndex: 'name',
+      align: 'center'
+    },
+    {
+      title: 'Description',
+      key: 'description',
+      dataIndex: 'description',
       align: 'center'
     },
     {
@@ -111,13 +120,29 @@ const ManageProduct: React.FC = () => {
       ),
     },
     {
+      title: 'Type',
+      key: 'type',
+      dataIndex: 'type',
+      align: 'center',
+      render: (_, record) => (
+        <>
+          {
+            record.isForSale && <Tag color='#108ee9' >For Sale</Tag>
+          }
+          {
+            record.isForRent && <Tag color='#87d068' >For Rent</Tag>
+          }
+        </>
+      )
+    },
+    {
       title: 'Actions',
       key: 'actions',
       dataIndex: 'actions',
       align: 'center',
       render: (_, record) => (
         <div className="btn-actions-wrapper">
-          <TbListDetails className='btn-icon' color='#00a76f' onClick={() => navigate(`/panel/manage-product-item/${record.id}`)} />
+          <TbListDetails className='btn-icon' color='#00a76f' onClick={() => navigate(`/panel/manage-product-item/${record.id}?page=1`)} />
           <AiFillEdit className='btn-icon' color='#00a76f' onClick={() => {
             setProductSelected(record)
             setAction('Update')
@@ -139,7 +164,7 @@ const ManageProduct: React.FC = () => {
   const handleToggleProduct = async (product: Product, checked: boolean) =>{
     setLoaderProId([...loaderProId, product.id])
     try{
-      const statusHandle: Status = checked ? 'Active' : 'Disable'
+      const statusHandle: Status = checked ? 'active' : 'disable'
       await productServcie.toggleProduct(product, statusHandle)
       setProducts(products.map(x => x.id === product.id ? {
         ...x,

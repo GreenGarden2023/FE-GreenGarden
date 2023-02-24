@@ -2,23 +2,19 @@
 
 .mpi-wrapper{
     .mpi-product-infor{
-        background-color: #fff;
-        padding: 10px;
-        border-radius: 5px;
-
         h1{
             font-size: 30px;
             color: $default-green;
         }
     }
     .mpi-search-wrapper{
-
+        .mpi-btn-wrapper{
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
     }
     .mpi-box{
-        background-color: #fff;
-        margin-top: 20px;
-        padding: 10px;
-        border-radius: 5px;
         .mpi-item{
             border: 1px solid $default-green;
             padding: 5px;
@@ -46,22 +42,25 @@
                                 margin-right: 5px;
                             }
                             &:last-child{
-                                font-weight: 700;
+                                // font-weight: 700;
                             }
                         }
                     }
                 }
                 .price-box{
                     margin-top: 5px;
-                    text-align: center;
-                    span{
-                        &:first-child{
-                            margin-right: 5px;
-                        }
-                        &:last-child{
-                            font-weight: 700;
-                            text-decoration: underline;
-                            color: $default-green;
+                    // text-align: center;
+                    .sale-price, .rent-price{
+                        margin-top: 5px;
+                        span{
+                            &:first-child{
+                                margin-right: 5px;
+                            }
+                            &:last-child{
+                                font-weight: 700;
+                                text-decoration: underline;
+                                color: $default-green;
+                            }
                         }
                     }
                 }
