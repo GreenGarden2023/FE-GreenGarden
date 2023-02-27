@@ -142,8 +142,8 @@ const ManageProduct: React.FC = () => {
       align: 'center',
       render: (_, record) => (
         <div className="btn-actions-wrapper">
-          <TbListDetails className='btn-icon' color='#00a76f' onClick={() => navigate(`/panel/manage-product-item/${record.id}?page=1`)} />
-          <AiFillEdit className='btn-icon' color='#00a76f' onClick={() => {
+          <TbListDetails className='btn-icon'onClick={() => navigate(`/panel/manage-product-item/${record.id}?page=1`)} />
+          <AiFillEdit className='btn-icon'  onClick={() => {
             setProductSelected(record)
             setAction('Update')
           }} />

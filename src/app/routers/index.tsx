@@ -1,7 +1,10 @@
 import { notification } from 'antd';
 import ClientCategory from 'app/pages/client-category/ClientCategory';
+import ClientProductItemDetail from 'app/pages/client-product-item-detail/ClientProductItemDetail';
+import ClientProductItem from 'app/pages/client-product-item/ClientProductItem';
 import ClientProduct from 'app/pages/client-product/ClientProduct';
 import ManageProductItem from 'app/pages/manage-product-item/ManageProductItem';
+import ManageSize from 'app/pages/manage-size/ManageSize';
 import React, { useEffect } from 'react';
 import { AiFillCheckCircle, AiFillWarning } from 'react-icons/ai';
 import { MdError } from 'react-icons/md';
@@ -103,11 +106,15 @@ const Routers: React.FC = () =>{
                 <Route path='/thankyou' element={<ThankYou />} />
                 <Route path='/category' element={<ClientCategory />} />
                 <Route path='/product/:categoryId' element={<ClientProduct />} />
+                <Route path='/product/:productId/product-item' element={<ClientProductItem />} />
+                <Route path='/product-item/:productItemId' element={<ClientProductItemDetail />} />
+
                 <Route path='/:slug' element={<AuthGuard rolesAuth={['Customer']} ><Product /></AuthGuard>} />
                 <Route path='panel' >
                     <Route path='manage-category' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_CATEGORY} ><AdminRoute><ManageCategory /></AdminRoute></AuthGuard>} />
                     <Route path='manage-product' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_PRODUCT} ><AdminRoute><ManageProduct /></AdminRoute></AuthGuard>} />
                     <Route path='manage-product-item/:productId' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_PRODUCT_ITEM} ><AdminRoute><ManageProductItem /></AdminRoute></AuthGuard>} />
+                    <Route path='manage-size' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_SIZE} ><AdminRoute><ManageSize /></AdminRoute></AuthGuard>} />
                 </Route>
                 <Route path='/file-not-found' element={<FileNotFound />} />
             </Routes>

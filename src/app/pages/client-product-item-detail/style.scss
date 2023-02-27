@@ -1,0 +1,185 @@
+@import 'app/styles/variable.scss';
+
+.cpid-wrapper{
+    .cpid-product-infor{
+        .left{
+            .img-main-view{
+                width: 100%;
+                height: 100%;
+                max-height: 653px;
+                object-fit: cover;
+            }
+            &.carousel-warpper{
+                .carousel:last-child{
+                    border: 1px solid #707070;
+                    border-radius: 5px;
+                    margin-top: 10px;
+                    .thumbs-wrapper{
+                        // margin: 20px 0;
+                        ul{
+                            text-align: center;
+                            padding: 0;
+                            margin: 0;
+                            background-color: #fff;
+                            li{
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .right{
+            .title{
+                margin-bottom: 50px;
+                h1{
+                    color: $default-green;
+                    font-weight: 700;
+                    font-size: 26px;
+                    line-height: normal;
+                }
+            }
+            .infor-detail{
+                margin-bottom: 50px;
+                ul{
+                    font-size: 14px;
+                    line-height: 22px;
+                    color: #707070;
+                }
+            }
+            .price-box{
+                display: flex;
+                flex-wrap: wrap;
+                gap: 20px;
+                .rent-price, .sale-price{
+                    position: relative;
+                    border: 1px solid $default-green;
+                    padding: 15px 10px;
+                    border-radius: 5px;
+                    width: calc(50% - 10px);
+                    .title-price{
+                        position: absolute;
+                        top: -10px;
+                        left: 20px;
+                        background-color: #fff;
+                        color: $default-green;
+                        padding: 0 10px;
+                    }
+                    .price{
+                        color: $default-green;
+                        font-size: 30px;
+                        line-height: 30px;
+                        font-weight: 500;
+                        margin-bottom: 10px;
+                    }
+                    .quantity{
+                        display: flex;
+                        // flex-wrap: wrap;
+                        align-items: center;
+                        margin-bottom: 10px;
+                        p{
+                            font-size: 14px;
+                            color: #707070;
+                            margin-right: 10px;
+                        }
+                        .quantity-box{
+                            display: flex;
+                            button{
+                                font-size: 16px;
+                                line-height: 0px;
+                                border: solid 1px #e1e1e1;
+                                display: inline-block;
+                                width: 26px;
+                                height: 26px;
+                                line-height: 23px;
+                                border-radius: 3px;
+                                background: #fff;
+                                color: #131425;
+                                text-align: center;
+                                padding: 0px;
+                            }
+                            input{
+                                margin: 0px 5px;
+                                padding: 0px;
+                                display: block;
+                                float: left;
+                                color: #131425;
+                                height: 26px;
+                                min-height: 26px;
+                                line-height: 26px;
+                                border: 1px solid #e1e1e1;
+                                width: 48px;
+                                text-align: center;
+                                box-shadow: none;
+                                border-radius: 3px;
+                                font-size: 14px;
+                                &:focus{
+                                    border-color: rgb(86, 181, 245);
+                                }
+                            }
+                        }
+                    }
+                    .atc{
+                        button{
+                            width: 100%;
+                            height: 45px;
+                            border: 1px solid $default-green;
+                            text-transform: uppercase;
+                            color: #fff;
+                            padding: 0 15px;
+                            background-color: $default-green;
+                            border-radius: 5px;
+                            font-size: 18px;
+                            font-weight: 400;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 10px;
+                        }
+                    }
+                }
+                .sale-price{
+                    flex: 1;
+                }
+            }
+            .policy{
+                .ant-collapse-header-text{
+                    color: #131425;
+                    font-size: 14px;
+                    font-weight: bold;
+                }
+                .panel-text{
+                    white-space: pre-wrap;
+                    color: #707070;
+                    font-size: 14px;
+                }
+            }
+        }
+    }
+}
+.pre-custom, .next-custom{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #707070;
+    background-color: #707070;
+    border-radius: 999px;
+    color: #fff;
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    z-index: 1;
+    .pre-icon, .next-icon{
+        filter: invert(1);
+        width: 30px;
+        height: 30px;
+    }
+}
+.pre-custom{
+    left: 0;
+}
+.next-custom{
+    right: 0;
+}

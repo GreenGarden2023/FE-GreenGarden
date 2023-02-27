@@ -25,6 +25,17 @@ h2{
     color: #222;
     font-size: 36px;
 }
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+button, input{
+    outline: none;
+}
+button{
+    cursor: pointer;
+}
 // button{
 //     outline: none;
 //     border-radius: 5px;

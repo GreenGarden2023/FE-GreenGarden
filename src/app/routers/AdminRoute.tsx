@@ -47,20 +47,21 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
     const handleCollapsedHeader = () =>{
         dispatch(setCollapsedHeader({active: !collapsedHeader}))
     }
-    const defaultOpenKey = useMemo(() =>{
-        const affix = location.pathname.split('/')[2]
+    // const defaultOpenKey = useMemo(() =>{
+    //     const affix = location.pathname.split('/')[2]
 
-        switch(affix){
-            case 'manage-category':
-                return ['1']
-            case 'manage-product':
-                return ['2']
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    //     switch(affix){
+    //         case 'manage-category':
+    //             return ['1']
+    //         case 'manage-product':
+    //             return ['2']
+    //     }
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [])
     const items: MenuItem[] = [
        CONSTANT.MANAGE_CATEGORY.includes(roleName as Role) ? getItem(<Link to='/panel/manage-category'>Manage Category</Link>, '1', <BiCategoryAlt size={18} />) : null,
        CONSTANT.MANAGE_PRODUCT.includes(roleName as Role) ? getItem(<Link to='/panel/manage-product'>Manage Product</Link>, '2', <MdOutlineInventory2 size={18} />) : null,
+       CONSTANT.MANAGE_SIZE.includes(roleName as Role) ? getItem(<Link to='/panel/manage-size'>Manage Size</Link>, '3', <MdOutlineInventory2 size={18} />) : null,
     ];
   return (
     <>
@@ -88,7 +89,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
                     collapsed={collapsedHeader}
                 >
                     <div style={{ height: 32, margin: 16, background: 'rgba(255, 255, 255, 0.2)' }} />
-                    <Menu className='admin-menu' theme="light" mode="inline" defaultSelectedKeys={defaultOpenKey} items={items} />
+                    <Menu className='admin-menu' theme="light" mode="inline"  items={items} />
                 </Sider>
                 <Layout className="site-layout" style={{ marginLeft: collapsedHeader ? 80 : 200 }}>
                     <Content>

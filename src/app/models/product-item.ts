@@ -31,3 +31,7 @@ export interface ProductItemHandle{
     imgURLs?: string[];
     imgFiles?: RcFile[];
 }
+
+export interface ProductItemInCart extends ProductItem{
+    quantityInCart: number
+}

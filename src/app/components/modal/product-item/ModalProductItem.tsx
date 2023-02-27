@@ -52,7 +52,7 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, p
     const dispatch = useDispatch();
     const [sizes, setSizes] = useState<Size[]>([])
 
-    const { setValue, getValues, control, handleSubmit, formState: { errors,  },  trigger, setError } = useForm<ProductItemHandle>({
+    const { setValue, getValues, control, handleSubmit, formState: { errors, isSubmitted, isSubmitting },  trigger, setError } = useForm<ProductItemHandle>({
         defaultValues: {
             status: ''
         },
@@ -185,6 +185,7 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, p
         setValue('imgURLs', urls)
         setValue('imgFiles', files)
         await trigger('imgURLs')
+        if(!isSubmitted) return;
         isValidLarge(newFileList)
     }
     return (
@@ -370,9 +371,9 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, p
                         </Form.Item>
                     </Col>
                     <Col span={24}>
-                        <Form.Item>
-                            <Button htmlType='button'>Cancel</Button>
-                            <Button htmlType='submit'>Create</Button>
+                        <Form.Item className='btn-form-wrapper'>
+                            <Button htmlType='button' disabled={isSubmitting} type='default' className='btn-cancel' size='large' onClick={handleCloseModal}>Cancel</Button>
+                            <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large'>{action}</Button>
                         </Form.Item>
                     </Col>
                 </Row>

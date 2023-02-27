@@ -76,7 +76,7 @@ const ClientProduct: React.FC = () => {
                   products.map((product, index) => (
                     <Col xs={24} xl={12} key={index}>
                       {/* <div className='cp-item'> */}
-                        <Link to='/' className='cp-item'>
+                        <Link to={`/product/${product.id}/product-item?page=1`} className='cp-item'>
                           <div className="left">
                             <img src={product.imgUrl} alt="/" />
                           </div>

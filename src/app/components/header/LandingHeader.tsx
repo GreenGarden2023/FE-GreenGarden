@@ -28,11 +28,11 @@ const schema = yup.object().shape({
 const LandingHeader: React.FC = () =>{
     const dispatch = useDispatch();
     const location = useLocation()
-
     
     const [openModalUserInfor, setOpenModalInfor] = useState(false);
     
     const userState = useSelector(state => state.userInfor);
+    const { rentalCart, buyCart } = useSelector(state => state.CartStore)
 
     const { setValue, formState: { errors, isSubmitting }, control, handleSubmit, reset } = useForm<UserUpdate>({
         resolver: yupResolver(schema)
@@ -83,7 +83,7 @@ const LandingHeader: React.FC = () =>{
                     <div className="right">
                         <div className="cart-box">
                             <Link to='/cart' >
-                                <Badge count={5} >
+                                <Badge count={rentalCart.length + buyCart.length} >
                                     <AiOutlineShoppingCart size={30} />
                                 </Badge>
                             </Link>

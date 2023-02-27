@@ -22,7 +22,8 @@ const PAGING_ITEMS = {
     CLIENT_CATEGORY: 20,
     PRODUCT: 5,
     CLIENT_PRODUCT: 20,
-    PRODUCT_ITEM: 20
+    PRODUCT_ITEM: 20,
+    CLIENT_PRODUCT_ITEM: 20
 }
 const STATUS = {
     ACTIVE: 'Active',
@@ -45,6 +46,7 @@ const SUPPORT_FORMATS = ['image/png', 'image/jpg', 'image/jpeg']
 const MANAGE_CATEGORY: Role[] = ['Admin', 'Staff']
 const MANAGE_PRODUCT: Role[] = ['Admin', 'Staff']
 const MANAGE_PRODUCT_ITEM: Role[] = ['Admin', 'Staff']
+const MANAGE_SIZE: Role[] = ['Admin', 'Staff']
 
 const CONSTANT = {
     STORAGE,
@@ -60,7 +62,8 @@ const CONSTANT = {
     SUPPORT_FORMATS,
     MANAGE_CATEGORY,
     MANAGE_PRODUCT,
-    MANAGE_PRODUCT_ITEM
+    MANAGE_PRODUCT_ITEM,
+    MANAGE_SIZE
 }
 
 export default CONSTANT
