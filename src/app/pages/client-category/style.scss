@@ -35,6 +35,17 @@
                 color: $default-green;
                 font-weight: 500;
             }
+            .description{
+                padding: 5px;
+                color: $soft-text;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-line-clamp: 4; /* number of lines to show */
+                line-clamp: 4; 
+                -webkit-box-orient: vertical;
+                line-height: 25px;
+            }
         }
         .rc-pagination{
             margin: 10px 0;

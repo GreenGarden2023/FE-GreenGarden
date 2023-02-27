@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { Layout, Menu } from 'antd'
 import type { MenuProps } from 'antd';
 import './style.scss';
@@ -6,7 +6,7 @@ import { FaLongArrowAltRight, FaLongArrowAltLeft } from 'react-icons/fa';
 import useSelector from '../hooks/use-selector';
 import useDispatch from '../hooks/use-dispatch';
 import { setCollapsedHeader } from '../slices/admin-layout';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { BiCategoryAlt } from 'react-icons/bi';
 import { MdOutlineInventory2 } from 'react-icons/md'
 import CONSTANT from 'app/utils/constant';
@@ -39,7 +39,7 @@ interface AdminRouteProps{
 
 const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
     const dispatch = useDispatch();
-    const location = useLocation();
+    // const location = useLocation();
     
     const { collapsedHeader } = useSelector(state => state.adminLayout);
     const { roleName } = useSelector(state => state.userInfor)

@@ -61,14 +61,15 @@
                 }
             }
             .right{
+                flex: 1;
                 .name{
                     font-size: 24px;
                     margin-bottom: 16px;
+                    color: $default-green;
                 }
                 .description{
                     margin-bottom: 10px;
                 }
-                flex: 1;
             }
         }
         .cp-pagination{

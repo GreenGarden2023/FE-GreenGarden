@@ -19,7 +19,7 @@ interface ModalSizeProps{
 
 const ModalSize: React.FC<ModalSizeProps> = ({size, action, open, onClose, onSubmit}) => {
   const dispatch = useDispatch()
-  const { setValue, handleSubmit, formState: { errors, isSubmitting }, control, reset } = useForm<SizeHandle>()
+  const { setValue, handleSubmit, formState: { isSubmitting }, control, reset } = useForm<SizeHandle>()
 
   useEffect(() =>{
     if(!size) return;

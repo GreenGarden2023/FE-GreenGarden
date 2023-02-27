@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction, CaseReducer } from '@reduxjs/toolkit';
-import { Cart } from 'app/models/cart';
 import { CartType } from 'app/models/general-type';
 import { ProductItem, ProductItemInCart } from 'app/models/product-item';
 

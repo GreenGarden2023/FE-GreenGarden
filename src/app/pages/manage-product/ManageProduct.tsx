@@ -91,7 +91,8 @@ const ManageProduct: React.FC = () => {
       title: 'Description',
       key: 'description',
       dataIndex: 'description',
-      align: 'center'
+      align: 'center',
+      width: 700
     },
     {
       title: 'Thumbnail',
@@ -101,6 +102,7 @@ const ManageProduct: React.FC = () => {
       render: (_, record) => (
         <Image
           width={100}
+          height={100}
           style={{maxHeight: '100px', objectFit: 'cover'}}
           src={record.imgUrl}
           onError={({currentTarget }) => {
@@ -116,7 +118,7 @@ const ManageProduct: React.FC = () => {
       dataIndex: 'status',
       align: 'center',
       render: (_, record) => (
-        <Switch loading={loaderProId.includes(record.id)} checked={record.status === CONSTANT.STATUS.ACTIVE} onChange={(checked: boolean) => handleToggleProduct(record, checked)} />
+        <Switch loading={loaderProId.includes(record.id)} checked={record.status === 'active'} onChange={(checked: boolean) => handleToggleProduct(record, checked)} />
       ),
     },
     {

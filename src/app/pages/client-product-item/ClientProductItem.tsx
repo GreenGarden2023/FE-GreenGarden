@@ -24,7 +24,7 @@ const ClientProductItem: React.FC = () => {
     const [productItems, setProductItems] = useState<ProductItem[]>([])
     const [product, setProduct] = useState<Product>()
     const [paging, setPaging] = useState<Paging>();
-
+    console.log(paging)
     useEffect(() =>{
         const currentPage = searchParams.get('page');
         if(!productId){

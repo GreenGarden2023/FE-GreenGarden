@@ -70,6 +70,7 @@ const ClientCategory: React.FC = () => {
                                                 }}  
                                             />
                                             <span>{category.name}</span>
+                                            <p className='description'>{category.description}</p>
                                         </Link>
                                     </div>
                                 </Col>

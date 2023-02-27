@@ -25,13 +25,13 @@ import utilsFile from 'app/utils/file';
 const schema = yup.object().shape({
   Name: yup.string().required('Category name is required').min(5, 'Category name is greater than 5 characters').max(30, 'Category name is less than 30 characters'),
   imgUrl: yup.string().required('Thumbnail is required'),
-  Description: yup.string().max(200, 'Description is less than 200 characters'),
+  Description: yup.string().max(500, 'Description is less than 500 characters'),
   imgFile: yup.mixed()
   .test('FILE_FORMAT', 'We only support png/jpg/jpeg', (value) => {
     return !value || (value && CONSTANT.SUPPORT_FORMATS.includes(value.type))
   })
   .test('FILE_SIZE', 'The file is too large', (value ) => {
-    return !value || (value && value.size <= 100000)
+    return !value || (value && value.size <= 1000000)
   })
 })
 
@@ -90,13 +90,14 @@ const ManageCategory: React.FC = () => {
         title: 'Name',
         key: 'name',
         dataIndex: 'name',
-        align: 'center'
+        align: 'center',
       },
       {
         title: 'Description',
         key: 'description',
         dataIndex: 'description',
-        align: 'center'
+        align: 'center',
+        width: 700
       },
       {
         title: 'Status',
@@ -114,11 +115,13 @@ const ManageCategory: React.FC = () => {
         render: (_, record) => (
           <Image 
             width={100}
+            height={100}
             src={record.imgUrl}
             onError={({currentTarget }) => {
               currentTarget.onerror = null
               currentTarget.src = '/assets/inventory-empty.png'
-            }} 
+            }}
+            style={{objectFit: 'cover'}}
           />
         ),
         align: 'center'

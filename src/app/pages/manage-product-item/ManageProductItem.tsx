@@ -14,6 +14,7 @@ import { Paging } from 'app/models/paging';
 import { IoCreateOutline } from 'react-icons/io5';
 import ModalProductItem from 'app/components/modal/product-item/ModalProductItem';
 import { Action } from 'app/models/general-type';
+import { Product } from 'app/models/product';
 
 const ManageProductItem: React.FC = () => {
     const { productId } = useParams()
@@ -22,6 +23,7 @@ const ManageProductItem: React.FC = () => {
     const [searchParams] = useSearchParams();
 
     const [productItems, setProductItems] = useState<ProductItem[]>([])
+    const [product, setProduct] = useState<Product>()
     const [paging, setPaging] = useState<Paging>();
     const [action, setAction] = useState<Action>('');
     console.log(paging)
@@ -40,6 +42,7 @@ const ManageProductItem: React.FC = () => {
                 const res = await productItemService.getAllProductItem({curPage: Number(currentPage), pageSize: CONSTANT.PAGING_ITEMS.PRODUCT_ITEM}, {productID: productId})
                 setProductItems(res.data.productItems)
                 setPaging(res.data.paging)
+                setProduct(res.data.product)
             }catch(err){
                 dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
             }
@@ -58,7 +61,7 @@ const ManageProductItem: React.FC = () => {
     return (
         <div className="mpi-wrapper">
             <section className="mpi-product-infor default-layout">
-                <h1>Hoa giấy</h1>
+                <h1>{product?.name}</h1>
             </section>
             <section className="mpi-search-wrapper default-layout">
                 <div className="mpi-btn-wrapper">

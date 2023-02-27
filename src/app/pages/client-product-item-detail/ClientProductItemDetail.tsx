@@ -1,18 +1,18 @@
-import { Breadcrumb, Col, Collapse, Divider, Image, Row } from 'antd';
+import { Breadcrumb, Col, Collapse, Divider, Row } from 'antd';
 import LandingFooter from 'app/components/footer/LandingFooter';
 import LandingHeader from 'app/components/header/LandingHeader';
 import React from 'react';
 import { AiOutlineShoppingCart } from 'react-icons/ai';
 import { BiPlus } from 'react-icons/bi';
 import { GrFormNext, GrFormPrevious, GrFormSubtract } from 'react-icons/gr';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Carousel } from 'react-responsive-carousel'
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import './style.scss';
 
 const text = `Đối với các sản phẩm cây/ bao gồm cây:\n- Chỉ giao hàng tại TP HCM\nĐối với các sản phẩm chậu, phụ kiện, vật tư:\n- Có giao hàng COD toàn quốc\n- Được kiểm tra hàng khi nhận hàng`
 const ClientProductItemDetail: React.FC = () => {
-    const { productItemId } = useParams()
+    // const { productItemId } = useParams()
 
     
     

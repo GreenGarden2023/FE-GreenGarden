@@ -17,8 +17,9 @@ import CONSTANT from 'app/utils/constant';
 import { RcFile, UploadChangeParam, UploadFile } from 'antd/es/upload';
 import utilsFile from 'app/utils/file';
 import ErrorMessage from 'app/components/message.tsx/ErrorMessage';
-// import CKEditor from '@ckeditor/ckeditor5-react';
-// import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import {CKEditor} from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+// import fileService from 'app/services/file.service';
 
 const schema = yup.object().shape({
     name: yup.string().required('Product name is required').min(5, 'Product name is greater than 5 characters').max(30, 'Product name is less than 30 characters'),
@@ -51,6 +52,7 @@ interface ModalProductItemProps{
 const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, productItem, action, open, onClose}) => {
     const dispatch = useDispatch();
     const [sizes, setSizes] = useState<Size[]>([])
+    const [uploaded, setUploaded] = useState<UploadFile[]>([])
 
     const { setValue, getValues, control, handleSubmit, formState: { errors, isSubmitted, isSubmitting },  trigger, setError } = useForm<ProductItemHandle>({
         defaultValues: {
@@ -90,6 +92,18 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, p
         }
         init()
     }, [action, dispatch])
+
+    // useEffect(() =>{
+    //     const initFiles = async () =>{
+    //         try{
+    //             const res = await fileService.getAnImage('https://greengardenstorage.blob.core.windows.net/greengardensimages/0b7212b6-e3c4-4570-bdee-94ab30331ff9.png')
+    //             setUploaded([res])
+    //         }catch{
+    //             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE})) 
+    //         }
+    //     }
+    //     initFiles()
+    // }, [dispatch])
 
     const handleCloseModal = () =>{
         onClose()
@@ -137,7 +151,7 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, p
         if(!isValidLarge(files)) return;
         
     }
-    const [uploaded, setUploaded] = useState<UploadFile[]>([])
+    
     const handleUpload: UploadProps['onChange']  = async (info: UploadChangeParam<UploadFile>) =>{
         const listPreview: string[] = []
         const listFile: RcFile[] = []
@@ -188,6 +202,37 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, p
         if(!isSubmitted) return;
         isValidLarge(newFileList)
     }
+    function uploadPlugin(editor) {
+        editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
+          return uploadAdapter(loader);
+        };
+    }
+    function uploadAdapter(loader) {
+        return {
+          upload: () => {
+            return new Promise((resolve, reject) => {
+              const body = new FormData();
+              loader.file.then((file) => {
+                body.append("files", file);
+                
+                fetch(`${process.env.REACT_APP_API_END_POINT}/image/upload`, {
+                  method: "post",
+                  body: body
+                })
+                  .then((res) => res.json())
+                  .then((res) => {
+                    resolve({
+                      default: res.data[0]
+                    });
+                  })
+                  .catch((err) => {
+                    reject(err);
+                  });
+              });
+            });
+          }
+        };
+      }
     return (
         <Modal
             className='modal-pi-wrapper'
@@ -359,15 +404,23 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, p
                     }
                     <Col span={24}>
                         <Form.Item label='Content'>
-                            {/* <Controller
+                            <Controller
                                 control={control}
                                 name='content'
-                                render={({field}) => (
+                                render={({field: { value }}) => (
                                     <CKEditor
-                                    
-                                    ></CKEditor>
+                                        editor={ ClassicEditor }
+                                        data={value}
+                                        onChange={ ( event, editor ) => {
+                                            const data = editor.getData();
+                                            setValue('content', data)
+                                        } }
+                                        config={{
+                                            extraPlugins: [uploadPlugin]
+                                        }}
+                                    />
                                 )}
-                            /> */}
+                            />
                         </Form.Item>
                     </Col>
                     <Col span={24}>

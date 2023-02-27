@@ -17,14 +17,14 @@ import { setNoti } from 'app/slices/notification';
 
 const schema = yup.object().shape({
     name: yup.string().required('Product name is required').min(5, 'Product name is greater than 5 characters').max(30, 'Product name is less than 30 characters'),
-    description: yup.string().max(200, 'Description is less than 200 characters'),
+    description: yup.string().max(500, 'Description is less than 500 characters'),
     imgUrl: yup.string().required('Thumbnail is required'),
     imgFile: yup.mixed()
     .test('FILE_FORMAT', 'We only support png/jpg/jpeg', (value) => {
         return !value || (value && CONSTANT.SUPPORT_FORMATS.includes(value.type))
     })
     .test('FILE_SIZE', 'The file is too large', (value ) => {
-        return !value || (value && value.size <= 100000)
+        return !value || (value && value.size <= 1000000)
     })
 })
 
