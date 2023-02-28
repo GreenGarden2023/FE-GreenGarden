@@ -85,14 +85,15 @@ const ManageProduct: React.FC = () => {
       title: 'Name',
       key: 'name',
       dataIndex: 'name',
-      align: 'center'
+      align: 'center',
+      width: 200
     },
     {
       title: 'Description',
       key: 'description',
       dataIndex: 'description',
-      align: 'center',
-      width: 700
+      align: 'left',
+      // width: 600
     },
     {
       title: 'Thumbnail',

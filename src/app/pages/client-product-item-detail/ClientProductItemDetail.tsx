@@ -9,6 +9,8 @@ import { Link } from 'react-router-dom';
 import { Carousel } from 'react-responsive-carousel'
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import './style.scss';
+import CONSTANT from 'app/utils/constant';
+import CurrencyFormat from 'react-currency-format';
 
 const text = `Đối với các sản phẩm cây/ bao gồm cây:\n- Chỉ giao hàng tại TP HCM\nĐối với các sản phẩm chậu, phụ kiện, vật tư:\n- Có giao hàng COD toàn quốc\n- Được kiểm tra hàng khi nhận hàng`
 const ClientProductItemDetail: React.FC = () => {
@@ -24,7 +26,7 @@ const ClientProductItemDetail: React.FC = () => {
                     <section className="cpid-bread">
                         <Breadcrumb>
                             <Breadcrumb.Item>
-                                <Link to='/' >Store</Link>
+                                <Link to='/' >{CONSTANT.APP_NAME}</Link>
                             </Breadcrumb.Item>
                             <Breadcrumb.Item>
                                 <Link to='/category' >Category</Link>
@@ -84,7 +86,7 @@ const ClientProductItemDetail: React.FC = () => {
                                         <div className="rent-price">
                                             <p className='title-price'>Rent price</p>
                                             <p className="price">
-                                                200000VNĐ
+                                                <CurrencyFormat value={200000} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
                                             </p>
                                             <div className="quantity">
                                                 <p>Quantity</p>
@@ -108,7 +110,7 @@ const ClientProductItemDetail: React.FC = () => {
                                         <div className="sale-price">
                                             <p className='title-price'>Sale price</p>
                                             <p className="price">
-                                                200000VNĐ
+                                                <CurrencyFormat value={200000} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
                                             </p>
                                             <div className="quantity">
                                                 <p>Quantity</p>

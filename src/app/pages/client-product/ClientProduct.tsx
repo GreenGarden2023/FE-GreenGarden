@@ -53,7 +53,7 @@ const ClientProduct: React.FC = () => {
             <section className="cp-bread">
               <Breadcrumb>
                 <Breadcrumb.Item>
-                  <Link to='/' >Store</Link>
+                  <Link to='/' >{CONSTANT.APP_NAME}</Link>
                 </Breadcrumb.Item>
                 <Breadcrumb.Item>
                   <Link to='/category' >Category</Link>

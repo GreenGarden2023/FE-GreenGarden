@@ -91,13 +91,14 @@ const ManageCategory: React.FC = () => {
         key: 'name',
         dataIndex: 'name',
         align: 'center',
+        width: 200
       },
       {
         title: 'Description',
         key: 'description',
         dataIndex: 'description',
-        align: 'center',
-        width: 700
+        align: 'left',
+        width: 600
       },
       {
         title: 'Status',

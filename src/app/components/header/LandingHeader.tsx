@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Badge, Button, Col, Form, Input, Modal, Row, Select } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { AiFillCaretDown, AiOutlineShoppingCart, AiOutlineUserAdd } from 'react-icons/ai';
 import { FaUserCircle } from 'react-icons/fa';
@@ -71,6 +71,21 @@ const LandingHeader: React.FC = () =>{
         }
     }
 
+    const cartQuantity = useMemo(() =>{
+      let quantity = 0
+      for (let i = 0; i < rentalCart.length; i++) {
+        const element = rentalCart[i];
+          quantity += element.quantityInCart
+      }
+      for (let i = 0; i < buyCart.length; i++) {
+        const element = buyCart[i];
+          quantity += element.quantityInCart
+      }
+      return quantity
+    }, [rentalCart, buyCart])
+
+    console.log({rentalCart, buyCart})
+
     return (
         <>
             <header className='landing-header'>
@@ -83,7 +98,7 @@ const LandingHeader: React.FC = () =>{
                     <div className="right">
                         <div className="cart-box">
                             <Link to='/cart' >
-                                <Badge count={rentalCart.length + buyCart.length} >
+                                <Badge count={cartQuantity} >
                                     <AiOutlineShoppingCart size={30} />
                                 </Badge>
                             </Link>

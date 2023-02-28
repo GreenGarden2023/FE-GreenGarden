@@ -45,7 +45,7 @@ const ClientCategory: React.FC = () => {
                 <section className="rc-bread">
                     <Breadcrumb>
                         <Breadcrumb.Item>
-                            <Link to='/' >Store</Link>
+                            <Link to='/' >{CONSTANT.APP_NAME}</Link>
                         </Breadcrumb.Item>
                         <Breadcrumb.Item>
                             Category
