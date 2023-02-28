@@ -14,6 +14,8 @@ import productItemService from 'app/services/product-item.service';
 import { Product } from 'app/models/product';
 import { CartType } from 'app/models/general-type';
 import { addToCart } from 'app/slices/cart';
+import CurrencyFormat from 'react-currency-format';
+import { Category } from 'app/models/category';
 
 const ClientProductItem: React.FC = () => {
     const { productId } = useParams()
@@ -23,6 +25,7 @@ const ClientProductItem: React.FC = () => {
 
     const [productItems, setProductItems] = useState<ProductItem[]>([])
     const [product, setProduct] = useState<Product>()
+    const [category, setCategory] = useState<Category>()
     const [paging, setPaging] = useState<Paging>();
     console.log(paging)
     useEffect(() =>{
@@ -43,6 +46,7 @@ const ClientProductItem: React.FC = () => {
                 setProductItems(res.data.productItems)
                 setPaging(res.data.paging)
                 setProduct(res.data.product)
+                setCategory(res.data.category)
             }catch{
                 dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
             }
@@ -65,13 +69,16 @@ const ClientProductItem: React.FC = () => {
                     <section className="cpo-bread">
                         <Breadcrumb>
                             <Breadcrumb.Item>
-                            <Link to='/' >Store</Link>
+                                <Link to='/' >Store</Link>
                             </Breadcrumb.Item>
                             <Breadcrumb.Item>
-                            <Link to='/category' >Category</Link>
+                                <Link to='/category' >Category</Link>
                             </Breadcrumb.Item>
                             <Breadcrumb.Item>
-                            {/* {category?.name} */}
+                                <Link to={`/product/${category?.id}?page=1`} >{category?.name}</Link>
+                            </Breadcrumb.Item>
+                            <Breadcrumb.Item>
+                                {product?.name}
                             </Breadcrumb.Item>
                         </Breadcrumb>
                     </section>
@@ -82,24 +89,34 @@ const ClientProductItem: React.FC = () => {
                             <span className={`cp-for-sale ${isRent === 'sale' ? 'active' : ''}`} onClick={() => setIsRent('sale')}>For Sale</span> */}
                         </div>
                     </section>
-                    <section className="cpi-box">
+                    <section className="cpi-box default-layout">
                         <Row gutter={[10, 10]}>
                             {
                                 productItems.map((proItem, index) => (
-                                    <Col xs={24} xl={6} key={index}>
+                                    <Col xs={24} xl={6} key={index} className='col-item'>
                                         <Link to={`/product-item/${proItem.id}`} className='cp-item'>
                                             <img src={proItem.imgURLs[0]} alt="/" />
                                             <div className="content">
-                                                <p>{proItem.name}</p>
+                                                <p className='name'>{proItem.name}</p>
                                                 {
                                                     product?.isForRent && 
-                                                    <p>{proItem.rentPrice}</p>
+                                                    <p>
+                                                        Rent price:&nbsp;
+                                                        <span>
+                                                            <CurrencyFormat value={proItem.rentPrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
+                                                        </span>
+                                                    </p>
                                                 }
                                                 {
                                                     product?.isForSale && 
-                                                    <p>{proItem.salePrice}</p>
+                                                    <p>
+                                                        Sale price:&nbsp;
+                                                        <span>
+                                                            <CurrencyFormat value={proItem.salePrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
+                                                        </span>
+                                                    </p>
                                                 }
-                                                <p>{proItem.quantity}</p>
+                                                <p>Quantity: <span>{proItem.quantity}</span></p>
                                             </div>
                                         </Link>
                                         <button type='button' onClick={() => handleClickAddToCart('Rent', proItem)}>Add to Cart</button>

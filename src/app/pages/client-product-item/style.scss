@@ -1,9 +1,25 @@
+@import 'app/styles/variable.scss';
+
 .cpi-wrapper{
     .cpi-box{
-        // .cp-item{
-            img{
-                width: 100%;
+        .col-item{
+            padding: 5px;
+            border: 1px solid $default-green;
+            border-radius: 5px;
+            .cp-item{
+                img{
+                    width: 100%;
+                }
+                .content{
+                    .name{
+                        margin-top: 5px;
+                        text-align: center;
+                        color: $default-green;
+                        font-size: 18px;
+                        font-weight: 500;
+                    }
+                }
             }
-        // }
+        }
     }
 }
