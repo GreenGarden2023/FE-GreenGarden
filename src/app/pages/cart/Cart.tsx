@@ -385,6 +385,7 @@ const CartPage: React.FC = () => {
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             navigate('/checkout-success')
             dispatch(setCartSlice({rentItems: [], saleItems: []}))
+            setCart(undefined)
         }catch{
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
