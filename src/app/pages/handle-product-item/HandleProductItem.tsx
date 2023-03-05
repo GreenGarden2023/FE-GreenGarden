@@ -1,64 +1,55 @@
-import { Button, Col, Form, Image, Input, Modal, Row, Select, Switch, Upload, UploadProps } from 'antd';
-import { Action, ProductItemType } from 'app/models/general-type';
-import { ProductItem, ProductItemHandleCreate } from 'app/models/product-item';
-import React, { useEffect, useState } from 'react';
-import { useForm, Controller, useFieldArray } from 'react-hook-form';
-import './style.scss';
-import * as yup from 'yup';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
 import { yupResolver } from '@hookform/resolvers/yup';
-import {InputNumber} from 'antd';
-import { BiDollar } from 'react-icons/bi';
-import { AiFillCaretDown, AiOutlineCloseCircle, AiOutlineCloudUpload } from 'react-icons/ai';
-import { Size } from 'app/models/size';
+import { Button, Col, Divider, Form, Image, Input, InputNumber, Row, Select, Switch, Upload } from 'antd';
+import { RcFile, UploadChangeParam, UploadFile } from 'antd/es/upload';
+import ErrorMessage from 'app/components/message.tsx/ErrorMessage';
 import useDispatch from 'app/hooks/use-dispatch';
+import { ProductItemType } from 'app/models/general-type';
+import { ProductItemHandleCreate } from 'app/models/product-item';
+import { Size } from 'app/models/size';
 import sizeService from 'app/services/size.service';
 import { setNoti } from 'app/slices/notification';
 import CONSTANT from 'app/utils/constant';
-import { RcFile, UploadChangeParam, UploadFile } from 'antd/es/upload';
 import utilsFile from 'app/utils/file';
-import ErrorMessage from 'app/components/message.tsx/ErrorMessage';
-import {CKEditor} from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import React, { useEffect, useState } from 'react';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { AiFillCaretDown, AiOutlineCloseCircle, AiOutlineCloudUpload } from 'react-icons/ai';
+import { BiDollar } from 'react-icons/bi';
+import * as yup from 'yup';
+import './style.scss';
 
 // import fileService from 'app/services/file.service';
 
 const schema = yup.object().shape({
-    name: yup.string().required('Product name is required').min(5, 'Product name is greater than 5 characters').max(30, 'Product name is less than 30 characters'),
-    salePrice: yup.number().required('Sale price is required').positive('Sale price must be positive number').max(1000000000, 'Sale price is less than 1.000.000.000 VNĐ'),
-    description: yup.string().max(200, 'Description is less than 200 characters'),
-    sizeId: yup.string().required('Size is required'),
-    quantity: yup.number().positive('Quantity is positive number').max(1000000, 'Quantity is less than 1000000'),
-    type: yup.string().required('Type is required'),
-    rentPrice: yup.number().positive('Rent price is positive number').max(1000000000, 'Sale price is less than 1.000.000.000 VNĐ'),
+    // name: yup.string().required('Product name is required').min(5, 'Product name is greater than 5 characters').max(30, 'Product name is less than 30 characters'),
+    // salePrice: yup.number().required('Sale price is required').positive('Sale price must be positive number').max(1000000000, 'Sale price is less than 1.000.000.000 VNĐ'),
+    // description: yup.string().max(200, 'Description is less than 200 characters'),
+    // sizeId: yup.string().required('Size is required'),
+    // quantity: yup.number().positive('Quantity is positive number').max(1000000, 'Quantity is less than 1000000'),
+    // type: yup.string().required('Type is required'),
+    // rentPrice: yup.number().positive('Rent price is positive number').max(1000000000, 'Sale price is less than 1.000.000.000 VNĐ'),
 
 })
 
-interface ModalProductItemProps{
-    productIdSelected: string;
-    // productItem?: ProductItem;
-    // action: Action;
-    open: boolean;
-    onClose: () => void;
-    // onSubmit: (product: Product, action: Action) => void;
-}
 
-const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, open, onClose}) => {
+const HandleProductItem: React.FC = () => {
     const dispatch = useDispatch();
     const [sizes, setSizes] = useState<Size[]>([])
-    const [uploaded, setUploaded] = useState<UploadFile[]>([])
+    const [uploaded, setUploaded] = useState<UploadFile[][]>([])
+    const [listErr, setListErr] = useState<string[][]>([])
 
     const { setValue, getValues, control, handleSubmit, formState: { errors, isSubmitted, isSubmitting },  trigger, setError } = useForm<ProductItemHandleCreate>({
         defaultValues: {
-           
+           sizeModelList: []
         },
-        resolver: yupResolver(schema)
+        // resolver: yupResolver(schema)
     })
 
     const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
         control,
         name: 'sizeModelList'
     })
-
 
     useEffect(() =>{
         const init = async () =>{
@@ -72,20 +63,8 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, o
         init()
     }, [dispatch])
 
-    // useEffect(() =>{
-    //     const initFiles = async () =>{
-    //         try{
-    //             const res = await fileService.getAnImage('https://greengardenstorage.blob.core.windows.net/greengardensimages/0b7212b6-e3c4-4570-bdee-94ab30331ff9.png')
-    //             setUploaded([res])
-    //         }catch{
-    //             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE})) 
-    //         }
-    //     }
-    //     initFiles()
-    // }, [dispatch])
-
     const handleCloseModal = () =>{
-        onClose()
+        // onClose()
     }
     
     const isValidLarge = (files: RcFile[] | UploadFile[]) =>{
@@ -109,7 +88,55 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, o
     //     return true
     }
 
+    const test = (index: number, value: string[]) =>{
+        return new Promise(res => {
+res(handleSetListError(index,value ))
+        })
+    }
+
+    const handleSetListError = (index: number, value: string[]) =>{
+        const lError = [...listErr]
+        console.log(lError)
+        lError[index] = value
+        setListErr([...lError])
+    }
+    console.log(listErr)
     const handleSubmitForm = async (data: ProductItemHandleCreate) =>{
+        let check = true
+        for (let i = 0; i < data.sizeModelList.length; i++) {
+            const element = data.sizeModelList[i];
+            if(!element.imgFiles || element.imgFiles.length === 0){
+                console.log(i, element)
+                await test(i, ['Images is required'])
+                // const lError = [...listErr]
+                // lError[i] = []
+                // setListErr([...lError])
+            }else if(element.imgFiles.length > 6){
+                await test(i, ['Image count is less than 7 items'])
+                check = false
+                // const lError = [...listErr]
+                // lError[i] = ['Image count is less than 7 items']
+                // setListErr([...lError])
+            }else{
+                let errorMsg = ''
+                for (let j = 0; j < element.imgFiles.length; j++) {
+                    const child = element.imgFiles[j];
+                    if(!CONSTANT.SUPPORT_FORMATS.includes(child.type)){
+                        errorMsg += `Image ${j + 1} is not valid file\n\r`
+                        check = false
+
+                    }
+                }
+                if(errorMsg){
+                    await test(i, [errorMsg])
+                    
+                }else{
+                    await test(i, [])
+                }
+            }
+        }
+        if(!check) return
+
         // const files = data.imgFiles || []
         // if(!files || files.length === 0){
         //     setError('imgURLs', {
@@ -134,50 +161,42 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, o
     const handleUpload  = async (index: number, info: UploadChangeParam<UploadFile<any>>) =>{
         const listPreview: string[] = []
         const listFile: RcFile[] = []
-        console.log(info)
-        // console.log(info.fileList)
-        // console.log()
-        setUploaded([...info.fileList])
-
-        // const fileInForm = getValues('imgFiles') || []
+        const itemUploads = [...uploaded]
+        itemUploads[index] = [...info.fileList]
         
-        // const newInfof = info.fileList.filter((x, index) => {
-        //     if((index + 1) > uploaded) return x
-        // })
-        // console.log(info.fileList.length)
-        // setUploaded(info.fileList.length)
-        // console.log(newInfof)
-
-
-
+        setUploaded([...itemUploads])
         
-        // for (let i = 0; i < info.fileList.length; i++) {
-        //     const originFileObj = info.fileList[i].originFileObj as RcFile;
-        //     utilsFile.getBase64(originFileObj, (url) =>{
-        //         listPreview.push(url)
-        //         setValue('imgURLs', [...listPreview])
-        //     })
-        //     listFile.push(originFileObj)
-        // }
-        // await trigger('imgURLs')
-        // setValue('imgFiles', listFile)
+        for (let i = 0; i < info.fileList.length; i++) {
+            const originFileObj = info.fileList[i].originFileObj as RcFile;
+            utilsFile.getBase64(originFileObj, (url) =>{
+                listPreview.push(url)
+                setValue(`sizeModelList.${index}.imagesURL`, [...listPreview])
+            })
+            listFile.push(originFileObj)
+        }
+        await trigger(`sizeModelList.${index}.imagesURL`)
+        setValue(`sizeModelList.${index}.imgFiles`, listFile)
+        await trigger(`sizeModelList.${index}.imgFiles`)
+
         // clearErrors('imgURLs')
     }
-    const handleRemoveItem = async (index: number) =>{
-        // let newFileList = [...uploaded];
-        // newFileList.splice(index, 1)
-        // setUploaded([...newFileList])
-        
+    console.log(uploaded)
+    const handleRemoveItem = async (index: number, indexImg: number) =>{
+        console.log({index, indexImg})
+        const itemUploads = [...uploaded]
+        itemUploads[index].splice(indexImg, 1)
+        setUploaded([...itemUploads])
 
-        // const urls = getValues('imgURLs')
-        // const files = getValues('imgFiles')
+        const urls = getValues(`sizeModelList.${index}.imagesURL`)
+        const files = getValues(`sizeModelList.${index}.imgFiles`)
 
-        // urls?.splice(index, 1)
-        // files?.splice(index, 1)
+        urls?.splice(indexImg, 1)
+        files?.splice(indexImg, 1)
 
-        // setValue('imgURLs', urls)
-        // setValue('imgFiles', files)
-        // await trigger('imgURLs')
+        setValue(`sizeModelList.${indexImg}.imagesURL`, urls)
+        setValue(`sizeModelList.${indexImg}.imgFiles`, files)
+
+        await trigger('sizeModelList')
         // if(!isSubmitted) return;
         // isValidLarge(newFileList)
     }
@@ -211,16 +230,36 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, o
             });
           }
         };
-      }
+    }
+    const handleAddSize = () =>{
+        if(getValues('sizeModelList').length >= 1 && getValues('type') === 'unique'){
+            dispatch(setNoti({type: 'warning', message: 'Can not gi do'}))
+            return
+        }
+        append({
+            status: 'active'
+        })
+        trigger('sizeModelList')
+    }
+    const handleRemove = (index: number) =>{
+        const items = [...uploaded]
+        if(items[index]){
+            items[index] = []
+            setUploaded([...items])
+        }
+        remove(index)
+        trigger('sizeModelList')
+    }
     return (
-        <Modal
-            className='modal-pi-wrapper'
-            open={open}
-            onCancel={handleCloseModal}
-            footer={null}
-            // title={`${action} product item ${productItem ? (' ' + productItem.name) : ''}`}
-            width={800}
-        >
+        // <Modal
+        //     className='modal-pi-wrapper'
+        //     open={open}
+        //     onCancel={handleCloseModal}
+        //     footer={null}
+        //     // title={`${action} product item ${productItem ? (' ' + productItem.name) : ''}`}
+        //     width={800}
+        // >
+        <div className="modal-pi-wrapper">
             <Form
                 layout='vertical'
                 onFinish={handleSubmit(handleSubmitForm)}
@@ -242,8 +281,9 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, o
                                 control={control}
                                 name='type'
                                 render={({ field: { value, onChange} }) => (
-                                    <Select suffixIcon={<AiFillCaretDown />} onChange={(value: string) => {
-                                        setValue('type', value as ProductItemType)
+                                    <Select disabled={(getValues('sizeModelList').length > 1)} suffixIcon={<AiFillCaretDown />} onChange={(value: string) => {
+                                        const val = value as ProductItemType
+                                        setValue('type', val)
                                         trigger('type')
                                     }} value={value} >
                                         <Select.Option value='normal'>
@@ -266,9 +306,12 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, o
                             />
                         </Form.Item>
                     </Col>
+                    <Col span={24}>
+                        <Button htmlType='button' disabled={!getValues('type')} onClick={handleAddSize}>Plus</Button>
+                    </Col>
                     {
                         fields.map((field, index) => (
-                            <>
+                            <React.Fragment key={index}>
                                 <Col span={12}>
                                     <Form.Item label='Size' required>
                                         <Controller 
@@ -334,6 +377,9 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, o
                                         />
                                     </Form.Item>
                                 </Col>
+                                <Col span={12}>
+                                    <Button htmlType='button' onClick={() => handleRemove(index)}>Remove</Button>
+                                </Col>
                                 <Col span={24}>
                                     <Form.Item label='Images' required>
                                         <Upload
@@ -342,16 +388,45 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, o
                                             accept='.png,.jpg,.jpeg'
                                             multiple
                                             className='modal-pi-uploader'
-                                            fileList={uploaded}
-                                            // onRemove={}
+                                            fileList={uploaded[index]}
                                         >
-                                                <button type='button'>
-                                                    <AiOutlineCloudUpload size={24} />
-                                                    Upload images
-                                                </button>
+                                            <button type='button'>
+                                                <AiOutlineCloudUpload size={24} />
+                                                Upload images
+                                            </button>
                                         </Upload>
                                     </Form.Item>
                                 </Col>
+                                {
+                                    getValues(`sizeModelList.${index}.imagesURL`)?.length !== 0 &&
+                                    <>
+                                        <Col span={24} className='preview-wrapper'>
+                                            <Image.PreviewGroup>
+                                                <Row gutter={[12, 12]}>
+                                                    {
+                                                        getValues(`sizeModelList.${index}.imagesURL`)?.map((x, indexImg) => (
+                                                            <Col span={6} className='preview-item' key={indexImg}>
+                                                                <Image
+                                                                    key={index}
+                                                                    // width={190}
+                                                                    src={x}
+                                                                    className='preview-image'
+                                                                />
+                                                                <AiOutlineCloseCircle className='btn-close' size={25} color='#fff' onClick={() => handleRemoveItem(index, indexImg)} />
+                                                            </Col>
+                                                        ))
+                                                    }
+                                                </Row>
+                                            </Image.PreviewGroup>
+                                        </Col>
+                                        {
+                                            (listErr[index] && listErr[index].length !== 0) && 
+                                            <Col span={24}>
+                                                <ErrorMessage message={listErr[index][0]} />
+                                            </Col>
+                                        }
+                                    </>
+                                }
                                 <Col span={24}>
                                     <Form.Item label='Content'>
                                         <Controller
@@ -373,47 +448,10 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, o
                                         />
                                     </Form.Item>
                                 </Col>
-                            </>
+                                <Divider />
+                            </React.Fragment>
                         ))
                     }
-                   
-                    
-                    
-                   
-                    
-                    
-                    
-                   
-                    {/* {
-                        getValues('imgURLs')?.length !== 0 &&
-                        <>
-                            <Col span={24} className='preview-wrapper'>
-                                <Image.PreviewGroup>
-                                    <Row gutter={[12, 12]}>
-                                        {
-                                            getValues('imgURLs')?.map((x, index) => (
-                                                <Col span={6} className='preview-item' key={index}>
-                                                    <Image
-                                                        key={index}
-                                                        // width={190}
-                                                        src={x}
-                                                        className='preview-image'
-                                                    />
-                                                    <AiOutlineCloseCircle className='btn-close' size={25} color='#fff' onClick={() => handleRemoveItem(index)} />
-                                                </Col>
-                                            ))
-                                        }
-                                    </Row>
-                                </Image.PreviewGroup>
-                            </Col>
-                            {
-                                errors.imgURLs && 
-                                <Col span={24}>
-                                    <ErrorMessage message={errors.imgURLs.message} />
-                                </Col>
-                            }
-                        </>
-                    } */}
                     <Col span={24}>
                         <Form.Item className='btn-form-wrapper'>
                             <Button htmlType='button' disabled={isSubmitting} type='default' className='btn-cancel' size='large' onClick={handleCloseModal}>Cancel</Button>
@@ -422,8 +460,9 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, o
                     </Col>
                 </Row>
             </Form>
-        </Modal>
+        </div>
+        // </Modal>
     )
 }
 
-export default ModalProductItem
+export default HandleProductItem

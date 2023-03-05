@@ -95,7 +95,7 @@ const ClientProductItem: React.FC = () => {
                                 productItems.map((proItem, index) => (
                                     <Col xs={24} xl={6} key={index} className='col-item'>
                                         <Link to={`/product-item/${proItem.id}`} className='cp-item'>
-                                            <img src={proItem.imgURLs[0]} alt="/" />
+                                            {/* <img src={proItem.imgURLs[0]} alt="/" /> */}
                                             <div className="content">
                                                 <p className='name'>{proItem.name}</p>
                                                 {
@@ -103,7 +103,7 @@ const ClientProductItem: React.FC = () => {
                                                     <p>
                                                         Rent price:&nbsp;
                                                         <span>
-                                                            <CurrencyFormat value={proItem.rentPrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
+                                                            {/* <CurrencyFormat value={proItem.rentPrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} /> */}
                                                         </span>
                                                     </p>
                                                 }
@@ -112,11 +112,11 @@ const ClientProductItem: React.FC = () => {
                                                     <p>
                                                         Sale price:&nbsp;
                                                         <span>
-                                                            <CurrencyFormat value={proItem.salePrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
+                                                            {/* <CurrencyFormat value={proItem.salePrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} /> */}
                                                         </span>
                                                     </p>
                                                 }
-                                                <p>Quantity: <span>{proItem.quantity}</span></p>
+                                                {/* <p>Quantity: <span>{proItem.quantity}</span></p> */}
                                             </div>
                                         </Link>
                                         <button type='button' onClick={() => handleClickAddToCart('Rent', proItem)}>Add to Cart</button>

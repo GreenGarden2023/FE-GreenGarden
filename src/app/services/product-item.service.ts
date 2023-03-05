@@ -25,7 +25,7 @@ const getAllProductItem = async (pagingProps: Partial<Paging>, props: GetAllProp
         ...pagingProps,
         ...props
     }
-    const result = await golbalAxios.get<Response<ResponseType>>(`/product-item/get-products-items?${queryString.stringify(getAllProps)}`);
+    const result = await golbalAxios.get<Response<ResponseType>>(`/product-item/get-product-item?${queryString.stringify(getAllProps)}`);
     return result.data
 }
 const createProductItem = async () =>{

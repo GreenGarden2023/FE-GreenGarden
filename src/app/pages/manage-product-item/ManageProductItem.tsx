@@ -15,6 +15,8 @@ import { IoCreateOutline } from 'react-icons/io5';
 import ModalProductItem from 'app/components/modal/product-item/ModalProductItem';
 import { Action } from 'app/models/general-type';
 import { Product } from 'app/models/product';
+import { SiConvertio } from 'react-icons/si'
+import { MdPointOfSale } from 'react-icons/md';
 
 const ManageProductItem: React.FC = () => {
     const { productId } = useParams()
@@ -57,7 +59,7 @@ const ManageProductItem: React.FC = () => {
     const handleCloseModal = () =>{
         setAction('')
     }
-
+    console.log(productItems)
     return (
         <div className="mpi-wrapper">
             <section className="mpi-product-infor default-layout">
@@ -77,33 +79,28 @@ const ManageProductItem: React.FC = () => {
                         productItems.map((pt, index) => (
                             <Col xs={24} xl={6} key={index}>
                                 <div className="mpi-item">
-                                    <img src={pt.imgURLs[0]} alt="/" />
+                                    {/* <img src={pt.sizeModeList[0].} alt="/" /> */}
+                                    <img src='/assets/inventory-empty.png' alt='/' />
                                     <div className="mpi-item-infor">
                                         <p className="name">{pt.name}</p>
-                                        <div className="size-quantiy-box">
-                                            <div className='size'>
-                                                <span>Size:</span>
-                                                <Tag color='#108ee9' title='Small' >Small</Tag>
-                                            </div>
-                                            <div className="quantity">
-                                                <span>Quantity:</span>
-                                                <Tag color='#108ee9' title='Small' >{pt.quantity}</Tag>
-                                            </div>
-                                        </div>
-                                        <div className="price-box">
-                                            <div className="sale-price">
-                                                <span>Sale price:</span>
-                                                <span>
-                                                    <CurrencyFormat value={pt.salePrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
-                                                </span>
-                                            </div>
-                                            <div className="rent-price">
-                                                <span>Rent price:</span>
-                                                <span>
-                                                    <CurrencyFormat value={pt.rentPrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
-                                                </span>
-                                            </div>
-                                        </div>
+                                        {
+                                            pt.sizeModelList.map((item, indexItem) => (
+                                                <div className="item-detail" key={indexItem}>
+                                                    <p className="size-name">{item.size.sizeName} ({item.quantity})</p>
+                                                    
+                                                    <p className="sale-price">
+                                                        <SiConvertio color='#00a76f' size={20} />
+                                                        <span className='label'>Sale price</span>
+                                                        <CurrencyFormat value={item.salePrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} className='price' />
+                                                    </p>
+                                                    <p className="rent-price">
+                                                        <MdPointOfSale color='#00a76f' size={20} />
+                                                        <span className="label">Rent price</span>
+                                                        <CurrencyFormat value={item.rentPrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} className='price' />
+                                                    </p>
+                                                </div>
+                                            ))
+                                        }
                                         <div className="btn-box">
                                             <button className='btn-detail'>Detail</button>
                                             <button className='btn-edit'>Edit</button>
@@ -116,7 +113,7 @@ const ManageProductItem: React.FC = () => {
                 </Row>
             </section>
             <ModalProductItem 
-                action={action}
+                // action={action}
                 open={action !== ''}
                 onClose={handleCloseModal}
                 productIdSelected={productId || ''}

@@ -3,6 +3,7 @@ import ClientCategory from 'app/pages/client-category/ClientCategory';
 import ClientProductItemDetail from 'app/pages/client-product-item-detail/ClientProductItemDetail';
 import ClientProductItem from 'app/pages/client-product-item/ClientProductItem';
 import ClientProduct from 'app/pages/client-product/ClientProduct';
+import HandleProductItem from 'app/pages/handle-product-item/HandleProductItem';
 import ManageProductItem from 'app/pages/manage-product-item/ManageProductItem';
 import ManageSize from 'app/pages/manage-size/ManageSize';
 import React, { useEffect } from 'react';
@@ -113,6 +114,7 @@ const Routers: React.FC = () =>{
                 <Route path='panel' >
                     <Route path='manage-category' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_CATEGORY} ><AdminRoute><ManageCategory /></AdminRoute></AuthGuard>} />
                     <Route path='manage-product' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_PRODUCT} ><AdminRoute><ManageProduct /></AdminRoute></AuthGuard>} />
+                    <Route path='manage-product-item/create' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_PRODUCT_ITEM} ><AdminRoute><HandleProductItem /></AdminRoute></AuthGuard>} />
                     <Route path='manage-product-item/:productId' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_PRODUCT_ITEM} ><AdminRoute><ManageProductItem /></AdminRoute></AuthGuard>} />
                     <Route path='manage-size' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_SIZE} ><AdminRoute><ManageSize /></AdminRoute></AuthGuard>} />
                 </Route>
