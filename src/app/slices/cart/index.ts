@@ -1,87 +1,29 @@
 import { createSlice, PayloadAction, CaseReducer } from '@reduxjs/toolkit';
-import { CartType } from 'app/models/general-type';
-import { ProductItem, ProductItemInCart } from 'app/models/product-item';
+import { CartItem } from 'app/models/cart';
 
-interface CartSliceProps{
-    rentalCart: ProductItemInCart[]
-    buyCart: ProductItemInCart[]
+export interface CartProps{
+    rentItems: CartItem[]
+    saleItems: CartItem[]
 }
 
-const initialState: CartSliceProps = {
-    rentalCart: [],
-    buyCart: []
+const initialState: CartProps = {
+    rentItems: [],
+    saleItems: []
 }
 
-type CR<T> = CaseReducer<CartSliceProps, PayloadAction<T>>;
+type CR<T> = CaseReducer<CartProps, PayloadAction<T>>;
+const setCartCR: CR<CartProps> = (_, action) => ({
+    ...action.payload
+})
 
-// chưa có cart / đã có cart nhưng chưa có item (id) / đã có cart và item
-const addToCartCR: CR<{cartType: CartType, item: ProductItem}> = (state, action) =>{
-    const { rentalCart, buyCart } = state
-    const { cartType, item } = action.payload
-    switch(cartType){
-        case 'Rent':
-            if(rentalCart.length === 0){
-                return {
-                    ...state,
-                    rentalCart: [
-                        {
-                            ...item,
-                            quantityInCart: 1
-                        }
-                    ]
-                }
-            }
-            const indexRentalInCart = rentalCart.findIndex(x => x.id === item.id)
-            console.log(indexRentalInCart)
-            if(indexRentalInCart < 0){
-                rentalCart.push({
-                    ...item,
-                    quantityInCart: 1
-                })
-                void(state.rentalCart = rentalCart)
-            }
-            const newRentalCart = [...rentalCart]
-            newRentalCart[indexRentalInCart].quantityInCart = newRentalCart[indexRentalInCart].quantityInCart + 1
-            void(state.rentalCart = newRentalCart)
-            break;
-        default:
-            if(buyCart.length === 0){
-                return {
-                    ...state,
-                    buyCart: [{
-                        ...item,
-                        quantityInCart: 1
-                    }]
-                }
-            }
-            const indexBuyInCart = buyCart.findIndex(x => x.id === item.id)
-            if(indexBuyInCart < 0){
-                buyCart.push({
-                    ...item,
-                    quantityInCart: 1
-                })
-                return {
-                    ...state,
-                    buyCart: buyCart
-                }
-            }
-            const newBuyCart = [...buyCart]
-            newBuyCart[indexBuyInCart].quantityInCart = newBuyCart[indexBuyInCart].quantityInCart + 1
-            return {
-                ...state,
-                rentalCart: newBuyCart
-            }
-            // break;
-    }
-}
 
 const slice = createSlice({
     name: 'cart/slice',
     initialState,
     reducers: {
-        addToCart: addToCartCR,
+        setCartSlice: setCartCR
     },
 });
 
-export const {addToCart } = slice.actions
+export const { setCartSlice } = slice.actions
 export default slice.reducer

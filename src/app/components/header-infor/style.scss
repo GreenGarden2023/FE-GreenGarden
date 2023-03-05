@@ -1,0 +1,9 @@
+@import 'app/styles/variable.scss';
+
+.hi-wrapper{
+    .hi-title{
+        color: $default-green;
+        font-size: 26px;
+        font-weight: 500;
+    }
+}

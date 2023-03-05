@@ -2,6 +2,21 @@
 
 .modal-pi-wrapper{
     .modal-pi-form{
+        .btn-plus-form{
+            width: 100%;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 7px;
+            font-weight: 500;
+            color: #fff;
+            background-color: $default-green;
+            opacity: 1;
+            &.disabled{
+                opacity: 0.5;
+            }
+        }
         .modal-pi-uploader{
             button{
                 display: flex;

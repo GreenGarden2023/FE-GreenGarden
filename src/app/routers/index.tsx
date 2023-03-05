@@ -1,5 +1,7 @@
 import { notification } from 'antd';
+import CheckoutSuccess from 'app/pages/check-out/CheckoutSuccess';
 import ClientCategory from 'app/pages/client-category/ClientCategory';
+import ClientOrder from 'app/pages/client-order/ClientOrder';
 import ClientProductItemDetail from 'app/pages/client-product-item-detail/ClientProductItemDetail';
 import ClientProductItem from 'app/pages/client-product-item/ClientProductItem';
 import ClientProduct from 'app/pages/client-product/ClientProduct';
@@ -13,12 +15,11 @@ import { Route, Routes, useNavigate } from 'react-router-dom';
 import useDispatch from '../hooks/use-dispatch';
 import useSelector from '../hooks/use-selector';
 import FileNotFound from '../pages/404/FileNotFound';
-import Cart from '../pages/cart/Cart';
+import CartPage from '../pages/cart/Cart';
 import LandingPage from '../pages/landing-page/LandingPage';
 import Login from '../pages/login/Login';
 import ManageCategory from '../pages/manage-category/ManageCategory';
 import ManageProduct from '../pages/manage-product/ManageProduct';
-import Product from '../pages/products/Product';
 import Register from '../pages/register/Register';
 import TermOfService from '../pages/term-of-services/TermOfServices';
 import ThankYou from '../pages/thank-you/ThankYou';
@@ -28,6 +29,7 @@ import { setLoading, setUser } from '../slices/user-infor';
 import CONSTANT from '../utils/constant';
 import AdminRoute from './AdminRoute';
 import AuthGuard from './AuthGuard';
+
 
 const Routers: React.FC = () =>{
     const dispatch = useDispatch();
@@ -103,18 +105,19 @@ const Routers: React.FC = () =>{
                 <Route path='/register' element={<Register />} />
                 <Route path='/login' element={<Login />} />
                 <Route path='/term-of-services' element={<TermOfService />} />
-                <Route path='/cart' element={<Cart />} />
+                <Route path='/cart' element={<CartPage />} />
                 <Route path='/thankyou' element={<ThankYou />} />
                 <Route path='/category' element={<ClientCategory />} />
-                <Route path='/product/:categoryId' element={<ClientProduct />} />
-                <Route path='/product/:productId/product-item' element={<ClientProductItem />} />
+                <Route path='/category/:categoryId' element={<ClientProduct />} />
+                <Route path='/product/:productId' element={<ClientProductItem />} />
                 <Route path='/product-item/:productItemId' element={<ClientProductItemDetail />} />
+                <Route path='/orders' element={<ClientOrder />} />
+                <Route path='/checkout-success' element={<CheckoutSuccess />} />
 
-                <Route path='/:slug' element={<AuthGuard rolesAuth={['Customer']} ><Product /></AuthGuard>} />
                 <Route path='panel' >
                     <Route path='manage-category' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_CATEGORY} ><AdminRoute><ManageCategory /></AdminRoute></AuthGuard>} />
                     <Route path='manage-product' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_PRODUCT} ><AdminRoute><ManageProduct /></AdminRoute></AuthGuard>} />
-                    <Route path='manage-product-item/create' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_PRODUCT_ITEM} ><AdminRoute><HandleProductItem /></AdminRoute></AuthGuard>} />
+                    <Route path='manage-product-item/:productId/create' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_PRODUCT_ITEM} ><AdminRoute><HandleProductItem /></AdminRoute></AuthGuard>} />
                     <Route path='manage-product-item/:productId' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_PRODUCT_ITEM} ><AdminRoute><ManageProductItem /></AdminRoute></AuthGuard>} />
                     <Route path='manage-size' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_SIZE} ><AdminRoute><ManageSize /></AdminRoute></AuthGuard>} />
                 </Route>
@@ -123,5 +126,6 @@ const Routers: React.FC = () =>{
         </>
     );
 }
+
 
 export default Routers;

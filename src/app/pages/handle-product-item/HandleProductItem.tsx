@@ -8,48 +8,59 @@ import useDispatch from 'app/hooks/use-dispatch';
 import { ProductItemType } from 'app/models/general-type';
 import { ProductItemHandleCreate } from 'app/models/product-item';
 import { Size } from 'app/models/size';
+import productItemService from 'app/services/product-item.service';
 import sizeService from 'app/services/size.service';
 import { setNoti } from 'app/slices/notification';
 import CONSTANT from 'app/utils/constant';
 import utilsFile from 'app/utils/file';
 import React, { useEffect, useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
-import { AiFillCaretDown, AiOutlineCloseCircle, AiOutlineCloudUpload } from 'react-icons/ai';
+import { AiFillCaretDown, AiOutlineCloseCircle, AiOutlineCloudUpload, AiOutlinePlusCircle } from 'react-icons/ai';
 import { BiDollar } from 'react-icons/bi';
+import { useNavigate, useParams } from 'react-router-dom';
 import * as yup from 'yup';
 import './style.scss';
 
 // import fileService from 'app/services/file.service';
 
 const schema = yup.object().shape({
-    // name: yup.string().required('Product name is required').min(5, 'Product name is greater than 5 characters').max(30, 'Product name is less than 30 characters'),
+    name: yup.string().required('Product name is required').min(5, 'Product name is greater than 5 characters').max(30, 'Product name is less than 30 characters'),
     // salePrice: yup.number().required('Sale price is required').positive('Sale price must be positive number').max(1000000000, 'Sale price is less than 1.000.000.000 VNĐ'),
-    // description: yup.string().max(200, 'Description is less than 200 characters'),
+    description: yup.string().max(500, 'Description is less than 500 characters'),
     // sizeId: yup.string().required('Size is required'),
     // quantity: yup.number().positive('Quantity is positive number').max(1000000, 'Quantity is less than 1000000'),
-    // type: yup.string().required('Type is required'),
+    type: yup.string().required('Type is required'),
     // rentPrice: yup.number().positive('Rent price is positive number').max(1000000000, 'Sale price is less than 1.000.000.000 VNĐ'),
-
+    sizeModelList: yup.array().of(yup.object().shape({
+        quantity: yup.number().positive('Quantity is positive number').max(1000000, 'Quantity is less than 1000000'),
+        rentPrice: yup.number().required('Rent price is required').positive('Rent price is positive number').max(1000000000, 'Sale price is less than 1.000.000.000 VNĐ'),
+        salePrice: yup.number().required('Sale price is required').positive('Sale price must be positive number').max(1000000000, 'Sale price is less than 1.000.000.000 VNĐ'),
+        sizeId: yup.string().required('Size is required')
+    }))
 })
 
 
 const HandleProductItem: React.FC = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { productId } = useParams()
+
     const [sizes, setSizes] = useState<Size[]>([])
     const [uploaded, setUploaded] = useState<UploadFile[][]>([])
-    const [listErr, setListErr] = useState<string[][]>([])
+    // const [listErr, setListErr] = useState<string[][]>([])
 
-    const { setValue, getValues, control, handleSubmit, formState: { errors, isSubmitted, isSubmitting },  trigger, setError } = useForm<ProductItemHandleCreate>({
+    const { setValue, getValues, control, handleSubmit, formState: { errors, isSubmitting },  trigger } = useForm<ProductItemHandleCreate>({
         defaultValues: {
            sizeModelList: []
         },
-        // resolver: yupResolver(schema)
+        resolver: yupResolver(schema)
     })
 
-    const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
+    const { fields, append, remove } = useFieldArray({
         control,
         name: 'sizeModelList'
     })
+    
 
     useEffect(() =>{
         const init = async () =>{
@@ -63,11 +74,16 @@ const HandleProductItem: React.FC = () => {
         init()
     }, [dispatch])
 
+    useEffect(() =>{
+        if(!productId) return;
+        setValue('productId', productId)
+    }, [productId, setValue])
+
     const handleCloseModal = () =>{
         // onClose()
     }
     
-    const isValidLarge = (files: RcFile[] | UploadFile[]) =>{
+    // const isValidLarge = (files: RcFile[] | UploadFile[]) =>{
     //     const newFiles = files.map(x => x as RcFile)
     //     let errorMsg = ''
     //     for (let i = 0; i < newFiles.length; i++) {
@@ -86,55 +102,63 @@ const HandleProductItem: React.FC = () => {
     //         return false
     //     }
     //     return true
-    }
+    // }
 
-    const test = (index: number, value: string[]) =>{
-        return new Promise(res => {
-res(handleSetListError(index,value ))
-        })
-    }
+    // const test = (index: number, value: string[]) =>{
+    //     return new Promise(res => {
+    //         res(handleSetListError(index,value ))
+    //     })
+    // }
 
-    const handleSetListError = (index: number, value: string[]) =>{
-        const lError = [...listErr]
-        console.log(lError)
-        lError[index] = value
-        setListErr([...lError])
-    }
-    console.log(listErr)
+    // const handleSetListError = (index: number, value: string[]) =>{
+    //     const lError = [...listErr]
+    //     console.log(lError)
+    //     lError[index] = value
+    //     setListErr([...lError])
+    // }
     const handleSubmitForm = async (data: ProductItemHandleCreate) =>{
-        let check = true
-        for (let i = 0; i < data.sizeModelList.length; i++) {
-            const element = data.sizeModelList[i];
-            if(!element.imgFiles || element.imgFiles.length === 0){
-                console.log(i, element)
-                await test(i, ['Images is required'])
-                // const lError = [...listErr]
-                // lError[i] = []
-                // setListErr([...lError])
-            }else if(element.imgFiles.length > 6){
-                await test(i, ['Image count is less than 7 items'])
-                check = false
-                // const lError = [...listErr]
-                // lError[i] = ['Image count is less than 7 items']
-                // setListErr([...lError])
-            }else{
-                let errorMsg = ''
-                for (let j = 0; j < element.imgFiles.length; j++) {
-                    const child = element.imgFiles[j];
-                    if(!CONSTANT.SUPPORT_FORMATS.includes(child.type)){
-                        errorMsg += `Image ${j + 1} is not valid file\n\r`
-                        check = false
-
-                    }
-                }
-                if(errorMsg){
-                    await test(i, [errorMsg])
-                    
-                }else{
-                    await test(i, [])
-                }
-            }
+        console.log({data})
+        try{
+            await productItemService.createProductItem(data)
+            dispatch(setNoti({type: 'success', message: `Thêm mới ${data.name} thành công`}))
+            const productId = '938e6315-4a13-477d-8cda-3a04534ca543'
+            navigate(`/panel/manage-product-item/${productId}?page=1`)
+        }catch{
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
         }
+        let check = true
+        // for (let i = 0; i < data.sizeModelList.length; i++) {
+        //     const element = data.sizeModelList[i];
+        //     if(!element.imgFiles || element.imgFiles.length === 0){
+        //         console.log(i, element)
+        //         await test(i, ['Images is required'])
+        //         // const lError = [...listErr]
+        //         // lError[i] = []
+        //         // setListErr([...lError])
+        //     }else if(element.imgFiles.length > 6){
+        //         await test(i, ['Image count is less than 7 items'])
+        //         check = false
+        //         // const lError = [...listErr]
+        //         // lError[i] = ['Image count is less than 7 items']
+        //         // setListErr([...lError])
+        //     }else{
+        //         let errorMsg = ''
+        //         for (let j = 0; j < element.imgFiles.length; j++) {
+        //             const child = element.imgFiles[j];
+        //             if(!CONSTANT.SUPPORT_FORMATS.includes(child.type)){
+        //                 errorMsg += `Image ${j + 1} is not valid file\n\r`
+        //                 check = false
+
+        //             }
+        //         }
+        //         if(errorMsg){
+        //             await test(i, [errorMsg])
+                    
+        //         }else{
+        //             await test(i, [])
+        //         }
+        //     }
+        // }
         if(!check) return
 
         // const files = data.imgFiles || []
@@ -175,12 +199,11 @@ res(handleSetListError(index,value ))
             listFile.push(originFileObj)
         }
         await trigger(`sizeModelList.${index}.imagesURL`)
-        setValue(`sizeModelList.${index}.imgFiles`, listFile)
-        await trigger(`sizeModelList.${index}.imgFiles`)
+        setValue(`sizeModelList.${index}.Images`, listFile)
+        await trigger(`sizeModelList.${index}.Images`)
 
         // clearErrors('imgURLs')
     }
-    console.log(uploaded)
     const handleRemoveItem = async (index: number, indexImg: number) =>{
         console.log({index, indexImg})
         const itemUploads = [...uploaded]
@@ -188,13 +211,13 @@ res(handleSetListError(index,value ))
         setUploaded([...itemUploads])
 
         const urls = getValues(`sizeModelList.${index}.imagesURL`)
-        const files = getValues(`sizeModelList.${index}.imgFiles`)
+        const files = getValues(`sizeModelList.${index}.Images`)
 
         urls?.splice(indexImg, 1)
         files?.splice(indexImg, 1)
 
         setValue(`sizeModelList.${indexImg}.imagesURL`, urls)
-        setValue(`sizeModelList.${indexImg}.imgFiles`, files)
+        setValue(`sizeModelList.${indexImg}.Images`, files)
 
         await trigger('sizeModelList')
         // if(!isSubmitted) return;
@@ -233,13 +256,13 @@ res(handleSetListError(index,value ))
     }
     const handleAddSize = () =>{
         if(getValues('sizeModelList').length >= 1 && getValues('type') === 'unique'){
-            dispatch(setNoti({type: 'warning', message: 'Can not gi do'}))
+            dispatch(setNoti({type: 'warning', message: 'Loại duy nhất chỉ được thêm 1 loại cây'}))
             return
         }
         append({
             status: 'active'
         })
-        trigger('sizeModelList')
+        // trigger('sizeModelList')
     }
     const handleRemove = (index: number) =>{
         const items = [...uploaded]
@@ -248,7 +271,7 @@ res(handleSetListError(index,value ))
             setUploaded([...items])
         }
         remove(index)
-        trigger('sizeModelList')
+        // trigger('sizeModelList')
     }
     return (
         // <Modal
@@ -259,7 +282,7 @@ res(handleSetListError(index,value ))
         //     // title={`${action} product item ${productItem ? (' ' + productItem.name) : ''}`}
         //     width={800}
         // >
-        <div className="modal-pi-wrapper">
+        <div className="modal-pi-wrapper default-layout">
             <Form
                 layout='vertical'
                 onFinish={handleSubmit(handleSubmitForm)}
@@ -273,6 +296,7 @@ res(handleSetListError(index,value ))
                                 name='name'
                                 render={({ field }) => <Input {...field} />}
                             />
+                            {errors.name && <ErrorMessage message={errors.name.message} />}
                         </Form.Item>
                     </Col>
                     <Col span={12}>
@@ -295,6 +319,7 @@ res(handleSetListError(index,value ))
                                     </Select>
                                 )}
                             />
+                            {errors.type && <ErrorMessage message={errors.type.message} />}
                         </Form.Item>
                     </Col>
                     <Col span={24}>
@@ -304,19 +329,29 @@ res(handleSetListError(index,value ))
                                 name='description'
                                 render={({ field }) => <Input.TextArea {...field} style={{height: 120}} />}
                             />
+                            {errors.description && <ErrorMessage message={errors.description.message} />}
                         </Form.Item>
                     </Col>
                     <Col span={24}>
-                        <Button htmlType='button' disabled={!getValues('type')} onClick={handleAddSize}>Plus</Button>
+                        <Form.Item>
+                            <Button 
+                            htmlType='button' 
+                            disabled={!getValues('type')} onClick={handleAddSize} 
+                            className={`btn-plus-form ${getValues('type') ? 'active' : 'disabled'}`}>
+                                <AiOutlinePlusCircle size={25} />
+                                Add an item
+                            </Button>
+                        </Form.Item>
                     </Col>
                     {
                         fields.map((field, index) => (
                             <React.Fragment key={index}>
+                                <Divider orientation='center' >Item {index + 1}</Divider>
                                 <Col span={12}>
                                     <Form.Item label='Size' required>
                                         <Controller 
                                             control={control}
-                                            name={`sizeModelList.${index}.size`}
+                                            name={`sizeModelList.${index}.sizeId`}
                                             render={({ field }) => (
                                                 <Select suffixIcon={<AiFillCaretDown />} {...field} >
                                                     {
@@ -329,35 +364,7 @@ res(handleSetListError(index,value ))
                                                 </Select>
                                             )}
                                         />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={12}>
-                                    <Form.Item label='Status'>
-                                        <Controller 
-                                            control={control}
-                                            name={`sizeModelList.${index}.status`}
-                                            render={({ field: {value} }) => <Switch checked={value === 'active'} onChange={(checked: boolean) => {
-                                                setValue(`sizeModelList.${index}.status`, checked ? 'active' : 'disable')
-                                            }} />}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={12}>
-                                    <Form.Item label='Sale Price' required>
-                                        <Controller 
-                                            control={control}
-                                            name={`sizeModelList.${index}.salePrice`}
-                                            render={({ field }) => <InputNumber type={'number'} addonAfter={<BiDollar />} {...field} style={{width: '100%'}} />}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={12}>
-                                    <Form.Item label='Rent Price' required>
-                                        <Controller 
-                                            control={control}
-                                            name={`sizeModelList.${index}.rentPrice`}
-                                            render={({ field }) => <InputNumber type={'number'} addonAfter={<BiDollar />} {...field} style={{width: '100%'}} />}
-                                        />
+                                        {errors.sizeModelList?.[index]?.sizeId && <ErrorMessage message={errors.sizeModelList?.[index]?.sizeId?.message} />}
                                     </Form.Item>
                                 </Col>
                                 <Col span={12}>
@@ -375,10 +382,45 @@ res(handleSetListError(index,value ))
                                                 />
                                             )}
                                         />
+                                        {errors.sizeModelList?.[index]?.quantity && <ErrorMessage message={errors.sizeModelList?.[index]?.quantity?.message} />}
+                                    </Form.Item>
+                                </Col>
+                                
+                                <Col span={12}>
+                                    <Form.Item label='Sale Price' required>
+                                        <Controller 
+                                            control={control}
+                                            name={`sizeModelList.${index}.salePrice`}
+                                            render={({ field }) => <InputNumber type={'number'} addonAfter={<BiDollar />} {...field} style={{width: '100%'}} />}
+                                        />
+                                        {errors.sizeModelList?.[index]?.salePrice && <ErrorMessage message={errors.sizeModelList?.[index]?.salePrice?.message} />}
                                     </Form.Item>
                                 </Col>
                                 <Col span={12}>
-                                    <Button htmlType='button' onClick={() => handleRemove(index)}>Remove</Button>
+                                    <Form.Item label='Rent Price' required>
+                                        <Controller 
+                                            control={control}
+                                            name={`sizeModelList.${index}.rentPrice`}
+                                            render={({ field }) => <InputNumber type={'number'} addonAfter={<BiDollar />} {...field} style={{width: '100%'}} />}
+                                        />
+                                        {errors.sizeModelList?.[index]?.rentPrice && <ErrorMessage message={errors.sizeModelList?.[index]?.rentPrice?.message} />}
+                                    </Form.Item>
+                                </Col>
+                                <Col span={3}>
+                                    <Form.Item label='Status'>
+                                        <Controller 
+                                            control={control}
+                                            name={`sizeModelList.${index}.status`}
+                                            render={({ field: {value} }) => <Switch checked={value === 'active'} onChange={(checked: boolean) => {
+                                                setValue(`sizeModelList.${index}.status`, checked ? 'active' : 'disable')
+                                            }} />}
+                                        />
+                                    </Form.Item>
+                                </Col>
+                                <Col span={3}>
+                                    <Form.Item label='Remove Item'>
+                                        <Button htmlType='button' onClick={() => handleRemove(index)}>Remove</Button>
+                                    </Form.Item>
                                 </Col>
                                 <Col span={24}>
                                     <Form.Item label='Images' required>
@@ -419,12 +461,12 @@ res(handleSetListError(index,value ))
                                                 </Row>
                                             </Image.PreviewGroup>
                                         </Col>
-                                        {
+                                        {/* {
                                             (listErr[index] && listErr[index].length !== 0) && 
                                             <Col span={24}>
                                                 <ErrorMessage message={listErr[index][0]} />
                                             </Col>
-                                        }
+                                        } */}
                                     </>
                                 }
                                 <Col span={24}>
@@ -448,10 +490,11 @@ res(handleSetListError(index,value ))
                                         />
                                     </Form.Item>
                                 </Col>
-                                <Divider />
+                                
                             </React.Fragment>
                         ))
                     }
+                    {errors.sizeModelList && <ErrorMessage message={errors.sizeModelList.message} />}
                     <Col span={24}>
                         <Form.Item className='btn-form-wrapper'>
                             <Button htmlType='button' disabled={isSubmitting} type='default' className='btn-cancel' size='large' onClick={handleCloseModal}>Cancel</Button>

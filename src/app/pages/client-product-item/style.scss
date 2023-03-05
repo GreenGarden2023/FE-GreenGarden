@@ -3,10 +3,12 @@
 .cpi-wrapper{
     .cpi-box{
         .col-item{
-            padding: 5px;
-            border: 1px solid $default-green;
-            border-radius: 5px;
             .cp-item{
+                padding: 5px;
+                border: 1px solid $default-green;
+                border-radius: 5px;
+                display: block;
+                height: 100%;
                 img{
                     width: 100%;
                 }

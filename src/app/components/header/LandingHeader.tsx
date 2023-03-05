@@ -1,5 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Badge, Button, Col, Form, Input, Modal, Row, Select } from 'antd';
+import cartService from 'app/services/cart.service';
+import { CartProps, setCartSlice } from 'app/slices/cart';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { AiFillCaretDown, AiOutlineShoppingCart, AiOutlineUserAdd } from 'react-icons/ai';
@@ -32,7 +34,7 @@ const LandingHeader: React.FC = () =>{
     const [openModalUserInfor, setOpenModalInfor] = useState(false);
     
     const userState = useSelector(state => state.userInfor);
-    const { rentalCart, buyCart } = useSelector(state => state.CartStore)
+   
 
     const { setValue, formState: { errors, isSubmitting }, control, handleSubmit, reset } = useForm<UserUpdate>({
         resolver: yupResolver(schema)
@@ -53,6 +55,24 @@ const LandingHeader: React.FC = () =>{
         setValue('favorite', favorite);
     }, [openModalUserInfor, userState, setValue, reset])
 
+    useEffect(() =>{
+      if(location.pathname === '/cart') return;
+
+      const init = async () =>{
+        try{
+          const result = await cartService.getCart()
+          const cartProps: CartProps = {
+            rentItems: [...result.data.rentItems?.map(x => ({sizeProductItemID: x.sizeProductItem.id, quantity: x.quantity})) || []],
+            saleItems: [...result.data.saleItems?.map(x => ({sizeProductItemID: x.sizeProductItem.id, quantity: x.quantity})) || []],
+        }
+          dispatch(setCartSlice(cartProps))
+        }catch{
+          dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+        }
+      }
+      init()
+    }, [dispatch, location])
+
     const handleLogout = () =>{
         localStorage.removeItem(CONSTANT.STORAGE.ACCESS_TOKEN)
         dispatch(setEmptyUser())
@@ -70,21 +90,21 @@ const LandingHeader: React.FC = () =>{
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
         }
     }
-
+    const { rentItems, saleItems } = useSelector(state => state.CartStore)
     const cartQuantity = useMemo(() =>{
       let quantity = 0
-      for (let i = 0; i < rentalCart.length; i++) {
-        const element = rentalCart[i];
-          quantity += element.quantityInCart
+      for (let i = 0; i < rentItems.length; i++) {
+        const element = rentItems[i];
+          quantity += element.quantity
       }
-      for (let i = 0; i < buyCart.length; i++) {
-        const element = buyCart[i];
-          quantity += element.quantityInCart
+      for (let i = 0; i < saleItems.length; i++) {
+        const element = saleItems[i];
+          quantity += element.quantity
       }
       return quantity
-    }, [rentalCart, buyCart])
+    }, [rentItems, saleItems])
 
-    console.log({rentalCart, buyCart})
+    console.log({rentItems, saleItems})
 
     return (
         <>

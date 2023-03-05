@@ -61,7 +61,7 @@ const ClientCategory: React.FC = () => {
                             categories.map((category, index) =>(
                                 <Col  key={index} xs={24} xl={6} >
                                     <div className="rc-item">
-                                        <Link to={`/product/${category.id}?page=1`} >
+                                        <Link to={`/category/${category.id}?page=1`} >
                                             <img 
                                                 src={category.imgUrl} alt='/' 
                                                 onError={({currentTarget }) => {

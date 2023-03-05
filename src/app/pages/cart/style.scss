@@ -1,1 +1,100 @@
-@import '../../styles/variable.scss';
+@import 'app/styles/variable.scss';
+
+.cart-wrapper{
+    .cart-box{
+        .cart-rent, .cart-sale{
+            position: relative;
+            border: 1px solid $default-green;
+            border-radius: 5px;
+            padding: 30px 10px 10px 10px;
+            margin-top: 10px;
+            p{
+                position: absolute;
+                top: 0;
+                transform: translateY(-50%);
+                background-color: #fff;
+                font-size: 26px;
+                font-weight: 500;
+                padding: 0 5px;
+                color: $default-green;
+            }
+            .cart-table{
+                .quantity-box{
+                    display: flex;
+                    justify-content: center;
+                    button{
+                        font-size: 16px;
+                        line-height: 0px;
+                        border: solid 1px #e1e1e1;
+                        display: inline-block;
+                        width: 26px;
+                        height: 26px;
+                        line-height: 23px;
+                        border-radius: 3px;
+                        background: #fff;
+                        color: #131425;
+                        text-align: center;
+                        padding: 0px;
+                    }
+                    input{
+                        margin: 0px 5px;
+                        padding: 0px;
+                        display: block;
+                        float: left;
+                        color: #131425;
+                        height: 26px;
+                        min-height: 26px;
+                        line-height: 26px;
+                        border: 1px solid #e1e1e1;
+                        width: 48px;
+                        text-align: center;
+                        box-shadow: none;
+                        border-radius: 3px;
+                        font-size: 14px;
+                        &:focus{
+                            border-color: rgb(86, 181, 245);
+                        }
+                    }
+                }
+            }
+        }
+        .cart-rent{
+            margin-top: 30px;
+        }
+    }
+    .cart-infor{
+        .box{
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-end;
+            font-weight: bold;
+            font-size: 17px;
+            .cart-quantity{
+                span{
+                    color: $default-green;
+                    margin-right: 5px;
+                }
+            }
+            .cart-total{
+                span{
+                    color: $default-green;
+                    margin-left: 5px;
+                }
+            }
+            .btn-order{
+                color: #fff;
+                background-color: $default-green;
+                border: none;
+                height: 40px;
+                padding: 0 30px;
+                font-weight: 500;
+            }
+            .cart-date-picker{
+                p{
+                    margin-bottom: 5px;
+                }
+            }
+        }
+    }
+}

@@ -1,22 +1,21 @@
-import { Col, Row, Tag } from 'antd';
+import { Col, Row } from 'antd';
 import useDispatch from 'app/hooks/use-dispatch';
-import React, { useEffect, useState } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import CurrencyFormat from 'react-currency-format';
-import './style.scss';
 import { setNoti } from 'app/slices/notification';
 import CONSTANT from 'app/utils/constant';
-// import productServcie from 'app/services/product.service';
+import React, { useEffect, useState } from 'react';
+import CurrencyFormat from 'react-currency-format';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import './style.scss';
+import ModalProductItem from 'app/components/modal/product-item/ModalProductItem';
+import { Action } from 'app/models/general-type';
+import { Paging } from 'app/models/paging';
+import { Product } from 'app/models/product';
 import { ProductItem } from 'app/models/product-item';
 import productItemService from 'app/services/product-item.service';
 import pagingPath from 'app/utils/paging-path';
-import { Paging } from 'app/models/paging';
 import { IoCreateOutline } from 'react-icons/io5';
-import ModalProductItem from 'app/components/modal/product-item/ModalProductItem';
-import { Action } from 'app/models/general-type';
-import { Product } from 'app/models/product';
-import { SiConvertio } from 'react-icons/si'
 import { MdPointOfSale } from 'react-icons/md';
+import { SiConvertio } from 'react-icons/si';
 
 const ManageProductItem: React.FC = () => {
     const { productId } = useParams()
@@ -54,6 +53,7 @@ const ManageProductItem: React.FC = () => {
 
     const handleCreateProduct = () =>{
         setAction('Create')
+        navigate(`/panel/manage-product-item/${product?.id}/create`)
     }
 
     const handleCloseModal = () =>{

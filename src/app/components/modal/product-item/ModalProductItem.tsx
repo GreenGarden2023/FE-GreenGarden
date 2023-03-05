@@ -1,24 +1,21 @@
-import { Button, Col, Form, Image, Input, Modal, Row, Select, Switch, Upload, UploadProps } from 'antd';
-import { Action, ProductItemType } from 'app/models/general-type';
-import { ProductItem, ProductItemHandleCreate } from 'app/models/product-item';
-import React, { useEffect, useState } from 'react';
-import { useForm, Controller, useFieldArray } from 'react-hook-form';
-import './style.scss';
-import * as yup from 'yup';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
 import { yupResolver } from '@hookform/resolvers/yup';
-import {InputNumber} from 'antd';
-import { BiDollar } from 'react-icons/bi';
-import { AiFillCaretDown, AiOutlineCloseCircle, AiOutlineCloudUpload } from 'react-icons/ai';
-import { Size } from 'app/models/size';
+import { Button, Col, Form, Input, InputNumber, Modal, Row, Select, Switch, Upload } from 'antd';
+// import {  UploadFile } from 'antd/es/upload';
 import useDispatch from 'app/hooks/use-dispatch';
+import { ProductItemType } from 'app/models/general-type';
+import { ProductItemHandleCreate } from 'app/models/product-item';
+import { Size } from 'app/models/size';
 import sizeService from 'app/services/size.service';
 import { setNoti } from 'app/slices/notification';
 import CONSTANT from 'app/utils/constant';
-import { RcFile, UploadChangeParam, UploadFile } from 'antd/es/upload';
-import utilsFile from 'app/utils/file';
-import ErrorMessage from 'app/components/message.tsx/ErrorMessage';
-import {CKEditor} from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import React, { useEffect, useState } from 'react';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { AiFillCaretDown, AiOutlineCloudUpload } from 'react-icons/ai';
+import { BiDollar } from 'react-icons/bi';
+import * as yup from 'yup';
+import './style.scss';
 
 // import fileService from 'app/services/file.service';
 
@@ -45,16 +42,16 @@ interface ModalProductItemProps{
 const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, open, onClose}) => {
     const dispatch = useDispatch();
     const [sizes, setSizes] = useState<Size[]>([])
-    const [uploaded, setUploaded] = useState<UploadFile[]>([])
+    // const [uploaded, setUploaded] = useState<UploadFile[]>([])
 
-    const { setValue, getValues, control, handleSubmit, formState: { errors, isSubmitted, isSubmitting },  trigger, setError } = useForm<ProductItemHandleCreate>({
+    const { setValue, getValues, control, handleSubmit, formState: {  isSubmitting },  trigger } = useForm<ProductItemHandleCreate>({
         defaultValues: {
            
         },
         resolver: yupResolver(schema)
     })
 
-    const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
+    const { fields } = useFieldArray({
         control,
         name: 'sizeModelList'
     })
@@ -88,7 +85,7 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, o
         onClose()
     }
     
-    const isValidLarge = (files: RcFile[] | UploadFile[]) =>{
+    // const isValidLarge = (files: RcFile[] | UploadFile[]) =>{
     //     const newFiles = files.map(x => x as RcFile)
     //     let errorMsg = ''
     //     for (let i = 0; i < newFiles.length; i++) {
@@ -107,7 +104,7 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, o
     //         return false
     //     }
     //     return true
-    }
+    // }
 
     const handleSubmitForm = async (data: ProductItemHandleCreate) =>{
         // const files = data.imgFiles || []
@@ -131,13 +128,13 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, o
         
     }
     
-    const handleUpload  = async (index: number, info: UploadChangeParam<UploadFile<any>>) =>{
-        const listPreview: string[] = []
-        const listFile: RcFile[] = []
-        console.log(info)
-        // console.log(info.fileList)
-        // console.log()
-        setUploaded([...info.fileList])
+    // const handleUpload  = async (index: number, info: UploadChangeParam<UploadFile<any>>) =>{
+    //     const listPreview: string[] = []
+    //     const listFile: RcFile[] = []
+    //     console.log(info)
+    //     // console.log(info.fileList)
+    //     // console.log()
+    //     setUploaded([...info.fileList])
 
         // const fileInForm = getValues('imgFiles') || []
         
@@ -162,25 +159,26 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, o
         // await trigger('imgURLs')
         // setValue('imgFiles', listFile)
         // clearErrors('imgURLs')
-    }
-    const handleRemoveItem = async (index: number) =>{
-        // let newFileList = [...uploaded];
-        // newFileList.splice(index, 1)
-        // setUploaded([...newFileList])
+    // }
+
+    // const handleRemoveItem = async (index: number) =>{
+    //     // let newFileList = [...uploaded];
+    //     // newFileList.splice(index, 1)
+    //     // setUploaded([...newFileList])
         
 
-        // const urls = getValues('imgURLs')
-        // const files = getValues('imgFiles')
+    //     // const urls = getValues('imgURLs')
+    //     // const files = getValues('imgFiles')
 
-        // urls?.splice(index, 1)
-        // files?.splice(index, 1)
+    //     // urls?.splice(index, 1)
+    //     // files?.splice(index, 1)
 
-        // setValue('imgURLs', urls)
-        // setValue('imgFiles', files)
-        // await trigger('imgURLs')
-        // if(!isSubmitted) return;
-        // isValidLarge(newFileList)
-    }
+    //     // setValue('imgURLs', urls)
+    //     // setValue('imgFiles', files)
+    //     // await trigger('imgURLs')
+    //     // if(!isSubmitted) return;
+    //     // isValidLarge(newFileList)
+    // }
     function uploadPlugin(editor) {
         editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
           return uploadAdapter(loader);
@@ -273,7 +271,7 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, o
                                     <Form.Item label='Size' required>
                                         <Controller 
                                             control={control}
-                                            name={`sizeModelList.${index}.size`}
+                                            name={`sizeModelList.${index}.sizeId`}
                                             render={({ field }) => (
                                                 <Select suffixIcon={<AiFillCaretDown />} {...field} >
                                                     {
@@ -337,12 +335,12 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, o
                                 <Col span={24}>
                                     <Form.Item label='Images' required>
                                         <Upload
-                                            onChange={(info) => handleUpload(index, info)}
+                                            // onChange={(info) => handleUpload(index, info)}
                                             showUploadList={false}
                                             accept='.png,.jpg,.jpeg'
                                             multiple
                                             className='modal-pi-uploader'
-                                            fileList={uploaded}
+                                            // fileList={uploaded}
                                             // onRemove={}
                                         >
                                                 <button type='button'>

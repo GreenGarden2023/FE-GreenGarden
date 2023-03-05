@@ -15,7 +15,8 @@ const MESSAGES = {
 }
 const FAVORITES = ['Hoa giấy', 'Hoa Hồng', 'Cây cảnh', 'Cây để bàn']
 const ERROS_MESSAGE = {
-    RESPONSE: 'Error occurred while handling. Please try again'
+    RESPONSE: 'Error occurred while handling. Please try again',
+    RESPONSE_VI: 'Đã xảy ra lỗi trong khi xử lý. Vui lòng thử lại',
 }
 const PAGING_ITEMS = {
     CATEGORY: 10,
