@@ -48,6 +48,11 @@ const CartPage: React.FC = () => {
             try{
                 const result = await cartService.getCart()
                 setCart(result.data)
+                const cartProps: CartProps = {
+                    rentItems: result.data.rentItems.map(x => ({sizeProductItemID: x.sizeProductItem.id, quantity: x.quantity})),
+                    saleItems: result.data.saleItems.map(x => ({sizeProductItemID: x.sizeProductItem.id, quantity: x.quantity})),
+                }
+                dispatch(setCartSlice(cartProps))
             }catch{
                 dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
@@ -71,7 +76,7 @@ const CartPage: React.FC = () => {
             align: 'center',
             render:(value) => (
                 <Image 
-                    src={value}
+                    src={value ? value : '/assets/inventory-empty.png'}
                     width={100}
                     height={100}
                     style={{maxHeight: '100px', objectFit: 'cover'}}
@@ -136,7 +141,7 @@ const CartPage: React.FC = () => {
             )
         }
     ]
-    console.log(sizeProductItemSelect)
+    
     const controlSale = async (sizeProductItemId: string, common: string) =>{
         console.log({sizeProductItemId, common})
         const newCart = {...cart}
@@ -343,7 +348,6 @@ const CartPage: React.FC = () => {
         })
         return price
     }, [cart, dateRange])
-    console.log({totalPrice})
 
     const handleRemoveItem = async () =>{
         const [type, id] = sizeProductItemSelect
@@ -382,10 +386,9 @@ const CartPage: React.FC = () => {
                 endRentDate: dateRange ? dateRange[1].format(dateFormat) : '',
             }
             await orderService.createOrder(orderProps)
-            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+            dispatch(setNoti({type: 'success', message: 'Tạo đơn hàng thành công'}))
             navigate('/checkout-success')
             dispatch(setCartSlice({rentItems: [], saleItems: []}))
-            setCart(undefined)
         }catch{
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
@@ -416,7 +419,7 @@ const CartPage: React.FC = () => {
                                             locale={locale} 
                                             placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
                                             format={dateFormatList}
-                                            disabledDate={(current) => current && current.valueOf() < Date.now()}
+                                            disabledDate={(current) => current && current.valueOf()  < (Date.now() + 277600000)}
                                             defaultValue={dateRange}
                                             onChange={handleChangeDateRange}
                                             status={(submited && !dateRange) ? 'error' : ''}

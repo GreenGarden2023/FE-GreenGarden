@@ -62,6 +62,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
        CONSTANT.MANAGE_CATEGORY.includes(roleName as Role) ? getItem(<Link to='/panel/manage-category'>Manage Category</Link>, '1', <BiCategoryAlt size={18} />) : null,
        CONSTANT.MANAGE_PRODUCT.includes(roleName as Role) ? getItem(<Link to='/panel/manage-product'>Manage Product</Link>, '2', <MdOutlineInventory2 size={18} />) : null,
        CONSTANT.MANAGE_SIZE.includes(roleName as Role) ? getItem(<Link to='/panel/manage-size'>Manage Size</Link>, '3', <MdOutlineInventory2 size={18} />) : null,
+       CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/manage-order'>Manage Order</Link>, '4', <BiCategoryAlt size={18} />) : null,
     ];
   return (
     <>

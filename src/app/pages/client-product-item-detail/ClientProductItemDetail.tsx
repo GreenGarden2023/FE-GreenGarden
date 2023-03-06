@@ -123,7 +123,7 @@ const ClientProductItemDetail: React.FC = () => {
                     data[index] = nest
                     newData.saleItems = data
                 }else{
-                    newData.saleItems = [...newData.saleItems, { sizeProductItemID: sizeProductItemId, quantity: 1}]
+                    newData.saleItems = [...newData.saleItems, { sizeProductItemID: sizeProductItemId, quantity: quanSale}]
                 }
                 console.log({newData})
                 const res = await cartService.addToCart(newData)
@@ -146,7 +146,7 @@ const ClientProductItemDetail: React.FC = () => {
                     data[index] = nest
                     newData.rentItems = data
                 }else{
-                    newData.rentItems = [...newData.rentItems, { sizeProductItemID: sizeProductItemId, quantity: 1}]
+                    newData.rentItems = [...newData.rentItems, { sizeProductItemID: sizeProductItemId, quantity: quanSale}]
                 }
                 console.log({newData})
                 const res = await cartService.addToCart(newData)
@@ -251,6 +251,10 @@ const ClientProductItemDetail: React.FC = () => {
                                                     <Tag style={{cursor: 'pointer'}} color={proItemDe.size.id === sizeSelect ? '#00a76f' : ''} key={i} onClick={() => handleSelectSize(proItemDe.size.id)} >{proItemDe.size.sizeName}</Tag>
                                                 ))
                                             }
+                                        </div>
+                                        <div className="num-tree">
+                                            <span className='title'>Số lượng cây còn lại</span>
+                                            <span className='result'>{proItemSelectBySize?.quantity}</span>
                                         </div>
                                         {
                                             proItemSelectBySize && 

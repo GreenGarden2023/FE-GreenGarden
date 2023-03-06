@@ -56,6 +56,17 @@
                     margin-right: 10px;
                 }
             }
+            .num-tree{
+                color: $default-green;
+                margin: 10px 0;
+                .title{
+                    font-size: 18px;
+                    margin-right: 5px;
+                }
+                .result{
+                    font-size: 30px;
+                }
+            }
             .price-box{
                 display: flex;
                 flex-wrap: wrap;
@@ -77,6 +88,11 @@
                     }
                     .price{
                         margin-bottom: 10px;
+                        .quan{
+                            border-right: 1px solid $default-green;
+                            padding-right: 10px;
+                            margin-right: 10px;
+                        }
                         span{
                             color: $default-green;
                             font-size: 30px;

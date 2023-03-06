@@ -30,11 +30,9 @@ const schema = yup.object().shape({
 const LandingHeader: React.FC = () =>{
     const dispatch = useDispatch();
     const location = useLocation()
-    
-    const [openModalUserInfor, setOpenModalInfor] = useState(false);
-    
     const userState = useSelector(state => state.userInfor);
-   
+
+    const [openModalUserInfor, setOpenModalInfor] = useState(false);
 
     const { setValue, formState: { errors, isSubmitting }, control, handleSubmit, reset } = useForm<UserUpdate>({
         resolver: yupResolver(schema)
@@ -67,7 +65,8 @@ const LandingHeader: React.FC = () =>{
         }
           dispatch(setCartSlice(cartProps))
         }catch{
-          dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+          // console.log('asdsa')
+          // dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
       }
       init()

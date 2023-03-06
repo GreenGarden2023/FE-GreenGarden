@@ -10,6 +10,7 @@ import categoryService from 'app/services/category.service';
 import productServcie from 'app/services/product.service';
 import { setNoti } from 'app/slices/notification';
 import CONSTANT from 'app/utils/constant';
+import utilGeneral from 'app/utils/general';
 import pagingPath from 'app/utils/paging-path';
 import React, { useEffect, useMemo, useState } from 'react';
 import { AiFillCaretDown, AiFillEdit } from 'react-icons/ai';
@@ -106,10 +107,7 @@ const ManageProduct: React.FC = () => {
           height={100}
           style={{maxHeight: '100px', objectFit: 'cover'}}
           src={record.imgUrl}
-          onError={({currentTarget }) => {
-            currentTarget.onerror = null
-            currentTarget.src = '/assets/inventory-empty.png'
-          }} 
+          onError={utilGeneral.setDefaultImage} 
         />
       ),
     },

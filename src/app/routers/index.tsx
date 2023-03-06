@@ -6,6 +6,7 @@ import ClientProductItemDetail from 'app/pages/client-product-item-detail/Client
 import ClientProductItem from 'app/pages/client-product-item/ClientProductItem';
 import ClientProduct from 'app/pages/client-product/ClientProduct';
 import HandleProductItem from 'app/pages/handle-product-item/HandleProductItem';
+import ManageOrder from 'app/pages/manage-order/ManageOrder';
 import ManageProductItem from 'app/pages/manage-product-item/ManageProductItem';
 import ManageSize from 'app/pages/manage-size/ManageSize';
 import React, { useEffect } from 'react';
@@ -106,7 +107,7 @@ const Routers: React.FC = () =>{
                 <Route path='/login' element={<Login />} />
                 <Route path='/term-of-services' element={<TermOfService />} />
                 <Route path='/cart' element={<CartPage />} />
-                <Route path='/thankyou' element={<ThankYou />} />
+                <Route path='/thanks' element={<ThankYou />} />
                 <Route path='/category' element={<ClientCategory />} />
                 <Route path='/category/:categoryId' element={<ClientProduct />} />
                 <Route path='/product/:productId' element={<ClientProductItem />} />
@@ -120,6 +121,7 @@ const Routers: React.FC = () =>{
                     <Route path='manage-product-item/:productId/create' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_PRODUCT_ITEM} ><AdminRoute><HandleProductItem /></AdminRoute></AuthGuard>} />
                     <Route path='manage-product-item/:productId' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_PRODUCT_ITEM} ><AdminRoute><ManageProductItem /></AdminRoute></AuthGuard>} />
                     <Route path='manage-size' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_SIZE} ><AdminRoute><ManageSize /></AdminRoute></AuthGuard>} />
+                    <Route path='manage-order' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageOrder /></AdminRoute></AuthGuard>} />
                 </Route>
                 <Route path='/file-not-found' element={<FileNotFound />} />
             </Routes>

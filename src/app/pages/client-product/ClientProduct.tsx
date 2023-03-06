@@ -9,6 +9,7 @@ import { Product } from 'app/models/product';
 import productServcie from 'app/services/product.service';
 import { setNoti } from 'app/slices/notification';
 import CONSTANT from 'app/utils/constant';
+import utilGeneral from 'app/utils/general';
 import pagingPath from 'app/utils/paging-path';
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -26,6 +27,7 @@ const ClientProduct: React.FC = () => {
     const [isRent, setIsRent] = useState<TypeOfSale>('rent')
 
     useEffect(() =>{
+      pagingPath.scrollTop()
       const currentPage = searchParams.get('page');
   
       if(!categoryId || !currentPage || !pagingPath.isValidPaging(currentPage)) {
@@ -78,7 +80,7 @@ const ClientProduct: React.FC = () => {
                       {/* <div className='cp-item'> */}
                         <Link to={`/product/${product.id}?page=1`} className='cp-item'>
                           <div className="left">
-                            <img src={product.imgUrl} alt="/" />
+                            <img src={product.imgUrl} alt="/" onError={utilGeneral.setDefaultImage}  />
                           </div>
                           <div className="right">
                             <h3 className='name'>{product.name}</h3>

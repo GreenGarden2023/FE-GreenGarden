@@ -12,9 +12,9 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import './style.scss';
 import productItemService from 'app/services/product-item.service';
 import { Product } from 'app/models/product';
-// import { CartType } from 'app/models/general-type';
-import CurrencyFormat from 'react-currency-format';
 import { Category } from 'app/models/category';
+import utilGeneral from 'app/utils/general';
+import PriceBox from 'app/components/price-box/PriceBox';
 
 const ClientProductItem: React.FC = () => {
     const { productId } = useParams()
@@ -28,6 +28,7 @@ const ClientProductItem: React.FC = () => {
     const [paging, setPaging] = useState<Paging>();
     console.log(paging)
     useEffect(() =>{
+        pagingPath.scrollTop()
         const currentPage = searchParams.get('page');
         if(!productId){
             return navigate('/category')
@@ -53,12 +54,6 @@ const ClientProductItem: React.FC = () => {
         init();
 
     }, [productId, dispatch, navigate, searchParams])
-
-    // const handleClickAddToCart = (cartType: CartType, productItem: ProductItem) =>{
-    //     if(cartType === 'Rent'){
-    //         // dispatch(addToCart({cartType, item: productItem}))
-    //     }
-    // }
 
     return (
         <div>
@@ -92,37 +87,16 @@ const ClientProductItem: React.FC = () => {
                         <Row gutter={[10, 10]}>
                             {
                                 productItems.map((proItem, index) => (
-                                    <Col xs={24} xl={6} key={index} className='col-item'>
+                                    <Col xs={24} xl={8} key={index} className='col-item'>
                                         <Link to={`/product-item/${proItem.id}`} className='cp-item'>
-                                            <img src={proItem.sizeModelList[0].imagesURL[0] ? proItem.sizeModelList[0].imagesURL[0] : '/assets/inventory-empty.png'} alt="/" />
+                                            <img src={proItem.sizeModelList[0].imagesURL[0] ? proItem.sizeModelList[0].imagesURL[0] : '/assets/inventory-empty.png'} alt="/" onError={utilGeneral.setDefaultImage} />
+                                            <p className='pro-name'>{proItem.name}</p>
                                             {
                                                 proItem.sizeModelList.map((pItem, i) => (
-                                                    <div className="content" key={i}>
-                                                        <p className='size'>{pItem.size.sizeName}</p>
-                                                        {
-                                                            product?.isForRent && 
-                                                            <p>
-                                                                Rent price:&nbsp;
-                                                                <span>
-                                                                    <CurrencyFormat value={pItem.rentPrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
-                                                                </span>
-                                                            </p>
-                                                        }
-                                                        {
-                                                            product?.isForSale && 
-                                                            <p>
-                                                                Sale price:&nbsp;
-                                                                <span>
-                                                                    <CurrencyFormat value={pItem.salePrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
-                                                                </span>
-                                                            </p>
-                                                        }
-                                                        {/* <p>Quantity: <span>{proItem.quantity}</span></p> */}
-                                                    </div>
+                                                    <PriceBox key={i} sizeName={pItem.size.sizeName} rentPrice={pItem.rentPrice} salePrice={pItem.salePrice} />
                                                 ))
                                             }
                                         </Link>
-                                        {/* <button type='button' onClick={() => handleClickAddToCart('Rent', proItem)}>Add to Cart</button> */}
                                     </Col>
                                 ))
                             }

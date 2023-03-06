@@ -44,10 +44,11 @@ const SUPPORT_FORMATS = ['image/png', 'image/jpg', 'image/jpeg']
 
 
 
-const MANAGE_CATEGORY: Role[] = ['Admin', 'Staff']
-const MANAGE_PRODUCT: Role[] = ['Admin', 'Staff']
-const MANAGE_PRODUCT_ITEM: Role[] = ['Admin', 'Staff']
-const MANAGE_SIZE: Role[] = ['Admin', 'Staff']
+const MANAGE_CATEGORY: Role[] = ['Admin', 'Staff', 'Manager']
+const MANAGE_PRODUCT: Role[] = ['Admin', 'Staff', 'Manager']
+const MANAGE_PRODUCT_ITEM: Role[] = ['Admin', 'Staff', 'Manager']
+const MANAGE_SIZE: Role[] = ['Admin', 'Staff', 'Manager']
+const MANAGE_ORDER: Role[] = ['Admin', 'Staff', 'Manager']
 
 const CONSTANT = {
     STORAGE,
@@ -64,7 +65,8 @@ const CONSTANT = {
     MANAGE_CATEGORY,
     MANAGE_PRODUCT,
     MANAGE_PRODUCT_ITEM,
-    MANAGE_SIZE
+    MANAGE_SIZE,
+    MANAGE_ORDER
 }
 
 export default CONSTANT
