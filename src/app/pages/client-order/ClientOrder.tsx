@@ -88,7 +88,7 @@ const ClientOrder: React.FC = () =>{
             key: 'isForRent',
             dataIndex: 'isForRent',
             align: 'center',
-            render: (v) => (v.toString())
+            render: (v) => (v ? <Tag color='volcano'>Thuê</Tag> : <Tag color='purple'>Mua</Tag>)
         },
         {
             title: 'Ngày bắt đầu thuê',
