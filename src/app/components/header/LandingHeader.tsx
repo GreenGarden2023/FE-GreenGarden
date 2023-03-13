@@ -60,8 +60,8 @@ const LandingHeader: React.FC = () =>{
         try{
           const result = await cartService.getCart()
           const cartProps: CartProps = {
-            rentItems: [...result.data.rentItems?.map(x => ({sizeProductItemID: x.sizeProductItem.id, quantity: x.quantity})) || []],
-            saleItems: [...result.data.saleItems?.map(x => ({sizeProductItemID: x.sizeProductItem.id, quantity: x.quantity})) || []],
+            rentItems: [...result.data.rentItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})) || []],
+            saleItems: [...result.data.saleItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})) || []],
         }
           dispatch(setCartSlice(cartProps))
         }catch{

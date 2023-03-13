@@ -1,223 +1,136 @@
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Button, Col, Form, Input, InputNumber, Modal, Row, Select, Switch, Upload } from 'antd';
-// import {  UploadFile } from 'antd/es/upload';
+import { Button, Col, Form, Image, Input, Modal, Row, Select } from 'antd';
+import ErrorMessage from 'app/components/message.tsx/ErrorMessage';
 import useDispatch from 'app/hooks/use-dispatch';
 import { ProductItemType } from 'app/models/general-type';
-import { ProductItemHandleCreate } from 'app/models/product-item';
-import { Size } from 'app/models/size';
-import sizeService from 'app/services/size.service';
+import { ProductItem } from 'app/models/product-item';
+import productItemService from 'app/services/product-item.service';
+import uploadService from 'app/services/upload.service';
 import { setNoti } from 'app/slices/notification';
 import CONSTANT from 'app/utils/constant';
-import React, { useEffect, useState } from 'react';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import React, { useEffect, useRef } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { AiFillCaretDown, AiOutlineCloudUpload } from 'react-icons/ai';
-import { BiDollar } from 'react-icons/bi';
 import * as yup from 'yup';
 import './style.scss';
-
-// import fileService from 'app/services/file.service';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const schema = yup.object().shape({
-    name: yup.string().required('Product name is required').min(5, 'Product name is greater than 5 characters').max(30, 'Product name is less than 30 characters'),
-    salePrice: yup.number().required('Sale price is required').positive('Sale price must be positive number').max(1000000000, 'Sale price is less than 1.000.000.000 VNĐ'),
-    description: yup.string().max(200, 'Description is less than 200 characters'),
-    sizeId: yup.string().required('Size is required'),
-    quantity: yup.number().positive('Quantity is positive number').max(1000000, 'Quantity is less than 1000000'),
-    type: yup.string().required('Type is required'),
-    rentPrice: yup.number().positive('Rent price is positive number').max(1000000000, 'Sale price is less than 1.000.000.000 VNĐ'),
-
+    name: yup.string().required('Tên sản phẩm không được để trống').min(5, 'Tên sản phẩm phải lớn hơn 5 ký tự').max(100, 'Tên sản phẩm phải nhỏ hơn 100 ký tự'),
+    description: yup.string().max(500, 'Mô tả phải ít hơn 500 ký tự'),
+    content: yup.string().required('Nội dung không được để trống'),
+    type: yup.string().required('Loại sản phẩm không được để trống'),
+    imageURL: yup.string().required('Hình đại diện sản phẩm không được để trống')
 })
 
 interface ModalProductItemProps{
-    productIdSelected: string;
-    // productItem?: ProductItem;
-    // action: Action;
-    open: boolean;
+    productId: string;
+    numberOfChild: number;
+    productItem?: ProductItem;
     onClose: () => void;
-    // onSubmit: (product: Product, action: Action) => void;
+    onSubmit: (productItem: ProductItem) => void;
 }
 
-const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, open, onClose}) => {
+const ModalProductItem: React.FC<ModalProductItemProps> = ({productId, numberOfChild, productItem, onClose, onSubmit}) => {
     const dispatch = useDispatch();
-    const [sizes, setSizes] = useState<Size[]>([])
-    // const [uploaded, setUploaded] = useState<UploadFile[]>([])
 
-    const { setValue, getValues, control, handleSubmit, formState: {  isSubmitting },  trigger } = useForm<ProductItemHandleCreate>({
-        defaultValues: {
-           
-        },
+    const ref = useRef<HTMLInputElement>(null);
+
+    const { setValue, getValues, control, handleSubmit, formState: { errors, isSubmitting },  trigger, setError, reset } = useForm<Partial<ProductItem>>({
         resolver: yupResolver(schema)
     })
 
-    const { fields } = useFieldArray({
-        control,
-        name: 'sizeModelList'
-    })
+    useEffect(() =>{
+        if(!productId) return;
 
+        setValue('productId', productId)
+    }, [productId, setValue])
 
     useEffect(() =>{
-        const init = async () =>{
-            try{
-                const resSize = await sizeService.getAllSize();
-                setSizes(resSize.data)
-            }catch(err){
-                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
-            }
-        }
-        init()
-    }, [dispatch])
+        if(!productItem) return;
 
-    // useEffect(() =>{
-    //     const initFiles = async () =>{
-    //         try{
-    //             const res = await fileService.getAnImage('https://greengardenstorage.blob.core.windows.net/greengardensimages/0b7212b6-e3c4-4570-bdee-94ab30331ff9.png')
-    //             setUploaded([res])
-    //         }catch{
-    //             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE})) 
-    //         }
-    //     }
-    //     initFiles()
-    // }, [dispatch])
+        const { id, productId, content, description, imageURL, name, type, productItemDetail } = productItem
+        setValue('id', id)
+        setValue('productId', productId)
+        setValue('content', content)
+        setValue('description', description)
+        setValue('imageURL', imageURL)
+        setValue('name', name)
+        setValue('type', type)
+        setValue('productItemDetail', productItemDetail)
+    }, [productItem, setValue])
 
     const handleCloseModal = () =>{
         onClose()
     }
-    
-    // const isValidLarge = (files: RcFile[] | UploadFile[]) =>{
-    //     const newFiles = files.map(x => x as RcFile)
-    //     let errorMsg = ''
-    //     for (let i = 0; i < newFiles.length; i++) {
-    //         const file = newFiles[i];
-    //         if(!CONSTANT.SUPPORT_FORMATS.includes(file.type)){
-    //             errorMsg += `Image ${i + 1} is not valid file\n\r`
-    //         }else if(file.size <= 100000){
-    //             errorMsg += `Image ${i + 1} is too large\n\r`
-    //         }
-    //     }
-    //     if(errorMsg){
-    //         setError('imgURLs', {
-    //             type: 'pattern',
-    //             message: errorMsg
-    //         })
-    //         return false
-    //     }
-    //     return true
-    // }
-
-    const handleSubmitForm = async (data: ProductItemHandleCreate) =>{
-        // const files = data.imgFiles || []
-        // if(!files || files.length === 0){
-        //     setError('imgURLs', {
-        //         type: 'pattern',
-        //         message: 'Image is required'
-        //     })
-        //     return
-        // }
-
-        // if(files.length > 6){
-        //     setError('imgURLs', {
-        //         type: 'pattern',
-        //         message: 'Image count is less than 7 items'
-        //     })
-        //     return  
-        // }
-
-        // if(!isValidLarge(files)) return;
-        
+  
+    const handleSubmitForm = async (data: Partial<ProductItem>) =>{
+        if(!data.id){
+            try{
+                const res = await productItemService.createProductItem(data);
+                handleCloseModal()
+                onSubmit(res.data)
+                reset()
+                dispatch(setNoti({type: 'success', message: `Tạo mới thành công`}))
+            }catch{
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+            }
+        }else{
+            try{
+                await productItemService.updateProductItem(data);
+                onSubmit(data as ProductItem)
+                handleCloseModal()
+                reset()
+                dispatch(setNoti({type: 'success', message: `Cập nhật thành công`}))
+            }catch{
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+            }
+        }
     }
-    
-    // const handleUpload  = async (index: number, info: UploadChangeParam<UploadFile<any>>) =>{
-    //     const listPreview: string[] = []
-    //     const listFile: RcFile[] = []
-    //     console.log(info)
-    //     // console.log(info.fileList)
-    //     // console.log()
-    //     setUploaded([...info.fileList])
 
-        // const fileInForm = getValues('imgFiles') || []
-        
-        // const newInfof = info.fileList.filter((x, index) => {
-        //     if((index + 1) > uploaded) return x
-        // })
-        // console.log(info.fileList.length)
-        // setUploaded(info.fileList.length)
-        // console.log(newInfof)
+    const handleUploadFiles = async (e: React.ChangeEvent<HTMLInputElement>) =>{
+        const files = e.target.files
 
+        if(!files) return;
 
+        const file = files[0]
 
-        
-        // for (let i = 0; i < info.fileList.length; i++) {
-        //     const originFileObj = info.fileList[i].originFileObj as RcFile;
-        //     utilsFile.getBase64(originFileObj, (url) =>{
-        //         listPreview.push(url)
-        //         setValue('imgURLs', [...listPreview])
-        //     })
-        //     listFile.push(originFileObj)
-        // }
-        // await trigger('imgURLs')
-        // setValue('imgFiles', listFile)
-        // clearErrors('imgURLs')
-    // }
+        if(!CONSTANT.SUPPORT_FORMATS.includes(file.type)){
+            setValue('imageURL', '')
+            setError('imageURL', {
+                type: 'pattern',
+                message: `Định dạng ảnh chỉ chấp nhận ${CONSTANT.SUPPORT_FORMATS.join(' - ')}`
+            })
+            trigger('imageURL')
+            return;
+        }
 
-    // const handleRemoveItem = async (index: number) =>{
-    //     // let newFileList = [...uploaded];
-    //     // newFileList.splice(index, 1)
-    //     // setUploaded([...newFileList])
-        
-
-    //     // const urls = getValues('imgURLs')
-    //     // const files = getValues('imgFiles')
-
-    //     // urls?.splice(index, 1)
-    //     // files?.splice(index, 1)
-
-    //     // setValue('imgURLs', urls)
-    //     // setValue('imgFiles', files)
-    //     // await trigger('imgURLs')
-    //     // if(!isSubmitted) return;
-    //     // isValidLarge(newFileList)
-    // }
-    function uploadPlugin(editor) {
-        editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
-          return uploadAdapter(loader);
-        };
+        try{
+            const res = await uploadService.uploadListFiles([file])
+            setValue('imageURL', res.data[0])
+            trigger('imageURL')
+        }catch{
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+        }
     }
-    function uploadAdapter(loader) {
-        return {
-          upload: () => {
-            return new Promise((resolve, reject) => {
-              const body = new FormData();
-              loader.file.then((file) => {
-                body.append("files", file);
-                
-                fetch(`${process.env.REACT_APP_API_END_POINT}/image/upload`, {
-                  method: "post",
-                  body: body
-                })
-                  .then((res) => res.json())
-                  .then((res) => {
-                    resolve({
-                      default: res.data[0]
-                    });
-                  })
-                  .catch((err) => {
-                    reject(err);
-                  });
-              });
-            });
-          }
-        };
-      }
+    const editorConfiguration = {
+        toolbar: [ 'bold', 'italic', 'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor']
+    };
+    const toolbarStyle = {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0
+      };
     return (
         <Modal
             className='modal-pi-wrapper'
-            open={open}
+            open
             onCancel={handleCloseModal}
             footer={null}
-            // title={`${action} product item ${productItem ? (' ' + productItem.name) : ''}`}
-            width={800}
+            title={`${productItem ? 'Chỉnh sửa' : 'Tạo mới'} sản phẩm`}
+            width={1200}
         >
             <Form
                 layout='vertical'
@@ -226,196 +139,100 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productIdSelected, o
             >
                 <Row gutter={24}>
                     <Col span={12}>
-                        <Form.Item label='Name' required>
+                        <Form.Item label='Tên sản phẩm' required>
                             <Controller 
                                 control={control}
                                 name='name'
                                 render={({ field }) => <Input {...field} />}
                             />
+                            {errors.name && <ErrorMessage message={errors.name.message} />}
                         </Form.Item>
                     </Col>
                     <Col span={12}>
-                        <Form.Item label='Type' required>
+                        <Form.Item label='Loại sản phẩm' required>
                             <Controller 
                                 control={control}
                                 name='type'
-                                render={({ field: { value, onChange} }) => (
-                                    <Select suffixIcon={<AiFillCaretDown />} onChange={(value: string) => {
+                                render={({ field: { value } }) => (
+                                    <Select disabled={(numberOfChild === 1 && productItem?.type === 'unique') || (numberOfChild > 1 && productItem?.type === 'normal')} suffixIcon={<AiFillCaretDown />} onChange={(value: string) => {
                                         setValue('type', value as ProductItemType)
                                         trigger('type')
                                     }} value={value} >
-                                        <Select.Option value='normal'>
-                                            Normal
-                                        </Select.Option>
                                         <Select.Option value='unique'>
-                                            Unique
+                                            Duy nhất
+                                        </Select.Option>
+                                        <Select.Option value='normal'>
+                                            Số lượng lớn
                                         </Select.Option>
                                     </Select>
                                 )}
                             />
+                            {errors.type && <ErrorMessage message={errors.type.message} />}
                         </Form.Item>
                     </Col>
                     <Col span={24}>
-                        <Form.Item label='Description'>
+                        <Form.Item label='Mô tả'>
                             <Controller 
                                 control={control}
                                 name='description'
-                                render={({ field }) => <Input.TextArea {...field} style={{height: 120}} />}
+                                render={({ field }) => <Input.TextArea {...field} autoSize={{minRows: 4, maxRows: 6}} />}
                             />
                         </Form.Item>
                     </Col>
+                    <Col span={24} style={{marginBottom: '20px'}}>
+                        <button className='btn btn-upload' type='button' onClick={() => ref.current?.click()}>
+                            <AiOutlineCloudUpload size={24} />
+                            Chọn ảnh đại diện sản phẩm
+                        </button>
+                        {errors.imageURL && <ErrorMessage message={errors.imageURL.message} />}
+                    </Col>
+                    <input type="file" multiple hidden ref={ref} accept='.png,.jpg,.jpeg' onChange={handleUploadFiles} />
                     {
-                        fields.map((field, index) => (
-                            <>
-                                <Col span={12}>
-                                    <Form.Item label='Size' required>
-                                        <Controller 
-                                            control={control}
-                                            name={`sizeModelList.${index}.sizeId`}
-                                            render={({ field }) => (
-                                                <Select suffixIcon={<AiFillCaretDown />} {...field} >
-                                                    {
-                                                        sizes.map((size, index) => (
-                                                            <Select.Option key={index} value={size.id}>
-                                                                {size.sizeName}
-                                                            </Select.Option>
-                                                        ))
-                                                    }
-                                                </Select>
-                                            )}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={12}>
-                                    <Form.Item label='Status'>
-                                        <Controller 
-                                            control={control}
-                                            name={`sizeModelList.${index}.status`}
-                                            render={({ field: {value} }) => <Switch checked={value === 'active'} onChange={(checked: boolean) => {
-                                                setValue(`sizeModelList.${index}.status`, checked ? 'active' : 'disable')
-                                            }} />}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={12}>
-                                    <Form.Item label='Sale Price' required>
-                                        <Controller 
-                                            control={control}
-                                            name={`sizeModelList.${index}.salePrice`}
-                                            render={({ field }) => <InputNumber type={'number'} addonAfter={<BiDollar />} {...field} style={{width: '100%'}} />}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={12}>
-                                    <Form.Item label='Rent Price' required>
-                                        <Controller 
-                                            control={control}
-                                            name={`sizeModelList.${index}.rentPrice`}
-                                            render={({ field }) => <InputNumber type={'number'} addonAfter={<BiDollar />} {...field} style={{width: '100%'}} />}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={12}>
-                                    <Form.Item label='Quantity'>
-                                        <Controller 
-                                            control={control}
-                                            name={`sizeModelList.${index}.quantity`}
-                                            render={({ field: { value, onChange } }) => (
-                                                <InputNumber 
-                                                    onChange={onChange} 
-                                                    value={getValues('type') === 'unique' ? '' : value} 
-                                                    disabled={getValues('type') === 'unique'} 
-                                                    type={'number'} 
-                                                    style={{width: '100%'}} 
-                                                />
-                                            )}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={24}>
-                                    <Form.Item label='Images' required>
-                                        <Upload
-                                            // onChange={(info) => handleUpload(index, info)}
-                                            showUploadList={false}
-                                            accept='.png,.jpg,.jpeg'
-                                            multiple
-                                            className='modal-pi-uploader'
-                                            // fileList={uploaded}
-                                            // onRemove={}
-                                        >
-                                                <button type='button'>
-                                                    <AiOutlineCloudUpload size={24} />
-                                                    Upload images
-                                                </button>
-                                        </Upload>
-                                    </Form.Item>
-                                </Col>
-                                <Col span={24}>
-                                    <Form.Item label='Content'>
-                                        <Controller
-                                            control={control}
-                                            name={`sizeModelList.${index}.content`}
-                                            render={({field: { value }}) => (
-                                                <CKEditor
-                                                    editor={ ClassicEditor }
-                                                    data={value}
-                                                    onChange={ ( event, editor ) => {
-                                                        const data = editor.getData();
-                                                        setValue(`sizeModelList.${index}.content`, data)
-                                                    } }
-                                                    config={{
-                                                        extraPlugins: [uploadPlugin]
-                                                    }}
-                                                />
-                                            )}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                            </>
-                        ))
+                        getValues('imageURL') && 
+                       <Col  span={6} >
+                            <Image 
+                                src={getValues('imageURL')}
+                                alt='/'
+                            />
+                        </Col>
                     }
-                   
-                    
-                    
-                   
-                    
-                    
-                    
-                   
-                    {/* {
-                        getValues('imgURLs')?.length !== 0 &&
-                        <>
-                            <Col span={24} className='preview-wrapper'>
-                                <Image.PreviewGroup>
-                                    <Row gutter={[12, 12]}>
-                                        {
-                                            getValues('imgURLs')?.map((x, index) => (
-                                                <Col span={6} className='preview-item' key={index}>
-                                                    <Image
-                                                        key={index}
-                                                        // width={190}
-                                                        src={x}
-                                                        className='preview-image'
-                                                    />
-                                                    <AiOutlineCloseCircle className='btn-close' size={25} color='#fff' onClick={() => handleRemoveItem(index)} />
-                                                </Col>
-                                            ))
-                                        }
-                                    </Row>
-                                </Image.PreviewGroup>
-                            </Col>
-                            {
-                                errors.imgURLs && 
-                                <Col span={24}>
-                                    <ErrorMessage message={errors.imgURLs.message} />
-                                </Col>
-                            }
-                        </>
-                    } */}
                     <Col span={24}>
+                        <Form.Item label='Nội dung sản phẩm' required>
+                            <Controller
+                                control={control}
+                                name={`content`}
+                                render={({field: { value }}) => (
+                                    <ReactQuill theme="snow" value={value} onChange={(val) => {
+                                        setValue('content', val)
+                                    }}
+                                    style={{
+                                        height: '400px'
+                                    }}
+                                    modules={{
+                                        toolbar: {
+                                          container: [
+                                            [{ 'header': [1, 2, false] }],
+                                            ['bold', 'italic', 'underline','strike', 'blockquote'],
+                                            [{'color': ['#00a76f', '#707070']}, {'background': ['#00a76f', '#707070']}],          
+                                            [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
+                                            ['link', 'image'],
+                                            [{'size': ['small', false, 'large', 'huge']}],        
+                                            ['clean']
+                                          ],
+                                        },
+                                    }}
+                                    />
+                                )}
+                            />
+                            {errors.content && <ErrorMessage message={errors.content.message} />}
+                        </Form.Item>
+                    </Col>
+                    <Col span={24} style={{'marginTop': '30px'}}>
                         <Form.Item className='btn-form-wrapper'>
-                            <Button htmlType='button' disabled={isSubmitting} type='default' className='btn-cancel' size='large' onClick={handleCloseModal}>Cancel</Button>
-                            <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large'>Create</Button>
+                            <Button htmlType='button' disabled={isSubmitting} type='default' className='btn-cancel' size='large' onClick={handleCloseModal}>Hủy bỏ</Button>
+                            <Button htmlType='submit'  loading={isSubmitting} type='primary' className='btn-update' size='large'>
+                                {productItem ? 'Cập nhật' : 'Tạo mới'}
+                            </Button>
                         </Form.Item>
                     </Col>
                 </Row>

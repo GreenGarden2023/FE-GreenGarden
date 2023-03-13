@@ -1,4 +1,4 @@
-@import '../../styles/variable.scss';
+@import 'app/styles/variable.scss';
 
 .mp-wrapper{
     .mp-infor{
@@ -15,9 +15,15 @@
             margin-top: 10px;
         }
     }
-    // .mp-content-wrapper{
-    //     // margin-top: 10px;
-    // }
+    .mp-content-wrapper{
+        h1{
+            padding: 10px 0;
+            color: $default-green;
+            text-align: center;
+            font-size: 30px;
+            font-weight: 500;
+        }
+    }
 }
 .mp-option{
     img{

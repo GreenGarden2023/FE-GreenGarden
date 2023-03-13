@@ -1,31 +1,71 @@
-import { Order, OrderCreate } from "app/models/order";
+import { OrderStatus } from "app/models/general-type";
+import { OrderCreate, RentOrder, RentOrderResponse, SaleOrderResponse } from "app/models/order";
+import { Paging } from "app/models/paging";
 import { Response } from "app/models/response";
-import { User } from "app/models/user";
+import queryString from "query-string";
 import golbalAxios from "../utils/http-client";
-
-interface GetData{
-    orders: Order[];
-    user: User
-}
-
-const getAllOrdersCustomer = async (): Promise<Response<GetData>> =>{
-    const result = await golbalAxios.get<Response<GetData>>('/order/get-list-order-by-customer')
-    return result.data
-}
-const getAllOrdersManager = async (): Promise<Response<GetData>> =>{
-    const result = await golbalAxios.get<Response<GetData>>('/order/get-list-order-by-manager')
-    return result.data
-}
 
 const createOrder = async (orderCreate: OrderCreate) =>{
     const res = await golbalAxios.post('/order/create-order', orderCreate)
     return res.data
 }
 
+const getRentOrders = async () =>{
+    const res = await golbalAxios.get<Response<RentOrderResponse>>('/order/get-rent-orders')
+    return res.data
+}
+
+const getRentOrderDetail = async (rentOrderDetailID: string) =>{
+    const res = await golbalAxios.get(`/order/get-rent-order-detail?rentOrderDetailID=${rentOrderDetailID}`)
+    return res.data
+}
+
+const getRentOrderGroup = async (groupID: string) =>{
+    const res = await golbalAxios.get<Response<RentOrder>>(`/order/get-rent-order-group?groupID=${groupID}`)
+    return res.data
+}
+
+const updateRentOrderStatus = async (rentOrderID: string, status: OrderStatus) =>{
+    const res = await golbalAxios.post('/order/update-rent-order-status', { rentOrderID, status })
+    return res.data
+}
+
+const getSaleOrders = async () =>{
+    const res = await golbalAxios.get<Response<SaleOrderResponse>>('/order/get-sale-orders')
+    return res.data
+}
+
+const getSaleOrderDetail = async (saleOrderDetailID: string) =>{
+    const res = await golbalAxios.get(`/order/get-sale-order-detail?saleOrderDetailID=${saleOrderDetailID}`)
+    return res.data
+}
+
+const updateSaleOrderStatus = async (saleOrderID: string, status: OrderStatus) =>{
+    const res = await golbalAxios.post('/order/update-sale-order-status', { saleOrderID, status })
+    return res.data
+}
+
+const getAllRentOrders = async (paging: Partial<Paging>) =>{
+    const res = await golbalAxios.get<Response<RentOrderResponse>>(`/order/get-all-rent-orders?${queryString.stringify(paging)}`)
+    return res.data
+}
+
+const getAllSaleOrders = async (paging: Partial<Paging>) =>{
+    const res = await golbalAxios.get<Response<SaleOrderResponse>>(`/order/get-all-sale-orders?${queryString.stringify(paging)}`)
+    return res.data
+}
+
 const orderService = {
-    getAllOrdersCustomer,
-    getAllOrdersManager,
-    createOrder
+    createOrder,
+    getRentOrders,
+    getRentOrderDetail,
+    updateRentOrderStatus,
+    getSaleOrders,
+    getSaleOrderDetail,
+    updateSaleOrderStatus,
+    getAllRentOrders,
+    getAllSaleOrders,
+    getRentOrderGroup
 }
 
 export default orderService

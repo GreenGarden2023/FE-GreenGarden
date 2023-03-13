@@ -36,14 +36,6 @@ button, input{
 button{
     cursor: pointer;
 }
-// button{
-//     outline: none;
-//     border-radius: 5px;
-//     border: none;
-//     padding: 5px 10px;
-//     color: #000;
-//     cursor: pointer;
-// }
 
 // global class css
 .container-wrapper{
@@ -61,7 +53,16 @@ button{
 .ant-notification-notice-message{
     margin-bottom: 0!important;
 }
-
+:where(.css-dev-only-do-not-override-1km3mtt).ant-switch.ant-switch-checked .ant-switch-inner{
+    background-color: $default-green;
+}
+:where(.css-dev-only-do-not-override-1km3mtt).ant-ribbon-wrapper{
+    height: 100%;
+}
+// override ckeditor
+.ck-rounded-corners .ck.ck-editor__main>.ck-editor__editable, .ck.ck-editor__main>.ck-editor__editable.ck-rounded-corners{
+    height: 400px;
+}
 // btn in table
 .btn-actions-wrapper{
     display: flex;
@@ -80,6 +81,18 @@ button{
     .btn-cancel{
         margin-right: 10px;
     }
+}
+.btn{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+    color: #fff;
+    // background-color: #5cb9d8;
+    border: none;
+    border-radius: 5px;
+    padding: 0 16px;
+    cursor: pointer;
 }
 // upload img in form
 .form-upload-box{

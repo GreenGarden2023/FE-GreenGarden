@@ -1,0 +1,26 @@
+@import 'app/styles/variable.scss';
+
+.btn-upload{
+    width: 100%;
+    justify-content: center;
+    height: 58px;
+    background-color: #5cb9d8;
+}
+.preview-wrapper{
+    position: relative;
+    .img-preview{
+        width: 220px!important;
+        height: 220px!important;
+        object-fit: cover;
+    }
+    .btn-remove{
+        position: absolute;
+        top: -3px;
+        right: 9px;
+        cursor: pointer;
+        color: #707070;
+        &:hover{
+            color: $default-green;
+        }
+    }
+}

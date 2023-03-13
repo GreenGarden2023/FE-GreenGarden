@@ -6,12 +6,13 @@ import './style.scss';
 interface LandingWidgetProps{
     index: number;
     url: string;
+    backgroundUrl: string;
 }
 
-const LandingWidget: React.FC<LandingWidgetProps> = ({ index, url }) => {
+const LandingWidget: React.FC<LandingWidgetProps> = ({ index, url, backgroundUrl }) => {
   return (
     <section className='widget-wrapper'>
-        <div className="widget-box container-wrapper">
+        <div className="widget-box container-wrapper" style={{backgroundImage: `url(${backgroundUrl})`}}>
             <div className="content-box">
                 <div className="content">
                     <h1>Dịch vụ cho thuê cây</h1>

@@ -1,44 +1,49 @@
-import { RcFile } from "antd/es/upload";
+import { Category } from "./category";
 import { ProductItemType, Status } from "./general-type";
+import { Paging } from "./paging";
+import { Product } from "./product";
 import { Size } from "./size";
 
-export interface ProductItem{
-    id: string;
-    name: string;
-    productId: string;
-    description: string;
-    sizeModelList: ProductItemSize[];
-    type: ProductItemType
+export interface ProductItemDetailHandle{
+    id?: string;
+    sizeId: string;
+    productItemID: string;
+    rentPrice: number | null;
+    salePrice: number | null;
+    quantity: number;
+    status: Status;
+    imagesUrls: string[];
 }
 
-export interface ProductItemSize{
+export interface ProductItemDetail{
     id: string;
     quantity: number;
-    rentPrice: number;
-    salePrice: number;
+    rentPrice?: number;
+    salePrice?: number;
     size: Size;
     status: Status;
     imagesURL: string[]
-    content: string;
 }
-
-interface ProductItemSizeCreate {
-    sizeId: string;
-    quantity: number;
-    rentPrice: number;
-    salePrice: number;
-    content: string;
-    status: Status;
-    imagesURL: string[];
-    Images: RcFile[]
-}
-
-export interface ProductItemHandleCreate{
+export interface ProductItem{
+    id: string;
     name: string;
-    productId: string;
     description: string;
+    content: string;
+    productId: string;
     type: ProductItemType
-    sizeModelList: Partial<ProductItemSizeCreate>[];
+    imageURL: string;
+    productItemDetail: ProductItemDetail[];
+}
+export interface ProductItemResponse{
+    paging: Paging;
+    category: Category;
+    product: Product;
+    productItems: ProductItem[];
+}
+export interface ProductItemDetailResponse{
+    category: Category;
+    product: Product;
+    productItem: ProductItem;
 }
 
 export interface ProductItemInCart extends ProductItem{

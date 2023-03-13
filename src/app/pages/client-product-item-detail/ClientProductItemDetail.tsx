@@ -46,7 +46,7 @@ const ClientProductItemDetail: React.FC = () => {
                 setProItem(res.data.productItem)
                 setproduct(res.data.product)
                 setCategory(res.data.category)
-                setSizeSelect(res.data.productItem.sizeModelList[0].size.id)
+                setSizeSelect(res.data.productItem.productItemDetail[0].size.id)
             }catch{
                 dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
@@ -106,16 +106,16 @@ const ClientProductItemDetail: React.FC = () => {
     
     const proItemSelectBySize = useMemo(() =>{
         if(!proItem) return
-        return proItem.sizeModelList.filter(x => x.size.id === sizeSelect)[0]
+        return proItem.productItemDetail.filter(x => x.size.id === sizeSelect)[0]
     }, [proItem, sizeSelect])
 
 
-    const handleAddCart = async (cartType: CartType, sizeProductItemId: string) =>{
+    const handleAddCart = async (cartType: CartType, productItemDetailID: string) =>{
         const newData = {...cartState}
 
         if(cartType === 'Sale'){
             try{
-                const index = newData.saleItems.findIndex(x => x.sizeProductItemID === sizeProductItemId)
+                const index = newData.saleItems.findIndex(x => x.productItemDetailID === productItemDetailID)
                 if(index >= 0){
                     let data = [...newData.saleItems]
                     let nest = {...data[index]}
@@ -123,13 +123,13 @@ const ClientProductItemDetail: React.FC = () => {
                     data[index] = nest
                     newData.saleItems = data
                 }else{
-                    newData.saleItems = [...newData.saleItems, { sizeProductItemID: sizeProductItemId, quantity: quanSale}]
+                    newData.saleItems = [...newData.saleItems, { productItemDetailID: productItemDetailID, quantity: quanSale}]
                 }
                 console.log({newData})
                 const res = await cartService.addToCart(newData)
                 const cartProps: CartProps = {
-                    rentItems: [...res.data.rentItems?.map(x => ({sizeProductItemID: x.sizeProductItem.id, quantity: x.quantity})) || []],
-                    saleItems: [...res.data.saleItems?.map(x => ({sizeProductItemID: x.sizeProductItem.id, quantity: x.quantity})) || []],
+                    rentItems: [...res.data.rentItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})) || []],
+                    saleItems: [...res.data.saleItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})) || []],
                 }
                 dispatch(setCartSlice(cartProps))
                 dispatch(setNoti({type: 'success', message: 'Thêm vào giỏ hàng thành công'}))
@@ -138,7 +138,7 @@ const ClientProductItemDetail: React.FC = () => {
             }
         }else{
             try{
-                const index = newData.rentItems.findIndex(x => x.sizeProductItemID === sizeProductItemId)
+                const index = newData.rentItems.findIndex(x => x.productItemDetailID === productItemDetailID)
                 if(index >= 0){
                     let data = [...newData.rentItems]
                     let nest = {...data[index]}
@@ -146,13 +146,13 @@ const ClientProductItemDetail: React.FC = () => {
                     data[index] = nest
                     newData.rentItems = data
                 }else{
-                    newData.rentItems = [...newData.rentItems, { sizeProductItemID: sizeProductItemId, quantity: quanSale}]
+                    newData.rentItems = [...newData.rentItems, { productItemDetailID: productItemDetailID, quantity: quanSale}]
                 }
                 console.log({newData})
                 const res = await cartService.addToCart(newData)
                 const cartProps: CartProps = {
-                    rentItems: [...res.data.rentItems?.map(x => ({sizeProductItemID: x.sizeProductItem.id, quantity: x.quantity})) || []],
-                    saleItems: [...res.data.saleItems?.map(x => ({sizeProductItemID: x.sizeProductItem.id, quantity: x.quantity})) || []],
+                    rentItems: [...res.data.rentItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})) || []],
+                    saleItems: [...res.data.saleItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})) || []],
                 }
                 // dispatch(addToCart({cartType: 'Sale', item: {sizeProductItemID: id, quantity: quanSale}}))
                 dispatch(setCartSlice(cartProps))
@@ -200,9 +200,6 @@ const ClientProductItemDetail: React.FC = () => {
                         <section className="cpid-product-infor default-layout">
                             <Row gutter={[24, 24]}>
                                 <Col xs={12} xl={12}>
-                                    {/* <div className="left">
-                                        <img src="/assets/inventory-empty.png" alt="/" className='img-main-view' />
-                                    </div> */}
                                     <div className="left carousel-warpper">
                                         <Carousel 
                                             infiniteLoop 
@@ -220,10 +217,10 @@ const ClientProductItemDetail: React.FC = () => {
                                             )}
                                         >
                                             {
-                                                [...Array(10)].map((_, index) => (
-                                                    <div key={index}>
+                                                proItem.productItemDetail.filter(x => x.size.id === sizeSelect)[0].imagesURL.map((detail, index) => (
+                                                    <div key={index} className='root-image'>
                                                         {/* <Image src='/assets/inventory-empty.png' alt='/' /> */}
-                                                        <img src="/assets/inventory-empty.png" alt='/' />
+                                                        <img src={detail} alt='/' />
                                                     </div>
                                                 ))
                                             }
@@ -238,16 +235,19 @@ const ClientProductItemDetail: React.FC = () => {
                                         <div className="infor-detail">
                                             {/* proItem.description */}
                                             <ul>
-                                                <li>Kích thước chậu / Item dimensions (W x H): 15x17cm</li>
-                                                <li>Chất liệu chậu / Pot Material: Men / Ceramic</li>
-                                                <li>Tổng chiều cao / Total height: ~35cm</li>
-                                                <li>Giá sản phẩm không bao gồm đĩa lót chậu (The saucer is not included)</li>
+                                                {
+                                                    proItem.description.split('\n').map((item, index) => (
+                                                        <li key={index}>
+                                                            {item}
+                                                        </li>
+                                                    ))
+                                                }
                                             </ul>
                                         </div>
                                         <div className="size-wrapper">
                                             <span className='title'>Kích thước</span>
                                             {
-                                                proItem.sizeModelList.map((proItemDe, i) => (
+                                                proItem.productItemDetail.map((proItemDe, i) => (
                                                     <Tag style={{cursor: 'pointer'}} color={proItemDe.size.id === sizeSelect ? '#00a76f' : ''} key={i} onClick={() => handleSelectSize(proItemDe.size.id)} >{proItemDe.size.sizeName}</Tag>
                                                 ))
                                             }
@@ -323,12 +323,12 @@ const ClientProductItemDetail: React.FC = () => {
                                 </Col>
                             </Row>
                             {
-                                proItemSelectBySize && 
+                                proItem && 
                                 <>
                                     <Divider orientation='left'>
-                                        <p style={{fontSize: '36px', fontWeight: 'bold'}}>Product information</p>
+                                        <p style={{fontSize: '36px', fontWeight: 'bold'}}>Thông tin</p>
                                     </Divider>
-                                    <div dangerouslySetInnerHTML={{__html: proItemSelectBySize.content}} />
+                                    <div dangerouslySetInnerHTML={{__html: proItem.content}} />
                                 </>
                             }
                         </section>

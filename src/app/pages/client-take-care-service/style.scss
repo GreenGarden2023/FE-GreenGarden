@@ -1,0 +1,59 @@
+@import 'app/styles/variable.scss';
+
+.ts-wrapper{
+    .ts-box{
+        .ts-btn-create{
+            // background-color: $color-create;
+            // height: 40px;
+        }
+    }
+    .ts-infor{
+        .empty-tree{
+            text-align: center;
+            h1{
+                font-size: 30px;
+                color: $default-green;
+            }
+            button{
+                margin: 10px auto;
+            }
+        }
+    }
+    .item-detail{
+        border: 1px solid $default-green;
+        border-radius: 5px;
+        padding: 10px;
+        img{
+            width: 100%;
+        }
+        .item-infor{
+            h1{
+                font-size: 24px;
+            }
+            .quantity{
+                font-size: 18px;
+                color: $soft-text;
+                span{
+                    color: $default-green;
+                    font-size: 24px;
+                    display: inline-block;
+                    margin-left: 5px;
+                    font-weight: 500;
+                }
+            }
+            .description{
+                font-size: 18px;
+                color: $soft-text;
+                span{
+                    color: $default-green;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 3; /* number of lines to show */
+                            line-clamp: 3; 
+                    -webkit-box-orient: vertical;
+                }
+            }
+        }
+    }
+}

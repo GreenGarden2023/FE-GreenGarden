@@ -5,9 +5,13 @@ import ClientOrder from 'app/pages/client-order/ClientOrder';
 import ClientProductItemDetail from 'app/pages/client-product-item-detail/ClientProductItemDetail';
 import ClientProductItem from 'app/pages/client-product-item/ClientProductItem';
 import ClientProduct from 'app/pages/client-product/ClientProduct';
-import HandleProductItem from 'app/pages/handle-product-item/HandleProductItem';
+import ClientRentOrderGroup from 'app/pages/client-rent-order-group/ClientRentOrderGroup';
+import ClientTakeCareService from 'app/pages/client-take-care-service/ClientTakeCareService';
 import ManageOrder from 'app/pages/manage-order/ManageOrder';
 import ManageProductItem from 'app/pages/manage-product-item/ManageProductItem';
+import ManageRentOrder from 'app/pages/manage-rent-order/ManageRentOrder';
+import ManageRentOrderGroup from 'app/pages/manage-rent-order/rent-order-group/ManageRentOrderGroup';
+import ManageSaleOrder from 'app/pages/manage-sale-order/ManageSaleOrder';
 import ManageSize from 'app/pages/manage-size/ManageSize';
 import React, { useEffect } from 'react';
 import { AiFillCheckCircle, AiFillWarning } from 'react-icons/ai';
@@ -113,15 +117,19 @@ const Routers: React.FC = () =>{
                 <Route path='/product/:productId' element={<ClientProductItem />} />
                 <Route path='/product-item/:productItemId' element={<ClientProductItemDetail />} />
                 <Route path='/orders' element={<ClientOrder />} />
+                <Route path='/order-group/:orderId' element={<ClientRentOrderGroup />} />
                 <Route path='/checkout-success' element={<CheckoutSuccess />} />
+                <Route path='/take-care-service' element={<ClientTakeCareService />} />
 
                 <Route path='panel' >
                     <Route path='manage-category' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_CATEGORY} ><AdminRoute><ManageCategory /></AdminRoute></AuthGuard>} />
                     <Route path='manage-product' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_PRODUCT} ><AdminRoute><ManageProduct /></AdminRoute></AuthGuard>} />
-                    <Route path='manage-product-item/:productId/create' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_PRODUCT_ITEM} ><AdminRoute><HandleProductItem /></AdminRoute></AuthGuard>} />
                     <Route path='manage-product-item/:productId' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_PRODUCT_ITEM} ><AdminRoute><ManageProductItem /></AdminRoute></AuthGuard>} />
                     <Route path='manage-size' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_SIZE} ><AdminRoute><ManageSize /></AdminRoute></AuthGuard>} />
                     <Route path='manage-order' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageOrder /></AdminRoute></AuthGuard>} />
+                    <Route path='sale-order' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageSaleOrder /></AdminRoute></AuthGuard>} />
+                    <Route path='rent-order' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageRentOrder /></AdminRoute></AuthGuard>} />
+                    <Route path='rent-order/:groupId' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageRentOrderGroup /></AdminRoute></AuthGuard>} />
                 </Route>
                 <Route path='/file-not-found' element={<FileNotFound />} />
             </Routes>

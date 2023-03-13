@@ -15,7 +15,9 @@ type CR<T> = CaseReducer<CartProps, PayloadAction<T>>;
 const setCartCR: CR<CartProps> = (_, action) => ({
     ...action.payload
 })
-
+const resendCartCR: CR<void> = (_, action) => {
+    
+}
 
 const slice = createSlice({
     name: 'cart/slice',

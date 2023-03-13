@@ -27,8 +27,8 @@ const LandingPage: React.FC = () =>{
                         </div>
                     </div>
                 </section>
-                <LandingWidget index={1} url='/category' />
-                <LandingWidget index={2} url='' />
+                <LandingWidget index={1} url='/category' backgroundUrl='/assets/widget-1.jpg' />
+                <LandingWidget index={2} url='/take-care-service' backgroundUrl='/assets/widget-2.jpg' />
                 <About />
                 {/* <Divider className='divider-custom'>Posts</Divider>
                 <div className="post">

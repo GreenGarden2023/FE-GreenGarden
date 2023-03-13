@@ -1,13 +1,12 @@
+import { ProductItemType } from "./general-type";
 import { Size } from "./size";
 
 interface CartProductItem {
     id: string;
     name: string;
     description: string;
-    productId: string;
-    type: string;
-    product?: any;
-    tblFeedBacks: any[];
+    type: ProductItemType;
+    content: string;
 }
 interface CartSizeProductItem{
     id: string;
@@ -22,7 +21,7 @@ interface CartSizeProductItem{
     imgUrl: string[]
 }
 interface CartItemDetail{
-    sizeProductItem: CartSizeProductItem;
+    productItemDetail: CartSizeProductItem;
     productItem: CartProductItem;
     quantity: number;
     unitPrice: number;
@@ -37,6 +36,12 @@ export interface Cart{
 }
 
 export interface CartItem{
-    sizeProductItemID: string;
+    productItemDetailID: string;
     quantity: number
+}
+
+export interface CartUserData{
+    recipientAddress: string;
+    recipientPhone: string;
+    recipientName: string;
 }

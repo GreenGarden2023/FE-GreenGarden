@@ -1,10 +1,9 @@
-@import '../../styles/variable.scss';
+@import 'app/styles/variable.scss';
 
 .widget-wrapper{
     margin: 50px 0;
     .widget-box{
         min-height: 458px;
-        background-image: url('../../../../public/assets/widget-1.jpg');
         background-position: center center;
         background-repeat: no-repeat;
         background-size: cover;

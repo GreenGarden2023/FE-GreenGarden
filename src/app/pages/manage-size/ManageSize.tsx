@@ -8,16 +8,17 @@ import { Size } from 'app/models/size'
 import Table, { ColumnsType } from 'antd/es/table'
 import { AiFillEdit } from 'react-icons/ai'
 import { IoCreateOutline } from 'react-icons/io5'
-import { Action } from 'app/models/general-type'
 import ModalSize from 'app/components/modal/size/ModalSize'
+import { Tag } from 'antd'
+import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 
 const ManageSize: React.FC = () => {
     const dispatch = useDispatch()
 
     const [sizes, setSizes] = useState<Size[]>([])
     const [loading, setLoading] = useState(false)
-    const [action, setAction] = useState<Action>('')
     const [sizeSelected, setSizeSelected] = useState<Size>()
+    const [openModal, setOpenModal] = useState(false);
 
     useEffect(() =>{
         const init = async () =>{
@@ -39,16 +40,23 @@ const ManageSize: React.FC = () => {
             key: '#',
             dataIndex: '#',
             align: 'center',
-            render:(_, record, index) => (<p>{index + 1}</p>)
+            render:(_, r, index) => (<p>{index + 1}</p>)
         },
         {
-            title: 'Size name',
+            title: 'Tên kích thước',
             key: 'sizeName',
             dataIndex: 'sizeName',
             align: 'center',
         },
         {
-            title: 'Actions',
+            title: 'Loại kích thước',
+            key: 'sizeType',
+            dataIndex: 'sizeType',
+            align: 'center',
+            render: (value) => (value ? <Tag color='#108ee9'>Duy nhất</Tag> : <Tag color='#87d068'>Số lượng lớn</Tag>)
+        },
+        {
+            title: 'Công cụ',
             key: 'actions',
             dataIndex: 'actions',
             align: 'center',
@@ -68,35 +76,35 @@ const ManageSize: React.FC = () => {
 
     const handleUpdateSize = (size: Size) =>{
         setSizeSelected(size)
-        setAction('Update')
+        setOpenModal(true)
     }
     const handleCreateSize = () =>{
-        setAction('Create')
+        setOpenModal(true)
     }
     const handleCloseModal = () =>{
-        setAction('')
         setSizeSelected(undefined)
+        setOpenModal(false)
     }
-    const handleSubmitModal = (actionType: Action, size: Size) =>{
-        if(actionType === 'Create'){
+    const handleSubmitModal = (size: Size) =>{
+        const index = sizes.findIndex(x => x.id === size.id)
+
+        if(index < 1){
             setSizes([size, ...sizes])
-        }else if(actionType === 'Update'){
-            setSizes(sizes.map((s => s.id === size.id ? {
+        }else{
+            setSizes(sizes.map((s => s.id === size.id ? ({
                 ...s,
                 sizeName: size.sizeName
-            } : s)))
+            }) : s)))
         }
     }
     return (
         <div className='ms-wrapper'>
-            <section className="ms-infor default-layout">
-                <h1>Manage sizes</h1>
-            </section>
+            <HeaderInfor title='Quản lý kích thước' />
             <section className="ms-search-wrapper default-layout">
                 <div className="ms-btn-wrapper">
                     <button onClick={handleCreateSize} className='btn-create'>
                         <IoCreateOutline size={20} />
-                        Create a size
+                        Tạo mới 1 kích thước
                     </button>
                 </div>
             </section>
@@ -104,8 +112,7 @@ const ManageSize: React.FC = () => {
                 <Table loading={loading} dataSource={DataSource} columns={Column}  />
             </section>
             <ModalSize 
-                action={action}
-                open={action !== ''}
+                open={openModal}
                 onClose={handleCloseModal}
                 size={sizeSelected}
                 onSubmit={handleSubmitModal}

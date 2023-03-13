@@ -212,3 +212,15 @@
 .next-custom{
     right: 0;
 }
+.root-image{
+    img{
+        height: 430px;
+        object-fit: cover;
+    }
+}
+.thumb{
+    img{
+        height: 60px;
+        object-fit: cover;
+    }
+}

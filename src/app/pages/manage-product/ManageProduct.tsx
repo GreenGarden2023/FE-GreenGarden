@@ -1,4 +1,4 @@
-import { Image, Select, Switch, Tag } from 'antd';
+import { Image, Select, Switch, Tag, Tooltip } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 import ModalProduct from 'app/components/modal/product/ModalProduct';
 import useDispatch from 'app/hooks/use-dispatch';
@@ -40,7 +40,7 @@ const ManageProduct: React.FC = () => {
         const res = await categoryService.getAllCategory()
         setCategories(res.data.result)
       }catch(err){
-        dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
+        dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
       }
     }
     init()
@@ -74,7 +74,7 @@ const ManageProduct: React.FC = () => {
         // setCategories(res.data.result)
         console.log(res)
       }catch(err){
-        dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
+        dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
       }
       setLoading(false)
     }
@@ -83,21 +83,21 @@ const ManageProduct: React.FC = () => {
   
   const Column: ColumnsType<Product> = [
     {
-      title: 'Name',
+      title: 'Tên loại sản phẩm',
       key: 'name',
       dataIndex: 'name',
       align: 'center',
-      width: 200
+      // width: 200
     },
     {
-      title: 'Description',
+      title: 'Mô tả',
       key: 'description',
       dataIndex: 'description',
       align: 'left',
-      // width: 600
+      width: 600
     },
     {
-      title: 'Thumbnail',
+      title: 'Ảnh đại diện',
       key: 'imgUrl',
       dataIndex: 'imgUrl',
       align: 'center',
@@ -112,7 +112,7 @@ const ManageProduct: React.FC = () => {
       ),
     },
     {
-      title: 'Status',
+      title: 'Trạng thái',
       key: 'status',
       dataIndex: 'status',
       align: 'center',
@@ -121,33 +121,37 @@ const ManageProduct: React.FC = () => {
       ),
     },
     {
-      title: 'Type',
+      title: 'Loại giao dịch',
       key: 'type',
       dataIndex: 'type',
       align: 'center',
       render: (_, record) => (
         <>
           {
-            record.isForSale && <Tag color='#108ee9' >For Sale</Tag>
+            record.isForSale && <Tag color='#108ee9' >Bán</Tag>
           }
           {
-            record.isForRent && <Tag color='#87d068' >For Rent</Tag>
+            record.isForRent && <Tag color='#87d068' >Thuê</Tag>
           }
         </>
       )
     },
     {
-      title: 'Actions',
+      title: 'Công cụ',
       key: 'actions',
       dataIndex: 'actions',
       align: 'center',
       render: (_, record) => (
         <div className="btn-actions-wrapper">
-          <TbListDetails className='btn-icon'onClick={() => navigate(`/panel/manage-product-item/${record.id}?page=1`)} />
-          <AiFillEdit className='btn-icon'  onClick={() => {
-            setProductSelected(record)
-            setAction('Update')
-          }} />
+          <Tooltip title='Chi tiết' color='#108ee9'>
+            <TbListDetails className='btn-icon'onClick={() => navigate(`/panel/manage-product-item/${record.id}?page=1`)} />
+          </Tooltip>
+          <Tooltip title='Chỉnh sửa' color='#108ee9'>
+            <AiFillEdit className='btn-icon'  onClick={() => {
+              setProductSelected(record)
+              setAction('Update')
+            }} />
+          </Tooltip>
         </div>
       )
     },
@@ -171,16 +175,16 @@ const ManageProduct: React.FC = () => {
         ...x,
         status: statusHandle
       } : x))
-      dispatch(setNoti({type: 'success', message: `Update status ${product.name} success`}))
+      dispatch(setNoti({type: 'success', message: `Cập nhật trạng thái "${product.name}" thành công`}))
     }catch(err){
-      dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
+      dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
     }
     setLoaderProId(loaderProId.filter(x => x !== product.id))
   }
 
   const handleCreateProduct = () =>{
     if(!categoryIdSelected){
-      dispatch(setNoti({type: 'warning', message: 'Selecte category before create a product'}))
+      dispatch(setNoti({type: 'warning', message: 'Chọn 1 thể loại cây trước khi tạo mới một loại cây'}))
       return;
     }
     setProductSelected(undefined)
@@ -203,11 +207,11 @@ const ManageProduct: React.FC = () => {
   return (
     <div className="mp-wrapper">
       <section className="mp-infor default-layout">
-        <h1>Manage product</h1>
+        <h1>Quản lý loại cây</h1>
       </section>
       <section className="mp-search-wrapper default-layout">
         <Select
-          placeholder="Select a category"
+          placeholder="Chọn 1 thể loại cây"
           dropdownMatchSelectWidth
           style={{ width: 250 }}
           optionLabelProp="label"
@@ -218,10 +222,12 @@ const ManageProduct: React.FC = () => {
           {
             categories.map((category, index) => (
               <Option key={index} value={category.id} label={category.name} >
-                <div className="mp-option">
-                  <img src={category.imgUrl} alt="/"/>
-                  <span>{category.name}</span>
-                </div>
+                <Tooltip title={category.name} placement='right' color='#108ee9' >
+                  <div className="mp-option">
+                    <img src={category.imgUrl} alt="/"/>
+                    <span>{category.name}</span>
+                  </div>
+                </Tooltip>
               </Option>
             ))
           }
@@ -229,19 +235,23 @@ const ManageProduct: React.FC = () => {
         <div className="mp-btn-wrapper">
           <button onClick={handleCreateProduct} className='btn-create'>
             <IoCreateOutline size={20} />
-            Create a product
+            Tạo mới 1 loại cây
           </button>
         </div>
       </section>
       <section className="mp-content-wrapper default-layout">
-        <Table loading={loading} className='mc-table' dataSource={DataSource} columns={Column} pagination={{
-          pageSize: paging?.pageSize || 1,
-          current: paging?.curPage || 1,
-          total: paging?.recordCount || 1,
-          onChange: (page: number) =>{
-            navigate(`/panel/manage-product?category=${categoryIdSelected}&page=${page}`)
-          }
-        }} />
+        {
+          !searchParams.get('category') ?
+          <h1>Chọn 1 thể loại cây</h1> :
+          <Table loading={loading} className='mc-table' dataSource={DataSource} columns={Column} pagination={{
+            pageSize: paging?.pageSize || 1,
+            current: paging?.curPage || 1,
+            total: paging?.recordCount || 1,
+            onChange: (page: number) =>{
+              navigate(`/panel/manage-product?category=${categoryIdSelected}&page=${page}`)
+            }
+          }} />
+        }
       </section>
       <ModalProduct 
         action={action} 

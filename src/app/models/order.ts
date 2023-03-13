@@ -1,45 +1,74 @@
 import { CartItem } from "./cart"
+import { OrderStatus } from "./general-type";
+import { Paging } from "./paging";
 
 export interface OrderCreate{
-    rentItems: CartItem[]
-    saleItems: CartItem[]
-    startRentDate?: string;
-    endRentDate?: string;
+    startDateRent?: Date;
+    endDateRent?: Date;
+    rewardPointUsed: number;
+    recipientAddress: string;
+    recipientPhone: string;
+    recipientName: string;
+    rentOrderGroupID: string | null;
+    itemList: CartItem[];
 }
 
-interface SizeProductItems {
-    sizeProductItemID: string;
-    sizeName: string;
-    productName: string;
-    imgUrl: string[];
-}
-
-interface AddendumProductItem {
-    addendumProductItemID: string;
-    sizeProductItemPrice: number;
+// order get
+interface RentOrderDetailList {
+    id: string;
+    productItemDetailId: string;
+    productItemDetailTotalPrice: number;
     quantity: number;
-    sizeProductItems: SizeProductItems;
 }
-
-export interface Addendum {
-    addendumID: string;
+interface RentOrderList {
+    id: string;
+    orderCode: string;
     transportFee: number;
     startDateRent: Date;
     endDateRent: Date;
     deposit: number;
-    reducedMoney: number;
     totalPrice: number;
     status: string;
     remainMoney: number;
-    address: string;
-    addendumProductItems: AddendumProductItem[];
+    rewardPointGain: number;
+    rewardPointUsed: number;
+    rentOrderGroupID: string;
+    discountAmount: number;
+    recipientAddress: string;
+    recipientPhone: string;
+    recipientName: string;
+    rentOrderDetailList: RentOrderDetailList[];
+}
+export interface RentOrder{
+    id: string;
+    createDate: Date;
+    numberOfOrder: number;
+    totalGroupAmount: number;
+    rentOrderList: RentOrderList[]
+}
+export interface RentOrderResponse{
+    paging: Paging;
+    rentOrderGroups: RentOrder[]
 }
 
-export interface Order {
-    orderID: string;
-    totalPrice: number;
+// order sale
+export interface SaleOrderList {
+    id: string;
+    transportFee: number;
     createDate: Date;
-    status: string;
-    isForRent: boolean;
-    addendums: Addendum[];
+    deposit: number;
+    totalPrice: number;
+    status: OrderStatus;
+    remainMoney: number;
+    rewardPointGain: number;
+    rewardPointUsed: number;
+    discountAmount: number;
+    recipientAddress: string;
+    recipientPhone: string;
+    recipientName: string;
+    rentOrderDetailList: RentOrderDetailList[];
+}
+export interface SaleOrderResponse{
+    paging: Paging;
+    saleOrderList: SaleOrderList[];
 }

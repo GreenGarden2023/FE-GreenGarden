@@ -1,29 +1,43 @@
-import { DatePicker, Image, Modal } from 'antd';
+import { DatePicker, Form, Image, Input, Modal } from 'antd';
+import locale from 'antd/es/date-picker/locale/vi_VN';
 import Table, { ColumnsType } from 'antd/es/table';
 import LandingFooter from 'app/components/footer/LandingFooter';
 import HeaderInfor from 'app/components/header-infor/HeaderInfor';
 import LandingHeader from 'app/components/header/LandingHeader';
-import { Cart } from 'app/models/cart';
+import useSelector from 'app/hooks/use-selector';
+import { Cart, CartUserData } from 'app/models/cart';
+import { OrderCreate } from 'app/models/order';
 import cartService from 'app/services/cart.service';
+import orderService from 'app/services/order.service';
 import { CartProps, setCartSlice } from 'app/slices/cart';
 import { setNoti } from 'app/slices/notification';
+import pagingPath from 'app/utils/paging-path';
+import { Dayjs } from "dayjs";
+import 'dayjs/locale/vi';
 import React, { useEffect, useMemo, useState } from 'react';
+import CurrencyFormat from 'react-currency-format';
 import { BiPlus } from 'react-icons/bi';
+import { CiSquareRemove } from 'react-icons/ci';
 import { GrFormSubtract } from 'react-icons/gr';
+import { useNavigate } from 'react-router-dom';
 import useDispatch from '../../hooks/use-dispatch';
 import { setTitle } from '../../slices/window-title';
 import CONSTANT from '../../utils/constant';
 import './style.scss';
-import 'dayjs/locale/vi';
-import locale from 'antd/es/date-picker/locale/vi_VN';
-import { CiSquareRemove } from 'react-icons/ci'
-import pagingPath from 'app/utils/paging-path';
-import CurrencyFormat from 'react-currency-format';
-import { Dayjs } from "dayjs";
-import orderService from 'app/services/order.service';
-import { OrderCreate } from 'app/models/order';
-import useSelector from 'app/hooks/use-selector';
-import { useNavigate } from 'react-router-dom';
+import { useForm, Controller } from 'react-hook-form';
+import ErrorMessage from 'app/components/message.tsx/ErrorMessage';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+
+// recipientAddress: string;
+//     recipientPhone: string;
+//     recipientName: string;
+const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
+const schema = yup.object().shape({
+    recipientAddress: yup.string().required('Địa chỉ không được để trống').max(500, 'Địa chỉ không được nhiều hơn 500 ký tự'),
+    recipientName: yup.string().required('Tên không được để trống').max(200, 'Tên không được nhiều hơn 200 ký tự'),
+    recipientPhone: yup.string().required('Số điện thoại không được để trống').matches(phoneRegExp, 'Số điện thoại không hợp lệ'),
+})
 
 const { RangePicker } = DatePicker;
 const dateFormatList = ['DD/MM/YYYY', 'DD/MM/YY', 'DD-MM-YYYY', 'DD-MM-YY'];
@@ -37,6 +51,21 @@ const CartPage: React.FC = () => {
     const [sizeProductItemSelect, setSizeProductItemSelect] = useState<string[]>([])
     const [dateRange, setDateRange] = useState<[Dayjs, Dayjs]>()
     const [submited, setSubmited] = useState(false);
+    const { control, formState: { errors }, handleSubmit, setValue } = useForm<CartUserData>({
+        resolver: yupResolver(schema)
+    })
+    const userSate = useSelector(state => state.userInfor)
+
+    useEffect(() =>{
+        const { address, fullName, phone } = userSate
+
+        if(!address || !fullName || !phone) return;
+
+        setValue('recipientAddress', address)
+        setValue('recipientName', fullName)
+        setValue('recipientPhone', phone)
+
+    }, [userSate, setValue])
 
     useEffect(() =>{
         pagingPath.scrollTop()
@@ -49,8 +78,8 @@ const CartPage: React.FC = () => {
                 const result = await cartService.getCart()
                 setCart(result.data)
                 const cartProps: CartProps = {
-                    rentItems: result.data.rentItems.map(x => ({sizeProductItemID: x.sizeProductItem.id, quantity: x.quantity})),
-                    saleItems: result.data.saleItems.map(x => ({sizeProductItemID: x.sizeProductItem.id, quantity: x.quantity})),
+                    rentItems: result.data.rentItems.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})),
+                    saleItems: result.data.saleItems.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})),
                 }
                 dispatch(setCartSlice(cartProps))
             }catch{
@@ -148,7 +177,7 @@ const CartPage: React.FC = () => {
 
         if(!newCart) return
 
-        const sizeProductItemIdIndex = cart?.saleItems.findIndex(x => x.sizeProductItem.id === sizeProductItemId)
+        const sizeProductItemIdIndex = cart?.saleItems.findIndex(x => x.productItemDetail.id === sizeProductItemId)
         
         if(sizeProductItemIdIndex === undefined || sizeProductItemIdIndex < 0) return;
         
@@ -163,8 +192,8 @@ const CartPage: React.FC = () => {
 
         try{
             const cartProps: CartProps = {
-                rentItems: [...newCart.rentItems?.map(x => ({sizeProductItemID: x.sizeProductItem.id, quantity: x.quantity})) || []],
-                saleItems: [...newCart.saleItems?.map(x => ({sizeProductItemID: x.sizeProductItem.id, quantity: x.quantity})) || []],
+                rentItems: [...newCart.rentItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})) || []],
+                saleItems: [...newCart.saleItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})) || []],
             }
             const res = await cartService.addToCart(cartProps)
             setCart(res.data)
@@ -176,12 +205,12 @@ const CartPage: React.FC = () => {
     }
     const DataSourceSale = cart?.saleItems.map((c, index) => ({
         key: String(index + 1),
-        sizeProductItemId: c.sizeProductItem.id,
-        image: c.sizeProductItem.imgUrl[0],
+        sizeProductItemId: c.productItemDetail.id,
+        image: c.productItemDetail.imgUrl[0],
         name: c.productItem.name,
-        price: c.sizeProductItem.salePrice,
+        price: c.productItemDetail.salePrice,
         quantity: c.quantity,
-        sizeName: c.sizeProductItem.size.sizeName
+        sizeName: c.productItemDetail.size.sizeName
     }))
 
     const ColumnRent: ColumnsType<any> = [
@@ -274,7 +303,7 @@ const CartPage: React.FC = () => {
 
         if(!newCart) return
 
-        const sizeProductItemIdIndex = cart?.rentItems.findIndex(x => x.sizeProductItem.id === sizeProductItemId)
+        const sizeProductItemIdIndex = cart?.rentItems.findIndex(x => x.productItemDetail.id === sizeProductItemId)
         
         if(sizeProductItemIdIndex === undefined || sizeProductItemIdIndex < 0) return;
         
@@ -289,8 +318,8 @@ const CartPage: React.FC = () => {
 
         try{
             const cartProps: CartProps = {
-                rentItems: [...newCart.rentItems?.map(x => ({sizeProductItemID: x.sizeProductItem.id, quantity: x.quantity})) || []],
-                saleItems: [...newCart.saleItems?.map(x => ({sizeProductItemID: x.sizeProductItem.id, quantity: x.quantity})) || []],
+                rentItems: [...newCart.rentItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})) || []],
+                saleItems: [...newCart.saleItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})) || []],
             }
             const res = await cartService.addToCart(cartProps)
             setCart(res.data)
@@ -302,20 +331,20 @@ const CartPage: React.FC = () => {
     }
     const DataSourceRent = cart?.rentItems.map((c, index) => ({
         key: String(index + 1),
-        sizeProductItemId: c.sizeProductItem.id,
-        image: c.sizeProductItem.imgUrl[0],
+        sizeProductItemId: c.productItemDetail.id,
+        image: c.productItemDetail.imgUrl[0],
         name: c.productItem.name,
-        price: c.sizeProductItem.rentPrice,
+        price: c.productItemDetail.rentPrice,
         quantity: c.quantity,
-        sizeName: c.sizeProductItem.size.sizeName
+        sizeName: c.productItemDetail.size.sizeName
     }))
     
     const ModalData = useMemo(() =>{
         const [type, id] = sizeProductItemSelect
         if(type === 'Rent'){
-            return cart?.rentItems.filter(x => x.sizeProductItem.id === id)[0]
+            return cart?.rentItems.filter(x => x.productItemDetail.id === id)[0]
         }else{
-            return cart?.saleItems.filter(x => x.sizeProductItem.id === id)[0]
+            return cart?.saleItems.filter(x => x.productItemDetail.id === id)[0]
         }
         
     }, [sizeProductItemSelect, cart])
@@ -353,13 +382,13 @@ const CartPage: React.FC = () => {
         const [type, id] = sizeProductItemSelect
         
         const cartProps: CartProps = {
-            rentItems: [...cart?.rentItems?.map(x => ({sizeProductItemID: x.sizeProductItem.id, quantity: x.quantity})) || []],
-            saleItems: [...cart?.saleItems?.map(x => ({sizeProductItemID: x.sizeProductItem.id, quantity: x.quantity})) || []],
+            rentItems: [...cart?.rentItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})) || []],
+            saleItems: [...cart?.saleItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})) || []],
         }
         if(type === 'Rent'){
-            cartProps.rentItems = cartProps.rentItems.filter(x => x.sizeProductItemID !== id)
+            cartProps.rentItems = cartProps.rentItems.filter(x => x.productItemDetailID !== id)
         }else{
-            cartProps.saleItems = cartProps.saleItems.filter(x => x.sizeProductItemID !== id)
+            cartProps.saleItems = cartProps.saleItems.filter(x => x.productItemDetailID !== id)
         }
 
         try{
@@ -375,17 +404,39 @@ const CartPage: React.FC = () => {
     const handleChangeDateRange = (dates, dateStrings)=>{
         setDateRange(dates)
     }
-    const handleCreateOrder = async () =>{
+    const handleSubmitForm = async (data: CartUserData) =>{
         setSubmited(true)
         if(cart?.rentItems.length !== 0 && !dateRange) return;
+
+        const { recipientAddress, recipientName, recipientPhone } = data
+
         try{
-            const orderProps: OrderCreate = {
-                rentItems,
-                saleItems,
-                startRentDate: dateRange ? dateRange[0].format(dateFormat) : '',
-                endRentDate: dateRange ? dateRange[1].format(dateFormat) : '',
+            const listRequestOrder: Promise<any>[] = [];
+            if(rentItems.length !== 0){
+                const data: OrderCreate = {
+                    startDateRent: dateRange ? dateRange[0].toDate() : undefined,
+                    endDateRent: dateRange ? dateRange[1].toDate() : undefined,
+                    itemList: rentItems,
+                    rewardPointUsed: 0,
+                    rentOrderGroupID: null,
+                    recipientAddress,
+                    recipientName,
+                    recipientPhone
+                }
+                listRequestOrder.push(orderService.createOrder(data))
             }
-            await orderService.createOrder(orderProps)
+            if(saleItems.length !== 0){
+                const data: any = {
+                    itemList: rentItems,
+                    rewardPointUsed: 0,
+                    recipientAddress,
+                    recipientName,
+                    recipientPhone,
+                    rentOrderGroupID: null,
+                }
+                listRequestOrder.push(orderService.createOrder(data))
+            }
+            await Promise.all(listRequestOrder)
             dispatch(setNoti({type: 'success', message: 'Tạo đơn hàng thành công'}))
             navigate('/checkout-success')
             dispatch(setCartSlice({rentItems: [], saleItems: []}))
@@ -410,33 +461,63 @@ const CartPage: React.FC = () => {
                             </div>
                         </section>
                         <section className="cart-infor default-layout">
-                            <div className="box">
-                                {
-                                    cart?.rentItems.length !== 0 &&
-                                    <div className="cart-date-picker">
-                                        <p>Chọn ngày thuê</p>
-                                        <RangePicker 
-                                            locale={locale} 
-                                            placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
-                                            format={dateFormatList}
-                                            disabledDate={(current) => current && current.valueOf()  < (Date.now() + 277600000)}
-                                            defaultValue={dateRange}
-                                            onChange={handleChangeDateRange}
-                                            status={(submited && !dateRange) ? 'error' : ''}
-                                        />
-                                    </div>
-                                }
-                                <p className='cart-quantity'>
-                                    <span>({totalItem})</span> 
-                                    sản phẩm
-                                </p>
-                                <p className='cart-total'>Tổng cộng: 
+                            <Form
+                                layout='vertical'
+                                onFinish={handleSubmit(handleSubmitForm)}
+                                style={{width: '500px', marginLeft: 'auto'}}
+                            >
+                                <Form.Item label='Tên người nhận' required>
+                                    <Controller 
+                                        control={control}
+                                        name='recipientName'
+                                        render={({ field }) => <Input {...field} />}
+                                    />
+                                    {errors.recipientName && <ErrorMessage message={errors.recipientName.message} />}
+                                </Form.Item>
+                                <Form.Item label='Địa chỉ' required>
+                                    <Controller 
+                                        control={control}
+                                        name='recipientAddress'
+                                        render={({ field }) => <Input {...field} />}
+                                    />
+                                    {errors.recipientAddress && <ErrorMessage message={errors.recipientAddress.message} />}
+                                </Form.Item>
+                                <Form.Item label='Số điện thoại' required>
+                                    <Controller 
+                                        control={control}
+                                        name='recipientPhone'
+                                        render={({ field }) => <Input {...field} />}
+                                    />
+                                    {errors.recipientPhone && <ErrorMessage message={errors.recipientPhone.message} />}
+                                </Form.Item>
+                                <div className="box">
                                     {
-                                        (dateRange || cart?.rentItems.length === 0) && <CurrencyFormat value={totalPrice} displayType={'text'} thousandSeparator={true} suffix={'đ'} />
+                                        cart?.rentItems.length !== 0 &&
+                                        <div className="cart-date-picker">
+                                            <p>Chọn ngày thuê</p>
+                                            <RangePicker 
+                                                locale={locale} 
+                                                placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
+                                                format={dateFormatList}
+                                                disabledDate={(current) => current && current.valueOf()  < (Date.now() + 277600000)}
+                                                defaultValue={dateRange}
+                                                onChange={handleChangeDateRange}
+                                                status={(submited && !dateRange) ? 'error' : ''}
+                                            />
+                                        </div>
                                     }
-                                </p>
-                                <button className='btn-order' onClick={handleCreateOrder}>Đặt hàng</button>
-                            </div>
+                                    <p className='cart-quantity'>
+                                        <span>({totalItem})</span> 
+                                        sản phẩm
+                                    </p>
+                                    <p className='cart-total'>Tổng cộng: 
+                                        {
+                                            (dateRange || cart?.rentItems.length === 0) && <CurrencyFormat value={totalPrice} displayType={'text'} thousandSeparator={true} suffix={'đ'} />
+                                        }
+                                    </p>
+                                    <button className='btn-order' type='submit'>Đặt hàng</button>
+                                </div>
+                            </Form>
                         </section>
                     </div>
                 </div>
@@ -451,7 +532,7 @@ const CartPage: React.FC = () => {
                     ModalData &&
                     <p>Xác nhận xóa sản phẩm 
                         <span style={{color: '#FF3333'}}> {ModalData.productItem.name}</span> có kích thước là
-                        <span style={{color: '#FF3333'}}> {ModalData.sizeProductItem.size.sizeName}</span> khỏi giỏ hàng?
+                        <span style={{color: '#FF3333'}}> {ModalData.productItemDetail.size.sizeName}</span> khỏi giỏ hàng?
                     </p>
                 }
             </Modal>

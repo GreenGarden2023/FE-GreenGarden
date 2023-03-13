@@ -87,15 +87,17 @@ const ClientProductItem: React.FC = () => {
                         <Row gutter={[10, 10]}>
                             {
                                 productItems.map((proItem, index) => (
-                                    <Col xs={24} xl={8} key={index} className='col-item'>
+                                    <Col xs={24} xl={6} key={index} className='col-item'>
                                         <Link to={`/product-item/${proItem.id}`} className='cp-item'>
-                                            <img src={proItem.sizeModelList[0].imagesURL[0] ? proItem.sizeModelList[0].imagesURL[0] : '/assets/inventory-empty.png'} alt="/" onError={utilGeneral.setDefaultImage} />
+                                            <img src={proItem.imageURL} alt="/" onError={utilGeneral.setDefaultImage} />
                                             <p className='pro-name'>{proItem.name}</p>
-                                            {
-                                                proItem.sizeModelList.map((pItem, i) => (
-                                                    <PriceBox key={i} sizeName={pItem.size.sizeName} rentPrice={pItem.rentPrice} salePrice={pItem.salePrice} />
-                                                ))
-                                            }
+                                            <div className="price-box">
+                                                {
+                                                    proItem.productItemDetail.map((pItem, i) => (
+                                                        <PriceBox key={i} sizeName={pItem.size.sizeName} rentPrice={pItem.rentPrice || 0} salePrice={pItem.salePrice || 0} />
+                                                    ))
+                                                }
+                                            </div>
                                         </Link>
                                     </Col>
                                 ))

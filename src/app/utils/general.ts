@@ -6,7 +6,7 @@ const statusToColor = (status: OrderStatus) =>{
         case 'ready': return '#108ee9'
         case 'paid': return '#87d068'
         case 'completed': return '#2db7f5'
-        case 'cancle': return 'f50'
+        case 'cancel': return 'f50'
     }
 }
 const statusToViLanguage = (status: OrderStatus) =>{
@@ -14,10 +14,11 @@ const statusToViLanguage = (status: OrderStatus) =>{
         case 'unpaid': return 'Đang xử lý'
         case 'ready': return 'Đã thanh toán cọc'
         case 'paid': return 'Đã thanh toán đủ'
-        case 'completed': return 'Đã hoàn tất và hoàn cọc'
-        case 'cancle': return 'Đã bị hủy'
+        case 'completed': return 'Đã thanh toán đủ'
+        case 'cancel': return 'Đã bị hủy'
     }
 }
+
 const setDefaultImage = ({currentTarget}) =>{
     currentTarget.onerror = null
     currentTarget.src = '/assets/inventory-empty.png'

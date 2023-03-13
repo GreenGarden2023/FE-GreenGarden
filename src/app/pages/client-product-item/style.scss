@@ -11,13 +11,18 @@
                 height: 100%;
                 img{
                     width: 100%;
+                    height: 220px;
+                    object-fit: cover;
                 }
                 .pro-name{
-                    text-align: center;
                     color: #000;
                     font-size: 22px;
                     font-weight: 500;
                     margin: 10px 0;
+                    height: 52px;
+                }
+                .price-box{
+                    // margin-top: auto;
                 }
                 .content{
                     .name{

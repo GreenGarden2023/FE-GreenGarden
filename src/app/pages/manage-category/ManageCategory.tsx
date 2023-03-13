@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Button, Form, Image, Input, Modal, Switch, Table, Upload } from 'antd';
+import { Button, Form, Image, Input, Modal, Switch, Table, Tooltip, Upload } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import type { UploadChangeParam } from 'antd/es/upload';
 import type { RcFile, UploadFile, UploadProps } from 'antd/es/upload/interface';
@@ -65,7 +65,7 @@ const ManageCategory: React.FC = () => {
         setCategories(res.data.result)
         setPaging(res.data.paging)
       }catch(err){
-        dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
+        dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
       }
       setLoading(false)
     }
@@ -87,30 +87,30 @@ const ManageCategory: React.FC = () => {
   }, [categorySelected, setValue])
   const Column: ColumnsType<Category> = [
       {
-        title: 'Name',
+        title: 'Tên thể loại cây',
         key: 'name',
         dataIndex: 'name',
         align: 'center',
         width: 200
       },
       {
-        title: 'Description',
+        title: 'Mô tả',
         key: 'description',
         dataIndex: 'description',
         align: 'left',
         width: 600
       },
       {
-        title: 'Status',
+        title: 'Trạng thái',
         key: 'status',
         dataIndex: 'status',
-        render: (text, record, index) => (
+        render: (_, record) => (
           <Switch loading={loaderCateId.includes(record.id)} checked={record.status === CONSTANT.STATUS.ACTIVE} onChange={(checked: boolean) => handleToggleStatus(checked, record)} />
         ),
         align: 'center'
       },
       {
-        title: 'Thumbnail',
+        title: 'Ảnh đại diện',
         key: 'imgUrl',
         dataIndex: 'imgUrl',
         render: (_, record) => (
@@ -128,15 +128,17 @@ const ManageCategory: React.FC = () => {
         align: 'center'
       },
       {
-        title: 'Actions',
+        title: 'Công cụ',
         key: 'actions',
         dataIndex: 'actions',
         render: (_, record) => (
           <div className="btn-actions-wrapper">
-            <AiFillEdit className='btn-icon' color='#00a76f' onClick={() => {
-              setCagorySelected(record)
-              setAction(CONSTANT.ACTION.UPDATE)
-            }} />
+            <Tooltip title='Chỉnh sửa' color='#108ee9'>
+              <AiFillEdit className='btn-icon' color='#00a76f' onClick={() => {
+                setCagorySelected(record)
+                setAction(CONSTANT.ACTION.UPDATE)
+              }} />
+            </Tooltip>
           </div>
         ),
         align: 'center'
@@ -158,9 +160,9 @@ const ManageCategory: React.FC = () => {
         ...x,
         status: statusHandle
       } : x))
-      dispatch(setNoti({type: 'success', message: `Update status ${category.name} success`}))
+      dispatch(setNoti({type: 'success', message: `Cập nhật trạng thái "${category.name}" thành công`}))
     }catch(err){
-      dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
+      dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
     }
     setLoaderCateId(loaderCateId.filter(x => x !== category.id))
   }
@@ -176,7 +178,7 @@ const ManageCategory: React.FC = () => {
           setCategories([res.data, ...categories])
         }
         closeModal()
-        dispatch(setNoti({type: 'success', message: `Create Category success`}))
+        dispatch(setNoti({type: 'success', message: `Tạo mới "${data.Name}" thành công`}))
       }catch(err: any){
         if(err.response.data.code === 400){
           setError('Name', {
@@ -186,7 +188,7 @@ const ManageCategory: React.FC = () => {
           // await trigger('Name')
           return
         }
-        dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
+        dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
       }
     }else{
       try{
@@ -200,7 +202,7 @@ const ManageCategory: React.FC = () => {
           }) : category)
         )
         closeModal();
-        dispatch(setNoti({type: 'success', message: `Update Category success`}))
+        dispatch(setNoti({type: 'success', message: `Cập nhật "${data.Name}" thành công`}))
       }catch(err: any){
         if(err.response.data.code === 400){
           setError('Name', {
@@ -210,7 +212,7 @@ const ManageCategory: React.FC = () => {
           // await trigger('Name')
           return
         }
-        dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
+        dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
       }
     }
   }
@@ -266,13 +268,13 @@ const ManageCategory: React.FC = () => {
   return (
     <div className='mc-wrapper'>
       <section className="mc-infor default-layout">
-        <h1>Manage Category</h1>
+        <h1>Quản lý thể loại cây</h1>
       </section>
       <section className="mc-search-wrapper default-layout">
         <button className='btn-create' onClick={() => {
           setAction(CONSTANT.ACTION.CREATE)
           reset()
-        }}>Create category</button>
+        }}>Tạo mới 1 thể loại cây</button>
       </section>
       <>
         {/* <DatePicker

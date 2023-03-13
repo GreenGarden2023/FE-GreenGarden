@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { Layout, Menu } from 'antd'
 import type { MenuProps } from 'antd';
 import './style.scss';
@@ -6,7 +6,7 @@ import { FaLongArrowAltRight, FaLongArrowAltLeft } from 'react-icons/fa';
 import useSelector from '../hooks/use-selector';
 import useDispatch from '../hooks/use-dispatch';
 import { setCollapsedHeader } from '../slices/admin-layout';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { BiCategoryAlt } from 'react-icons/bi';
 import { MdOutlineInventory2 } from 'react-icons/md'
 import CONSTANT from 'app/utils/constant';
@@ -30,16 +30,13 @@ function getItem(
     } as MenuItem;
 }
 
-
-
-
 interface AdminRouteProps{
     children: any
 }
 
 const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
     const dispatch = useDispatch();
-    // const location = useLocation();
+    const location = useLocation();
     
     const { collapsedHeader } = useSelector(state => state.adminLayout);
     const { roleName } = useSelector(state => state.userInfor)
@@ -47,22 +44,46 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
     const handleCollapsedHeader = () =>{
         dispatch(setCollapsedHeader({active: !collapsedHeader}))
     }
-    // const defaultOpenKey = useMemo(() =>{
-    //     const affix = location.pathname.split('/')[2]
+    const defaultOpenKey = useMemo(() =>{
+        const affix = location.pathname.split('/')[2]
 
-    //     switch(affix){
-    //         case 'manage-category':
-    //             return ['1']
-    //         case 'manage-product':
-    //             return ['2']
-    //     }
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [])
+        const manageCategory = ['manage-category']
+        if(manageCategory.includes(affix)){
+            return ['1']
+        }
+
+        const manageProduct = ['manage-product', 'manage-product-item']
+        if(manageProduct.includes(affix)){
+            return ['2']
+        }
+
+        const manageSize = ['manage-size']
+        if(manageSize.includes(affix)){
+            return ['3']
+        }
+        const manageOrder = ['manage-order']
+        if(manageOrder.includes(affix)){
+            return ['4']
+        }
+        const rentOrder = ['rent-order']
+        if(rentOrder.includes(affix)){
+            return ['5']
+        }
+        const saleOrder = ['sale-order']
+        if(saleOrder.includes(affix)){
+            return ['6']
+        }
+
+    }, [location])
+    const childrenOrder = [
+        CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/rent-order'>Đơn thuê</Link>, '5', <BiCategoryAlt size={18} />) : null,
+        CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/sale-order'>Đơn mua</Link>, '6', <BiCategoryAlt size={18} />) : null,
+    ]
     const items: MenuItem[] = [
        CONSTANT.MANAGE_CATEGORY.includes(roleName as Role) ? getItem(<Link to='/panel/manage-category'>Manage Category</Link>, '1', <BiCategoryAlt size={18} />) : null,
        CONSTANT.MANAGE_PRODUCT.includes(roleName as Role) ? getItem(<Link to='/panel/manage-product'>Manage Product</Link>, '2', <MdOutlineInventory2 size={18} />) : null,
        CONSTANT.MANAGE_SIZE.includes(roleName as Role) ? getItem(<Link to='/panel/manage-size'>Manage Size</Link>, '3', <MdOutlineInventory2 size={18} />) : null,
-       CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/manage-order'>Manage Order</Link>, '4', <BiCategoryAlt size={18} />) : null,
+       CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem('Manage Order', '4', <BiCategoryAlt size={18} />, childrenOrder) : null,
     ];
   return (
     <>
@@ -90,7 +111,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
                     collapsed={collapsedHeader}
                 >
                     <div style={{ height: 32, margin: 16, background: 'rgba(255, 255, 255, 0.2)' }} />
-                    <Menu className='admin-menu' theme="light" mode="inline"  items={items} />
+                    <Menu className='admin-menu' theme="light" mode="inline"  items={items} selectedKeys={defaultOpenKey}  />
                 </Sider>
                 <Layout className="site-layout" style={{ marginLeft: collapsedHeader ? 80 : 200 }}>
                     <Content>

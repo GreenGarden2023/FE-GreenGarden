@@ -1,8 +1,6 @@
-import { Category } from "app/models/category";
 import { ProductItemType, Status } from "app/models/general-type";
 import { Paging } from "app/models/paging";
-import { Product } from "app/models/product";
-import { ProductItem, ProductItemHandleCreate } from "app/models/product-item";
+import { ProductItem, ProductItemDetail, ProductItemDetailHandle, ProductItemDetailResponse, ProductItemResponse } from "app/models/product-item";
 import { Response } from "app/models/response";
 import queryString from "query-string";
 import golbalAxios from "../utils/http-client";
@@ -13,51 +11,37 @@ interface GetAllProps{
     type?: ProductItemType;
     status?: Status
 }
-interface ResponseType{
-    paging: Paging;
-    productItems: ProductItem[];
-    category: Category;
-    product: Product
-}
-interface GetDetail{
-    category: Category;
-    product: Product;
-    productItem: ProductItem;
-}
 
-const getAllProductItem = async (pagingProps: Partial<Paging>, props: GetAllProps): Promise<Response<ResponseType>> =>{
+const getAllProductItem = async (pagingProps: Partial<Paging>, props: GetAllProps): Promise<Response<ProductItemResponse>> =>{
     const getAllProps = {
         ...pagingProps,
         ...props
     }
-    const result = await golbalAxios.get<Response<ResponseType>>(`/product-item/get-product-item?${queryString.stringify(getAllProps)}`);
+    const result = await golbalAxios.get<Response<ProductItemResponse>>(`/product-item/get-product-item?${queryString.stringify(getAllProps)}`);
     return result.data
 }
-const createProductItem = async (productItemHandleCreate: ProductItemHandleCreate) =>{
-    const { name, description, productId, type, sizeModelList } = productItemHandleCreate
-    const createProps = {
-        Name: name,
-        Description: description,
-        ProductId: productId,
-        Type: type,
-        sizeModelList
-    }
-    const result = await golbalAxios.post<Response<ResponseType>>(`/product-item/create-product-item`, createProps, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
-    });
+const createProductItem = async (productItem: Partial<ProductItem>) =>{
+    const result = await golbalAxios.post<Response<ProductItem>>(`/product-item/create-product-item`, productItem);
     return result.data
 }
-const updateProductItem = async () =>{
-    
+const updateProductItem = async (productItem: Partial<ProductItem>) =>{
+    const result = await golbalAxios.post<Response<ProductItem>>(`/product-item/update-product-item`, productItem);
+    return result.data
 }
-const getProductItemDetail = async (productItemId: string, sizeProductItemStatus: Status): Promise<Response<GetDetail>> =>{
+const getProductItemDetail = async (productItemId: string, sizeProductItemStatus: Status): Promise<Response<ProductItemDetailResponse>> =>{
     const props = {
         productItemId,
         sizeProductItemStatus
     }
-    const result = await golbalAxios.get<Response<GetDetail>>(`/product-item/get-product-item-detail?${queryString.stringify(props)}`);
+    const result = await golbalAxios.get<Response<ProductItemDetailResponse>>(`/product-item/get-product-item-detail?${queryString.stringify(props)}`);
+    return result.data
+}
+const createProductItemDetail = async (item: ProductItemDetailHandle) =>{
+    const result = await golbalAxios.post<Response<ProductItemDetailHandle>>(`/product-item/create-product-item-detail`, item);
+    return result.data
+}
+const updateProductItemDetail = async (item: ProductItemDetailHandle) =>{
+    const result = await golbalAxios.post<Response<ProductItemDetailHandle>>(`/product-item/update-product-item-detail`, item);
     return result.data
 }
 
@@ -65,7 +49,9 @@ const productItemService = {
     getAllProductItem,
     createProductItem,
     updateProductItem,
-    getProductItemDetail
+    getProductItemDetail,
+    createProductItemDetail,
+    updateProductItemDetail
 }
 
 export default productItemService
