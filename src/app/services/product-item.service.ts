@@ -1,6 +1,6 @@
 import { ProductItemType, Status } from "app/models/general-type";
 import { Paging } from "app/models/paging";
-import { ProductItem, ProductItemDetail, ProductItemDetailHandle, ProductItemDetailResponse, ProductItemResponse } from "app/models/product-item";
+import { ProductItem, ProductItemDetailHandle, ProductItemDetailResponse, ProductItemResponse } from "app/models/product-item";
 import { Response } from "app/models/response";
 import queryString from "query-string";
 import golbalAxios from "../utils/http-client";

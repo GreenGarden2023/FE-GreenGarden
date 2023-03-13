@@ -22,6 +22,7 @@ const ManageRentOrder:React.FC = () => {
     const dispatch = useDispatch();
 
     const [action, setAction] = useState<PaymentModal>();
+    console.log(action)
 
     const [rentOrders, setRentOrders] = useState<RentOrder[]>([])
 

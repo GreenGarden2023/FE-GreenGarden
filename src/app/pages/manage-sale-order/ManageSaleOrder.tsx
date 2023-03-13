@@ -214,7 +214,7 @@ const ManageSaleOrder: React.FC = () => {
             >
                 <p>Nhập số tiền cần thanh toán</p>
                 <CurrencyFormat disabled={checkFullAmount} value={amount} thousandSeparator={true} suffix={' VNĐ'} onValueChange={(values) => {
-                    const {formattedValue, value} = values;
+                    const {value} = values;
                     // formattedValue = $2,223
                     // value ie, 2223
                     setAmount(Number(value))

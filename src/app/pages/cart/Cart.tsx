@@ -41,7 +41,7 @@ const schema = yup.object().shape({
 
 const { RangePicker } = DatePicker;
 const dateFormatList = ['DD/MM/YYYY', 'DD/MM/YY', 'DD-MM-YYYY', 'DD-MM-YY'];
-const dateFormat = 'DD/MM/YYYY';
+// const dateFormat = 'DD/MM/YYYY';
 
 const CartPage: React.FC = () => {
     const dispatch = useDispatch();

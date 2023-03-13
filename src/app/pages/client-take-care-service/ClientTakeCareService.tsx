@@ -10,6 +10,7 @@ import './style.scss'
 const ClientTakeCareService: React.FC = () => {
 
     const [openModal, setOpenModal] = useState(0);
+    console.log(openModal)
 
     useEffect(() =>{
         pagingPath.scrollTop()

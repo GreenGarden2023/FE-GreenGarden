@@ -114,15 +114,15 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productId, numberOfC
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
     }
-    const editorConfiguration = {
-        toolbar: [ 'bold', 'italic', 'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor']
-    };
-    const toolbarStyle = {
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0
-      };
+    // const editorConfiguration = {
+    //     toolbar: [ 'bold', 'italic', 'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor']
+    // };
+    // const toolbarStyle = {
+    //     position: 'fixed',
+    //     top: 0,
+    //     left: 0,
+    //     right: 0
+    //   };
     return (
         <Modal
             className='modal-pi-wrapper'
