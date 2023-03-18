@@ -1,89 +1,69 @@
-import { Tag, Tooltip } from 'antd'
+import { Popover, Tag, Tooltip } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import LandingFooter from 'app/components/footer/LandingFooter'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import LandingHeader from 'app/components/header/LandingHeader'
+import ModalClientRentOrderDetai from 'app/components/modal/client-rent-order-detail/ModalClientRentOrderDetai'
+import ModalClientSaleOrderDetai from 'app/components/modal/client-sale-order-detail/ModalClientSaleOrderDetai'
 import MoneyFormat from 'app/components/money/MoneyFormat'
-import { PaymentAction } from 'app/models/general-type'
+import useDispatch from 'app/hooks/use-dispatch'
+import { PaymentActionType } from 'app/models/general-type'
 import { RentOrder } from 'app/models/order'
+import { PaymentControlState } from 'app/models/payment'
 import orderService from 'app/services/order.service'
 import paymentService from 'app/services/payment.service'
+import { setNoti } from 'app/slices/notification'
+import CONSTANT from 'app/utils/constant'
 import utilDateTime from 'app/utils/date-time'
 import utilGeneral from 'app/utils/general'
 import React, { useEffect, useMemo, useState } from 'react'
 import { BiCommentDetail } from 'react-icons/bi'
+import { GrMore } from 'react-icons/gr'
 import { MdOutlinePayments } from 'react-icons/md'
 import { RiBillLine } from 'react-icons/ri'
 import { useParams } from 'react-router-dom'
 import './style.scss'
 
 const ClientRentOrderGroup: React.FC = () => {
-    const { orderId } = useParams()
+    const { groupId } = useParams()
+    const dispatch = useDispatch();
 
     const [rentOrderGroup, setRentOrderGroup] = useState<RentOrder>()
+    const [actionMethod, setActionMethod] = useState<PaymentControlState>()
 
     useEffect(() =>{
-        if(!orderId) return;
+        if(!groupId) return;
 
         const init = async () =>{
             try{
-                const res = await orderService.getRentOrderGroup(orderId)
+                const res = await orderService.getRentOrderGroup(groupId)
                 setRentOrderGroup(res.data)
             }catch{
 
             }
         }
         init()
-    }, [orderId])
+    }, [groupId])
     const ColumnRentOrder: ColumnsType<any> = [
         {
-            title: '#',
-            key: '#',
-            dataIndex: '#',
-            align: 'center',
-            render: (v, _, index) => (<span style={{color: '#00a76f'}}>{index + 1}</span>)
-        },
-        {
             title: 'Mã đơn hàng',
-            key: 'orderID',
-            dataIndex: 'orderID',
+            key: 'orderCode',
+            dataIndex: 'orderCode',
             align: 'center',
-            render: (v) => (v.slice(0, 5))
+            width: 170,
+            fixed: 'left',
         },
         {
             title: 'Ngày bắt đầu thuê',
             key: 'startDateRent',
             dataIndex: 'startDateRent',
-            align: 'center',
             render: (v) => (utilDateTime.dateToString(v))
         },
         {
             title: 'Ngày kết thúc thuê',
             key: 'endDateRent',
             dataIndex: 'endDateRent',
-            align: 'center',
             render: (v) => (utilDateTime.dateToString(v))
-        },
-        {
-            title: 'Giá tiền',
-            key: 'totalPrice',
-            dataIndex: 'totalPrice',
-            align: 'center',
-            render: (v) => (<MoneyFormat value={v} />)
-        },
-        {
-            title: 'Số tiền cần trả',
-            key: 'remainMoney',
-            dataIndex: 'remainMoney',
-            align: 'center',
-            render: (v) => (<MoneyFormat value={v} />)
-        },
-        {
-            title: 'Số tiền cọc',
-            key: 'deposit',
-            dataIndex: 'deposit',
-            align: 'center',
-            render: (v) => (<MoneyFormat value={v} />)
         },
         {
             title: 'Trạng thái',
@@ -93,55 +73,128 @@ const ClientRentOrderGroup: React.FC = () => {
             render: (v) => (<Tag color={utilGeneral.statusToColor(v)}>{utilGeneral.statusToViLanguage(v)}</Tag>)
         },
         {
+            title: 'Phí vận chuyển',
+            key: 'transportFee',
+            dataIndex: 'transportFee',
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} />)
+        },
+        {
+            title: 'Tiền cọc',
+            key: 'deposit',
+            dataIndex: 'deposit',
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} />)
+        },
+        {
+            title: 'Tiền cần trả',
+            key: 'remainMoney',
+            dataIndex: 'remainMoney',
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} />)
+        },
+        {
+            title: 'Tổng đơn hàng',
+            key: 'totalPrice',
+            dataIndex: 'totalPrice',
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} />)
+        },
+        {
             title: 'Xử lý',
             key: 'action',
             dataIndex: 'action',
             align: 'center',
-            render: (_, record) => (
-                <>
-                    <Tooltip title='Chi tiết đơn hàng' color='#108ee9' >
-                        <BiCommentDetail size={25} color='#00a76f' cursor='pointer' onClick={() => handleSetAction(record.orderID, 'detail')} />
-                    </Tooltip>
-                    <Tooltip title='Thanh toán cọc bằng Momo' color='#108ee9' >
-                        <MdOutlinePayments size={25} color='#00a76f' cursor='pointer' onClick={() => handleSetAction(record.orderID, 'deposit')} />
-                    </Tooltip>
-                    <Tooltip title='Thanh toán bằng Momo' color='#108ee9'>
-                        <RiBillLine size={25} color='#00a76f' cursor='pointer' onClick={() => handleSetAction(record.orderID, 'remaining')} />
-                    </Tooltip>
-                </>
+            fixed:'right',
+            render: (_, record, index) => (
+                <Popover
+                content={() => contextRent(record, index)} 
+                placement='bottom' 
+                trigger="click" 
+                open={index === actionMethod?.openIndex} 
+                onOpenChange={(open: boolean) => {
+                    if(open){
+                        setActionMethod({orderId: '', actionType: '', orderType: '', openIndex: index})
+                    }else{
+                        setActionMethod({orderId: '', actionType: '', orderType: '', openIndex: -1})
+                    }
+                }}
+                >
+                    <GrMore size={25} cursor='pointer' color='#00a76f' />
+                </Popover>
             )
         },
     ]
+    const contextRent = (record, index: number) => {
+        return (
+            <div className='context-menu-wrapper'>
+                <div className="item" onClick={() => {
+                    setActionMethod({orderId: record.orderId, actionType: 'detail', orderType: 'rent', openIndex: -1})
+                }}>
+                    <BiCommentDetail size={25} className='icon'/>
+                    <span>Chi tiết đơn hàng</span>
+                </div>
+                <div className="item" onClick={() => {
+                    handleSetAction({orderId: record.orderId, actionType: 'deposit', orderType: 'rent', openIndex: -1})
+                }} >
+                    <MdOutlinePayments size={25} className='icon'/>
+                    <span>Thanh toán cọc bằng Momo</span>
+                </div>
+                <div className="item" onClick={() => {
+                    handleSetAction({orderId: record.orderId, actionType: 'remaining', orderType: 'rent', openIndex: -1})
+                }} >
+                    <MdOutlinePayments size={25} className='icon'/>
+                    <span>Thanh toán đơn hàng bằng Momo</span>
+                </div>
+            </div>
+        )
+    }
     const DataSourceRentOrder = useMemo(() =>{
         return rentOrderGroup?.rentOrderList.map((x, index) => ({
             key: String(index + 1),
-            orderID: x.id,
+            orderId: x.id,
+            orderCode: x.orderCode,
             totalPrice: x.totalPrice,
             startDateRent: x.startDateRent,
             endDateRent: x.endDateRent,
             status: x.status,
             remainMoney: x.remainMoney,
-            deposit: x.deposit
+            deposit: x.deposit,
+            transportFee: x.transportFee
         }))
     }, [rentOrderGroup])
-    const handleSetAction = async (orderId: string, type: PaymentAction) =>{
-        console.log(orderId)
-        if(type === 'deposit'){
+    const handleSetAction = async (data: PaymentControlState) =>{
+        const { orderId, actionType } = data
+
+        if(!rentOrderGroup) return;
+
+        const [order] = rentOrderGroup?.rentOrderList.filter(x => x.id === orderId)
+
+        if(actionType === 'deposit' && order.status !== 'unpaid'){
+            return dispatch(setNoti({type: 'info', message: CONSTANT.PAYMENT_MESSAGE.PAID_DEPOSIT}))
+        }
+        if(actionType === 'remaining' && (order.status === 'paid' || order.status === 'completed')){
+            return dispatch(setNoti({type: 'info', message: CONSTANT.PAYMENT_MESSAGE.PAID_REMAINING}))
+        }
+        
+        if(actionType === 'deposit'){
             try{
                 const res = await paymentService.depositPaymentMomo(orderId, 'rent')
                 window.open(res.data.payUrl, '_blank')
             }catch{
 
             }
-        }else if(type === 'remaining'){
+        }else if(actionType === 'remaining'){
             try{
-                const amount = rentOrderGroup?.rentOrderList.filter(x => x.id === orderId)[0].remainMoney || 0
-                const res = await paymentService.paymentMomo(orderId, amount, 'rent')
+                const res = await paymentService.paymentMomo(orderId, order.remainMoney, 'rent', order.status === 'unpaid' ? 'whole' : '')
                 window.open(res.data.payUrl, '_blank')
             }catch{
                 
             }
         }
+    }
+    const handleCancel = () =>{
+        setActionMethod(undefined)
     }
     return (
         <div>
@@ -150,11 +203,18 @@ const ClientRentOrderGroup: React.FC = () => {
                 <div className="container-wrapper crog-wrapper">
                     <HeaderInfor title={`Nhóm đơn hàng thuê ${rentOrderGroup?.id}`} />
                     <section className="crog-box default-layout">
-                        <Table className='cart-table' dataSource={DataSourceRentOrder} columns={ColumnRentOrder} pagination={false} />
+                        <Table className='cart-table' dataSource={DataSourceRentOrder} columns={ColumnRentOrder} pagination={false} scroll={{x: 1500}} />
                     </section>
                 </div>
             </div>
             <LandingFooter />
+            {
+                (actionMethod?.actionType === 'detail' && rentOrderGroup) && 
+                <ModalClientRentOrderDetai
+                    rentOrderList={rentOrderGroup.rentOrderList.filter(x => x.id === actionMethod.orderId)[0]}
+                    onClose={handleCancel}
+                />
+            }
         </div>
     )
 }

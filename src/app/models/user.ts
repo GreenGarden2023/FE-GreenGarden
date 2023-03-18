@@ -7,6 +7,7 @@ export interface User{
     favorite: string;
     mail: string;
     roleName: string;
+    currentPoint: number;
 }
 export interface UserLogin extends User{
     token: string;

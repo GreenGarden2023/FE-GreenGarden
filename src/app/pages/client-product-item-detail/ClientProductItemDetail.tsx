@@ -146,7 +146,7 @@ const ClientProductItemDetail: React.FC = () => {
                     data[index] = nest
                     newData.rentItems = data
                 }else{
-                    newData.rentItems = [...newData.rentItems, { productItemDetailID: productItemDetailID, quantity: quanSale}]
+                    newData.rentItems = [...newData.rentItems, { productItemDetailID: productItemDetailID, quantity: quanRent}]
                 }
                 console.log({newData})
                 const res = await cartService.addToCart(newData)

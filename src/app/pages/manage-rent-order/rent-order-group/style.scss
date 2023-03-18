@@ -1,1 +1,28 @@
 @import 'app/styles/variable.scss';
+
+.mrog-wrapper{
+    .mrog-infor{
+        width: 500px;
+        margin-left: auto;
+        border: 1px solid $default-green;
+        border-radius: 5px;
+        padding: 10px;
+        .infor-box{
+            display: flex;
+            align-items: center;
+            .left{
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                width: 250px;
+                font-size: 18px;
+            }
+            .right{
+                span{
+                    font-size: 20px;
+                    font-weight: 500;
+                }
+            }
+        }
+    }
+}

@@ -22,9 +22,15 @@ const PAGING_ITEMS = {
     CATEGORY: 10,
     CLIENT_CATEGORY: 20,
     PRODUCT: 5,
-    CLIENT_PRODUCT: 20,
+    CLIENT_PRODUCT: 5,
     PRODUCT_ITEM: 20,
-    CLIENT_PRODUCT_ITEM: 20
+    CLIENT_PRODUCT_ITEM: 20,
+    CLIENT_ORDER_SALE: 10,
+    CLIENT_ORDER_RENT: 10,
+    CLIENT_ORDER_RENT_GROUP: 20,
+    MANAGE_ORDER_SALE: 20,
+    MANAGE_ORDER_RENT: 20,
+    MANAGE_ORDER_RENT_GROUP: 20,
 }
 const STATUS = {
     ACTIVE: 'Active',
@@ -50,6 +56,11 @@ const MANAGE_PRODUCT_ITEM: Role[] = ['Admin', 'Staff', 'Manager']
 const MANAGE_SIZE: Role[] = ['Admin', 'Staff', 'Manager']
 const MANAGE_ORDER: Role[] = ['Admin', 'Staff', 'Manager']
 
+const PAYMENT_MESSAGE = {
+    PAID_DEPOSIT: 'Đơn hàng này đã thanh toán tiền cọc',
+    PAID_REMAINING: 'Đơn hàng này đã thanh toán đủ'
+}
+
 const CONSTANT = {
     STORAGE,
     ROLES,
@@ -66,7 +77,8 @@ const CONSTANT = {
     MANAGE_PRODUCT,
     MANAGE_PRODUCT_ITEM,
     MANAGE_SIZE,
-    MANAGE_ORDER
+    MANAGE_ORDER,
+    PAYMENT_MESSAGE,
 }
 
 export default CONSTANT

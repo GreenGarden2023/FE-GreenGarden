@@ -1,113 +1,96 @@
-import { Tag, Tooltip } from 'antd'
+import { Popover, Tag } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
+import ModalClientRentOrderDetai from 'app/components/modal/client-rent-order-detail/ModalClientRentOrderDetai'
+import RentOrderPaymentCash from 'app/components/modal/rent-oder-payment-cash/RentOrderPaymentCash'
+import RentOrderPaymentDeposit from 'app/components/modal/rent-order-payment-deposit/RentOrderPaymentDeposit'
 import MoneyFormat from 'app/components/money/MoneyFormat'
+import UserInforTable from 'app/components/user-infor/UserInforTable'
 import useDispatch from 'app/hooks/use-dispatch'
-import { PaymentAction } from 'app/models/general-type'
 import { RentOrder } from 'app/models/order'
-import { PaymentModal } from 'app/models/payment'
+import { Paging } from 'app/models/paging'
+import { PaymentControlState } from 'app/models/payment'
 import orderService from 'app/services/order.service'
+import paymentService from 'app/services/payment.service'
 import { setNoti } from 'app/slices/notification'
+import CONSTANT from 'app/utils/constant'
 import utilDateTime from 'app/utils/date-time'
 import utilGeneral from 'app/utils/general'
+import pagingPath from 'app/utils/paging-path'
 import React, { useEffect, useMemo, useState } from 'react'
 import { BiDetail } from 'react-icons/bi'
+import { FaLayerGroup } from 'react-icons/fa'
+import { GrMore } from 'react-icons/gr'
 import { MdOutlinePayments } from 'react-icons/md'
 import { RiBillLine } from 'react-icons/ri'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import './style.scss'
 
 const ManageRentOrder:React.FC = () => {
-    const navigate = useNavigate();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
-    const [action, setAction] = useState<PaymentModal>();
-    console.log(action)
+    // data
+    const [actionMethod, setActionMethod] = useState<PaymentControlState>()
 
     const [rentOrders, setRentOrders] = useState<RentOrder[]>([])
 
+    const [paging, setPaging] = useState<Partial<Paging>>({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_RENT})
+    const [recall, setRecall] = useState(true)
+
     useEffect(() =>{
+        pagingPath.scrollTop()
+        const currentPage = searchParams.get('page');
+
+        if(!pagingPath.isValidPaging(currentPage)){
+            setPaging({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_RENT})
+            return navigate('/panel/rent-order?page=1')
+        }
+        if(!recall) return;
+
         const init = async () =>{
             try{
-                const res = await orderService.getAllRentOrders({curPage: 1, pageSize: 20});
+                const res = await orderService.getAllRentOrders({curPage: Number(currentPage), pageSize: paging.pageSize});
                 setRentOrders(res.data.rentOrderGroups)
+                setPaging(res.data.paging)
             }catch{
 
             }
+            setRecall(false)
         }
         init()
-    }, [])
+    }, [searchParams, navigate, paging.pageSize, recall])
 
     const ColumnRentOrder: ColumnsType<any> = [
         {
-            title: '#',
-            key: '#',
-            dataIndex: '#',
-            align: 'center',
-            render: (v, _, index) => (<span style={{color: '#00a76f'}}>{index + 1}</span>)
-        },
-        {
             title: 'Mã đơn hàng',
-            key: 'orderID',
-            dataIndex: 'orderID',
+            key: 'orderCode',
+            dataIndex: 'orderCode',
             align: 'center',
-            render: (v) => (v.slice(0, 5))
+            fixed: 'left',
+            width: 170,
+            render: (v) => (<span className='order-code'>{v}</span>)
         },
         {
-            title: 'Tên khách hàng',
+            title: 'Thông tin khách hàng',
             key: 'recipientName',
             dataIndex: 'recipientName',
-            align: 'center',
-            // render: (v) => (v)
-        },
-        {
-            title: 'Số điện thoại',
-            key: 'recipientPhone',
-            dataIndex: 'recipientPhone',
-            align: 'center',
-            // render: (v) => (v)
-        },
-        {
-            title: 'Địa chỉ',
-            key: 'recipientAddress',
-            dataIndex: 'recipientAddress',
-            align: 'center',
+            width: 300,
+            render: (_, record) => (<UserInforTable name={record.recipientName} phone={record.recipientPhone} address={record.recipientAddress}  />)
             // render: (v) => (v)
         },
         {
             title: 'Ngày bắt đầu thuê',
             key: 'startDateRent',
             dataIndex: 'startDateRent',
-            align: 'center',
             render: (v) => (utilDateTime.dateToString(v))
         },
         {
             title: 'Ngày kết thúc thuê',
             key: 'endDateRent',
             dataIndex: 'endDateRent',
-            align: 'center',
             render: (v) => (utilDateTime.dateToString(v))
-        },
-        {
-            title: 'Giá tiền',
-            key: 'totalPrice',
-            dataIndex: 'totalPrice',
-            align: 'center',
-            render: (v) => (<MoneyFormat value={v} />)
-        },
-        {
-            title: 'Số tiền cần trả',
-            key: 'remainMoney',
-            dataIndex: 'remainMoney',
-            align: 'center',
-            render: (v) => (<MoneyFormat value={v} />)
-        },
-        {
-            title: 'Số tiền cọc',
-            key: 'deposit',
-            dataIndex: 'deposit',
-            align: 'center',
-            render: (v) => (<MoneyFormat value={v} />)
         },
         {
             title: 'Trạng thái',
@@ -117,43 +100,104 @@ const ManageRentOrder:React.FC = () => {
             render: (v) => (<Tag color={utilGeneral.statusToColor(v)}>{utilGeneral.statusToViLanguage(v)}</Tag>)
         },
         {
+            title: 'Phí vận chuyển',
+            key: 'transportFee',
+            dataIndex: 'transportFee',
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} />)
+        },
+        {
+            title: 'Tiền cọc',
+            key: 'deposit',
+            dataIndex: 'deposit',
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} />)
+        },
+        {
+            title: 'Số tiền cần trả',
+            key: 'remainMoney',
+            dataIndex: 'remainMoney',
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} />)
+        },
+        {
+            title: 'Tổng tiền',
+            key: 'totalPrice',
+            dataIndex: 'totalPrice',
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} />)
+        },
+        {
             title: 'Xử lý',
             key: 'action',
             dataIndex: 'action',
             align: 'center',
-            render: (_, record) => (
-                <>
-                    <Tooltip title="Chi tiết đơn hàng" color='#108ee9'>
-                        <BiDetail size={25} cursor='pointer' color='#00a76f' onClick={() => navigate(`/panel/rent-order/${record.groupID}`)} />
-                    </Tooltip>
-                    <Tooltip title='Thanh toán tiền cọc' color='#108ee9' >
-                        <MdOutlinePayments size={25} color='#00a76f' cursor='pointer' onClick={() => handleSetAction(record.orderID, 'deposit')} />
-                    </Tooltip>
-                    <Tooltip title='Thanh toán đơn hàng' color='#108ee9'>
-                        <RiBillLine size={25} color='#00a76f' cursor='pointer' onClick={() => handleSetAction(record.orderID, 'remaining')} />
-                    </Tooltip>
-                </>
+            fixed: 'right',
+            render: (_, record, index) => (
+                <Popover 
+                    content={() => contextRent(record)} 
+                    placement='bottom' 
+                    trigger="click" 
+                    open={index === actionMethod?.openIndex} 
+                    onOpenChange={(open: boolean) => {
+                    if(open){
+                        setActionMethod({orderId: '', actionType: '', orderType: '', openIndex: index})
+                    }else{
+                        setActionMethod({orderId: '', actionType: '', orderType: '', openIndex: -1})
+                    }
+                }}
+                >
+                    <GrMore size={25} cursor='pointer' color='#00a76f' />
+                </Popover>
             )
         },
     ]
-    const handleSetAction = async (orderId: string, type: PaymentAction) =>{
-        const order = rentOrders.filter(x => x.id === orderId)[0]
-
-        if(type === 'deposit' && order[0].status === 'ready'){
-            dispatch(setNoti({type: 'info', message: 'Đơn hàng này đã thanh toán đặt cọc!!'}))
-            return;
+    const contextRent = (record) =>{
+        return(
+            <div className='context-menu-wrapper'>
+                <div className="item" onClick={() => {
+                    setActionMethod({orderId: record.orderId, actionType: 'detail', orderType: 'rent', openIndex: -1})
+                }}>
+                    <BiDetail size={25} className='icon'/>
+                    <span>Chi tiết đơn hàng</span>
+                </div>
+                <div className="item" onClick={() => navigate(`/panel/rent-order/${record.groupID}`)}>
+                    <FaLayerGroup size={25} className='icon'/>
+                    <span>Xem nhóm đơn hàng</span>
+                </div>
+                <div className="item" onClick={() => {
+                    handleSetAction({orderId: record.orderId, actionType: 'deposit', orderType: 'rent', openIndex: -1})
+                }}>
+                    <MdOutlinePayments size={25} className='icon'/>
+                    <span>Thanh toán tiền cọc</span>
+                </div>
+                <div className="item" onClick={() => {
+                    handleSetAction({orderId: record.orderId, actionType: 'remaining', orderType: 'rent', openIndex: -1})
+                }}>
+                    <RiBillLine size={25} className='icon'/>
+                    <span>Thanh toán đơn hàng</span>
+                </div>
+            </div>
+        )
+    }
+    const handleSetAction = async (data: PaymentControlState) =>{
+        const { orderId, actionType } = data
+        const [order] = rentOrders.filter(x => x.rentOrderList[0].id === orderId)[0].rentOrderList
+        
+        if(actionType === 'deposit' && order.status !== 'unpaid'){
+            return dispatch(setNoti({type: 'info', message: CONSTANT.PAYMENT_MESSAGE.PAID_DEPOSIT}))
         }
-        if(type === 'remaining' && order[0].status === 'completed'){
-            dispatch(setNoti({type: 'info', message: 'Đơn hàng này đã thanh toán đủ!!'}))
-            return;
+        if(actionType === 'remaining' && (order.status === 'paid' || order.status === 'completed')){
+            return dispatch(setNoti({type: 'info', message: CONSTANT.PAYMENT_MESSAGE.PAID_REMAINING}))
         }
 
-        setAction({orderId, type})
+        setActionMethod(data)
     }
     const DataSourceRentOrder = useMemo(() =>{
         return rentOrders.map((x, index) => ({
             key: String(index + 1),
-            orderID: x.rentOrderList[0].id,
+            orderId: x.rentOrderList[0].id,
+            orderCode: x.rentOrderList[0].orderCode,
             groupID: x.id,
             totalPrice: x.totalGroupAmount,
             startDateRent: x.rentOrderList[0].startDateRent,
@@ -163,16 +207,89 @@ const ManageRentOrder:React.FC = () => {
             deposit: x.rentOrderList[0].deposit,
             recipientName: x.rentOrderList[0].recipientName,
             recipientPhone: x.rentOrderList[0].recipientPhone,
-            recipientAddress: x.rentOrderList[0].recipientAddress
+            recipientAddress: x.rentOrderList[0].recipientAddress,
+            transportFee: x.rentOrderList[0].transportFee,
         }))
     }, [rentOrders])
+    const handleClose = () =>{
+        setActionMethod(undefined)
+    }
+    const handlePaymentDeposit = async (orderId: string) =>{
+        try{
+            await paymentService.depositPaymentCash(orderId, 'rent')
+            dispatch(setNoti({type: 'success', message: 'Thanh toán cọc thành công'}))
+            setRecall(true)
+            handleClose()
+        }catch{
 
+        }
+    }
+    const handlePaymentCash = async (orderId: string, amount: number, isFull: boolean) =>{
+        console.log(amount)
+        if(!isFull && amount < 1000){
+            dispatch(setNoti({type: 'error', message: 'Số tiền nhập vào ít nhất là 1.000 VNĐ'}))
+            return;
+        }
+        
+        const [order] = rentOrders.filter(x => x.rentOrderList[0].id === orderId)[0].rentOrderList
+
+        try{
+            let amountOrder = 0;
+            if(isFull){
+                amountOrder = order.remainMoney
+            }else{
+                amountOrder = amount
+            }
+            await paymentService.paymentCash(orderId, amountOrder, 'rent', order.status === 'unpaid' ? 'whole' : '')
+            dispatch(setNoti({type: 'success', message: 'Thanh toán đơn hàng thành công'}))
+            setRecall(true)
+            handleClose()
+        }catch{
+
+        }
+    }
     return (
         <div className="mro-wrapper">
             <HeaderInfor title='Quản lý đơn hàng thuê' />
             <section className="mso-box default-layout">
-                <Table dataSource={DataSourceRentOrder} columns={ColumnRentOrder} />
+                <Table 
+                    dataSource={DataSourceRentOrder} 
+                    columns={ColumnRentOrder} 
+                    scroll={{ y: 680, x: 1500 }}
+                    pagination={{
+                        current: paging.curPage || 1,
+                        pageSize: paging.pageSize || 1,
+                        total: paging.recordCount || 1,
+                        onChange: (page: number) =>{
+                            setRecall(true)
+                            navigate(`/panel/rent-order?page=${page}`)
+                        }
+                    }}
+                />
             </section>
+            {
+                actionMethod?.actionType === 'detail' && 
+                <ModalClientRentOrderDetai
+                    onClose={handleClose}
+                    rentOrderList={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0]}
+                />
+            }
+            {
+                actionMethod?.actionType === 'deposit' && 
+                <RentOrderPaymentDeposit
+                    rentOrderList={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0]}
+                    onClose={handleClose}
+                    onSubmit={handlePaymentDeposit}
+                />
+            }
+            {
+                actionMethod?.actionType === 'remaining' &&
+                <RentOrderPaymentCash 
+                    rentOrderList={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0]}
+                    onClose={handleClose}
+                    onSubmit={handlePaymentCash}
+                />
+            }
         </div>
     )
 }

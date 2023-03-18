@@ -44,7 +44,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
     const handleCollapsedHeader = () =>{
         dispatch(setCollapsedHeader({active: !collapsedHeader}))
     }
-    const defaultOpenKey = useMemo(() =>{
+    const defaultSelectedKey = useMemo(() =>{
         const affix = location.pathname.split('/')[2]
 
         const manageCategory = ['manage-category']
@@ -74,6 +74,14 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
             return ['6']
         }
 
+    }, [location])
+    const openedKey = useMemo(() =>{
+        const affix = location.pathname.split('/')[2]
+
+        const manageOrder = ['rent-order', 'sale-order']
+        if(manageOrder.includes(affix)){
+            return ['4']
+        }
     }, [location])
     const childrenOrder = [
         CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/rent-order'>Đơn thuê</Link>, '5', <BiCategoryAlt size={18} />) : null,
@@ -111,7 +119,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
                     collapsed={collapsedHeader}
                 >
                     <div style={{ height: 32, margin: 16, background: 'rgba(255, 255, 255, 0.2)' }} />
-                    <Menu className='admin-menu' theme="light" mode="inline"  items={items} selectedKeys={defaultOpenKey}  />
+                    <Menu className='admin-menu' theme="light" mode="inline"  items={items} selectedKeys={defaultSelectedKey} openKeys={openedKey} />
                 </Sider>
                 <Layout className="site-layout" style={{ marginLeft: collapsedHeader ? 80 : 200 }}>
                     <Content>

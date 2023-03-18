@@ -117,7 +117,7 @@ const Routers: React.FC = () =>{
                 <Route path='/product/:productId' element={<ClientProductItem />} />
                 <Route path='/product-item/:productItemId' element={<ClientProductItemDetail />} />
                 <Route path='/orders' element={<ClientOrder />} />
-                <Route path='/order-group/:orderId' element={<ClientRentOrderGroup />} />
+                <Route path='/order-group/:groupId' element={<ClientRentOrderGroup />} />
                 <Route path='/checkout-success' element={<CheckoutSuccess />} />
                 <Route path='/take-care-service' element={<ClientTakeCareService />} />
 

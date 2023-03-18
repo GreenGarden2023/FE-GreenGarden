@@ -11,12 +11,12 @@ const depositPaymentCash = async (orderId: string, orderType: OrderType) =>{
     const res = await golbalAxios.post('/payment/deposit-payment-cash', { orderId, orderType })
     return res.data
 }
-const paymentCash = async (orderId: string, amount: number, orderType: OrderType) =>{
-    const res = await golbalAxios.post('/payment/payment-cash', { orderId, amount, orderType })
+const paymentCash = async (orderId: string, amount: number, orderType: OrderType, paymentType?: string) =>{
+    const res = await golbalAxios.post('/payment/payment-cash', { orderId, amount, orderType, paymentType })
     return res.data
 }
-const paymentMomo = async (orderId: string, amount: number, orderType: OrderType) =>{
-    const res = await golbalAxios.post<Response<Payment>>('/payment/payment-momo', { orderId, amount, orderType })
+const paymentMomo = async (orderId: string, amount: number, orderType: OrderType, paymentType?: string) =>{
+    const res = await golbalAxios.post<Response<Payment>>('/payment/payment-momo', { orderId, amount, orderType, paymentType })
     return res.data
 }
 

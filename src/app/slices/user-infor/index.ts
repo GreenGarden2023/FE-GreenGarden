@@ -14,6 +14,7 @@ const initialState: UserLogin = {
     roleName: '',
     token: '',
     role: '',
+    currentPoint: 0,
     loading: false,
 }
 

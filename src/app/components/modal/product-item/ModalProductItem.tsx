@@ -56,10 +56,11 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productId, numberOfC
         setValue('content', content)
         setValue('description', description)
         setValue('imageURL', imageURL)
+        trigger('imageURL')
         setValue('name', name)
         setValue('type', type)
         setValue('productItemDetail', productItemDetail)
-    }, [productItem, setValue])
+    }, [productItem, setValue, trigger])
 
     const handleCloseModal = () =>{
         onClose()

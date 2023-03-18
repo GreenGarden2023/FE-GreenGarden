@@ -7,7 +7,7 @@ interface MoneyFormatProps{
 
 const MoneyFormat: React.FC<MoneyFormatProps> = ({value}) => {
   return (
-        <CurrencyFormat value={value} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'}/>
+        <CurrencyFormat value={value} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
   )
 }
 

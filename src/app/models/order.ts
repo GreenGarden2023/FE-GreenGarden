@@ -14,21 +14,26 @@ export interface OrderCreate{
 }
 
 // order get
-interface RentOrderDetailList {
+export interface RentOrderDetailList {
     id: string;
-    productItemDetailId: string;
-    productItemDetailTotalPrice: number;
+    totalPrice: number;
     quantity: number;
+    salePricePerUnit: number;
+    rentPricePerUnit?: number
+    sizeName: string;
+    productItemName: string;
+    imgURL: string;
 }
-interface RentOrderList {
+export interface RentOrderList {
     id: string;
     orderCode: string;
     transportFee: number;
+    createDate: Date;
     startDateRent: Date;
     endDateRent: Date;
     deposit: number;
     totalPrice: number;
-    status: string;
+    status: OrderStatus;
     remainMoney: number;
     rewardPointGain: number;
     rewardPointUsed: number;
@@ -66,9 +71,21 @@ export interface SaleOrderList {
     recipientAddress: string;
     recipientPhone: string;
     recipientName: string;
+    orderCode: string;
     rentOrderDetailList: RentOrderDetailList[];
 }
 export interface SaleOrderResponse{
     paging: Paging;
     saleOrderList: SaleOrderList[];
 }
+
+export interface OrderCalculate {
+    transportFee: number
+    deposit: number
+    totalPrice: number
+    remainMoney: number
+    rewardPointGain: number
+    rewardPointUsed: number
+    discountAmount: number
+}
+  

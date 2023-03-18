@@ -1,4 +1,4 @@
-import { PaymentAction } from "./general-type";
+import { OrderType, PaymentActionType } from "./general-type";
 
 export interface Payment {
     partnerCode: string;
@@ -13,5 +13,13 @@ export interface Payment {
 
 export interface PaymentModal{
     orderId: string;
-    type: PaymentAction
+    type: PaymentActionType;
+    orderCode?: string;
+    groupId?: string;
+}
+export interface PaymentControlState{
+    orderId: string;
+    actionType: PaymentActionType;
+    orderType: OrderType;
+    openIndex: number;
 }

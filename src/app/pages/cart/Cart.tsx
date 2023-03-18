@@ -1,12 +1,15 @@
+import { yupResolver } from '@hookform/resolvers/yup';
 import { DatePicker, Form, Image, Input, Modal } from 'antd';
 import locale from 'antd/es/date-picker/locale/vi_VN';
 import Table, { ColumnsType } from 'antd/es/table';
 import LandingFooter from 'app/components/footer/LandingFooter';
 import HeaderInfor from 'app/components/header-infor/HeaderInfor';
 import LandingHeader from 'app/components/header/LandingHeader';
+import ErrorMessage from 'app/components/message.tsx/ErrorMessage';
+import MoneyFormat from 'app/components/money/MoneyFormat';
 import useSelector from 'app/hooks/use-selector';
 import { Cart, CartUserData } from 'app/models/cart';
-import { OrderCreate } from 'app/models/order';
+import { OrderCalculate, OrderCreate } from 'app/models/order';
 import cartService from 'app/services/cart.service';
 import orderService from 'app/services/order.service';
 import { CartProps, setCartSlice } from 'app/slices/cart';
@@ -16,18 +19,17 @@ import { Dayjs } from "dayjs";
 import 'dayjs/locale/vi';
 import React, { useEffect, useMemo, useState } from 'react';
 import CurrencyFormat from 'react-currency-format';
+import { Controller, useForm } from 'react-hook-form';
 import { BiPlus } from 'react-icons/bi';
 import { CiSquareRemove } from 'react-icons/ci';
+import { FaMoneyBillAlt } from 'react-icons/fa';
 import { GrFormSubtract } from 'react-icons/gr';
 import { useNavigate } from 'react-router-dom';
+import * as yup from 'yup';
 import useDispatch from '../../hooks/use-dispatch';
 import { setTitle } from '../../slices/window-title';
 import CONSTANT from '../../utils/constant';
 import './style.scss';
-import { useForm, Controller } from 'react-hook-form';
-import ErrorMessage from 'app/components/message.tsx/ErrorMessage';
-import * as yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
 
 // recipientAddress: string;
 //     recipientPhone: string;
@@ -51,10 +53,72 @@ const CartPage: React.FC = () => {
     const [sizeProductItemSelect, setSizeProductItemSelect] = useState<string[]>([])
     const [dateRange, setDateRange] = useState<[Dayjs, Dayjs]>()
     const [submited, setSubmited] = useState(false);
-    const { control, formState: { errors }, handleSubmit, setValue } = useForm<CartUserData>({
+    const { control, formState: { errors, isValid }, handleSubmit, setValue, getValues, trigger } = useForm<CartUserData>({
         resolver: yupResolver(schema)
     })
     const userSate = useSelector(state => state.userInfor)
+
+    // const [finalPrice, setFinalPrice] = useState(0);
+    const [finalRentPrice, setFinalRentPrice] = useState<OrderCalculate>();
+    const [finalSalePrice, setFinalSalePrice] = useState<OrderCalculate>();
+
+    const [rentPoint, setRentPoint] = useState(0)
+    const [salePoint, setSalePoint] = useState(0)
+
+    useEffect(() =>{
+        if(rentItems.length !== 0 && !dateRange){
+            setFinalRentPrice(undefined)
+            setFinalSalePrice(undefined)
+            return;
+        }
+        if(!isValid){
+            setFinalRentPrice(undefined)
+            setFinalSalePrice(undefined)
+            return
+        }
+
+        const init = async () =>{
+            try{
+                const { recipientAddress, recipientName, recipientPhone } = getValues()
+                // const listRequestOrder: Promise<any>[] = [];
+                if(rentItems.length !== 0){
+                    const data: OrderCreate = {
+                        startDateRent: dateRange ? dateRange[0].toDate() : undefined,
+                        endDateRent: dateRange ? dateRange[1].toDate() : undefined,
+                        itemList: rentItems,
+                        rewardPointUsed: rentPoint,
+                        rentOrderGroupID: null,
+                        recipientAddress,
+                        recipientName,
+                        recipientPhone
+                    }
+                    const res = await orderService.calculateOrder(data)
+                    setFinalRentPrice(res.data)
+                    // setFinalPrice(finalPrice + res.data.totalPrice)
+                    // listRequestOrder.push(orderService.calculateOrder(data))
+                }
+                if(saleItems.length !== 0){
+                    const data: any = {
+                        itemList: saleItems,
+                        rewardPointUsed: salePoint,
+                        recipientAddress,
+                        recipientName,
+                        recipientPhone,
+                        rentOrderGroupID: null,
+                    }
+                    const res = await orderService.calculateOrder(data)
+                    setFinalSalePrice(res.data)
+                    // listRequestOrder.push(orderService.calculateOrder(data))
+                }
+                // await Promise.all(listRequestOrder)
+                // const rentCalRes = await orderService.calculateOrder()
+            }catch{
+
+            }
+        }
+        init()
+
+    }, [isValid, dateRange, rentItems, getValues, saleItems, rentPoint, salePoint])
 
     useEffect(() =>{
         const { address, fullName, phone } = userSate
@@ -65,7 +129,8 @@ const CartPage: React.FC = () => {
         setValue('recipientName', fullName)
         setValue('recipientPhone', phone)
 
-    }, [userSate, setValue])
+        trigger()
+    }, [userSate, setValue, trigger])
 
     useEffect(() =>{
         pagingPath.scrollTop()
@@ -115,33 +180,30 @@ const CartPage: React.FC = () => {
                     }} 
                 />
             )
-            // width: 200
         },
         {
             title: 'Tên sản phẩm',
             key: 'name',
             dataIndex: 'name',
-            align: 'center',
         },
         {
             title: 'Kích thước',
             key: 'sizeName',
             dataIndex: 'sizeName',
-            align: 'center',
             
-        },
-        {
-            title: 'Giá',
-            key: 'price',
-            dataIndex: 'price',
-            align: 'center',
         },
         {
             title: 'Đơn vị',
             key: 'unit',
             dataIndex: 'unit',
-            align: 'center',
             render: () => ('Cây')
+        },
+        {
+            title: 'Giá',
+            key: 'price',
+            dataIndex: 'price',
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} />)
         },
         {
             title: 'Số lượng',
@@ -159,6 +221,13 @@ const CartPage: React.FC = () => {
                     </button>
                 </div>
             )
+        },
+        {
+            title: 'Tổng cộng',
+            key: 'total',
+            dataIndex: 'total',
+            align: 'right',
+            render: (_, record) => (<MoneyFormat value={record.price * record.quantity} />)
         },
         {
             title: 'Xóa',
@@ -245,31 +314,28 @@ const CartPage: React.FC = () => {
             title: 'Tên sản phẩm',
             key: 'name',
             dataIndex: 'name',
-            align: 'center',
-            // width: 200
         },
         {
             title: 'Kích thước',
             key: 'size',
             dataIndex: 'size',
-            align: 'center',
             render: (value, record, index) => (record.sizeName)
-            // width: 200
-        },
-        {
-            title: 'Giá',
-            key: 'price',
-            dataIndex: 'price',
-            align: 'center',
             // width: 200
         },
         {
             title: 'Đơn vị',
             key: 'unit',
             dataIndex: 'unit',
-            align: 'center',
-            render: () => ('Ngày')
+            render: () => ('Cây/ngày')
         },
+        {
+            title: 'Giá',
+            key: 'price',
+            dataIndex: 'price',
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} />)
+        },
+        
         {
             title: 'Số lượng',
             key: 'action',
@@ -286,6 +352,13 @@ const CartPage: React.FC = () => {
                     </button>
                 </div>
             )
+        },
+        {
+            title: 'Tổng cộng',
+            key: 'total',
+            dataIndex: 'total',
+            align: 'right',
+            render: (_, record) => (<MoneyFormat value={record.price * record.quantity} />)
         },
         {
             title: 'Xóa',
@@ -417,7 +490,7 @@ const CartPage: React.FC = () => {
                     startDateRent: dateRange ? dateRange[0].toDate() : undefined,
                     endDateRent: dateRange ? dateRange[1].toDate() : undefined,
                     itemList: rentItems,
-                    rewardPointUsed: 0,
+                    rewardPointUsed: rentPoint,
                     rentOrderGroupID: null,
                     recipientAddress,
                     recipientName,
@@ -427,8 +500,8 @@ const CartPage: React.FC = () => {
             }
             if(saleItems.length !== 0){
                 const data: any = {
-                    itemList: rentItems,
-                    rewardPointUsed: 0,
+                    itemList: saleItems,
+                    rewardPointUsed: salePoint,
                     recipientAddress,
                     recipientName,
                     recipientPhone,
@@ -454,10 +527,130 @@ const CartPage: React.FC = () => {
                             <div className="cart-sale">
                                 <p>Cây bán</p>
                                 <Table className='cart-table' dataSource={DataSourceSale} columns={ColumnSale} pagination={false} />
+                                {
+                                    finalSalePrice && 
+                                    <div className="price-infor">
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Phí vận chuyển</span>
+                                            </div>
+                                            <div className="right">
+                                                {finalSalePrice.transportFee}
+                                            </div>
+                                        </div>
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Tiền được giảm</span>
+                                            </div>
+                                            <div className="right">
+                                                {finalSalePrice.discountAmount}
+                                            </div>
+                                        </div>
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Số điểm đã dùng</span>
+                                            </div>
+                                            <div className="right">
+                                                {finalSalePrice.rewardPointUsed}
+                                            </div>
+                                        </div>
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Tiền cọc</span>
+                                            </div>
+                                            <div className="right">
+                                                {finalSalePrice.deposit}
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Tích điểm</span>
+                                            </div>
+                                            <div className="right">
+                                                {finalSalePrice.rewardPointGain}
+                                            </div>
+                                        </div>
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Tổng tiền</span>
+                                            </div>
+                                            <div className="right">
+                                                {finalSalePrice.totalPrice}
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
                             </div>
                             <div className="cart-rent">
                                 <p>Cây cho thuê</p>
                                 <Table className='cart-table' dataSource={DataSourceRent} columns={ColumnRent} pagination={false} />
+                                {
+                                    finalRentPrice && 
+                                    <div className="price-infor">
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Phí vận chuyển</span>
+                                            </div>
+                                            <div className="right">
+                                                {finalRentPrice.transportFee}
+                                            </div>
+                                        </div>
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Tiền được giảm</span>
+                                            </div>
+                                            <div className="right">
+                                                {finalRentPrice.discountAmount}
+                                            </div>
+                                        </div>
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Số điểm đã dùng</span>
+                                            </div>
+                                            <div className="right">
+                                                {finalRentPrice.rewardPointUsed}
+                                            </div>
+                                        </div>
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Tiền cọc</span>
+                                            </div>
+                                            <div className="right">
+                                                {finalRentPrice.deposit}
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Tích điểm</span>
+                                            </div>
+                                            <div className="right">
+                                                {finalRentPrice.rewardPointGain}
+                                            </div>
+                                        </div>
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Tổng tiền</span>
+                                            </div>
+                                            <div className="right">
+                                                {finalRentPrice.totalPrice}
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
                             </div>
                         </section>
                         <section className="cart-infor default-layout">
@@ -470,7 +663,10 @@ const CartPage: React.FC = () => {
                                     <Controller 
                                         control={control}
                                         name='recipientName'
-                                        render={({ field }) => <Input {...field} />}
+                                        render={({ field: { value } }) => <Input value={value} onChange={(e) => {
+                                            setValue('recipientName', e.target.value)
+                                            trigger('recipientName')
+                                        }} />}
                                     />
                                     {errors.recipientName && <ErrorMessage message={errors.recipientName.message} />}
                                 </Form.Item>
@@ -478,7 +674,10 @@ const CartPage: React.FC = () => {
                                     <Controller 
                                         control={control}
                                         name='recipientAddress'
-                                        render={({ field }) => <Input {...field} />}
+                                        render={({ field: { value} }) => <Input value={value} onChange={(e) => {
+                                            setValue('recipientAddress', e.target.value)
+                                            trigger('recipientAddress')
+                                        }} />}
                                     />
                                     {errors.recipientAddress && <ErrorMessage message={errors.recipientAddress.message} />}
                                 </Form.Item>
@@ -486,9 +685,29 @@ const CartPage: React.FC = () => {
                                     <Controller 
                                         control={control}
                                         name='recipientPhone'
-                                        render={({ field }) => <Input {...field} />}
+                                        render={({ field: { value } }) => <Input value={value} onChange={(e) => {
+                                            setValue('recipientPhone', e.target.value)
+                                            trigger('recipientPhone')
+                                        }}/>}
                                     />
                                     {errors.recipientPhone && <ErrorMessage message={errors.recipientPhone.message} />}
+                                </Form.Item>
+                                <p>Số điểm của bạn là {userSate.currentPoint}</p>
+                                <Form.Item label='Số điểm sử dụng cho đơn thuê'>
+                                    <Input min={0} type='number' max={userSate.currentPoint - salePoint} value={rentPoint} onChange={(e) => {
+                                        const value = Number(e.target.value)
+                                        if((userSate.currentPoint - salePoint) > value){
+                                            setRentPoint(Number(e.target.value))
+                                        }
+                                    }} />
+                                </Form.Item>
+                                <Form.Item label='Số điểm sử dụng cho đơn mua'>
+                                    <Input min={0} type='number' max={0} value={salePoint} onChange={(e) => {
+                                        const value = Number(e.target.value)
+                                        if((userSate.currentPoint - rentPoint) > value){
+                                            setSalePoint(Number(e.target.value))
+                                        }
+                                    }} />
                                 </Form.Item>
                                 <div className="box">
                                     {

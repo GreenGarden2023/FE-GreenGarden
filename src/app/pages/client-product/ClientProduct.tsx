@@ -108,7 +108,7 @@ const ClientProduct: React.FC = () => {
                   current={paging?.curPage || 1}
                   total={paging?.recordCount || 1}
                   onChange={(page: number) =>{
-                    navigate(`/product/${categoryId}?page=${page}`)
+                    navigate(`/category/${categoryId}?page=${page}`)
                   }}
                 />
               </div>

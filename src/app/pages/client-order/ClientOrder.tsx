@@ -1,85 +1,145 @@
-import { Collapse, Tag, Tooltip } from 'antd';
+import { Popover, Segmented, Tag } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 import LandingFooter from 'app/components/footer/LandingFooter';
 import HeaderInfor from 'app/components/header-infor/HeaderInfor';
 import LandingHeader from 'app/components/header/LandingHeader';
+import ModalClientRentOrderDetai from 'app/components/modal/client-rent-order-detail/ModalClientRentOrderDetai';
+import ModalClientSaleOrderDetai from 'app/components/modal/client-sale-order-detail/ModalClientSaleOrderDetai';
 import MoneyFormat from 'app/components/money/MoneyFormat';
 import useDispatch from 'app/hooks/use-dispatch';
 import useSelector from 'app/hooks/use-selector';
-import { PaymentAction } from 'app/models/general-type';
 import { RentOrder, SaleOrderList } from 'app/models/order';
-import { PaymentModal } from 'app/models/payment';
+import { Paging } from 'app/models/paging';
+import { PaymentControlState } from 'app/models/payment';
 import orderService from 'app/services/order.service';
 import paymentService from 'app/services/payment.service';
 import { setNoti } from 'app/slices/notification';
 import CONSTANT from 'app/utils/constant';
 import utilDateTime from 'app/utils/date-time';
 import utilGeneral from 'app/utils/general';
+import pagingPath from 'app/utils/paging-path';
 import React, { useEffect, useMemo, useState } from 'react';
 import { BiCommentDetail, BiDetail } from 'react-icons/bi';
+import { GrMore } from 'react-icons/gr';
 import { MdOutlinePayments } from 'react-icons/md';
-import { RiBillLine } from 'react-icons/ri';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import './style.scss';
 
-// interface OrderViewModel{
-//     orderID: string;
-//     totalPrice: string;
-//     createDate: string;
-//     status: OrderStatus;
-//     isForRent: boolean;
-//     addendums: Addendum[]
-// }
+type OrderPage = 'rent' | 'sale' | 'service'
 
 const ClientOrder: React.FC = () =>{
     const { id } = useSelector(state => state.userInfor)
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
+    // change segment page
+    const [pageType, setPageType] = useState<OrderPage>('rent')
+
+    // check action of type payment
+    const [actionMethod, setActionMethod] = useState<PaymentControlState>()
+
+    // data
     const [saleOrders, setSaleOrders] = useState<SaleOrderList[]>([])
     const [rentOrders, setRentOrders] = useState<RentOrder[]>([])
-    const [action, setAction] = useState<PaymentModal>();
-    console.log(action)
+
+    const [paging, setPaging] = useState<Partial<Paging>>({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.CLIENT_ORDER_RENT})
+
+    useEffect(() =>{
+        pagingPath.scrollTop()
+        const currentPage = searchParams.get('page');
+
+        if(!pagingPath.isValidPaging(currentPage)){
+            setPaging({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.CLIENT_ORDER_RENT})
+            return navigate('/orders?page=1')
+        }
+
+    }, [searchParams, navigate])
+
     useEffect(() =>{
         if(!id) return;
+        if(pageType !== 'sale') return;
+        const currentPage = searchParams.get('page');
 
         const init = async () =>{
             try{
-                const res = await orderService.getSaleOrders()
+                const res = await orderService.getSaleOrders({curPage: Number(currentPage), pageSize: paging.pageSize})
                 setSaleOrders(res.data.saleOrderList)
+                setPaging(res.data.paging)
             }catch{
                 dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
         }
         init()
-    }, [id, dispatch])
+    }, [id, dispatch, pageType, searchParams, paging.pageSize])
+
     useEffect(() =>{
         if(!id) return;
+        if(pageType !== 'rent') return;
+        const currentPage = searchParams.get('page');
 
         const init = async () =>{
             try{
-                const res = await orderService.getRentOrders()
+                const res = await orderService.getRentOrders({curPage: Number(currentPage), pageSize: paging.pageSize})
                 setRentOrders(res.data.rentOrderGroups)
+                setPaging(res.data.paging)
             }catch{
                 dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
         }
         init()
-    }, [id, dispatch])
+    }, [id, dispatch, pageType, searchParams, paging.pageSize])
 
-    const handleSetAction = async (orderId: string, type: PaymentAction) =>{
-        setAction({orderId, type})
-        if(type === 'deposit'){
+    const handlePaymentSale = async (data: PaymentControlState) =>{
+        const { orderId, actionType } = data
+        const [order] = saleOrders.filter(x => x.id === orderId)
+
+        if(actionType === 'deposit' && order.status !== 'unpaid'){
+            return dispatch(setNoti({type: 'info', message: CONSTANT.PAYMENT_MESSAGE.PAID_DEPOSIT}))
+        }
+        if(actionType === 'remaining' && (order.status === 'paid' || order.status === 'completed')){
+            return dispatch(setNoti({type: 'info', message: CONSTANT.PAYMENT_MESSAGE.PAID_REMAINING}))
+        }
+
+        if(actionType === 'deposit'){
             try{
                 const res = await paymentService.depositPaymentMomo(orderId, 'sale')
                 window.open(res.data.payUrl, '_blank')
             }catch{
 
             }
-        }else if(type === 'remaining'){
+        }else if(actionType === 'remaining'){
             try{
-                const amount = saleOrders.filter(x => x.id === orderId)[0].remainMoney
-                const res = await paymentService.paymentMomo(orderId, amount, 'sale')
+                const order = saleOrders.filter(x => x.id === orderId)[0]
+                const res = await paymentService.paymentMomo(orderId, order.remainMoney, 'sale', order.status === 'unpaid' ? 'whole' : '')
+                window.open(res.data.payUrl, '_blank')
+            }catch{
+
+            }
+        }
+    }
+
+    const handlePaymentRent = async (data: PaymentControlState) =>{
+        const { orderId, actionType } = data
+        const [order] = rentOrders.filter(x => x.rentOrderList[0].id === orderId)[0].rentOrderList
+
+        if(actionType === 'deposit' && order.status !== 'unpaid'){
+            return dispatch(setNoti({type: 'info', message: CONSTANT.PAYMENT_MESSAGE.PAID_DEPOSIT}))
+        }
+        if(actionType === 'remaining' && (order.status === 'paid' || order.status === 'completed')){
+            return dispatch(setNoti({type: 'info', message: CONSTANT.PAYMENT_MESSAGE.PAID_REMAINING}))
+        }
+
+        if(actionType === 'deposit'){
+            try{
+                const res = await paymentService.depositPaymentMomo(orderId, 'rent')
+                window.open(res.data.payUrl, '_blank')
+            }catch{
+
+            }
+        }else if(actionType === 'remaining'){
+            try{
+                const res = await paymentService.paymentMomo(orderId, order.remainMoney, 'rent', order.status === 'unpaid' ? 'whole' : '')
                 window.open(res.data.payUrl, '_blank')
             }catch{
 
@@ -89,17 +149,18 @@ const ClientOrder: React.FC = () =>{
 
     const ColumnSaleOrder: ColumnsType<any> = [
         {
-            title: '#',
-            key: '#',
-            dataIndex: '#',
+            title: 'Mã đơn hàng',
+            key: 'orderCode',
+            dataIndex: 'orderCode',
             align: 'center',
-            render: (v, _, index) => (<span style={{color: '#00a76f'}}>{index + 1}</span>)
+            width: 170,
+            fixed: 'left',
+            render: (v) => (v)
         },
         {
             title: 'Ngày tạo đơn hàng',
             key: 'createDate',
             dataIndex: 'createDate',
-            align: 'center',
             render: (v) => (utilDateTime.dateToString(v))
         },
         {
@@ -112,31 +173,31 @@ const ClientOrder: React.FC = () =>{
             )
         },
         {
-            title: 'Tổng giá trị đơn hàng',
-            key: 'totalPrice',
-            dataIndex: 'totalPrice',
-            align: 'center',
-            render: (v) => (<MoneyFormat value={v} />)
-        },
-        {
             title: 'Phí vận chuyển',
             key: 'transportFee',
             dataIndex: 'transportFee',
-            align: 'center',
+            align: 'right',
             render: (v) => (<MoneyFormat value={v} />)
         },
         {
-            title: 'Số tiền còn thiếu',
-            key: 'remainMoney',
-            dataIndex: 'remainMoney',
-            align: 'center',
-            render: (v) => (<MoneyFormat value={v} />)
-        },
-        {
-            title: 'Số tiền cọc',
+            title: 'Tiền cọc',
             key: 'deposit',
             dataIndex: 'deposit',
-            align: 'center',
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} />)
+        },
+        {
+            title: 'Số tiền cần trả',
+            key: 'remainMoney',
+            dataIndex: 'remainMoney',
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} />)
+        },
+        {
+            title: 'Tổng đơn hàng',
+            key: 'totalPrice',
+            dataIndex: 'totalPrice',
+            align: 'right',
             render: (v) => (<MoneyFormat value={v} />)
         },
         {
@@ -144,21 +205,51 @@ const ClientOrder: React.FC = () =>{
             key: 'actions',
             dataIndex: 'actions',
             align: 'center',
-            render: (_, record) => (
-                <>
-                    <Tooltip title='Chi tiết đơn hàng' color='#108ee9' >
-                        <BiCommentDetail size={25} color='#00a76f' cursor='pointer' onClick={() => handleSetAction(record.orderId, 'detail')} />
-                    </Tooltip>
-                    <Tooltip title='Thanh toán cọc bằng Momo' color='#108ee9' >
-                        <MdOutlinePayments size={25} color='#00a76f' cursor='pointer' onClick={() => handleSetAction(record.orderId, 'deposit')} />
-                    </Tooltip>
-                    <Tooltip title='Thanh toán bằng Momo' color='#108ee9'>
-                        <RiBillLine size={25} color='#00a76f' cursor='pointer' onClick={() => handleSetAction(record.orderId, 'remaining')} />
-                    </Tooltip>
-                </>
+            fixed:'right',
+            render: (_, record, index) => (
+                <Popover 
+                content={() => contextSale(record)} 
+                placement='bottom' 
+                trigger="click" 
+                open={index === actionMethod?.openIndex} 
+                onOpenChange={(open: boolean) => {
+                    if(open){
+                        setActionMethod({orderId: '', actionType: '', orderType: '', openIndex: index})
+                    }else{
+                        setActionMethod({orderId: '', actionType: '', orderType: '', openIndex: -1})
+                    }
+                }}
+                >
+                    <GrMore size={25} cursor='pointer' color='#00a76f' />
+                </Popover>
             )
         },
     ]
+    
+    const contextSale = (record) => {
+        return (
+            <div className='context-menu-wrapper'>
+                <div className="item" onClick={() => {
+                    setActionMethod({orderId: record.orderId, actionType: 'detail', orderType: 'sale', openIndex: -1})
+                }}>
+                    <BiCommentDetail size={25} className='icon'/>
+                    <span>Chi tiết đơn hàng</span>
+                </div>
+                <div className="item" onClick={() => {
+                    handlePaymentSale({orderId: record.orderId, actionType: 'deposit', orderType: 'sale', openIndex: -1})
+                }} >
+                    <MdOutlinePayments size={25} className='icon'/>
+                    <span>Thanh toán cọc bằng Momo</span>
+                </div>
+                <div className="item" onClick={() => {
+                    handlePaymentSale({orderId: record.orderId, actionType: 'remaining', orderType: 'sale', openIndex: -1})
+                }} >
+                    <MdOutlinePayments size={25} className='icon'/>
+                    <span>Thanh toán đơn hàng bằng Momo</span>
+                </div>
+            </div>
+        )
+    }
     const DataSourceSaleOrder = useMemo(() =>{
         return saleOrders.map((x, index) => ({
             key: String(index + 1),
@@ -169,23 +260,18 @@ const ClientOrder: React.FC = () =>{
             transportFee: x.transportFee,
             remainMoney: x.remainMoney,
             deposit: x.deposit,
+            orderCode: x.orderCode
         }))
     }, [saleOrders])
-
     const ColumnRentOrder: ColumnsType<any> = [
         {
-            title: '#',
-            key: '#',
-            dataIndex: '#',
-            align: 'center',
-            render: (v, _, index) => (<span style={{color: '#00a76f'}}>{index + 1}</span>)
-        },
-        {
             title: 'Mã đơn hàng',
-            key: 'orderID',
-            dataIndex: 'orderID',
+            key: 'orderCode',
+            dataIndex: 'orderCode',
             align: 'center',
-            render: (v) => (v.slice(0, 5))
+            fixed: 'left',
+            width: 170,
+            render: (v) => (v)
         },
         {
             title: 'Ngày bắt đầu thuê',
@@ -202,27 +288,6 @@ const ClientOrder: React.FC = () =>{
             render: (v) => (utilDateTime.dateToString(v))
         },
         {
-            title: 'Giá tiền',
-            key: 'totalPrice',
-            dataIndex: 'totalPrice',
-            align: 'center',
-            render: (v) => (<MoneyFormat value={v} />)
-        },
-        {
-            title: 'Số tiền cần trả',
-            key: 'remainMoney',
-            dataIndex: 'remainMoney',
-            align: 'center',
-            render: (v) => (<MoneyFormat value={v} />)
-        },
-        {
-            title: 'Số tiền cọc',
-            key: 'deposit',
-            dataIndex: 'deposit',
-            align: 'center',
-            render: (v) => (<MoneyFormat value={v} />)
-        },
-        {
             title: 'Trạng thái',
             key: 'status',
             dataIndex: 'status',
@@ -230,56 +295,179 @@ const ClientOrder: React.FC = () =>{
             render: (v) => (<Tag color={utilGeneral.statusToColor(v)}>{utilGeneral.statusToViLanguage(v)}</Tag>)
         },
         {
+            title: 'Phí vận chuyển',
+            key: 'transportFee',
+            dataIndex: 'transportFee',
+            align: 'center',
+            render: (v) => (<MoneyFormat value={v} />)
+        },
+        {
+            title: 'Tiền cọc',
+            key: 'deposit',
+            dataIndex: 'deposit',
+            align: 'center',
+            render: (v) => (<MoneyFormat value={v} />)
+        },
+        {
+            title: 'Tiền cần trả',
+            key: 'remainMoney',
+            dataIndex: 'remainMoney',
+            align: 'center',
+            render: (v) => (<MoneyFormat value={v} />)
+        },
+        {
+            title: 'Tổng đơn hàng',
+            key: 'totalPrice',
+            dataIndex: 'totalPrice',
+            align: 'center',
+            render: (v) => (<MoneyFormat value={v} />)
+        },
+        {
             title: 'Xử lý',
             key: 'action',
             dataIndex: 'action',
             align: 'center',
-            render: (_, record) => (
-                <>
-                    <Tooltip title="Chi tiết đơn hàng" color='#108ee9'>
-                        <BiDetail size={25} cursor='pointer' color='#00a76f' onClick={() => navigate(`/order-group/${record.groupID}`)} />
-                    </Tooltip>
-                </>
+            fixed: 'right',
+            render: (_, record, index) => (
+                    <Popover 
+                        content={() => contextRent(record)} 
+                        placement='bottom' 
+                        trigger="click"
+                        open={index === actionMethod?.openIndex} 
+                        onOpenChange={(open: boolean) => {
+                            if(open){
+                                setActionMethod({orderId: '', actionType: '', orderType: '', openIndex: index})
+                            }else{
+                                setActionMethod({orderId: '', actionType: '', orderType: '', openIndex: -1})
+                            }
+                        }}
+                    >
+                        <GrMore size={25} cursor='pointer' color='#00a76f' />
+                    </Popover>
             )
         },
     ]
+    const contextRent = (record) => {
+        return (
+            <div className='context-menu-wrapper'>
+                <div className="item" onClick={() => {
+                    setActionMethod({orderId: record.orderId, actionType: 'detail', orderType: 'rent', openIndex: -1})
+                }}>
+                    <BiCommentDetail size={25} className='icon'/>
+                    <span>Chi tiết đơn hàng</span>
+                </div>
+                <div className="item" onClick={() => navigate(`/order-group/${record.groupID}`)}>
+                    <BiDetail size={25} className='icon'/>
+                    <span>Xem nhóm đơn hàng</span>
+                </div>
+                <div className="item" onClick={() => {
+                    handlePaymentRent({orderId: record.orderId, actionType: 'deposit', orderType: 'rent', openIndex: -1})
+                }} >
+                    <MdOutlinePayments size={25} className='icon'/>
+                    <span>Thanh toán cọc bằng Momo</span>
+                </div>
+                <div className="item" onClick={() => {
+                    handlePaymentRent({orderId: record.orderId, actionType: 'remaining', orderType: 'rent', openIndex: -1})
+                }} >
+                    <MdOutlinePayments size={25} className='icon'/>
+                    <span>Thanh toán đơn hàng bằng Momo</span>
+                </div>
+            </div>
+        )
+    }
     const DataSourceRentOrder = useMemo(() =>{
         return rentOrders.map((x, index) => ({
             key: String(index + 1),
-            orderID: x.rentOrderList[0].id,
+            orderId: x.rentOrderList[0].id,
             groupID: x.id,
             totalPrice: x.totalGroupAmount,
             startDateRent: x.rentOrderList[0].startDateRent,
             endDateRent: x.rentOrderList[0].endDateRent,
             status: x.rentOrderList[0].status,
             remainMoney: x.rentOrderList[0].remainMoney,
-            deposit: x.rentOrderList[0].deposit
+            deposit: x.rentOrderList[0].deposit,
+            orderCode: x.rentOrderList[0].orderCode,
+            transportFee: x.rentOrderList[0].transportFee
         }))
     }, [rentOrders])
 
+    const handleChangeSegment = (value: string | number) =>{
+        navigate('/orders?page=1')
+        switch(value){
+            case 'Thuê': return setPageType('rent')
+            case 'Bán': return setPageType('sale')
+            default: setPageType('service')
+        }
+    }
+
+    const handleCancel = () =>{
+        setActionMethod(undefined)
+    }
     return (
         <div>
             <LandingHeader />
             <div className="main-content-not-home">
                 <div className="container-wrapper co-wrapper">
                     <HeaderInfor title='Quản lý đơn hàng của bạn' />
-                    <section className="co-box default-layout">
-                        <Collapse defaultActiveKey={['1']}>
-                            <Collapse.Panel header="Đơn hàng cho thuê" key="1">
-                                <Table className='cart-table' dataSource={DataSourceRentOrder} columns={ColumnRentOrder} pagination={false} />
-                            </Collapse.Panel>
-                        </Collapse>
+                    <section className="default-layout">
+                        <h3 style={{marginBottom: '5px'}}>Loại đơn hàng</h3>
+                        <Segmented size="large" onChange={handleChangeSegment} options={['Thuê', 'Bán', 'Dịch vụ']} />
                     </section>
-                    <section className="co-box default-layout">
-                        <Collapse defaultActiveKey={['1']}>
-                            <Collapse.Panel header="Đơn hàng bán" key="1">
-                                <Table className='cart-table' dataSource={DataSourceSaleOrder} columns={ColumnSaleOrder} pagination={false} />
-                            </Collapse.Panel>
-                        </Collapse>
-                    </section>
+                    {
+                        pageType === 'rent' &&
+                        <section className="co-box default-layout">
+                            <Table 
+                                className='cart-table' 
+                                dataSource={DataSourceRentOrder} 
+                                columns={ColumnRentOrder} 
+                                scroll={{x: 1500}}
+                                pagination={{
+                                    current: paging.curPage,
+                                    pageSize: paging.pageSize,
+                                    total: paging.recordCount,
+                                    onChange: (page: number) =>{
+                                        navigate(`/orders?page=${page}`)
+                                    }
+                                }}
+                            />
+                        </section>
+                    }
+                    {
+                        pageType === 'sale' &&
+                        <section className="co-box default-layout">
+                            <Table 
+                                className='cart-table' 
+                                dataSource={DataSourceSaleOrder} 
+                                columns={ColumnSaleOrder} 
+                                scroll={{x: 1500}}
+                                pagination={{
+                                    current: paging.curPage,
+                                    pageSize: paging.pageSize,
+                                    total: paging.recordCount,
+                                    onChange: (page: number) =>{
+                                        navigate(`/orders?page=${page}`)
+                                    }
+                                }}
+                            />
+                        </section>
+                    }
                 </div>
             </div>
             <LandingFooter />
+            {
+                (actionMethod?.actionType === 'detail' && actionMethod.orderType === 'sale') && 
+                <ModalClientSaleOrderDetai
+                    saleOrderList={saleOrders.filter(x => x.id === actionMethod.orderId)[0]}
+                    onClose={handleCancel}
+                />
+            }
+            {
+                (actionMethod?.actionType === 'detail' && actionMethod.orderType === 'rent') &&
+                <ModalClientRentOrderDetai
+                    onClose={handleCancel}
+                    rentOrderList={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0]}
+                />
+            }
         </div>
     );
 }
