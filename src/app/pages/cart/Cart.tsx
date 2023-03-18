@@ -31,9 +31,6 @@ import { setTitle } from '../../slices/window-title';
 import CONSTANT from '../../utils/constant';
 import './style.scss';
 
-// recipientAddress: string;
-//     recipientPhone: string;
-//     recipientName: string;
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
 const schema = yup.object().shape({
     recipientAddress: yup.string().required('Địa chỉ không được để trống').max(500, 'Địa chỉ không được nhiều hơn 500 ký tự'),
