@@ -21,6 +21,7 @@ import { MdOutlinePayments } from 'react-icons/md'
 import { useParams } from 'react-router-dom'
 import './style.scss'
 
+
 const ClientRentOrderGroup: React.FC = () => {
     const { groupId } = useParams()
     const dispatch = useDispatch();
