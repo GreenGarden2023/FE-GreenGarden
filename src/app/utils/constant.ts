@@ -55,6 +55,7 @@ const MANAGE_PRODUCT: Role[] = ['Admin', 'Staff', 'Manager']
 const MANAGE_PRODUCT_ITEM: Role[] = ['Admin', 'Staff', 'Manager']
 const MANAGE_SIZE: Role[] = ['Admin', 'Staff', 'Manager']
 const MANAGE_ORDER: Role[] = ['Admin', 'Staff', 'Manager']
+const MANAGE_SHIPPING_FEE: Role[] = ['Admin', 'Staff', 'Manager']
 
 const PAYMENT_MESSAGE = {
     PAID_DEPOSIT: 'Đơn hàng này đã thanh toán tiền cọc',
@@ -79,6 +80,7 @@ const CONSTANT = {
     MANAGE_SIZE,
     MANAGE_ORDER,
     PAYMENT_MESSAGE,
+    MANAGE_SHIPPING_FEE
 }
 
 export default CONSTANT

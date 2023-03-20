@@ -12,6 +12,7 @@ import ManageProductItem from 'app/pages/manage-product-item/ManageProductItem';
 import ManageRentOrder from 'app/pages/manage-rent-order/ManageRentOrder';
 import ManageRentOrderGroup from 'app/pages/manage-rent-order/rent-order-group/ManageRentOrderGroup';
 import ManageSaleOrder from 'app/pages/manage-sale-order/ManageSaleOrder';
+import ManageShippingFee from 'app/pages/manage-shipping-fee/ManageShippingFee';
 import ManageSize from 'app/pages/manage-size/ManageSize';
 import React, { useEffect } from 'react';
 import { AiFillCheckCircle, AiFillWarning } from 'react-icons/ai';
@@ -44,6 +45,7 @@ const Routers: React.FC = () =>{
     const notiState = useSelector(state => state.notification);
 
     const [api, contextHolder] = notification.useNotification();
+
     useEffect(() =>{
         const tokenInLocal = localStorage.getItem(CONSTANT.STORAGE.ACCESS_TOKEN)
         if(!tokenInLocal) return;
@@ -58,7 +60,7 @@ const Routers: React.FC = () =>{
                     role: res.data.roleName,
                     loading: false
                 }
-                dispatch(setUser(resData))
+                dispatch(setUser({user: resData, token: tokenInLocal, loading: false}))
             }catch(err: any){
                 if(err.response.status === 401){
                     localStorage.removeItem(CONSTANT.STORAGE.ACCESS_TOKEN)
@@ -130,6 +132,7 @@ const Routers: React.FC = () =>{
                     <Route path='sale-order' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageSaleOrder /></AdminRoute></AuthGuard>} />
                     <Route path='rent-order' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageRentOrder /></AdminRoute></AuthGuard>} />
                     <Route path='rent-order/:groupId' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageRentOrderGroup /></AdminRoute></AuthGuard>} />
+                    <Route path='manage-shipping-fee' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageShippingFee /></AdminRoute></AuthGuard>} />
                 </Route>
                 <Route path='/file-not-found' element={<FileNotFound />} />
             </Routes>

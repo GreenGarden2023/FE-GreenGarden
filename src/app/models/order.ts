@@ -1,10 +1,12 @@
 import { CartItem } from "./cart"
 import { OrderStatus } from "./general-type";
 import { Paging } from "./paging";
+import { ProductItemDetail } from "./product-item";
 
 export interface OrderCreate{
     startDateRent?: Date;
     endDateRent?: Date;
+    shippingID: number;
     rewardPointUsed: number;
     recipientAddress: string;
     recipientPhone: string;
@@ -88,4 +90,8 @@ export interface OrderCalculate {
     rewardPointUsed: number
     discountAmount: number
 }
-  
+
+export interface OrderExtendDetail{
+    rentOrder: RentOrderList;
+    productItemDetailList: ProductItemDetail[]
+}

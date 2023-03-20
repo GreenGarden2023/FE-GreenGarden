@@ -44,4 +44,5 @@ export interface CartUserData{
     recipientAddress: string;
     recipientPhone: string;
     recipientName: string;
+    shippingID: number;
 }

@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { DatePicker, Form, Image, Input, Modal } from 'antd';
+import { Col, DatePicker, Form, Image, Input, Modal, Row, Select } from 'antd';
 import locale from 'antd/es/date-picker/locale/vi_VN';
 import Table, { ColumnsType } from 'antd/es/table';
 import LandingFooter from 'app/components/footer/LandingFooter';
@@ -10,8 +10,10 @@ import MoneyFormat from 'app/components/money/MoneyFormat';
 import useSelector from 'app/hooks/use-selector';
 import { Cart, CartUserData } from 'app/models/cart';
 import { OrderCalculate, OrderCreate } from 'app/models/order';
+import { ShippingFee } from 'app/models/shipping-fee';
 import cartService from 'app/services/cart.service';
 import orderService from 'app/services/order.service';
+import shippingFeeService from 'app/services/shipping-fee.service';
 import { CartProps, setCartSlice } from 'app/slices/cart';
 import { setNoti } from 'app/slices/notification';
 import pagingPath from 'app/utils/paging-path';
@@ -62,6 +64,21 @@ const CartPage: React.FC = () => {
     const [rentPoint, setRentPoint] = useState(0)
     const [salePoint, setSalePoint] = useState(0)
 
+    const [shipping, setShipping] = useState<ShippingFee[]>([])
+    const [recall, setRecall] = useState(true);
+
+    useEffect(() =>{
+        const init = async () =>{
+            try{
+                const res = await shippingFeeService.getList()
+                setShipping(res.data)
+            }catch{
+
+            }
+        }
+        init()
+    }, [])
+
     useEffect(() =>{
         if(rentItems.length !== 0 && !dateRange){
             setFinalRentPrice(undefined)
@@ -73,15 +90,27 @@ const CartPage: React.FC = () => {
             setFinalSalePrice(undefined)
             return
         }
+        if(rentItems.length === 0 && saleItems.length === 0){
+            setFinalRentPrice(undefined)
+            setFinalSalePrice(undefined)
+            return;
+        }
+        if(rentItems.length === 0){
+            setFinalRentPrice(undefined)
+        }
+        if(saleItems.length === 0){
+            setFinalSalePrice(undefined)
+        }
 
         const init = async () =>{
             try{
-                const { recipientAddress, recipientName, recipientPhone } = getValues()
+                const { recipientAddress, recipientName, recipientPhone, shippingID } = getValues()
                 // const listRequestOrder: Promise<any>[] = [];
                 if(rentItems.length !== 0){
                     const data: OrderCreate = {
                         startDateRent: dateRange ? dateRange[0].toDate() : undefined,
                         endDateRent: dateRange ? dateRange[1].toDate() : undefined,
+                        shippingID: shippingID,
                         itemList: rentItems,
                         rewardPointUsed: rentPoint,
                         rentOrderGroupID: null,
@@ -95,9 +124,10 @@ const CartPage: React.FC = () => {
                     // listRequestOrder.push(orderService.calculateOrder(data))
                 }
                 if(saleItems.length !== 0){
-                    const data: any = {
+                    const data: OrderCreate = {
                         itemList: saleItems,
                         rewardPointUsed: salePoint,
+                        shippingID: shippingID,
                         recipientAddress,
                         recipientName,
                         recipientPhone,
@@ -115,16 +145,17 @@ const CartPage: React.FC = () => {
         }
         init()
 
-    }, [isValid, dateRange, rentItems, getValues, saleItems, rentPoint, salePoint])
+    }, [isValid, dateRange, rentItems, getValues, saleItems, rentPoint, salePoint, recall])
 
     useEffect(() =>{
-        const { address, fullName, phone } = userSate
+        const { address, fullName, phone, districtID } = userSate.user
 
         if(!address || !fullName || !phone) return;
 
         setValue('recipientAddress', address)
         setValue('recipientName', fullName)
         setValue('recipientPhone', phone)
+        setValue('shippingID', districtID)
 
         trigger()
     }, [userSate, setValue, trigger])
@@ -145,7 +176,7 @@ const CartPage: React.FC = () => {
                 }
                 dispatch(setCartSlice(cartProps))
             }catch{
-                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+                // dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
         }
         init()
@@ -478,7 +509,7 @@ const CartPage: React.FC = () => {
         setSubmited(true)
         if(cart?.rentItems.length !== 0 && !dateRange) return;
 
-        const { recipientAddress, recipientName, recipientPhone } = data
+        const { recipientAddress, recipientName, recipientPhone, shippingID } = data
 
         try{
             const listRequestOrder: Promise<any>[] = [];
@@ -486,6 +517,7 @@ const CartPage: React.FC = () => {
                 const data: OrderCreate = {
                     startDateRent: dateRange ? dateRange[0].toDate() : undefined,
                     endDateRent: dateRange ? dateRange[1].toDate() : undefined,
+                    shippingID,
                     itemList: rentItems,
                     rewardPointUsed: rentPoint,
                     rentOrderGroupID: null,
@@ -496,8 +528,9 @@ const CartPage: React.FC = () => {
                 listRequestOrder.push(orderService.createOrder(data))
             }
             if(saleItems.length !== 0){
-                const data: any = {
+                const data: OrderCreate = {
                     itemList: saleItems,
+                    shippingID,
                     rewardPointUsed: salePoint,
                     recipientAddress,
                     recipientName,
@@ -530,40 +563,12 @@ const CartPage: React.FC = () => {
                                         <div className="price-box">
                                             <div className="left">
                                                 <FaMoneyBillAlt color='#00a76f' size={25} />
-                                                <span>Phí vận chuyển</span>
-                                            </div>
-                                            <div className="right">
-                                                {finalSalePrice.transportFee}
-                                            </div>
-                                        </div>
-                                        <div className="price-box">
-                                            <div className="left">
-                                                <FaMoneyBillAlt color='#00a76f' size={25} />
-                                                <span>Tiền được giảm</span>
-                                            </div>
-                                            <div className="right">
-                                                {finalSalePrice.discountAmount}
-                                            </div>
-                                        </div>
-                                        <div className="price-box">
-                                            <div className="left">
-                                                <FaMoneyBillAlt color='#00a76f' size={25} />
                                                 <span>Số điểm đã dùng</span>
                                             </div>
                                             <div className="right">
                                                 {finalSalePrice.rewardPointUsed}
                                             </div>
                                         </div>
-                                        <div className="price-box">
-                                            <div className="left">
-                                                <FaMoneyBillAlt color='#00a76f' size={25} />
-                                                <span>Tiền cọc</span>
-                                            </div>
-                                            <div className="right">
-                                                {finalSalePrice.deposit}
-                                            </div>
-                                        </div>
-                                        
                                         <div className="price-box">
                                             <div className="left">
                                                 <FaMoneyBillAlt color='#00a76f' size={25} />
@@ -576,10 +581,37 @@ const CartPage: React.FC = () => {
                                         <div className="price-box">
                                             <div className="left">
                                                 <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Phí vận chuyển</span>
+                                            </div>
+                                            <div className="right">
+                                                <MoneyFormat value={finalSalePrice.transportFee} />
+                                            </div>
+                                        </div>
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Tiền cọc</span>
+                                            </div>
+                                            <div className="right">
+                                                <MoneyFormat value={finalSalePrice.deposit} />
+                                            </div>
+                                        </div>
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Tiền được giảm</span>
+                                            </div>
+                                            <div className="right">
+                                                <MoneyFormat value={finalSalePrice.discountAmount} />
+                                            </div>
+                                        </div>
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
                                                 <span>Tổng tiền</span>
                                             </div>
                                             <div className="right">
-                                                {finalSalePrice.totalPrice}
+                                                <MoneyFormat value={finalSalePrice.totalPrice} isHighlight color='Orange' />
                                             </div>
                                         </div>
                                     </div>
@@ -589,24 +621,15 @@ const CartPage: React.FC = () => {
                                 <p>Cây cho thuê</p>
                                 <Table className='cart-table' dataSource={DataSourceRent} columns={ColumnRent} pagination={false} />
                                 {
-                                    finalRentPrice && 
+                                    (finalRentPrice && dateRange) && 
                                     <div className="price-infor">
                                         <div className="price-box">
                                             <div className="left">
                                                 <FaMoneyBillAlt color='#00a76f' size={25} />
-                                                <span>Phí vận chuyển</span>
+                                                <span>Tổng số ngày thuê</span>
                                             </div>
                                             <div className="right">
-                                                {finalRentPrice.transportFee}
-                                            </div>
-                                        </div>
-                                        <div className="price-box">
-                                            <div className="left">
-                                                <FaMoneyBillAlt color='#00a76f' size={25} />
-                                                <span>Tiền được giảm</span>
-                                            </div>
-                                            <div className="right">
-                                                {finalRentPrice.discountAmount}
+                                                {dateRange[1].diff(dateRange[0], 'days')}
                                             </div>
                                         </div>
                                         <div className="price-box">
@@ -621,16 +644,6 @@ const CartPage: React.FC = () => {
                                         <div className="price-box">
                                             <div className="left">
                                                 <FaMoneyBillAlt color='#00a76f' size={25} />
-                                                <span>Tiền cọc</span>
-                                            </div>
-                                            <div className="right">
-                                                {finalRentPrice.deposit}
-                                            </div>
-                                        </div>
-                                        
-                                        <div className="price-box">
-                                            <div className="left">
-                                                <FaMoneyBillAlt color='#00a76f' size={25} />
                                                 <span>Tích điểm</span>
                                             </div>
                                             <div className="right">
@@ -640,10 +653,37 @@ const CartPage: React.FC = () => {
                                         <div className="price-box">
                                             <div className="left">
                                                 <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Phí vận chuyển</span>
+                                            </div>
+                                            <div className="right">
+                                                <MoneyFormat value={finalRentPrice.transportFee} />
+                                            </div>
+                                        </div>
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Tiền cọc</span>
+                                            </div>
+                                            <div className="right">
+                                                <MoneyFormat value={finalRentPrice.deposit} />
+                                            </div>
+                                        </div>
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Tiền được giảm</span>
+                                            </div>
+                                            <div className="right">
+                                                <MoneyFormat value={finalRentPrice.discountAmount} />
+                                            </div>
+                                        </div>
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
                                                 <span>Tổng tiền</span>
                                             </div>
                                             <div className="right">
-                                                {finalRentPrice.totalPrice}
+                                                <MoneyFormat value={finalRentPrice.totalPrice} isHighlight color='Orange' />
                                             </div>
                                         </div>
                                     </div>
@@ -656,56 +696,96 @@ const CartPage: React.FC = () => {
                                 onFinish={handleSubmit(handleSubmitForm)}
                                 style={{width: '500px', marginLeft: 'auto'}}
                             >
-                                <Form.Item label='Tên người nhận' required>
-                                    <Controller 
-                                        control={control}
-                                        name='recipientName'
-                                        render={({ field: { value } }) => <Input value={value} onChange={(e) => {
-                                            setValue('recipientName', e.target.value)
-                                            trigger('recipientName')
-                                        }} />}
-                                    />
-                                    {errors.recipientName && <ErrorMessage message={errors.recipientName.message} />}
-                                </Form.Item>
-                                <Form.Item label='Địa chỉ' required>
-                                    <Controller 
-                                        control={control}
-                                        name='recipientAddress'
-                                        render={({ field: { value} }) => <Input value={value} onChange={(e) => {
-                                            setValue('recipientAddress', e.target.value)
-                                            trigger('recipientAddress')
-                                        }} />}
-                                    />
-                                    {errors.recipientAddress && <ErrorMessage message={errors.recipientAddress.message} />}
-                                </Form.Item>
-                                <Form.Item label='Số điện thoại' required>
-                                    <Controller 
-                                        control={control}
-                                        name='recipientPhone'
-                                        render={({ field: { value } }) => <Input value={value} onChange={(e) => {
-                                            setValue('recipientPhone', e.target.value)
-                                            trigger('recipientPhone')
-                                        }}/>}
-                                    />
-                                    {errors.recipientPhone && <ErrorMessage message={errors.recipientPhone.message} />}
-                                </Form.Item>
-                                <p>Số điểm của bạn là {userSate.currentPoint}</p>
-                                <Form.Item label='Số điểm sử dụng cho đơn thuê'>
-                                    <Input min={0} type='number' max={userSate.currentPoint - salePoint} value={rentPoint} onChange={(e) => {
-                                        const value = Number(e.target.value)
-                                        if((userSate.currentPoint - salePoint) > value){
-                                            setRentPoint(Number(e.target.value))
-                                        }
-                                    }} />
-                                </Form.Item>
-                                <Form.Item label='Số điểm sử dụng cho đơn mua'>
-                                    <Input min={0} type='number' max={0} value={salePoint} onChange={(e) => {
-                                        const value = Number(e.target.value)
-                                        if((userSate.currentPoint - rentPoint) > value){
-                                            setSalePoint(Number(e.target.value))
-                                        }
-                                    }} />
-                                </Form.Item>
+                                <Row gutter={[12, 12]}>
+                                    <Col span={12}>
+                                        <Form.Item label='Tên người nhận' required>
+                                            <Controller 
+                                                control={control}
+                                                name='recipientName'
+                                                render={({ field: { value } }) => <Input value={value} onChange={(e) => {
+                                                    setValue('recipientName', e.target.value)
+                                                    trigger('recipientName')
+                                                }} />}
+                                            />
+                                            {errors.recipientName && <ErrorMessage message={errors.recipientName.message} />}
+                                        </Form.Item>
+                                    </Col>
+                                    <Col span={12}>
+                                        <Form.Item label='Số điện thoại' required>
+                                            <Controller 
+                                                control={control}
+                                                name='recipientPhone'
+                                                render={({ field: { value } }) => <Input value={value} onChange={(e) => {
+                                                    setValue('recipientPhone', e.target.value)
+                                                    trigger('recipientPhone')
+                                                }}/>}
+                                            />
+                                            {errors.recipientPhone && <ErrorMessage message={errors.recipientPhone.message} />}
+                                        </Form.Item>
+                                    </Col>
+                                    <Col span={12}>
+                                        <Form.Item label='Nơi nhận' required>
+                                            <Controller 
+                                                control={control}
+                                                name='shippingID'
+                                                render={({ field: { value} }) => (
+                                                    <Select value={value} onChange={(e) => {
+                                                        setRecall(!recall)
+                                                        setValue('shippingID', e)
+                                                        trigger()
+                                                    }}>
+                                                        {
+                                                            shipping.map((item, index) => (
+                                                                <Select.Option value={item.districtID} key={index} >
+                                                                    {item.district}
+                                                                </Select.Option>
+                                                            ))
+                                                        }
+                                                    </Select>
+                                                )}
+                                            />
+                                            {errors.recipientAddress && <ErrorMessage message={errors.recipientAddress.message} />}
+                                        </Form.Item>
+                                    </Col>
+                                    <Col span={12}>
+                                        <Form.Item label='Địa chỉ cụ thể' required>
+                                            <Controller 
+                                                control={control}
+                                                name='recipientAddress'
+                                                render={({ field: { value} }) => <Input value={value} onChange={(e) => {
+                                                    setValue('recipientAddress', e.target.value)
+                                                    trigger('recipientAddress')
+                                                }} />}
+                                            />
+                                            {errors.recipientAddress && <ErrorMessage message={errors.recipientAddress.message} />}
+                                        </Form.Item>  
+                                    </Col>
+                                    <Col span={24}><p>Số điểm của bạn là {userSate.user.currentPoint}</p></Col>
+                                    <Col span={12}>
+                                        <Form.Item label='Số điểm sử dụng cho đơn thuê'>
+                                            <Input min={0} type='number' max={userSate.user.currentPoint - salePoint} value={rentPoint} onChange={(e) => {
+                                                const value = Number(e.target.value)
+                                                if((userSate.user.currentPoint - salePoint) > value){
+                                                    setRentPoint(Number(e.target.value))
+                                                }else{
+                                                    setRentPoint(userSate.user.currentPoint - salePoint)
+                                                }
+                                            }} />
+                                        </Form.Item>
+                                    </Col>
+                                    <Col span={12}>
+                                        <Form.Item label='Số điểm sử dụng cho đơn mua'>
+                                            <Input min={0} type='number' max={0} value={salePoint} onChange={(e) => {
+                                                const value = Number(e.target.value)
+                                                if((userSate.user.currentPoint - rentPoint) > value){
+                                                    setSalePoint(Number(e.target.value))
+                                                }else{
+                                                    setSalePoint(userSate.user.currentPoint - rentPoint)
+                                                }
+                                            }} />
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
                                 <div className="box">
                                     {
                                         cart?.rentItems.length !== 0 &&

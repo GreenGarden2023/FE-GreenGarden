@@ -4,6 +4,7 @@ import HeaderInfor from "app/components/header-infor/HeaderInfor";
 import ModalClientRentOrderDetai from "app/components/modal/client-rent-order-detail/ModalClientRentOrderDetai";
 import RentOrderPaymentCash from "app/components/modal/rent-oder-payment-cash/RentOrderPaymentCash";
 import RentOrderPaymentDeposit from "app/components/modal/rent-order-payment-deposit/RentOrderPaymentDeposit";
+import ReturnDepositRentOrder from "app/components/modal/return-deposit-rent-order/ReturnDepositRentOrder";
 import MoneyFormat from "app/components/money/MoneyFormat";
 import UserInforTable from "app/components/user-infor/UserInforTable";
 import useDispatch from "app/hooks/use-dispatch";
@@ -19,6 +20,7 @@ import pagingPath from "app/utils/paging-path";
 import React, { useEffect, useMemo, useState } from "react";
 import CurrencyFormat from "react-currency-format";
 import { BiDetail } from "react-icons/bi";
+import { GiReturnArrow } from "react-icons/gi";
 import { GrMore } from "react-icons/gr";
 import { HiArrowTopRightOnSquare } from "react-icons/hi2";
 import { MdOutlinePayments } from "react-icons/md";
@@ -94,6 +96,7 @@ const ManageRentOrderGroup: React.FC = () => {
       key: "status",
       dataIndex: "status",
       align: "center",
+      width: 190,
       render: (v) => (
         <Tag color={utilGeneral.statusToColor(v)}>
           {utilGeneral.statusToViLanguage(v)}
@@ -183,6 +186,20 @@ const ManageRentOrderGroup: React.FC = () => {
         >
           <RiBillLine size={25} className="icon" />
           <span>Thanh toán đơn hàng</span>
+        </div>
+        <div className="item" onClick={() => {
+          if(record.status === 'completed'){
+            handleSetAction({orderId: '', actionType: '', orderType: '', openIndex: -1})
+            return dispatch(setNoti({type: 'info', message: 'Đơn hàng đã hoàn thành'}))
+          }
+          if(record.status !== 'paid'){
+              handleSetAction({orderId: '', actionType: '', orderType: '', openIndex: -1})
+              return dispatch(setNoti({type: 'info', message: 'Chưa đủ điều kiện hoàn cọc'}))
+          }
+            handleSetAction({orderId: record.orderId, actionType: 'return deposit', orderType: 'rent', openIndex: -1})
+        }}>
+          <GiReturnArrow size={25} className='icon'/>
+          <span>Xác nhận hoàn cọc</span>
         </div>
       </div>
     );
@@ -278,6 +295,14 @@ const ManageRentOrderGroup: React.FC = () => {
       handleClose();
     } catch {}
   };
+  const handleReturnDeposit = (rentOrderListId: string) =>{
+    if(!groupOrder) return;
+
+    const index = groupOrder.rentOrderList.findIndex(x => x.id === rentOrderListId)
+    groupOrder.rentOrderList[index].status = 'completed'
+    setGroupOrder({...groupOrder})
+    setActionMethod(undefined)
+  }
   return (
     <div className="mrog-wrapper">
       <HeaderInfor title="Xem nhóm đơn hàng cho thuê" />
@@ -350,6 +375,14 @@ const ManageRentOrderGroup: React.FC = () => {
           onSubmit={handlePaymentCash}
         />
       )}
+       {
+        actionMethod?.actionType === 'return deposit' && groupOrder &&
+        (<ReturnDepositRentOrder 
+            rentOrderList={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0]}
+            onClose={handleClose}
+            onSubmit={handleReturnDeposit}
+        />)
+      } 
     </div>
   );
 };

@@ -44,7 +44,7 @@ const LandingHeader: React.FC = () =>{
             return;
         }
 
-        const { id, fullName, address, phone, mail, favorite } = userState
+        const { id, fullName, address, phone, mail, favorite } = userState.user
         setValue('id', id);
         setValue('fullName', fullName);
         setValue('address', address);
@@ -55,7 +55,7 @@ const LandingHeader: React.FC = () =>{
 
     useEffect(() =>{
       if(location.pathname === '/cart') return;
-
+      if(!userState.user.id) return;
       const init = async () =>{
         try{
           const result = await cartService.getCart()
@@ -70,7 +70,7 @@ const LandingHeader: React.FC = () =>{
         }
       }
       init()
-    }, [dispatch, location])
+    }, [dispatch, location, userState])
 
     const handleLogout = () =>{
         localStorage.removeItem(CONSTANT.STORAGE.ACCESS_TOKEN)
@@ -83,7 +83,7 @@ const LandingHeader: React.FC = () =>{
 
     const handleSubmitForm = async(data: UserUpdate) =>{
         try{
-            console.log(data)
+            // console.log(data)
             dispatch(setNoti({type: 'success', message: 'Update infor success'}))
         }catch(err){
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
@@ -102,9 +102,6 @@ const LandingHeader: React.FC = () =>{
       }
       return quantity
     }, [rentItems, saleItems])
-
-    console.log({rentItems, saleItems})
-
     return (
         <>
             <header className='landing-header'>
@@ -131,7 +128,7 @@ const LandingHeader: React.FC = () =>{
                                   <>
                                       <div className='user-infor-box' onClick={handleViewInfor}>
                                           <FaUserCircle size={20} />
-                                          <span>{userState.fullName}</span>
+                                          <span>{userState.user.fullName}</span>
                                       </div>
                                       <div className="log-out" onClick={handleLogout}>
                                           <GiExitDoor size={20} />

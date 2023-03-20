@@ -39,7 +39,8 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
     const location = useLocation();
     
     const { collapsedHeader } = useSelector(state => state.adminLayout);
-    const { roleName } = useSelector(state => state.userInfor)
+    const userState = useSelector(state => state.userInfor)
+    const { roleName } = userState.user
 
     const handleCollapsedHeader = () =>{
         dispatch(setCollapsedHeader({active: !collapsedHeader}))
@@ -73,6 +74,10 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
         if(saleOrder.includes(affix)){
             return ['6']
         }
+        const shippingFee = ['manage-shipping-fee']
+        if(shippingFee.includes(affix)){
+            return ['7']
+        }
 
     }, [location])
     const openedKey = useMemo(() =>{
@@ -92,6 +97,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
        CONSTANT.MANAGE_PRODUCT.includes(roleName as Role) ? getItem(<Link to='/panel/manage-product'>Manage Product</Link>, '2', <MdOutlineInventory2 size={18} />) : null,
        CONSTANT.MANAGE_SIZE.includes(roleName as Role) ? getItem(<Link to='/panel/manage-size'>Manage Size</Link>, '3', <MdOutlineInventory2 size={18} />) : null,
        CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem('Manage Order', '4', <BiCategoryAlt size={18} />, childrenOrder) : null,
+       CONSTANT.MANAGE_SHIPPING_FEE.includes(roleName as Role) ? getItem(<Link to='/panel/manage-shipping-fee'>Phí vận chuyển</Link>, '7', <MdOutlineInventory2 size={18} />) : null,
     ];
   return (
     <>

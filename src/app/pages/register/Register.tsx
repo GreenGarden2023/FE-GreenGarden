@@ -16,6 +16,8 @@ import useDispatch from '../../hooks/use-dispatch';
 import { setTitle } from '../../slices/window-title';
 import authService from '../../services/auth.service';
 import { setNoti } from '../../slices/notification';
+import { ShippingFee } from 'app/models/shipping-fee';
+import shippingFeeService from 'app/services/shipping-fee.service';
 
 const defaultValues: UserRegister = {
   userName: '',
@@ -27,6 +29,7 @@ const defaultValues: UserRegister = {
   mail: '',
   confirmPassword: '',
   isAgreeTerm: false,
+  districtID: 1,
 }
 /* eslint-disable no-useless-escape */
 const schema = yup.object().shape({
@@ -48,10 +51,24 @@ const Register: React.FC = () => {
   const [viewPassword, setViewPassword] = useState(false);
   const [viewConPassword, setViewConPassword] = useState(false);
 
+  const [shipping, setShipping] = useState<ShippingFee[]>([])
+
   const { handleSubmit, formState: { errors, isSubmitting }, control, setError } = useForm<UserRegister>({
     defaultValues,
     resolver: yupResolver(schema)
   })
+
+  useEffect(() =>{
+    const init = async () =>{
+      try{
+        const res = await shippingFeeService.getList()
+        setShipping(res.data)
+      }catch{
+
+      }
+    }
+    init()
+  }, [])
 
   useEffect(() =>{
     dispatch(setTitle(`${CONSTANT.APP_NAME} | Register`))
@@ -117,8 +134,25 @@ const Register: React.FC = () => {
                           {errors.address && <ErrorMessage message={errors.address.message} />}
                         </Form.Item>
                       </Col>
-                    </Row>
-                    <Row gutter={24}>
+                      <Col span={24}>
+                        <Form.Item label='Địa chỉ nhận hàng' required validateStatus={errors.address ? 'error' : ''}>
+                          <Controller
+                            control={control}
+                            name='districtID'
+                            render={({ field }) => (
+                              <Select showSearch {...field}>
+                                {
+                                  shipping.map((item, index) => (
+                                    <Select.Option value={item.districtID} key={index} >
+                                      {item.district}
+                                    </Select.Option>
+                                  ))
+                                }
+                              </Select>
+                            )}
+                          />
+                        </Form.Item>
+                      </Col>
                       <Col span={12}>
                         <Form.Item label='Phone' required validateStatus={errors.phone ? 'error' : ''}>
                           <Controller
@@ -139,8 +173,6 @@ const Register: React.FC = () => {
                           {errors.mail && <ErrorMessage message={errors.mail.message} />}
                         </Form.Item>
                       </Col>
-                    </Row>
-                    <Row gutter={24}>
                       <Col span={12}>
                         <Form.Item label='Username' required validateStatus={errors.userName ? 'error' : ''}>
                           <Controller
@@ -169,8 +201,6 @@ const Register: React.FC = () => {
                           {errors.favorite && <ErrorMessage message={errors.favorite.message} />}
                         </Form.Item>
                       </Col>
-                    </Row>
-                    <Row gutter={24}>
                       <Col span={12}>
                           <Form.Item label='Password' required validateStatus={errors.password ? 'error' : ''}>
                             <Controller

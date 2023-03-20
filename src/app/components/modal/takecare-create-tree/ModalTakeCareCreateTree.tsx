@@ -1,8 +1,197 @@
-import React from 'react'
+import { Button, Col, Form, Image, Input, Modal, Row } from 'antd';
+import useDispatch from 'app/hooks/use-dispatch';
+import { UserTree } from 'app/models/user-tree'
+import uploadService from 'app/services/upload.service';
+import { setNoti } from 'app/slices/notification';
+import CONSTANT from 'app/utils/constant';
+import React, { useEffect, useRef } from 'react'
+import { useForm, Controller } from 'react-hook-form'
+import { AiOutlineCloudUpload } from 'react-icons/ai';
+import { CiSquareRemove } from 'react-icons/ci';
+import './style.scss';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+import ErrorMessage from 'app/components/message.tsx/ErrorMessage';
+import userTreeService from 'app/services/user-tree.service';
 
-const ModalTakeCareCreateTree:React.FC = () => {
+const schema = yup.object().shape({
+  treeName: yup.string().required('Tên của cây không được để trống').max(50, 'Tên của cây không nhiều hơn 50 ký tự'),
+  description: yup.string().required('Mô tả không được để trống').max(500, 'Mô tả không nhiều hơn 500 ký tự'),
+  quantity: yup.number().required('Số lượng không được để trống').min(1, 'Số lượng có ít nhất 1 cây').typeError('Kiểu giá trị của số lượng là số'),
+  imgUrl: yup.array().required('Có ít nhất 1 hình ảnh cho thông tin này').min(1, 'Có ít nhất 1 hình ảnh cho thông tin này')
+})
+
+interface ModalTakeCareCreateTreeProps{
+  tree?: UserTree
+  onClose: () => void;
+  onSubmit: (tree: UserTree, isCreate: boolean) => void
+}
+
+const ModalTakeCareCreateTree:React.FC<ModalTakeCareCreateTreeProps> = ({ tree, onClose, onSubmit }) => {
+  console.log({tree})
+  const dispatch = useDispatch()
+  const { setValue, formState: { errors, isSubmitting }, control, handleSubmit, setError, trigger, getValues } = useForm<Partial<UserTree>>({
+    defaultValues: {
+      status: 'active',
+      quantity: 1,
+    },
+    resolver: yupResolver(schema)
+  })
+  const ref = useRef<HTMLInputElement>(null);
+
+  useEffect(() =>{
+    if(!tree) return;
+
+    const { id, treeName, quantity, description, imgUrl, status } = tree
+    setValue('id', id)
+    setValue('treeName', treeName)
+    setValue('quantity', quantity)
+    setValue('description', description)
+    setValue('imgUrl', imgUrl)
+    setValue('status', status)
+    trigger('imgUrl')
+  }, [tree, setValue, trigger])
+
+  const handleSubmitForm = async (data: Partial<UserTree>) =>{
+    console.log(data)
+    if(!data.id){
+      // create
+      try{
+        const { status, ...rest } = data
+        
+        const res = await userTreeService.createUserTree(data)
+        onSubmit(res.data.userTrees, true)
+      }catch{
+
+      }
+    }else{
+      // update
+      try{
+        const res = await userTreeService.updateUserTree(data)
+        onSubmit(res.data, false)
+      }catch{
+
+      }
+    }
+  }
+  const handleUploadFiles = async (e: React.ChangeEvent<HTMLInputElement>) =>{
+    const files = e.target.files
+    if(!files) return;
+
+    const finalFiles: File[] = []
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if(!CONSTANT.SUPPORT_FORMATS.includes(file.type)){
+            setError('imgUrl', {
+                type: 'pattern',
+                message: `Định dạng ảnh chỉ chấp nhận ${CONSTANT.SUPPORT_FORMATS.join(' - ')}`
+            })
+            trigger('imgUrl')
+            return;
+        }
+        finalFiles.push(file)
+    }
+    try{
+        const res = await uploadService.uploadListFiles(finalFiles)
+        let finalValues = getValues('imgUrl') || []
+        finalValues = [...finalValues, ...res.data]
+        setValue('imgUrl', finalValues)
+        trigger('imgUrl')
+    }catch{
+        dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+    }
+  }
+  const handleRemoveImage = (index: number) => {
+    const finalValues = getValues('imgUrl') || []
+    finalValues.splice(index, 1)
+    setValue('imgUrl', finalValues)
+    trigger('imgUrl')
+  }
+  const handleCloseModal = () =>{
+    onClose()
+  }
+
   return (
-    <div>ModalTakeCareCreateTree</div>
+    <Modal
+      open
+      title={`${tree ? 'Tạo mới' : 'Cập nhật'} cây`}
+      onCancel={onClose}
+      footer={null}
+      width={1000}
+    >
+      <Form
+        layout='vertical'
+        onFinish={handleSubmit(handleSubmitForm)}
+      >
+        <Row gutter={24}>
+          <Col span={12}>
+            <Form.Item label='Name' required >
+              <Controller
+                control={control}
+                name='treeName'
+                render={({ field }) => (<Input {...field} />)}
+              />
+              {errors.treeName && <ErrorMessage message={errors.treeName.message} />}
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label='Số lượng cây' required >
+              <Controller
+                control={control}
+                name='quantity'
+                render={({ field }) => (<Input {...field} />)}
+              />
+              {errors.quantity && <ErrorMessage message={errors.quantity.message} />}
+            </Form.Item>
+          </Col>
+          <Col span={24}>
+            <Form.Item label='Mô tả' required>
+                <Controller 
+                    control={control}
+                    name='description'
+                    render={({ field }) => <Input.TextArea {...field} autoSize={{minRows: 4, maxRows: 6}} />}
+                />
+                {errors.description && <ErrorMessage message={errors.description.message} />}
+            </Form.Item>
+          </Col>
+          <input type="file" hidden ref={ref} accept='.png,.jpg,.jpeg' multiple onChange={handleUploadFiles} />
+          <Col span={24} style={{marginBottom: '20px'}}>
+              <button className='btn btn-upload' type='button' onClick={() => ref.current?.click()}>
+                  <AiOutlineCloudUpload size={24} />
+                  Đăng tải hình ảnh
+              </button>
+              {errors.imgUrl && <ErrorMessage message={errors.imgUrl.message} />}
+          </Col>
+          {
+            getValues('imgUrl') &&
+            <Image.PreviewGroup>
+                {
+                    (getValues('imgUrl') || []).map((item, index) => (
+                        <Col span={6} key={index} className='preview-wrapper'>
+                            <Image 
+                                src={item}
+                                alt='/'
+                                className='img-preview'
+                            />
+                            <CiSquareRemove size={30} onClick={() => handleRemoveImage(index)} className='btn-remove' />
+                        </Col>
+                    ))
+                }
+            </Image.PreviewGroup>
+          }
+          <Col span={24} >
+            <div className='btn-form-wrapper'>
+                <Button htmlType='button' disabled={isSubmitting} type='default' className='btn-cancel' size='large' onClick={handleCloseModal}>Hủy bỏ</Button>
+                <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large' onClick={() => console.log(errors)}>
+                    {
+                        tree ? 'Cập nhật' : 'Tạo mới'
+                    }
+                </Button>
+            </div>
+        </Col>
+        </Row>
+      </Form>
+    </Modal>
   )
 }
 

@@ -14,7 +14,7 @@ const statusToViLanguage = (status: OrderStatus) =>{
         case 'unpaid': return 'Đang xử lý'
         case 'ready': return 'Đã thanh toán cọc'
         case 'paid': return 'Đã thanh toán đủ'
-        case 'completed': return 'Đã thanh toán đủ'
+        case 'completed': return 'Đã hoàn thành đơn hàng'
         case 'cancel': return 'Đã bị hủy'
     }
 }

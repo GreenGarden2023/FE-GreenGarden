@@ -3,6 +3,7 @@ import Table, { ColumnsType } from 'antd/es/table';
 import LandingFooter from 'app/components/footer/LandingFooter';
 import HeaderInfor from 'app/components/header-infor/HeaderInfor';
 import LandingHeader from 'app/components/header/LandingHeader';
+import ClientExtendOrder from 'app/components/modal/client-extend-order/ClientExtendOrder';
 import ModalClientRentOrderDetai from 'app/components/modal/client-rent-order-detail/ModalClientRentOrderDetai';
 import ModalClientSaleOrderDetai from 'app/components/modal/client-sale-order-detail/ModalClientSaleOrderDetai';
 import MoneyFormat from 'app/components/money/MoneyFormat';
@@ -22,13 +23,15 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { BiCommentDetail, BiDetail } from 'react-icons/bi';
 import { GrMore } from 'react-icons/gr';
 import { MdOutlinePayments } from 'react-icons/md';
+import { SiGitextensions } from 'react-icons/si';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import './style.scss';
 
 type OrderPage = 'rent' | 'sale' | 'service'
 
 const ClientOrder: React.FC = () =>{
-    const { id } = useSelector(state => state.userInfor)
+    const userState = useSelector(state => state.userInfor)
+    const { id } = userState.user
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -361,6 +364,17 @@ const ClientOrder: React.FC = () =>{
                     <span>Xem nhóm đơn hàng</span>
                 </div>
                 <div className="item" onClick={() => {
+                    // xong demo thì bỏ comment
+                    // if(record.status !== 'completed'){
+                    //     setActionMethod({orderId: '', actionType: '', orderType: '', openIndex: -1})
+                    //     return dispatch(setNoti({type: 'info', message: 'Không thể gia hạn đơn hàng khi chưa hoàn tất'}))
+                    // }
+                    setActionMethod({orderId: record.orderId, actionType: 'extend', orderType: 'rent', openIndex: -1})
+                }}>
+                    <SiGitextensions size={25} className='icon'/>
+                    <span>Gia hạn đơn hàng</span>
+                </div>
+                <div className="item" onClick={() => {
                     handlePaymentRent({orderId: record.orderId, actionType: 'deposit', orderType: 'rent', openIndex: -1})
                 }} >
                     <MdOutlinePayments size={25} className='icon'/>
@@ -467,6 +481,14 @@ const ClientOrder: React.FC = () =>{
                     onClose={handleCancel}
                     rentOrderList={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0]}
                 />
+            }
+            {
+                (actionMethod?.actionType === 'extend') &&
+                <ClientExtendOrder
+                    onClose={handleCancel}
+                    rentOrderList={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0]}
+                    onExtend={() => {}}
+                /> 
             }
         </div>
     );

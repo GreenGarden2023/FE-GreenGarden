@@ -4,6 +4,7 @@ import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import ModalClientRentOrderDetai from 'app/components/modal/client-rent-order-detail/ModalClientRentOrderDetai'
 import RentOrderPaymentCash from 'app/components/modal/rent-oder-payment-cash/RentOrderPaymentCash'
 import RentOrderPaymentDeposit from 'app/components/modal/rent-order-payment-deposit/RentOrderPaymentDeposit'
+import ReturnDepositRentOrder from 'app/components/modal/return-deposit-rent-order/ReturnDepositRentOrder'
 import MoneyFormat from 'app/components/money/MoneyFormat'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
 import useDispatch from 'app/hooks/use-dispatch'
@@ -20,6 +21,7 @@ import pagingPath from 'app/utils/paging-path'
 import React, { useEffect, useMemo, useState } from 'react'
 import { BiDetail } from 'react-icons/bi'
 import { FaLayerGroup } from 'react-icons/fa'
+import { GiReturnArrow } from 'react-icons/gi'
 import { GrMore } from 'react-icons/gr'
 import { MdOutlinePayments } from 'react-icons/md'
 import { RiBillLine } from 'react-icons/ri'
@@ -31,9 +33,9 @@ const ManageRentOrder:React.FC = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
-    // data
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
-
+    
+    // data
     const [rentOrders, setRentOrders] = useState<RentOrder[]>([])
 
     const [paging, setPaging] = useState<Partial<Paging>>({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_RENT})
@@ -97,6 +99,7 @@ const ManageRentOrder:React.FC = () => {
             key: 'status',
             dataIndex: 'status',
             align: 'center',
+            width: 190,
             render: (v) => (<Tag color={utilGeneral.statusToColor(v)}>{utilGeneral.statusToViLanguage(v)}</Tag>)
         },
         {
@@ -177,6 +180,16 @@ const ManageRentOrder:React.FC = () => {
                     <RiBillLine size={25} className='icon'/>
                     <span>Thanh toán đơn hàng</span>
                 </div>
+                <div className="item" onClick={() => {
+                    if(record.status !== 'paid'){
+                        handleSetAction({orderId: '', actionType: '', orderType: '', openIndex: -1})
+                        return dispatch(setNoti({type: 'info', message: 'Chưa đủ điều kiện hoàn cọc'}))
+                    }
+                    handleSetAction({orderId: record.orderId, actionType: 'return deposit', orderType: 'rent', openIndex: -1})
+                }}>
+                    <GiReturnArrow size={25} className='icon'/>
+                    <span>Xác nhận hoàn cọc</span>
+                </div>
             </div>
         )
     }
@@ -248,6 +261,12 @@ const ManageRentOrder:React.FC = () => {
 
         }
     }
+    const handleReturnDeposit = (rentOrderListId: string) =>{
+        const index = rentOrders.findIndex(x => x.rentOrderList[0].id === rentOrderListId)
+        rentOrders[index].rentOrderList[0].status = 'completed'
+        setRentOrders([...rentOrders])
+        setActionMethod(undefined)
+    }
     return (
         <div className="mro-wrapper">
             <HeaderInfor title='Quản lý đơn hàng thuê' />
@@ -288,6 +307,14 @@ const ManageRentOrder:React.FC = () => {
                     rentOrderList={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0]}
                     onClose={handleClose}
                     onSubmit={handlePaymentCash}
+                />
+            }
+            {
+                actionMethod?.actionType === 'return deposit' &&
+                <ReturnDepositRentOrder 
+                    rentOrderList={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0]}
+                    onClose={handleClose}
+                    onSubmit={handleReturnDeposit}
                 />
             }
         </div>

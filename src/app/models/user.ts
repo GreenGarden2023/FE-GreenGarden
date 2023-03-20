@@ -3,17 +3,14 @@ export interface User{
     userName: string;
     fullName: string;
     address: string;
+    districtID:number;
     phone: string;
     favorite: string;
     mail: string;
     roleName: string;
     currentPoint: number;
 }
-export interface UserLogin extends User{
-    token: string;
-    role: string;
-    loading: boolean;
-}
+
 export interface UserUpdate{
     id: string;
     fullName: string;
@@ -21,4 +18,13 @@ export interface UserUpdate{
     phone: string;
     mail: string;
     favorite: string;
+}
+
+export interface LoginResponse{
+    user: User
+    token: string
+}
+
+export interface UserLogin extends LoginResponse{
+    loading: boolean;
 }

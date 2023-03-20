@@ -8,4 +8,5 @@ export interface UserRegister{
     mail: string;
     confirmPassword: string;
     isAgreeTerm: boolean;
+    districtID: number;
 }

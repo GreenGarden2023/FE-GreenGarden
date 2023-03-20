@@ -4,22 +4,26 @@ import { UserLogin } from '../../models/user';
 type CR<T> = CaseReducer<UserLogin, PayloadAction<T>>;
 
 const initialState: UserLogin = {
-    id: '',
-    userName: '',
-    fullName: '',
-    address: '',
-    phone: '',
-    favorite: '',
-    mail: '',
-    roleName: '',
+    user: {
+        id: '',
+        userName: '',
+        fullName: '',
+        address: '',
+        phone: '',
+        favorite: '',
+        mail: '',
+        roleName: '',
+        currentPoint: 0,
+        districtID: 0
+    },
     token: '',
-    role: '',
-    currentPoint: 0,
-    loading: false,
+    loading: false
 }
 
 const setUserCR: CR<UserLogin> = (_, action) => (action.payload);
-const setEmptyUserCR: CR<void> = () => (initialState)
+
+const setEmptyUserCR: CR<void> = () => ({...initialState, loading: false});
+
 const setTokenAndRoleCR: CR<{token: string, role: string}> = (state: UserLogin, action) => (
     {
         ...state,

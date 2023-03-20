@@ -1,5 +1,5 @@
 import { OrderStatus } from "app/models/general-type";
-import { OrderCalculate, OrderCreate, RentOrder, RentOrderDetailList, RentOrderResponse, SaleOrderResponse } from "app/models/order";
+import { OrderCalculate, OrderCreate, OrderExtendDetail, RentOrder, RentOrderDetailList, RentOrderResponse, SaleOrderResponse } from "app/models/order";
 import { Paging } from "app/models/paging";
 import { Response } from "app/models/response";
 import queryString from "query-string";
@@ -25,8 +25,9 @@ const getRentOrderGroup = async (groupID: string) =>{
     return res.data
 }
 
-const updateRentOrderStatus = async (rentOrderID: string, status: OrderStatus) =>{
-    const res = await golbalAxios.post('/order/update-rent-order-status', { rentOrderID, status })
+const updateRentOrderStatus = async (orderID: string, status: OrderStatus) =>{
+    
+    const res = await golbalAxios.post('/order/update-rent-order-status', { orderID, status })
     return res.data
 }
 
@@ -58,6 +59,10 @@ const calculateOrder = async (orderCreate: OrderCreate) =>{
     const res = await golbalAxios.post<Response<OrderCalculate>>(`/order/calculate-order`, orderCreate)
     return res.data
 }
+const getARentOrder = async (rentOrderID: string) =>{
+    const res = await golbalAxios.get<Response<OrderExtendDetail>>(`/order/get-a-rent-order?rentOrderID=${rentOrderID}`)
+    return res.data
+}
 
 const orderService = {
     createOrder,
@@ -70,7 +75,8 @@ const orderService = {
     getAllRentOrders,
     getAllSaleOrders,
     getRentOrderGroup,
-    calculateOrder
+    calculateOrder,
+    getARentOrder
 }
 
 export default orderService

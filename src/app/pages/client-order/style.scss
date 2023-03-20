@@ -1,1 +1,39 @@
 @import 'app/styles/variable.scss';
+
+.quantity-box{
+    display: flex;
+    justify-content: center;
+    button{
+        font-size: 16px;
+        line-height: 0px;
+        border: solid 1px #e1e1e1;
+        display: inline-block;
+        width: 26px;
+        height: 26px;
+        line-height: 23px;
+        border-radius: 3px;
+        background: #fff;
+        color: #131425;
+        text-align: center;
+        padding: 0px;
+    }
+    input{
+        margin: 0px 5px;
+        padding: 0px;
+        display: block;
+        float: left;
+        color: #131425;
+        height: 26px;
+        min-height: 26px;
+        line-height: 26px;
+        border: 1px solid #e1e1e1;
+        width: 48px;
+        text-align: center;
+        box-shadow: none;
+        border-radius: 3px;
+        font-size: 14px;
+        &:focus{
+            border-color: rgb(86, 181, 245);
+        }
+    }
+}
