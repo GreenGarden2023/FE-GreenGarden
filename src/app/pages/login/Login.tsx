@@ -31,7 +31,7 @@ const Login: React.FC = () => {
       const { username, password } = values
       const res = await authService.login(username, password)
       if(res.isSuccess){
-        const roleName = authService.decodeToken(res.data.token).rolename
+        // const roleName = authService.decodeToken(res.data.token).rolename
         dispatch(setUser({user: res.data.user, token: res.data.token, loading: false}))
         localStorage.setItem(CONSTANT.STORAGE.ACCESS_TOKEN, res.data.token)
         if(location.state && location.state['history']) return navigate(location.state['history'])

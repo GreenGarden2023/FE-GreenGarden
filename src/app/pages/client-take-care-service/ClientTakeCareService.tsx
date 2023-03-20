@@ -1,5 +1,4 @@
-import { Checkbox, Col, Modal, Row, Switch } from 'antd'
-import { CheckboxChangeEvent } from 'antd/es/checkbox'
+import { Checkbox, Col, Row, Switch } from 'antd'
 import LandingFooter from 'app/components/footer/LandingFooter'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import LandingHeader from 'app/components/header/LandingHeader'

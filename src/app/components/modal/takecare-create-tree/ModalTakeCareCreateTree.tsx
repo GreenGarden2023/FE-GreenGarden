@@ -57,7 +57,7 @@ const ModalTakeCareCreateTree:React.FC<ModalTakeCareCreateTreeProps> = ({ tree, 
     if(!data.id){
       // create
       try{
-        const { status, ...rest } = data
+        // const { status, ...rest } = data
         
         const res = await userTreeService.createUserTree(data)
         onSubmit(res.data.userTrees, true)

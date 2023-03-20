@@ -9,7 +9,7 @@ import { setNoti } from 'app/slices/notification'
 import CONSTANT from 'app/utils/constant'
 import React, { useEffect, useMemo, useState } from 'react'
 import CurrencyFormat from 'react-currency-format'
-import { GrDocumentUpdate, GrUpdate } from 'react-icons/gr'
+import { GrUpdate } from 'react-icons/gr'
 
 const ManageShippingFee: React.FC = () => {
     const dispatch = useDispatch();

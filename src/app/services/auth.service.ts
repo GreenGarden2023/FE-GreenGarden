@@ -1,9 +1,9 @@
-import { UserRegister } from "../models/register";
-import { Response } from "../models/response";
-import { LoginResponse, User, UserLogin } from "../models/user";
-import golbalAxios from "../utils/http-client"
 import jwt_decode from 'jwt-decode';
 import { JWTDecode } from "../models/decode";
+import { UserRegister } from "../models/register";
+import { Response } from "../models/response";
+import { LoginResponse, User } from "../models/user";
+import golbalAxios from "../utils/http-client";
 
 const register = async (user: Partial<UserRegister>): Promise<Response<null>> =>{
     const result = await golbalAxios.post<Response<null>>('/user/register', { ...user });
