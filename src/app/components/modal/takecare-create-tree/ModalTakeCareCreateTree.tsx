@@ -42,14 +42,14 @@ const ModalTakeCareCreateTree:React.FC<ModalTakeCareCreateTreeProps> = ({ tree, 
   useEffect(() =>{
     if(!tree) return;
 
-    const { id, treeName, quantity, description, imgUrl, status } = tree
+    const { id, treeName, quantity, description, imgUrls, status } = tree
     setValue('id', id)
     setValue('treeName', treeName)
     setValue('quantity', quantity)
     setValue('description', description)
-    setValue('imgUrl', imgUrl)
+    setValue('imgUrls', imgUrls)
     setValue('status', status)
-    trigger('imgUrl')
+    trigger('imgUrls')
   }, [tree, setValue, trigger])
 
   const handleSubmitForm = async (data: Partial<UserTree>) =>{
@@ -82,30 +82,30 @@ const ModalTakeCareCreateTree:React.FC<ModalTakeCareCreateTreeProps> = ({ tree, 
     for (let i = 0; i < files.length; i++) {
         const file = files[i];
         if(!CONSTANT.SUPPORT_FORMATS.includes(file.type)){
-            setError('imgUrl', {
+            setError('imgUrls', {
                 type: 'pattern',
                 message: `Định dạng ảnh chỉ chấp nhận ${CONSTANT.SUPPORT_FORMATS.join(' - ')}`
             })
-            trigger('imgUrl')
+            trigger('imgUrls')
             return;
         }
         finalFiles.push(file)
     }
     try{
         const res = await uploadService.uploadListFiles(finalFiles)
-        let finalValues = getValues('imgUrl') || []
+        let finalValues = getValues('imgUrls') || []
         finalValues = [...finalValues, ...res.data]
-        setValue('imgUrl', finalValues)
-        trigger('imgUrl')
+        setValue('imgUrls', finalValues)
+        trigger('imgUrls')
     }catch{
         dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
     }
   }
   const handleRemoveImage = (index: number) => {
-    const finalValues = getValues('imgUrl') || []
+    const finalValues = getValues('imgUrls') || []
     finalValues.splice(index, 1)
-    setValue('imgUrl', finalValues)
-    trigger('imgUrl')
+    setValue('imgUrls', finalValues)
+    trigger('imgUrls')
   }
   const handleCloseModal = () =>{
     onClose()
@@ -160,13 +160,13 @@ const ModalTakeCareCreateTree:React.FC<ModalTakeCareCreateTreeProps> = ({ tree, 
                   <AiOutlineCloudUpload size={24} />
                   Đăng tải hình ảnh
               </button>
-              {errors.imgUrl && <ErrorMessage message={errors.imgUrl.message} />}
+              {errors.imgUrls && <ErrorMessage message={errors.imgUrls.message} />}
           </Col>
           {
-            getValues('imgUrl') &&
+            getValues('imgUrls') &&
             <Image.PreviewGroup>
                 {
-                    (getValues('imgUrl') || []).map((item, index) => (
+                    (getValues('imgUrls') || []).map((item, index) => (
                         <Col span={6} key={index} className='preview-wrapper'>
                             <Image 
                                 src={item}

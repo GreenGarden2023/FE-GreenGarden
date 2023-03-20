@@ -28,7 +28,7 @@ const ClientTakeCareService: React.FC = () => {
 
         const init = async () =>{
             try{
-                const res = await userTreeService.getListUserTree()
+                const res = await userTreeService.getUserTree()
                 console.log(res)
                 setListTrees(res.data.userTrees)
             }catch{
