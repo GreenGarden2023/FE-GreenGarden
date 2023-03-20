@@ -807,8 +807,12 @@ const CartPage: React.FC = () => {
                                         sản phẩm
                                     </p>
                                     <p className='cart-total'>Tổng cộng: 
-                                        {
+                                        {/* {
                                             (dateRange || cart?.rentItems.length === 0) && <CurrencyFormat value={totalPrice} displayType={'text'} thousandSeparator={true} suffix={'đ'} />
+                                        } */}
+                                        {
+                                            ((finalRentPrice?.totalPrice || 0) + (finalSalePrice?.totalPrice || 0) !== 0) &&
+                                            <CurrencyFormat value={(finalRentPrice?.totalPrice || 0) + (finalSalePrice?.totalPrice || 0)} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
                                         }
                                     </p>
                                     <button className='btn-order' type='submit'>Đặt hàng</button>
