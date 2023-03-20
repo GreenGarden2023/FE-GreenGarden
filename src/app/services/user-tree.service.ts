@@ -3,34 +3,28 @@ import { UserTree, UserTreeResponse } from "app/models/user-tree";
 import golbalAxios from "../utils/http-client";
 
 const createUserTree = async (data: Partial<UserTree>) =>{
-    const res = await golbalAxios.post<Response<{userTrees: UserTree}>>('/userTree/create-user-tree', data)
+    const res = await golbalAxios.post<Response<{userTrees: UserTree}>>('/user-tree/create-user-tree', data)
     return res.data
 }
 
-const getListUserTree = async () =>{
-    const res = await golbalAxios.get<Response<UserTreeResponse>>('/userTree/get-list-user-tree')
-    return res.data
-}
-
-const getDetailUserTree = async (userTreeID: string) =>{
-    const res = await golbalAxios.get<Response<UserTreeResponse>>(`/userTree/get-detail-user-tree?userTreeID=${userTreeID}`)
+const getUserTree = async () =>{
+    const res = await golbalAxios.get<Response<UserTreeResponse>>('/user-tree/get-user-tree')
     return res.data
 }
 
 const updateUserTree = async (data: Partial<UserTree>) =>{
-    const res = await golbalAxios.post(`/userTree/update-user-tree`, data)
+    const res = await golbalAxios.post(`/user-tree/update-user-tree`, data)
     return res.data
 }
 
-const changeStatus = async (data: Partial<UserTree>) =>{
-    const res = await golbalAxios.patch(`/userTree/changeStatus`, data)
+const changeStatus = async (id: string, status: 'active' | 'disable') =>{
+    const res = await golbalAxios.post(`/user-tree/update-user-tree-status`, {id, status})
     return res.data
 }
 
 const userTreeService = {
     createUserTree,
-    getListUserTree,
-    getDetailUserTree,
+    getUserTree,
     updateUserTree,
     changeStatus
 }

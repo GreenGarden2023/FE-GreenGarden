@@ -2,10 +2,11 @@ import { Status } from "./general-type";
 
 export interface UserTree{
     id: string;
+    userId: string;
     treeName: string;
     description: string;
     quantity: number;
-    imgUrl: string[];
+    imgUrls: string[];
     status: Status;
 }
 

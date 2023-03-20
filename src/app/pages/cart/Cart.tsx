@@ -460,24 +460,24 @@ const CartPage: React.FC = () => {
         })
         return quantity 
     }, [cart])
-    const totalPrice = useMemo(() =>{
-        let price = 0;
-        cart?.saleItems.forEach(item => {
-            console.log({item})
-            price += item.unitPrice * item.quantity
-        })
+    // const totalPrice = useMemo(() =>{
+    //     let price = 0;
+    //     cart?.saleItems.forEach(item => {
+    //         console.log({item})
+    //         price += item.unitPrice * item.quantity
+    //     })
 
-        // tính tổng số ngày
-        let totalRentDate = 1
-        if(dateRange){
-            const [d1, d2] = dateRange
-            totalRentDate = d2.diff(d1, 'days')
-        }
-        cart?.rentItems.forEach(item => {
-            price += (item.unitPrice * totalRentDate * item.quantity)
-        })
-        return price
-    }, [cart, dateRange])
+    //     // tính tổng số ngày
+    //     let totalRentDate = 1
+    //     if(dateRange){
+    //         const [d1, d2] = dateRange
+    //         totalRentDate = d2.diff(d1, 'days')
+    //     }
+    //     cart?.rentItems.forEach(item => {
+    //         price += (item.unitPrice * totalRentDate * item.quantity)
+    //     })
+    //     return price
+    // }, [cart, dateRange])
 
     const handleRemoveItem = async () =>{
         const [type, id] = sizeProductItemSelect
