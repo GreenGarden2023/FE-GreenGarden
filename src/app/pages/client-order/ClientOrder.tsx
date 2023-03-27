@@ -99,6 +99,7 @@ const ClientOrder: React.FC = () =>{
         if(!id) return;
         if(pageType !== 'rent') return;
         const currentPage = searchParams.get('page');
+        if(!Number(currentPage)) return;
 
         const init = async () =>{
             try{

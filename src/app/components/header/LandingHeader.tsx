@@ -5,9 +5,10 @@ import { CartProps, setCartSlice } from 'app/slices/cart';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { AiFillCaretDown, AiOutlineShoppingCart, AiOutlineUserAdd } from 'react-icons/ai';
+import { BsBagCheckFill } from 'react-icons/bs';
 import { FaUserCircle } from 'react-icons/fa';
 import { GiExitDoor } from 'react-icons/gi';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
 import useDispatch from '../../hooks/use-dispatch';
 import useSelector from '../../hooks/use-selector';
@@ -29,6 +30,7 @@ const schema = yup.object().shape({
 
 const LandingHeader: React.FC = () =>{
     const dispatch = useDispatch();
+    const navigate = useNavigate()
     const location = useLocation()
     const userState = useSelector(state => state.userInfor);
 
@@ -75,6 +77,7 @@ const LandingHeader: React.FC = () =>{
     const handleLogout = () =>{
         localStorage.removeItem(CONSTANT.STORAGE.ACCESS_TOKEN)
         dispatch(setEmptyUser())
+        dispatch(setCartSlice({rentItems: [], saleItems: []}))
     }
 
     const handleViewInfor = () =>{
@@ -126,6 +129,10 @@ const LandingHeader: React.FC = () =>{
                               {
                                   userState.token ? 
                                   <>
+                                      <div className='user-infor-box' onClick={() => navigate('/orders')}>
+                                          <BsBagCheckFill size={20} />
+                                          <span>Đơn hàng của bạn</span>
+                                      </div>
                                       <div className='user-infor-box' onClick={handleViewInfor}>
                                           <FaUserCircle size={20} />
                                           <span>{userState.user.fullName}</span>
