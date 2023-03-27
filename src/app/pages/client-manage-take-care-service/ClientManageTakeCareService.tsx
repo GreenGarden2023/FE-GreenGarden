@@ -10,7 +10,7 @@ import serviceService from 'app/services/service.service'
 import { setNoti } from 'app/slices/notification'
 import utilDateTime from 'app/utils/date-time'
 import React, { useEffect, useMemo, useState } from 'react'
-import { BiCommentDetail, BiDetail } from 'react-icons/bi'
+import { BiCommentDetail } from 'react-icons/bi'
 import { GrMore } from 'react-icons/gr'
 import { useNavigate } from 'react-router-dom'
 
