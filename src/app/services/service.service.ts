@@ -1,32 +1,41 @@
-import { Status } from "app/models/general-type";
-import { ServiceCreate } from "app/models/service";
-import queryString from "query-string";
+import { ServiceStatus } from "app/models/general-type";
+import { Response } from "app/models/response";
+import { Service, ServiceCreate, UpdateServiceDetail } from "app/models/service";
 import golbalAxios from "../utils/http-client";
 
-const getListServiceByCustomer = async () =>{
-    const res = await golbalAxios.get('/service/get-list-service-by-customer')
+const createServcieRequest = async (data: ServiceCreate) =>{
+    const res = await golbalAxios.post('/service/create-service-request', data)
     return res.data
 }
-const changeStatus = async (serviceID: string, status: Status) =>{
-    const params = {serviceID, status}
-    const res = await golbalAxios.patch(`/service/change-status?${queryString.stringify(params)}`)
+const updateServiceRequestStatus = async (serviceID: string, status: ServiceStatus) =>{
+    const res = await golbalAxios.post(`/service/update-service-request-status`, {serviceID, status})
     return res.data
 }
-const createServcie = async (data: ServiceCreate) =>{
-    const res = await golbalAxios.post('/service/create-service', data)
+const getAllServiceRequest = async () =>{
+    const res = await golbalAxios.get<Response<Service[]>>(`/service/get-all-service-request`)
     return res.data
 }
-const getDetailServiceByCustomer = async (serviceID: string) =>{
-    const res = await golbalAxios.post(`/service/get-detail-service-by-customer?serviceID=${serviceID}`)
+const getUserServiceRequest = async () =>{
+    const res = await golbalAxios.get<Response<Service[]>>(`/service/get-user-service-request`)
+    return res.data
+}
+const assignServiceTechnician = async (serviceID: string, technicianID: string) =>{
+    const res = await golbalAxios.post(`/service/assign-service-technician`, {serviceID, technicianID})
+    return res.data
+}
+const updateServiceDetail = async (data: UpdateServiceDetail) =>{
+    const res = await golbalAxios.post(`/service/update-service-detail`, data)
     return res.data
 }
 // const updateService 
 
 const serviceService = {
-    getListServiceByCustomer,
-    changeStatus,
-    createServcie,
-    getDetailServiceByCustomer
+    updateServiceRequestStatus,
+    getAllServiceRequest,
+    getUserServiceRequest,
+    createServcieRequest,
+    assignServiceTechnician,
+    updateServiceDetail
 }
 
 export default serviceService

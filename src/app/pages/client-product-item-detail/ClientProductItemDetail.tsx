@@ -60,6 +60,8 @@ const ClientProductItemDetail: React.FC = () => {
         setQuanSale(1)
     }
     const controlRent = (common: string) =>{
+        if(proItem?.type === 'unique') return;
+
         if(common === '+'){
             setQuanRent(pre => Number(pre) + 1)
         }else{
@@ -82,6 +84,8 @@ const ClientProductItemDetail: React.FC = () => {
     }
     
     const controlSale = (common: string) =>{
+        if(proItem?.type === 'unique') return;
+
         if(common === '+'){
             setQuanSale(pre => Number(pre) + 1)
         }else{
@@ -111,7 +115,31 @@ const ClientProductItemDetail: React.FC = () => {
 
 
     const handleAddCart = async (cartType: CartType, productItemDetailID: string) =>{
+        const currentItem = proItem?.productItemDetail.filter(x => x.id === productItemDetailID)[0].quantity || 0
         const newData = {...cartState}
+
+        let finalQuantity = 0
+        const indexRent = newData.rentItems.findIndex(x => x.productItemDetailID === productItemDetailID)
+        const indexSale = newData.saleItems.findIndex(x => x.productItemDetailID === productItemDetailID)
+        if(indexRent >= 0){
+            finalQuantity += newData.rentItems[indexRent].quantity
+        }
+        if(indexSale >= 0){
+            finalQuantity += newData.saleItems[indexSale].quantity
+        }
+        if(cartType === 'Rent'){
+            finalQuantity += quanRent
+        }
+        if(cartType === 'Sale'){
+            finalQuantity += quanSale
+        }
+        if(finalQuantity > currentItem){
+            dispatch(setNoti({type: 'warning', message: 'Không thể thêm vào giỏ hàng nhiều hơn số lượng cây đang có'}))
+            return
+        }
+
+
+        
 
         if(cartType === 'Sale'){
             try{
@@ -125,7 +153,6 @@ const ClientProductItemDetail: React.FC = () => {
                 }else{
                     newData.saleItems = [...newData.saleItems, { productItemDetailID: productItemDetailID, quantity: quanSale}]
                 }
-                console.log({newData})
                 const res = await cartService.addToCart(newData)
                 const cartProps: CartProps = {
                     rentItems: [...res.data.rentItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})) || []],
@@ -259,54 +286,60 @@ const ClientProductItemDetail: React.FC = () => {
                                         {
                                             proItemSelectBySize && 
                                             <div className="price-box">
-                                                <div className="rent-price">
-                                                    <p className='title-price'>Rent price</p>
-                                                    <p className="price">
-                                                        <CurrencyFormat value={proItemSelectBySize.rentPrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
-                                                    </p>
-                                                    <div className="quantity">
-                                                        <p>Quantity</p>
-                                                        <div className="quantity-box">
-                                                            <button className="decrease" onClick={() => controlRent('-')}>
-                                                                <GrFormSubtract />
-                                                            </button>
-                                                            <input type="number" value={quanRent} onChange={handleChangeRent} />
-                                                            <button className="increase" onClick={() => controlRent('+')}>
-                                                                <BiPlus />
+                                                {
+                                                    proItemSelectBySize.rentPrice &&
+                                                    <div className="rent-price">
+                                                        <p className='title-price'>Rent price</p>
+                                                        <p className="price">
+                                                            <CurrencyFormat value={proItemSelectBySize.rentPrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
+                                                        </p>
+                                                        <div className="quantity">
+                                                            <p>Quantity</p>
+                                                            <div className="quantity-box">
+                                                                <button className="decrease" onClick={() => controlRent('-')}>
+                                                                    <GrFormSubtract />
+                                                                </button>
+                                                                <input type="number" value={quanRent} onChange={handleChangeRent} />
+                                                                <button className="increase" onClick={() => controlRent('+')}>
+                                                                    <BiPlus />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div className="atc">
+                                                            <button onClick={() => handleAddCart('Rent', proItemSelectBySize.id)}>
+                                                                <AiOutlineShoppingCart size={40} />
+                                                                <span>Add to cart</span>
                                                             </button>
                                                         </div>
                                                     </div>
-                                                    <div className="atc">
-                                                        <button onClick={() => handleAddCart('Rent', proItemSelectBySize.id)}>
-                                                            <AiOutlineShoppingCart size={40} />
-                                                            <span>Add to cart</span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div className="sale-price">
-                                                    <p className='title-price'>Sale price</p>
-                                                    <p className="price">
-                                                        <CurrencyFormat value={proItemSelectBySize.salePrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
-                                                    </p>
-                                                    <div className="quantity">
-                                                        <p>Quantity</p>
-                                                        <div className="quantity-box">
-                                                            <button className="decrease" onClick={() => controlSale('-')}>
-                                                                <GrFormSubtract  />
-                                                            </button>
-                                                            <input type="number" value={quanSale} onChange={handleChangeSale} />
-                                                            <button className="increase" onClick={() => controlSale('+')}>
-                                                                <BiPlus  />
+                                                }
+                                                {
+                                                    proItemSelectBySize.salePrice && 
+                                                    <div className="sale-price">
+                                                        <p className='title-price'>Sale price</p>
+                                                        <p className="price">
+                                                            <CurrencyFormat value={proItemSelectBySize.salePrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
+                                                        </p>
+                                                        <div className="quantity">
+                                                            <p>Quantity</p>
+                                                            <div className="quantity-box">
+                                                                <button className="decrease" onClick={() => controlSale('-')}>
+                                                                    <GrFormSubtract  />
+                                                                </button>
+                                                                <input type="number" value={quanSale} onChange={handleChangeSale} disabled={proItem.type === 'unique'} />
+                                                                <button className="increase" onClick={() => controlSale('+')}>
+                                                                    <BiPlus  />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div className="atc">
+                                                            <button onClick={() => handleAddCart('Sale', proItemSelectBySize.id)}>
+                                                                <AiOutlineShoppingCart size={40} />
+                                                                <span>Add to cart</span>
                                                             </button>
                                                         </div>
                                                     </div>
-                                                    <div className="atc">
-                                                        <button onClick={() => handleAddCart('Sale', proItemSelectBySize.id)}>
-                                                            <AiOutlineShoppingCart size={40} />
-                                                            <span>Add to cart</span>
-                                                        </button>
-                                                    </div>
-                                                </div>
+                                                }
                                             </div>
                                         }
                                         <Divider orientation='left' plain >Policy</Divider>

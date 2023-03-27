@@ -67,6 +67,9 @@ const CartPage: React.FC = () => {
     const [shipping, setShipping] = useState<ShippingFee[]>([])
     const [recall, setRecall] = useState(true);
 
+    const [rentValid, setRentValid] = useState(true)
+    const [saleValid, setSaleValid] = useState(true)
+
     useEffect(() =>{
         const init = async () =>{
             try{
@@ -119,6 +122,13 @@ const CartPage: React.FC = () => {
                         recipientPhone
                     }
                     const res = await orderService.calculateOrder(data)
+                    if(rentPoint > res.data.maxPoint){
+                        setFinalRentPrice(undefined)
+                        setRentValid(false)
+                        dispatch(setNoti({type: 'warning', message: `Số điểm sử dụng cho đơn hàng thuê không được nhiều hơn ${res.data.maxPoint}`}))
+                        return;
+                    }
+                    setRentValid(true)
                     setFinalRentPrice(res.data)
                     // setFinalPrice(finalPrice + res.data.totalPrice)
                     // listRequestOrder.push(orderService.calculateOrder(data))
@@ -134,6 +144,13 @@ const CartPage: React.FC = () => {
                         rentOrderGroupID: null,
                     }
                     const res = await orderService.calculateOrder(data)
+                    if(salePoint > res.data.maxPoint){
+                        setFinalSalePrice(undefined)
+                        setSaleValid(false)
+                        dispatch(setNoti({type: 'warning', message: `Số điểm sử dụng cho đơn hàng mua không được nhiều hơn ${res.data.maxPoint}`}))
+                        return;
+                    }
+                    setSaleValid(false)
                     setFinalSalePrice(res.data)
                     // listRequestOrder.push(orderService.calculateOrder(data))
                 }
@@ -145,7 +162,7 @@ const CartPage: React.FC = () => {
         }
         init()
 
-    }, [isValid, dateRange, rentItems, getValues, saleItems, rentPoint, salePoint, recall])
+    }, [isValid, dateRange, rentItems, getValues, saleItems, rentPoint, salePoint, recall, dispatch])
 
     useEffect(() =>{
         const { address, fullName, phone, districtID } = userSate.user
@@ -193,20 +210,29 @@ const CartPage: React.FC = () => {
         },
         {
             title: 'Hình ảnh',
-            key: 'image',
-            dataIndex: 'image',
+            key: 'imgUrl',
+            dataIndex: 'imgUrl',
             align: 'center',
-            render:(value) => (
-                <Image 
-                    src={value ? value : '/assets/inventory-empty.png'}
-                    width={100}
-                    height={100}
-                    style={{maxHeight: '100px', objectFit: 'cover'}}
-                    onError={({currentTarget }) => {
-                        currentTarget.onerror = null
-                        currentTarget.src = '/assets/inventory-empty.png'
-                    }} 
-                />
+            render: (v) => (
+                <Image.PreviewGroup>
+                    {
+                        v.map((item, index) => (
+                            <div style={{display: index === 0 ? 'initial' : 'none'}}>
+                                <Image 
+                                key={index}
+                                src={item}
+                                width={100}
+                                height={100}
+                                style={{maxHeight: '100px', objectFit: 'cover'}}
+                                onError={({currentTarget }) => {
+                                    currentTarget.onerror = null
+                                    currentTarget.src = '/assets/inventory-empty.png'
+                                }} 
+                            />
+                            </div>
+                        ))
+                    }
+                </Image.PreviewGroup>
             )
         },
         {
@@ -231,7 +257,7 @@ const CartPage: React.FC = () => {
             key: 'price',
             dataIndex: 'price',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} />)
+            render: (v) => (<MoneyFormat value={v} color='Light Blue' />)
         },
         {
             title: 'Số lượng',
@@ -255,7 +281,7 @@ const CartPage: React.FC = () => {
             key: 'total',
             dataIndex: 'total',
             align: 'right',
-            render: (_, record) => (<MoneyFormat value={record.price * record.quantity} />)
+            render: (_, record) => (<MoneyFormat value={record.price * record.quantity} color='Blue' />)
         },
         {
             title: 'Xóa',
@@ -280,30 +306,53 @@ const CartPage: React.FC = () => {
         
         if(common === '+'){
             if(!newCart.saleItems) return
+            // call api -> update in UI
+            try{
+                const cartProps: CartProps = {
+                    rentItems: [...newCart.rentItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})) || []],
+                    saleItems: [...newCart.saleItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity + 1})) || []],
+                }
+                const res = await cartService.addToCart(cartProps)
+                setCart(res.data)
+                dispatch(setCartSlice(cartProps))
+                dispatch(setNoti({type: 'success', message: 'Cập nhật giỏ hàng thành công'}))
+            }catch(err:any){
+                const code_101 = err.response.data.code
+                if(code_101 === 101){
+                    dispatch(setNoti({type: 'warning', message: 'Số lượng hàng trong kho không đủ'}))
+                    return;
+                }
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+            }
             newCart.saleItems[sizeProductItemIdIndex].quantity = newCart.saleItems[sizeProductItemIdIndex].quantity + 1
         }else{
             if(!newCart.saleItems) return
             if(newCart.saleItems[sizeProductItemIdIndex].quantity <= 1) return;
+            try{
+                const cartProps: CartProps = {
+                    rentItems: [...newCart.rentItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})) || []],
+                    saleItems: [...newCart.saleItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity - 1})) || []],
+                }
+                const res = await cartService.addToCart(cartProps)
+                setCart(res.data)
+                dispatch(setCartSlice(cartProps))
+                dispatch(setNoti({type: 'success', message: 'Cập nhật giỏ hàng thành công'}))
+            }catch(err:any){
+                const code_101 = err.response.data.code
+                if(code_101 === 101){
+                    dispatch(setNoti({type: 'warning', message: 'Số lượng hàng trong kho không đủ'}))
+                    return;
+                }
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+            }
             newCart.saleItems[sizeProductItemIdIndex].quantity = newCart.saleItems[sizeProductItemIdIndex].quantity - 1
         }
 
-        try{
-            const cartProps: CartProps = {
-                rentItems: [...newCart.rentItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})) || []],
-                saleItems: [...newCart.saleItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})) || []],
-            }
-            const res = await cartService.addToCart(cartProps)
-            setCart(res.data)
-            dispatch(setCartSlice(cartProps))
-            dispatch(setNoti({type: 'success', message: 'Cập nhật giỏ hàng thành công'}))
-        }catch{
-            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
-        }
     }
     const DataSourceSale = cart?.saleItems.map((c, index) => ({
         key: String(index + 1),
         sizeProductItemId: c.productItemDetail.id,
-        image: c.productItemDetail.imgUrl[0],
+        imgUrl: c.productItemDetail.imgUrl,
         name: c.productItem.name,
         price: c.productItemDetail.salePrice,
         quantity: c.quantity,
@@ -321,20 +370,29 @@ const CartPage: React.FC = () => {
         },
         {
             title: 'Hình ảnh',
-            key: 'image',
-            dataIndex: 'image',
+            key: 'imgUrl',
+            dataIndex: 'imgUrl',
             align: 'center',
-            render: (_, record) => (
-                <Image 
-                    src={record.image ? record.image : '/assets/inventory-empty.png'}
-                    width={100}
-                    height={100}
-                    style={{maxHeight: '100px', objectFit: 'cover'}}
-                    onError={({currentTarget }) => {
-                        currentTarget.onerror = null
-                        currentTarget.src = '/assets/inventory-empty.png'
-                    }} 
-                />
+            render: (v) => (
+                <Image.PreviewGroup>
+                    {
+                        v.map((item, index) => (
+                            <div style={{display: index === 0 ? 'initial' : 'none'}}>
+                                <Image 
+                                    key={index}
+                                    src={item}
+                                    width={100}
+                                    height={100}
+                                    style={{maxHeight: '100px', objectFit: 'cover'}}
+                                    onError={({currentTarget }) => {
+                                        currentTarget.onerror = null
+                                        currentTarget.src = '/assets/inventory-empty.png'
+                                    }} 
+                                />
+                            </div>
+                        ))
+                    }
+                </Image.PreviewGroup>
             )
             // width: 200
         },
@@ -361,7 +419,7 @@ const CartPage: React.FC = () => {
             key: 'price',
             dataIndex: 'price',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} />)
+            render: (v) => (<MoneyFormat value={v} color='Light Blue' />)
         },
         
         {
@@ -386,7 +444,7 @@ const CartPage: React.FC = () => {
             key: 'total',
             dataIndex: 'total',
             align: 'right',
-            render: (_, record) => (<MoneyFormat value={record.price * record.quantity} />)
+            render: (_, record) => (<MoneyFormat value={record.price * record.quantity} color='Blue' />)
         },
         {
             title: 'Xóa',
@@ -410,30 +468,53 @@ const CartPage: React.FC = () => {
         
         if(common === '+'){
             if(!newCart.rentItems) return
-            newCart.rentItems[sizeProductItemIdIndex].quantity = newCart.rentItems[sizeProductItemIdIndex].quantity + 1
+            try{
+                const cartProps: CartProps = {
+                    rentItems: [...newCart.rentItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity + 1})) || []],
+                    saleItems: [...newCart.saleItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})) || []],
+                }
+                const res = await cartService.addToCart(cartProps)
+                setCart(res.data)
+                dispatch(setCartSlice(cartProps))
+                dispatch(setNoti({type: 'success', message: 'Cập nhật giỏ hàng thành công'}))
+                newCart.rentItems[sizeProductItemIdIndex].quantity = newCart.rentItems[sizeProductItemIdIndex].quantity + 1
+            }catch(err: any){
+                const code_101 = err.response.data.code
+                if(code_101 === 101){
+                    dispatch(setNoti({type: 'warning', message: 'Số lượng hàng trong kho không đủ'}))
+                    return;
+                }
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+            }
         }else{
             if(!newCart.rentItems) return
             if(newCart.rentItems[sizeProductItemIdIndex].quantity <= 1) return;
-            newCart.rentItems[sizeProductItemIdIndex].quantity = newCart.rentItems[sizeProductItemIdIndex].quantity - 1
-        }
-
-        try{
-            const cartProps: CartProps = {
-                rentItems: [...newCart.rentItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})) || []],
-                saleItems: [...newCart.saleItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})) || []],
+            try{
+                const cartProps: CartProps = {
+                    rentItems: [...newCart.rentItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity - 1})) || []],
+                    saleItems: [...newCart.saleItems?.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})) || []],
+                }
+                const res = await cartService.addToCart(cartProps)
+                setCart(res.data)
+                dispatch(setCartSlice(cartProps))
+                dispatch(setNoti({type: 'success', message: 'Cập nhật giỏ hàng thành công'}))
+                newCart.rentItems[sizeProductItemIdIndex].quantity = newCart.rentItems[sizeProductItemIdIndex].quantity + 1
+            }catch(err: any){
+                const code_101 = err.response.data.code
+                if(code_101 === 101){
+                    dispatch(setNoti({type: 'warning', message: 'Số lượng hàng trong kho không đủ'}))
+                    return;
+                }
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
-            const res = await cartService.addToCart(cartProps)
-            setCart(res.data)
-            dispatch(setCartSlice(cartProps))
-            dispatch(setNoti({type: 'success', message: 'Cập nhật giỏ hàng thành công'}))
-        }catch{
-            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+            newCart.rentItems[sizeProductItemIdIndex].quantity = newCart.rentItems[sizeProductItemIdIndex].quantity - 1
+
         }
     }
     const DataSourceRent = cart?.rentItems.map((c, index) => ({
         key: String(index + 1),
         sizeProductItemId: c.productItemDetail.id,
-        image: c.productItemDetail.imgUrl[0],
+        imgUrl: c.productItemDetail.imgUrl,
         name: c.productItem.name,
         price: c.productItemDetail.rentPrice,
         quantity: c.quantity,
@@ -460,24 +541,7 @@ const CartPage: React.FC = () => {
         })
         return quantity 
     }, [cart])
-    // const totalPrice = useMemo(() =>{
-    //     let price = 0;
-    //     cart?.saleItems.forEach(item => {
-    //         console.log({item})
-    //         price += item.unitPrice * item.quantity
-    //     })
-
-    //     // tính tổng số ngày
-    //     let totalRentDate = 1
-    //     if(dateRange){
-    //         const [d1, d2] = dateRange
-    //         totalRentDate = d2.diff(d1, 'days')
-    //     }
-    //     cart?.rentItems.forEach(item => {
-    //         price += (item.unitPrice * totalRentDate * item.quantity)
-    //     })
-    //     return price
-    // }, [cart, dateRange])
+    
 
     const handleRemoveItem = async () =>{
         const [type, id] = sizeProductItemSelect
@@ -508,6 +572,10 @@ const CartPage: React.FC = () => {
     const handleSubmitForm = async (data: CartUserData) =>{
         setSubmited(true)
         if(cart?.rentItems.length !== 0 && !dateRange) return;
+
+        if(!saleValid || !rentValid){
+            return dispatch(setNoti({type: 'info', message: 'Vui lòng nhập đủ và đúng thông tin để có thể đặt hàng'}))
+        }
 
         const { recipientAddress, recipientName, recipientPhone, shippingID } = data
 
@@ -763,7 +831,7 @@ const CartPage: React.FC = () => {
                                     <Col span={24}><p>Số điểm của bạn là {userSate.user.currentPoint}</p></Col>
                                     <Col span={12}>
                                         <Form.Item label='Số điểm sử dụng cho đơn thuê'>
-                                            <Input min={0} type='number' max={userSate.user.currentPoint - salePoint} value={rentPoint} onChange={(e) => {
+                                            <Input disabled={cart?.rentItems.length === 0} min={0} type='number' max={userSate.user.currentPoint - salePoint} value={rentPoint} onChange={(e) => {
                                                 const value = Number(e.target.value)
                                                 if((userSate.user.currentPoint - salePoint) > value){
                                                     setRentPoint(Number(e.target.value))
@@ -775,7 +843,7 @@ const CartPage: React.FC = () => {
                                     </Col>
                                     <Col span={12}>
                                         <Form.Item label='Số điểm sử dụng cho đơn mua'>
-                                            <Input min={0} type='number' max={0} value={salePoint} onChange={(e) => {
+                                            <Input disabled={cart?.saleItems.length === 0} min={0} type='number' max={userSate.user.currentPoint - rentPoint} value={salePoint} onChange={(e) => {
                                                 const value = Number(e.target.value)
                                                 if((userSate.user.currentPoint - rentPoint) > value){
                                                     setSalePoint(Number(e.target.value))
@@ -795,7 +863,7 @@ const CartPage: React.FC = () => {
                                                 locale={locale} 
                                                 placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
                                                 format={dateFormatList}
-                                                disabledDate={(current) => current && current.valueOf()  < (Date.now() + 277600000)}
+                                                disabledDate={(current) => current && current.valueOf()  < Date.now()}
                                                 defaultValue={dateRange}
                                                 onChange={handleChangeDateRange}
                                                 status={(submited && !dateRange) ? 'error' : ''}

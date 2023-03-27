@@ -1,4 +1,4 @@
-import { Popover, Tag } from 'antd'
+import { Popover } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import ModalClientRentOrderDetai from 'app/components/modal/client-rent-order-detail/ModalClientRentOrderDetai'
@@ -16,7 +16,6 @@ import paymentService from 'app/services/payment.service'
 import { setNoti } from 'app/slices/notification'
 import CONSTANT from 'app/utils/constant'
 import utilDateTime from 'app/utils/date-time'
-import utilGeneral from 'app/utils/general'
 import pagingPath from 'app/utils/paging-path'
 import React, { useEffect, useMemo, useState } from 'react'
 import { BiDetail } from 'react-icons/bi'
@@ -26,6 +25,7 @@ import { GrMore } from 'react-icons/gr'
 import { MdOutlinePayments } from 'react-icons/md'
 import { RiBillLine } from 'react-icons/ri'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import { OrderStatusToTag } from '../manage-take-care-order/ManageTakeCareOrder'
 import './style.scss'
 
 const ManageRentOrder:React.FC = () => {
@@ -98,37 +98,49 @@ const ManageRentOrder:React.FC = () => {
             title: 'Trạng thái',
             key: 'status',
             dataIndex: 'status',
-            align: 'center',
-            width: 190,
-            render: (v) => (<Tag color={utilGeneral.statusToColor(v)}>{utilGeneral.statusToViLanguage(v)}</Tag>)
+            width: 200,
+            render: (v) => (OrderStatusToTag(v))
         },
         {
             title: 'Phí vận chuyển',
             key: 'transportFee',
             dataIndex: 'transportFee',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} />)
+            width: 200,
+            render: (v) => (<MoneyFormat value={v} color='Default' isHighlight />)
         },
         {
             title: 'Tiền cọc',
             key: 'deposit',
             dataIndex: 'deposit',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} />)
+            width: 200,
+            render: (v) => (<MoneyFormat value={v} color='Orange' isHighlight />)
         },
         {
-            title: 'Số tiền cần trả',
-            key: 'remainMoney',
-            dataIndex: 'remainMoney',
+            title: 'Tiền được giảm',
+            key: 'discountAmount',
+            dataIndex: 'discountAmount',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} />)
+            width: 200,
+            render: (v) => <MoneyFormat value={v} color='Yellow' isHighlight />
         },
         {
             title: 'Tổng tiền',
             key: 'totalPrice',
             dataIndex: 'totalPrice',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} />)
+            width: 200,
+            render: (v) => (<MoneyFormat value={v} color='Light Blue' isHighlight />)
+        },
+        {
+            title: 'Tiền còn thiếu',
+            key: 'remainMoney',
+            dataIndex: 'remainMoney',
+            align: 'right',
+            width: 200,
+            fixed: 'right',
+            render: (v) => (<MoneyFormat value={v} color='Blue' isHighlight />)
         },
         {
             title: 'Xử lý',
@@ -222,6 +234,7 @@ const ManageRentOrder:React.FC = () => {
             recipientPhone: x.rentOrderList[0].recipientPhone,
             recipientAddress: x.rentOrderList[0].recipientAddress,
             transportFee: x.rentOrderList[0].transportFee,
+            discountAmount: x.rentOrderList[0].discountAmount
         }))
     }, [rentOrders])
     const handleClose = () =>{
@@ -274,7 +287,7 @@ const ManageRentOrder:React.FC = () => {
                 <Table 
                     dataSource={DataSourceRentOrder} 
                     columns={ColumnRentOrder} 
-                    scroll={{ y: 680, x: 1500 }}
+                    scroll={{ y: 680, x: 2200 }}
                     pagination={{
                         current: paging.curPage || 1,
                         pageSize: paging.pageSize || 1,

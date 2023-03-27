@@ -2,7 +2,7 @@ import jwt_decode from 'jwt-decode';
 import { JWTDecode } from "../models/decode";
 import { UserRegister } from "../models/register";
 import { Response } from "../models/response";
-import { LoginResponse, User } from "../models/user";
+import { LoginResponse, User, UserGetByRole } from "../models/user";
 import golbalAxios from "../utils/http-client";
 
 const register = async (user: Partial<UserRegister>): Promise<Response<null>> =>{
@@ -21,11 +21,16 @@ const decodeToken = (token: string) =>{
     const data = jwt_decode<JWTDecode>(token)
     return data
 }
+const getUserListByRole = async (role: 'admin' | 'technician' | 'customer' | 'manager') => {
+    const res = await golbalAxios.get<Response<UserGetByRole[]>>(`/user/get-user-list-by-role?role=${role}`)
+    return res.data
+}
 const authService = {
     register,
     login,
     getUserDetail,
-    decodeToken
+    decodeToken,
+    getUserListByRole
 }
 
 export default authService

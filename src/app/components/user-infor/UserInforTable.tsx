@@ -1,5 +1,5 @@
 import React from 'react'
-import { AiOutlinePhone } from 'react-icons/ai';
+import { AiOutlineMail, AiOutlinePhone } from 'react-icons/ai';
 import { CiLocationOn } from 'react-icons/ci';
 import { MdOutlineDriveFileRenameOutline } from 'react-icons/md';
 import './style.scss'
@@ -8,9 +8,10 @@ interface UserInforTableProps{
     name: string;
     phone: string;
     address: string;
+    email?: string;
 }
 
-const UserInforTable: React.FC<UserInforTableProps> = ({ name, phone, address }) => {
+const UserInforTable: React.FC<UserInforTableProps> = ({ name, phone, address, email }) => {
   return (
     <div className='user-infor-table-wrapper'>
         <div className="user-box">
@@ -40,6 +41,18 @@ const UserInforTable: React.FC<UserInforTableProps> = ({ name, phone, address })
                 <span>{address}</span>
             </div>
         </div>
+        {
+            email && 
+            <div className="user-box">
+                <div className="left">
+                    <AiOutlineMail size={20} color='#0099FF' />
+                    <span>Email</span>
+                </div>
+                <div className="right">
+                    <span>{email}</span>
+                </div>
+            </div>
+        }
     </div>
   )
 }

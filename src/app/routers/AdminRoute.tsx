@@ -74,16 +74,28 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
         if(saleOrder.includes(affix)){
             return ['6']
         }
+        const serviceOrder = ['take-care-order']
+        if(serviceOrder.includes(affix)){
+            return ['7']
+        }
+        const takeCareService = ['manage-take-care-service']
+        if(takeCareService.includes(affix)){
+            return ['8']
+        }
         const shippingFee = ['manage-shipping-fee']
         if(shippingFee.includes(affix)){
-            return ['7']
+            return ['9']
+        }
+        const serviceAssigned = ['take-care-order-assigned']
+        if(serviceAssigned.includes(affix)){
+            return ['10']
         }
 
     }, [location])
     const openedKey = useMemo(() =>{
         const affix = location.pathname.split('/')[2]
 
-        const manageOrder = ['rent-order', 'sale-order']
+        const manageOrder = ['rent-order', 'sale-order', 'take-care-order']
         if(manageOrder.includes(affix)){
             return ['4']
         }
@@ -91,13 +103,16 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
     const childrenOrder = [
         CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/rent-order'>Đơn thuê</Link>, '5', <BiCategoryAlt size={18} />) : null,
         CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/sale-order'>Đơn mua</Link>, '6', <BiCategoryAlt size={18} />) : null,
+        CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/take-care-order'>Đơn chăm sóc</Link>, '7', <BiCategoryAlt size={18} />) : null,
     ]
     const items: MenuItem[] = [
        CONSTANT.MANAGE_CATEGORY.includes(roleName as Role) ? getItem(<Link to='/panel/manage-category'>Manage Category</Link>, '1', <BiCategoryAlt size={18} />) : null,
        CONSTANT.MANAGE_PRODUCT.includes(roleName as Role) ? getItem(<Link to='/panel/manage-product'>Manage Product</Link>, '2', <MdOutlineInventory2 size={18} />) : null,
        CONSTANT.MANAGE_SIZE.includes(roleName as Role) ? getItem(<Link to='/panel/manage-size'>Manage Size</Link>, '3', <MdOutlineInventory2 size={18} />) : null,
        CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem('Manage Order', '4', <BiCategoryAlt size={18} />, childrenOrder) : null,
-       CONSTANT.MANAGE_SHIPPING_FEE.includes(roleName as Role) ? getItem(<Link to='/panel/manage-shipping-fee'>Phí vận chuyển</Link>, '7', <MdOutlineInventory2 size={18} />) : null,
+       CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/manage-take-care-service'>Dịch vụ chăm sóc</Link>, '8', <MdOutlineInventory2 size={18} />) : null,
+       CONSTANT.MANAGE_SHIPPING_FEE.includes(roleName as Role) ? getItem(<Link to='/panel/manage-shipping-fee'>Phí vận chuyển</Link>, '9', <MdOutlineInventory2 size={18} />) : null,
+       CONSTANT.TAKE_CARE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/take-care-order-assigned'>Đơn chăm sóc</Link>, '10', <MdOutlineInventory2 size={18} />) : null,
     ];
   return (
     <>

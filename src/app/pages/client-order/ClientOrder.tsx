@@ -1,4 +1,4 @@
-import { Popover, Segmented, Tag } from 'antd';
+import { Popover, Segmented } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 import LandingFooter from 'app/components/footer/LandingFooter';
 import HeaderInfor from 'app/components/header-infor/HeaderInfor';
@@ -7,17 +7,18 @@ import ClientExtendOrder from 'app/components/modal/client-extend-order/ClientEx
 import ModalClientRentOrderDetai from 'app/components/modal/client-rent-order-detail/ModalClientRentOrderDetai';
 import ModalClientSaleOrderDetai from 'app/components/modal/client-sale-order-detail/ModalClientSaleOrderDetai';
 import MoneyFormat from 'app/components/money/MoneyFormat';
+import TechnicianName from 'app/components/renderer/technician/TechnicianName';
 import useDispatch from 'app/hooks/use-dispatch';
 import useSelector from 'app/hooks/use-selector';
 import { RentOrder, SaleOrderList } from 'app/models/order';
 import { Paging } from 'app/models/paging';
 import { PaymentControlState } from 'app/models/payment';
+import { ServiceDetailList, ServiceOrderList } from 'app/models/service';
 import orderService from 'app/services/order.service';
 import paymentService from 'app/services/payment.service';
 import { setNoti } from 'app/slices/notification';
 import CONSTANT from 'app/utils/constant';
 import utilDateTime from 'app/utils/date-time';
-import utilGeneral from 'app/utils/general';
 import pagingPath from 'app/utils/paging-path';
 import React, { useEffect, useMemo, useState } from 'react';
 import { BiCommentDetail, BiDetail } from 'react-icons/bi';
@@ -25,6 +26,7 @@ import { GrMore } from 'react-icons/gr';
 import { MdOutlinePayments } from 'react-icons/md';
 import { SiGitextensions } from 'react-icons/si';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { OrderStatusToTag } from '../manage-take-care-order/ManageTakeCareOrder';
 import './style.scss';
 
 type OrderPage = 'rent' | 'sale' | 'service'
@@ -45,6 +47,7 @@ const ClientOrder: React.FC = () =>{
     // data
     const [saleOrders, setSaleOrders] = useState<SaleOrderList[]>([])
     const [rentOrders, setRentOrders] = useState<RentOrder[]>([])
+    const [serviceOrders, setServiceOrders] = useState<ServiceOrderList[]>([])
 
     const [paging, setPaging] = useState<Partial<Paging>>({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.CLIENT_ORDER_RENT})
 
@@ -75,6 +78,22 @@ const ClientOrder: React.FC = () =>{
         }
         init()
     }, [id, dispatch, pageType, searchParams, paging.pageSize])
+
+    useEffect(() =>{
+        if(pageType !== 'service') return;
+        const currentPage = searchParams.get('page');
+
+        const init = async () =>{
+            try{
+                const res = await orderService.getServiceOrders({curPage: Number(currentPage), pageSize: CONSTANT.PAGING_ITEMS.CLIENT_ORDER_RENT})
+                setServiceOrders(res.data.serviceOrderList)
+                setPaging(res.data.paging)
+            }catch{
+
+            }
+        }
+        init()
+    }, [pageType, searchParams])
 
     useEffect(() =>{
         if(!id) return;
@@ -171,37 +190,43 @@ const ClientOrder: React.FC = () =>{
             key: 'status',
             dataIndex: 'status',
             align: 'center',
-            render: (v) => (
-                <Tag color={utilGeneral.statusToColor(v)}>{utilGeneral.statusToViLanguage(v)}</Tag>
-            )
+            render: (v) => (OrderStatusToTag(v))
         },
         {
             title: 'Phí vận chuyển',
             key: 'transportFee',
             dataIndex: 'transportFee',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} />)
+            render: (v) => (<MoneyFormat value={v} color='Default' />)
         },
         {
             title: 'Tiền cọc',
             key: 'deposit',
             dataIndex: 'deposit',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} />)
+            render: (v) => (<MoneyFormat value={v} color='Orange' />)
         },
         {
-            title: 'Số tiền cần trả',
-            key: 'remainMoney',
-            dataIndex: 'remainMoney',
+            title: 'Tiền được giảm',
+            key: 'discountAmount',
+            dataIndex: 'discountAmount',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} />)
+            render: (v) => (<MoneyFormat value={v} color='Yellow' />)
         },
         {
             title: 'Tổng đơn hàng',
             key: 'totalPrice',
             dataIndex: 'totalPrice',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} />)
+            render: (v) => (<MoneyFormat value={v} color='Light Blue' />)
+        },
+        {
+            title: 'Số tiền cần trả',
+            key: 'remainMoney',
+            dataIndex: 'remainMoney',
+            align: 'right',
+            fixed:'right',
+            render: (v) => (<MoneyFormat value={v} color='Blue' />)
         },
         {
             title: 'Xử lý',
@@ -263,7 +288,8 @@ const ClientOrder: React.FC = () =>{
             transportFee: x.transportFee,
             remainMoney: x.remainMoney,
             deposit: x.deposit,
-            orderCode: x.orderCode
+            orderCode: x.orderCode,
+            discountAmount: x.discountAmount
         }))
     }, [saleOrders])
     const ColumnRentOrder: ColumnsType<any> = [
@@ -280,50 +306,54 @@ const ClientOrder: React.FC = () =>{
             title: 'Ngày bắt đầu thuê',
             key: 'startDateRent',
             dataIndex: 'startDateRent',
-            align: 'center',
             render: (v) => (utilDateTime.dateToString(v))
         },
         {
             title: 'Ngày kết thúc thuê',
             key: 'endDateRent',
             dataIndex: 'endDateRent',
-            align: 'center',
             render: (v) => (utilDateTime.dateToString(v))
         },
         {
             title: 'Trạng thái',
             key: 'status',
             dataIndex: 'status',
-            align: 'center',
-            render: (v) => (<Tag color={utilGeneral.statusToColor(v)}>{utilGeneral.statusToViLanguage(v)}</Tag>)
+            render: (v) => (OrderStatusToTag(v))
         },
         {
             title: 'Phí vận chuyển',
             key: 'transportFee',
             dataIndex: 'transportFee',
-            align: 'center',
-            render: (v) => (<MoneyFormat value={v} />)
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} color='Default' />)
         },
         {
             title: 'Tiền cọc',
             key: 'deposit',
             dataIndex: 'deposit',
-            align: 'center',
-            render: (v) => (<MoneyFormat value={v} />)
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} color='Orange' />)
         },
         {
-            title: 'Tiền cần trả',
-            key: 'remainMoney',
-            dataIndex: 'remainMoney',
-            align: 'center',
-            render: (v) => (<MoneyFormat value={v} />)
+            title: 'Tiền được giảm',
+            key: 'discountAmount',
+            dataIndex: 'discountAmount',
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} color='Yellow' />)
         },
         {
             title: 'Tổng đơn hàng',
             key: 'totalPrice',
             dataIndex: 'totalPrice',
-            align: 'center',
-            render: (v) => (<MoneyFormat value={v} />)
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} color='Light Blue' />)
+        },
+        {
+            title: 'Số tiền cần trả',
+            key: 'remainMoney',
+            dataIndex: 'remainMoney',
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} color='Blue' />)
         },
         {
             title: 'Xử lý',
@@ -401,7 +431,8 @@ const ClientOrder: React.FC = () =>{
             remainMoney: x.rentOrderList[0].remainMoney,
             deposit: x.rentOrderList[0].deposit,
             orderCode: x.rentOrderList[0].orderCode,
-            transportFee: x.rentOrderList[0].transportFee
+            transportFee: x.rentOrderList[0].transportFee,
+            discountAmount: x.rentOrderList[0].discountAmount
         }))
     }, [rentOrders])
 
@@ -413,6 +444,208 @@ const ClientOrder: React.FC = () =>{
             default: setPageType('service')
         }
     }
+    const handlePaymentService = async (data: PaymentControlState) =>{
+        const { orderId, actionType } = data
+        const [order] = serviceOrders.filter(x => x.id === orderId)
+
+        if(actionType === 'deposit' && order.status !== 'unpaid'){
+            return dispatch(setNoti({type: 'info', message: CONSTANT.PAYMENT_MESSAGE.PAID_DEPOSIT}))
+        }
+        if(actionType === 'remaining' && (order.status === 'paid' || order.status === 'completed')){
+            return dispatch(setNoti({type: 'info', message: CONSTANT.PAYMENT_MESSAGE.PAID_REMAINING}))
+        }
+
+        if(actionType === 'deposit'){
+            try{
+                const res = await paymentService.depositPaymentMomo(orderId, 'service')
+                window.open(res.data.payUrl, '_blank')
+            }catch{
+
+            }
+        }else if(actionType === 'remaining'){
+            try{
+                const res = await paymentService.paymentMomo(orderId, order.remainAmount, 'service', order.status === 'unpaid' ? 'whole' : '')
+                window.open(res.data.payUrl, '_blank')
+            }catch{
+
+            }
+        }
+    }
+    
+    const contextService = (record) =>{
+        return (
+            <div className='context-menu-wrapper'>
+                <div className="item" onClick={() => {
+                    // setActionMethod({orderId: record.orderId, actionType: 'detail', orderType: 'service', openIndex: -1})
+                    navigate(`/order/service/${record.orderId}`)
+                }}>
+                    <BiCommentDetail size={25} className='icon'/>
+                    <span>Chi tiết đơn hàng</span>
+                </div>
+                {/* <div className="item" onClick={() => navigate(`/order-group/${record.groupID}`)}>
+                    <BiDetail size={25} className='icon'/>
+                    <span>Xem nhóm đơn hàng</span>
+                </div>
+                <div className="item" onClick={() => {
+                    setActionMethod({orderId: record.orderId, actionType: 'extend', orderType: 'rent', openIndex: -1})
+                }}>
+                    <SiGitextensions size={25} className='icon'/>
+                    <span>Gia hạn đơn hàng</span>
+                </div>*/}
+                <div className="item" onClick={() => {
+                    handlePaymentService({orderId: record.orderId, actionType: 'deposit', orderType: 'service', openIndex: -1})
+                }} >
+                    <MdOutlinePayments size={25} className='icon'/>
+                    <span>Thanh toán cọc bằng Momo</span>
+                </div>
+                <div className="item" onClick={() => {
+                    handlePaymentService({orderId: record.orderId, actionType: 'remaining', orderType: 'service', openIndex: -1})
+                }} >
+                    <MdOutlinePayments size={25} className='icon'/>
+                    <span>Thanh toán đơn hàng bằng Momo</span>
+                </div> 
+            </div>
+        )
+    }
+    const ColumnServiceOrder: ColumnsType<any> = [
+        {
+            title: 'Mã đơn hàng',
+            key: 'orderCode',
+            dataIndex: 'orderCode',
+            fixed: 'left'
+        },
+        {
+            title: 'Mã dịch vụ',
+            key: 'serviceCode',
+            dataIndex: 'serviceCode',
+        },
+        {
+            title: 'Ngày tạo đơn hàng',
+            key: 'createDate',
+            dataIndex: 'createDate',
+            render: (v) => (utilDateTime.dateToString(v))
+        },
+        {
+            title: 'Ngày bắt đầu chăm sóc',
+            key: 'startDate',
+            dataIndex: 'startDate',
+            render: (v) => (utilDateTime.dateToString(v))
+        },
+        {
+            title: 'Ngày kết thúc chăm sóc',
+            key: 'endDate',
+            dataIndex: 'endDate',
+            render: (v) => (utilDateTime.dateToString(v))
+        },
+        {
+            title: 'Trạng thái',
+            key: 'status',
+            dataIndex: 'status',
+            render: (v) => (OrderStatusToTag(v))
+        },
+        {
+            title: 'Người chăm sóc',
+            key: 'technicianName',
+            dataIndex: 'technicianName',
+            render: (v) => <TechnicianName name={v} />
+        },
+        {
+            title: 'Tổng số cây',
+            key: 'totalQuantity',
+            dataIndex: 'totalQuantity',
+        },
+        {
+            title: 'Phí vận chuyển',
+            key: 'transportFee',
+            dataIndex: 'transportFee',
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} color='Default' />)
+        },
+        {
+            title: 'Tiền cọc',
+            key: 'deposit',
+            dataIndex: 'deposit',
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} color='Orange' />)
+        },
+        {
+            title: 'Tiền được giảm',
+            key: 'discountAmount',
+            dataIndex: 'discountAmount',
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} color='Yellow' />)
+        },
+        {
+            title: 'Tổng đơn hàng',
+            key: 'totalPrice',
+            dataIndex: 'totalPrice',
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} color='Light Blue' />)
+        },
+        {
+            title: 'Số tiền cần trả',
+            key: 'remainAmount',
+            dataIndex: 'remainAmount',
+            align: 'right',
+            fixed: 'right',
+            render: (v) => (<MoneyFormat value={v} color='Blue' />)
+        },
+        {
+            title: 'Xử lý',
+            key: 'action',
+            dataIndex: 'action',
+            align: 'center',
+            fixed: 'right',
+            render: (_, record, index) => (
+                    <Popover 
+                        content={() => contextService(record)} 
+                        placement='bottom' 
+                        trigger="click"
+                        open={index === actionMethod?.openIndex} 
+                        onOpenChange={(open: boolean) => {
+                            if(open){
+                                setActionMethod({orderId: '', actionType: '', orderType: '', openIndex: index})
+                            }else{
+                                setActionMethod({orderId: '', actionType: '', orderType: '', openIndex: -1})
+                            }
+                        }}
+                    >
+                        <GrMore size={25} cursor='pointer' color='#00a76f' />
+                    </Popover>
+            )
+        },
+    ]
+    const calTotalQuantity = (data: ServiceDetailList[]) =>{
+        let count = 0;
+        for (const item of data) {
+            count += item.quantity
+        }
+        return count
+    }
+    const DataSourceServiceOrder = useMemo(() =>{
+        return serviceOrders.map((x, index) => {
+            const { id, orderCode, createDate, serviceStartDate, serviceEndDate, technician, transportFee, deposit, remainAmount, totalPrice, discountAmount } = x
+            return {
+                key: String(index + 1),
+                orderId: id,
+                orderCode,
+                serviceCode: x.service.serviceCode,
+                createDate: createDate,
+                startDate: serviceStartDate,
+                endDate: serviceEndDate,
+                status: x.status,
+                technicianName: technician.technicianFullName,
+                totalQuantity: calTotalQuantity(x.service.serviceDetailList),
+                transportFee,
+                deposit,
+                remainAmount,
+                totalPrice,
+                discountAmount
+            }
+        })
+    }, [serviceOrders])
+
+    
 
     const handleCancel = () =>{
         setActionMethod(undefined)
@@ -432,8 +665,8 @@ const ClientOrder: React.FC = () =>{
                         <section className="co-box default-layout">
                             <Table 
                                 className='cart-table' 
-                                dataSource={DataSourceRentOrder} 
                                 columns={ColumnRentOrder} 
+                                dataSource={DataSourceRentOrder} 
                                 scroll={{x: 1500}}
                                 pagination={{
                                     current: paging.curPage,
@@ -451,9 +684,28 @@ const ClientOrder: React.FC = () =>{
                         <section className="co-box default-layout">
                             <Table 
                                 className='cart-table' 
-                                dataSource={DataSourceSaleOrder} 
                                 columns={ColumnSaleOrder} 
+                                dataSource={DataSourceSaleOrder} 
                                 scroll={{x: 1500}}
+                                pagination={{
+                                    current: paging.curPage,
+                                    pageSize: paging.pageSize,
+                                    total: paging.recordCount,
+                                    onChange: (page: number) =>{
+                                        navigate(`/orders?page=${page}`)
+                                    }
+                                }}
+                            />
+                        </section>
+                    }
+                    {
+                        pageType === 'service' &&
+                        <section className="co-box default-layout">
+                            <Table 
+                                className='cart-table' 
+                                columns={ColumnServiceOrder} 
+                                dataSource={DataSourceServiceOrder} 
+                                scroll={{x: 2500}}
                                 pagination={{
                                     current: paging.curPage,
                                     pageSize: paging.pageSize,
@@ -482,6 +734,13 @@ const ClientOrder: React.FC = () =>{
                     rentOrderList={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0]}
                 />
             }
+            {/* {
+                (actionMethod?.actionType === 'detail' && actionMethod.orderType === 'service') && 
+                <ClientServiceOrderDetail
+                    onClose={handleCancel}
+                    serviceDetailList={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].serviceDetailList}
+                />
+            } */}
             {
                 (actionMethod?.actionType === 'extend') &&
                 <ClientExtendOrder

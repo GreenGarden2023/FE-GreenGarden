@@ -28,3 +28,11 @@ export interface LoginResponse{
 export interface UserLogin extends LoginResponse{
     loading: boolean;
 }
+
+export interface UserGetByRole{
+    id: string
+    userName: string
+    fullName: string
+    email: string
+    roleName: string
+}

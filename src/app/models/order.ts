@@ -89,9 +89,18 @@ export interface OrderCalculate {
     rewardPointGain: number
     rewardPointUsed: number
     discountAmount: number
+    maxPoint: number
 }
 
 export interface OrderExtendDetail{
     rentOrder: RentOrderList;
     productItemDetailList: ProductItemDetail[]
 }
+
+// service models
+export interface CreateServiceOrder {
+    serviceId: string
+    rewardPointUsed: number
+    transportFee: number
+  }
+  

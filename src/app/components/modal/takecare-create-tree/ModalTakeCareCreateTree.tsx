@@ -18,7 +18,7 @@ const schema = yup.object().shape({
   treeName: yup.string().required('Tên của cây không được để trống').max(50, 'Tên của cây không nhiều hơn 50 ký tự'),
   description: yup.string().required('Mô tả không được để trống').max(500, 'Mô tả không nhiều hơn 500 ký tự'),
   quantity: yup.number().required('Số lượng không được để trống').min(1, 'Số lượng có ít nhất 1 cây').typeError('Kiểu giá trị của số lượng là số'),
-  imgUrl: yup.array().required('Có ít nhất 1 hình ảnh cho thông tin này').min(1, 'Có ít nhất 1 hình ảnh cho thông tin này')
+  imgUrls: yup.array().required('Có ít nhất 1 hình ảnh cho thông tin này').min(1, 'Có ít nhất 1 hình ảnh cho thông tin này')
 })
 
 interface ModalTakeCareCreateTreeProps{
@@ -60,7 +60,8 @@ const ModalTakeCareCreateTree:React.FC<ModalTakeCareCreateTreeProps> = ({ tree, 
         // const { status, ...rest } = data
         
         const res = await userTreeService.createUserTree(data)
-        onSubmit(res.data.userTrees, true)
+        dispatch(setNoti({type: 'success', message: `Tạo mới cây của bạn thành công`}))
+        onSubmit(res.data, true)
       }catch{
 
       }
@@ -68,6 +69,7 @@ const ModalTakeCareCreateTree:React.FC<ModalTakeCareCreateTreeProps> = ({ tree, 
       // update
       try{
         const res = await userTreeService.updateUserTree(data)
+        dispatch(setNoti({type: 'success', message: `Cập nhật cây của bạn thành công`}))
         onSubmit(res.data, false)
       }catch{
 
@@ -114,7 +116,7 @@ const ModalTakeCareCreateTree:React.FC<ModalTakeCareCreateTreeProps> = ({ tree, 
   return (
     <Modal
       open
-      title={`${tree ? 'Tạo mới' : 'Cập nhật'} cây`}
+      title={`${!tree ? 'Tạo mới' : 'Cập nhật'} cây của bạn`}
       onCancel={onClose}
       footer={null}
       width={1000}
@@ -125,7 +127,7 @@ const ModalTakeCareCreateTree:React.FC<ModalTakeCareCreateTreeProps> = ({ tree, 
       >
         <Row gutter={24}>
           <Col span={12}>
-            <Form.Item label='Name' required >
+            <Form.Item label='Tên cây' required >
               <Controller
                 control={control}
                 name='treeName'

@@ -1,6 +1,8 @@
 import { notification } from 'antd';
 import CheckoutSuccess from 'app/pages/check-out/CheckoutSuccess';
 import ClientCategory from 'app/pages/client-category/ClientCategory';
+import ClientManageTakeCareService from 'app/pages/client-manage-take-care-service/ClientManageTakeCareService';
+import ClientManageTakeCareServiceDetail from 'app/pages/client-manage-take-care-service/detail/ClientManageTakeCareServiceDetail';
 import ClientOrder from 'app/pages/client-order/ClientOrder';
 import ClientProductItemDetail from 'app/pages/client-product-item-detail/ClientProductItemDetail';
 import ClientProductItem from 'app/pages/client-product-item/ClientProductItem';
@@ -14,6 +16,10 @@ import ManageRentOrderGroup from 'app/pages/manage-rent-order/rent-order-group/M
 import ManageSaleOrder from 'app/pages/manage-sale-order/ManageSaleOrder';
 import ManageShippingFee from 'app/pages/manage-shipping-fee/ManageShippingFee';
 import ManageSize from 'app/pages/manage-size/ManageSize';
+import ManageTakeCareOrder from 'app/pages/manage-take-care-order/ManageTakeCareOrder';
+import ManageTakeCareService from 'app/pages/manage-take-care-service/ManageTakeCareService';
+import TechManageServiceOrderDetail from 'app/pages/tech-manage-service-order/detail/TechManageServiceOrderDetail';
+import TechManageServiceOrder from 'app/pages/tech-manage-service-order/TechManageServiceOrder';
 import React, { useEffect } from 'react';
 import { AiFillCheckCircle, AiFillWarning } from 'react-icons/ai';
 import { MdError } from 'react-icons/md';
@@ -122,6 +128,8 @@ const Routers: React.FC = () =>{
                 <Route path='/order-group/:groupId' element={<ClientRentOrderGroup />} />
                 <Route path='/checkout-success' element={<CheckoutSuccess />} />
                 <Route path='/take-care-service' element={<ClientTakeCareService />} />
+                <Route path='/take-care-service/me' element={<ClientManageTakeCareService />} />
+                <Route path='/order/service/:orderId' element={<ClientManageTakeCareServiceDetail />} />
 
                 <Route path='panel' >
                     <Route path='manage-category' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_CATEGORY} ><AdminRoute><ManageCategory /></AdminRoute></AuthGuard>} />
@@ -131,8 +139,12 @@ const Routers: React.FC = () =>{
                     <Route path='manage-order' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageOrder /></AdminRoute></AuthGuard>} />
                     <Route path='sale-order' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageSaleOrder /></AdminRoute></AuthGuard>} />
                     <Route path='rent-order' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageRentOrder /></AdminRoute></AuthGuard>} />
+                    <Route path='take-care-order' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageTakeCareOrder /></AdminRoute></AuthGuard>} />
+                    <Route path='manage-take-care-service' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageTakeCareService /></AdminRoute></AuthGuard>} />
                     <Route path='rent-order/:groupId' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageRentOrderGroup /></AdminRoute></AuthGuard>} />
                     <Route path='manage-shipping-fee' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageShippingFee /></AdminRoute></AuthGuard>} />
+                    <Route path='take-care-order-assigned' element={<AuthGuard rolesAuth={CONSTANT.TAKE_CARE_ORDER} ><AdminRoute><TechManageServiceOrder /></AdminRoute></AuthGuard>} />
+                    <Route path='take-care-order-assigned/:orderId' element={<AuthGuard rolesAuth={CONSTANT.TAKE_CARE_ORDER} ><AdminRoute><TechManageServiceOrderDetail /></AdminRoute></AuthGuard>} />
                 </Route>
                 <Route path='/file-not-found' element={<FileNotFound />} />
             </Routes>

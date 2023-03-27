@@ -20,6 +20,7 @@ import { CiSquareRemove } from 'react-icons/ci';
 const schema = yup.object().shape({
     sizeId: yup.string().required('Kích thước không được để trống'),
     quantity: yup.number().required('Số lượng không được để trống').min(1, 'Số lượng có ít nhất 1 cây').typeError('Kiểu giá trị của số lượng là số'),
+    transportFee: yup.number().required('Phí vận chuyển không được để trống').typeError('Phí vận chuyển chỉ chấp nhận số'),
     salePrice: yup.string().nullable(),
     rentPrice: yup.string().nullable(),
     imagesUrls: yup.array().required('Có ít nhất 1 hình ảnh cho thông tin này')
@@ -43,7 +44,8 @@ console.log({productItemId})
     const { control, formState: { errors, isSubmitting }, getValues, setValue, handleSubmit, setError, trigger, reset } = useForm<ProductItemDetailHandle>({
         defaultValues: {
             status: 'active',
-            imagesUrls: []
+            imagesUrls: [],
+            transportFee: 0,
         },
         resolver: yupResolver(schema)
     })
@@ -57,7 +59,7 @@ console.log({productItemId})
     useEffect(() =>{
         if(!productItemDetail) return;
 
-        const { id, imagesURL, quantity, rentPrice, salePrice, size, status } = productItemDetail
+        const { id, imagesURL, quantity, rentPrice, salePrice, size, status, transportFee } = productItemDetail
         setValue('id', id)
         setValue('productItemID', productItemId)
         setValue('imagesUrls', imagesURL)
@@ -66,6 +68,7 @@ console.log({productItemId})
         setValue('salePrice', salePrice || null)
         setValue('sizeId', size.id)
         setValue('status', status)
+        setValue('transportFee', transportFee)
 
     }, [productItemDetail, setValue, productItemId])
 
@@ -234,7 +237,7 @@ console.log({productItemId})
                             {errors.rentPrice && <ErrorMessage message={errors.rentPrice.message} />}
                         </Form.Item>
                     </Col>
-                    <Col span={3}>
+                    <Col span={12}>
                         <Form.Item label='Trạng thái'>
                             <Controller
                                 control={control}
@@ -242,6 +245,16 @@ console.log({productItemId})
                                 render={({ field: { value, onChange } }) => <Switch checked={value === 'active'} onChange={onChange} />}
                             />
                             {errors.status && <ErrorMessage message={errors.status.message} />}
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item label='Phí vận chuyển'>
+                            <Controller
+                                control={control}
+                                name='transportFee'
+                                render={({ field }) => <InputNumber min={0} type='number' {...field} style={{width: '100%'}} />}
+                            />
+                            {errors.rentPrice && <ErrorMessage message={errors.rentPrice.message} />}
                         </Form.Item>
                     </Col>
                     <Col span={24} style={{marginBottom: '20px'}}>

@@ -1,0 +1,17 @@
+@import 'app/styles/variable.scss';
+
+.tmsod-wrapper{
+    .order-infor-wrapper{
+        margin-top: 20px;
+        .item{
+            display: flex;
+            .label{
+                color: $soft-text;
+                width: 160px;
+            }
+            .content{
+                margin-left: 10px;
+            }
+        }
+    }
+}

@@ -1,4 +1,4 @@
-import { Checkbox, Modal, Popover, Tag } from 'antd'
+import { Checkbox, Modal, Popover } from 'antd'
 import { CheckboxChangeEvent } from 'antd/es/checkbox'
 import Table, { ColumnsType } from 'antd/es/table'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
@@ -14,7 +14,6 @@ import paymentService from 'app/services/payment.service'
 import { setNoti } from 'app/slices/notification'
 import CONSTANT from 'app/utils/constant'
 import utilDateTime from 'app/utils/date-time'
-import utilGeneral from 'app/utils/general'
 import pagingPath from 'app/utils/paging-path'
 import React, { useEffect, useMemo, useState } from 'react'
 import CurrencyFormat from 'react-currency-format'
@@ -23,6 +22,7 @@ import { GrMore } from 'react-icons/gr'
 import { MdOutlinePayments } from 'react-icons/md'
 import { RiBillLine } from 'react-icons/ri'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import { OrderStatusToTag } from '../manage-take-care-order/ManageTakeCareOrder'
 import './style.scss'
 
 const ManageSaleOrder: React.FC = () => {
@@ -100,38 +100,49 @@ const ManageSaleOrder: React.FC = () => {
             title: 'Trạng thái',
             key: 'status',
             dataIndex: 'status',
-            align: 'center',
-            render: (v) => (
-                <Tag color={utilGeneral.statusToColor(v)}>{utilGeneral.statusToViLanguage(v)}</Tag>
-            )
+            width: 200,
+            render: (v) => (OrderStatusToTag(v))
         },
         {
             title: 'Phí vận chuyển',
             key: 'transportFee',
             dataIndex: 'transportFee',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} />)
+            width: 200,
+            render: (v) => <MoneyFormat value={v} color='Default' isHighlight />
         },
         {
             title: 'Tiền cọc',
             key: 'deposit',
             dataIndex: 'deposit',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} />)
+            width: 200,
+            render: (v) => <MoneyFormat value={v} color='Orange' isHighlight />
+        },
+        {
+            title: 'Tiền được giảm',
+            key: 'discountAmount',
+            dataIndex: 'discountAmount',
+            align: 'right',
+            width: 200,
+            render: (v) => <MoneyFormat value={v} color='Yellow' isHighlight />
+        },
+        {
+            title: 'Tổng tiền',
+            key: 'totalPrice',
+            dataIndex: 'totalPrice',
+            align: 'right',
+            width: 200,
+            render: (v) => <MoneyFormat value={v} color='Light Blue' isHighlight />
         },
         {
             title: 'Tiền còn thiếu',
             key: 'remainMoney',
             dataIndex: 'remainMoney',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} />)
-        },
-        {
-            title: 'Tổng đơn hàng',
-            key: 'totalPrice',
-            dataIndex: 'totalPrice',
-            align: 'right',
-            render: (v) => (<MoneyFormat value={v} />)
+            width: 200,
+            fixed: 'right',
+            render: (v) => <MoneyFormat value={v} color='Blue' isHighlight />
         },
         {
             title: 'Xử lý',
@@ -195,7 +206,8 @@ const ManageSaleOrder: React.FC = () => {
             recipientAddress: x.recipientAddress,
             recipientPhone: x.recipientPhone,
             recipientName: x.recipientName,
-            createDate: x.createDate
+            createDate: x.createDate,
+            discountAmount: x.discountAmount
         }))
     }, [saleOrders])
 
@@ -214,7 +226,7 @@ const ManageSaleOrder: React.FC = () => {
                 remainMoney: x.remainMoney - x.deposit
             }) : x))
             handleCancel()
-            dispatch(setNoti({type: 'success', message: 'Thanh toán đặt cọc thành công'}))
+             
         }catch{
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
@@ -258,7 +270,7 @@ const ManageSaleOrder: React.FC = () => {
                     className='table' 
                     dataSource={DataSource} 
                     columns={Column} 
-                    scroll={{ y: 680, x: 1500 }}
+                    scroll={{ y: 680, x: 2200 }}
                     pagination={{
                         current: paging.curPage,
                         pageSize: paging.pageSize,

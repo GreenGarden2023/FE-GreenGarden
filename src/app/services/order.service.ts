@@ -1,7 +1,8 @@
 import { OrderStatus } from "app/models/general-type";
-import { OrderCalculate, OrderCreate, OrderExtendDetail, RentOrder, RentOrderDetailList, RentOrderResponse, SaleOrderResponse } from "app/models/order";
+import { CreateServiceOrder, OrderCalculate, OrderCreate, OrderExtendDetail, RentOrder, RentOrderDetailList, RentOrderResponse, SaleOrderResponse } from "app/models/order";
 import { Paging } from "app/models/paging";
 import { Response } from "app/models/response";
+import { ServiceOrderDetail, ServiceResponse } from "app/models/service";
 import queryString from "query-string";
 import golbalAxios from "../utils/http-client";
 
@@ -64,6 +65,37 @@ const getARentOrder = async (rentOrderID: string) =>{
     return res.data
 }
 
+// ------------------------------------------------------------------------------------------------------------------
+// service
+
+const createOrderService = async (data: CreateServiceOrder) =>{
+    const res = await golbalAxios.post('/order/create-service-order', data)
+    return res.data
+}
+// get order by token
+const getServiceOrders = async (paging: Partial<Paging>) =>{
+    const res = await golbalAxios.get<Response<ServiceResponse>>(`/order/get-service-orders?${queryString.stringify(paging)}`)
+    return res.data
+}
+// get all
+const getAllServiceOrders = async (paging: Partial<Paging>) =>{
+    const res = await golbalAxios.get(`/order/get-all-service-orders?${queryString.stringify(paging)}`)
+    return res.data
+}
+const createServiceOrder = async (serviceId: string) =>{
+    const res = await golbalAxios.post('/order/create-service-order', {serviceId})
+    return res.data
+}
+const getServiceOrdersByTechnician = async (technicianID: string, paging: Partial<Paging>) =>{
+    const params = {technicianID, ...paging}
+    const res = await golbalAxios.get<Response<ServiceResponse>>(`/order/get-service-orders-by-technician?${queryString.stringify(params)}`)
+    return res.data
+}
+const getAServiceOrderDetail = async (orderID: string) =>{
+    const res = await golbalAxios.get<Response<ServiceOrderDetail>>(`/order/get-a-service-order-detail?orderID=${orderID}`)
+    return res.data
+}
+
 const orderService = {
     createOrder,
     getRentOrders,
@@ -76,7 +108,13 @@ const orderService = {
     getAllSaleOrders,
     getRentOrderGroup,
     calculateOrder,
-    getARentOrder
+    getARentOrder,
+    createOrderService,
+    getServiceOrders,
+    getAllServiceOrders,
+    createServiceOrder,
+    getServiceOrdersByTechnician,
+    getAServiceOrderDetail
 }
 
 export default orderService

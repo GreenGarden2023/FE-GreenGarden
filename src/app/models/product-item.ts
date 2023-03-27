@@ -11,6 +11,7 @@ export interface ProductItemDetailHandle{
     rentPrice: number | null;
     salePrice: number | null;
     quantity: number;
+    transportFee: number;
     status: Status;
     imagesUrls: string[];
 }
@@ -22,6 +23,7 @@ export interface ProductItemDetail{
     salePrice?: number;
     size: Size;
     status: Status;
+    transportFee: number;
     imagesURL: string[]
 }
 export interface ProductItem{
