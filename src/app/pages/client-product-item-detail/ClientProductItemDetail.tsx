@@ -22,6 +22,7 @@ import { setNoti } from 'app/slices/notification';
 import { Product } from 'app/models/product';
 import { Category } from 'app/models/category';
 import pagingPath from 'app/utils/paging-path';
+import { IoFlowerOutline } from 'react-icons/io5';
 
 const text = `Đối với các sản phẩm cây/ bao gồm cây:\n- Chỉ giao hàng tại TP HCM\nĐối với các sản phẩm chậu, phụ kiện, vật tư:\n- Có giao hàng COD toàn quốc\n- Được kiểm tra hàng khi nhận hàng`
 const ClientProductItemDetail: React.FC = () => {
@@ -199,13 +200,10 @@ const ClientProductItemDetail: React.FC = () => {
                             <Breadcrumb.Item>
                                 <Link to='/' >{CONSTANT.APP_NAME}</Link>
                             </Breadcrumb.Item>
-                            <Breadcrumb.Item>
-                                <Link to='/category' >Category</Link>
-                            </Breadcrumb.Item>
                             {
                                 category && 
                                 <Breadcrumb.Item>
-                                    <Link to={`/product/${category.id}?page=1`} >{category.name}</Link>
+                                    <Link to={`/category/${category.id}?page=1`} >{category.name}</Link>
                                 </Breadcrumb.Item> 
                             }
                             {
@@ -256,7 +254,8 @@ const ClientProductItemDetail: React.FC = () => {
                                 </Col>
                                 <Col xs={12} xl={12}>
                                     <div className="right">
-                                        <div className="title">
+                                        <div className="title title-name-wrapper">
+                                            <IoFlowerOutline size={30} color='#e91e63' />
                                             <h1>{proItem.name}</h1>
                                         </div>
                                         <div className="infor-detail">
@@ -272,7 +271,7 @@ const ClientProductItemDetail: React.FC = () => {
                                             </ul>
                                         </div>
                                         <div className="size-wrapper">
-                                            <span className='title'>Kích thước</span>
+                                            <span className='title'>Thể loại</span>
                                             {
                                                 proItem.productItemDetail.map((proItemDe, i) => (
                                                     <Tag style={{cursor: 'pointer'}} color={proItemDe.size.id === sizeSelect ? '#00a76f' : ''} key={i} onClick={() => handleSelectSize(proItemDe.size.id)} >{proItemDe.size.sizeName}</Tag>
@@ -289,12 +288,12 @@ const ClientProductItemDetail: React.FC = () => {
                                                 {
                                                     proItemSelectBySize.rentPrice &&
                                                     <div className="rent-price">
-                                                        <p className='title-price'>Rent price</p>
+                                                        <p className='title-price'>Giá thuê</p>
                                                         <p className="price">
                                                             <CurrencyFormat value={proItemSelectBySize.rentPrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
                                                         </p>
                                                         <div className="quantity">
-                                                            <p>Quantity</p>
+                                                            <p>Số lượng</p>
                                                             <div className="quantity-box">
                                                                 <button className="decrease" onClick={() => controlRent('-')}>
                                                                     <GrFormSubtract />
@@ -308,7 +307,7 @@ const ClientProductItemDetail: React.FC = () => {
                                                         <div className="atc">
                                                             <button onClick={() => handleAddCart('Rent', proItemSelectBySize.id)}>
                                                                 <AiOutlineShoppingCart size={40} />
-                                                                <span>Add to cart</span>
+                                                                <span>Thêm vào giỏ hàng</span>
                                                             </button>
                                                         </div>
                                                     </div>
@@ -316,12 +315,12 @@ const ClientProductItemDetail: React.FC = () => {
                                                 {
                                                     proItemSelectBySize.salePrice && 
                                                     <div className="sale-price">
-                                                        <p className='title-price'>Sale price</p>
+                                                        <p className='title-price'>Giá bán</p>
                                                         <p className="price">
                                                             <CurrencyFormat value={proItemSelectBySize.salePrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
                                                         </p>
                                                         <div className="quantity">
-                                                            <p>Quantity</p>
+                                                            <p>Số lượng</p>
                                                             <div className="quantity-box">
                                                                 <button className="decrease" onClick={() => controlSale('-')}>
                                                                     <GrFormSubtract  />
@@ -335,17 +334,17 @@ const ClientProductItemDetail: React.FC = () => {
                                                         <div className="atc">
                                                             <button onClick={() => handleAddCart('Sale', proItemSelectBySize.id)}>
                                                                 <AiOutlineShoppingCart size={40} />
-                                                                <span>Add to cart</span>
+                                                                <span>Thêm vào giỏ hàng</span>
                                                             </button>
                                                         </div>
                                                     </div>
                                                 }
                                             </div>
                                         }
-                                        <Divider orientation='left' plain >Policy</Divider>
+                                        <Divider orientation='left' plain >Chính sách</Divider>
                                         <div className="policy">
                                         <Collapse defaultActiveKey={['1']} ghost>
-                                            <Collapse.Panel header="Delivery policy" key="1">
+                                            <Collapse.Panel header="Chính sách vận chuyển" key="1">
                                                 <p className='panel-text'>
                                                     {text}
                                                 </p>

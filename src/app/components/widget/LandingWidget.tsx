@@ -1,4 +1,6 @@
+import { Divider } from 'antd';
 import React from 'react'
+import { AiOutlineStar } from 'react-icons/ai';
 import { MdNavigateNext } from 'react-icons/md';
 import { Link } from 'react-router-dom';
 import './style.scss';
@@ -12,8 +14,17 @@ interface LandingWidgetProps{
 const LandingWidget: React.FC<LandingWidgetProps> = ({ index, url, backgroundUrl }) => {
   return (
     <section className='widget-wrapper'>
-        <div className="widget-box container-wrapper" style={{backgroundImage: `url(${backgroundUrl})`}}>
-            <div className="content-box">
+        <div className="widget-box container-wrapper" >
+            {
+                index === 1 &&
+                <Divider >
+                    <div className='divider-item'>
+                        <AiOutlineStar color='#b06c67' size={30} />
+                        <span>Dịch vụ chăm sóc cây</span>
+                    </div>
+                </Divider>
+            }
+            <div className="content-box" style={{backgroundImage: `url(${backgroundUrl})`}}>
                 <div className="content">
                     <h1>Dịch vụ cho thuê cây</h1>
                     <div className="divider"></div>

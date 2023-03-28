@@ -1,20 +1,21 @@
-import { Breadcrumb, Col, Row } from 'antd';
+import { Breadcrumb, Col, Divider, Row } from 'antd';
 import LandingFooter from 'app/components/footer/LandingFooter';
 import LandingHeader from 'app/components/header/LandingHeader';
 import useDispatch from 'app/hooks/use-dispatch';
+import { Category } from 'app/models/category';
 import { Paging } from 'app/models/paging';
+import { Product } from 'app/models/product';
 import { ProductItem } from 'app/models/product-item';
+import productItemService from 'app/services/product-item.service';
 import { setNoti } from 'app/slices/notification';
 import CONSTANT from 'app/utils/constant';
+import utilGeneral from 'app/utils/general';
 import pagingPath from 'app/utils/paging-path';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
+import { BsFlower1 } from 'react-icons/bs';
+import { GiFlowerPot } from 'react-icons/gi';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import './style.scss';
-import productItemService from 'app/services/product-item.service';
-import { Product } from 'app/models/product';
-import { Category } from 'app/models/category';
-import utilGeneral from 'app/utils/general';
-import PriceBox from 'app/components/price-box/PriceBox';
 
 const ClientProductItem: React.FC = () => {
     const { productId } = useParams()
@@ -66,10 +67,7 @@ const ClientProductItem: React.FC = () => {
                                 <Link to='/' >{CONSTANT.APP_NAME}</Link>
                             </Breadcrumb.Item>
                             <Breadcrumb.Item>
-                                <Link to='/category' >Category</Link>
-                            </Breadcrumb.Item>
-                            <Breadcrumb.Item>
-                                <Link to={`/product/${category?.id}?page=1`} >{category?.name}</Link>
+                                <Link to={`/category/${category?.id}?page=1`} >{category?.name}</Link>
                             </Breadcrumb.Item>
                             <Breadcrumb.Item>
                                 {product?.name}
@@ -77,11 +75,8 @@ const ClientProductItem: React.FC = () => {
                         </Breadcrumb>
                     </section>
                     <section className="cpo-product-infor default-layout">
-                        <h1>Reference list</h1>
-                        <div className="cpo-tree-type">
-                            {/* <span className={`cp-for-rent ${isRent === 'rent' ? 'active' : ''}`} onClick={() => setIsRent('rent')}>For Rent</span>
-                            <span className={`cp-for-sale ${isRent === 'sale' ? 'active' : ''}`} onClick={() => setIsRent('sale')}>For Sale</span> */}
-                        </div>
+                        <BsFlower1 size={25} />
+                        <p>{product?.name}</p>
                     </section>
                     <section className="cpi-box default-layout">
                         <Row gutter={[10, 10]}>
@@ -91,12 +86,20 @@ const ClientProductItem: React.FC = () => {
                                         <Link to={`/product-item/${proItem.id}`} className='cp-item'>
                                             <img src={proItem.imageURL} alt="/" onError={utilGeneral.setDefaultImage} />
                                             <p className='pro-name'>{proItem.name}</p>
-                                            <div className="price-box">
-                                                {
-                                                    proItem.productItemDetail.map((pItem, i) => (
-                                                        <PriceBox key={i} sizeName={pItem.size.sizeName} rentPrice={pItem.rentPrice || 0} salePrice={pItem.salePrice || 0} />
-                                                    ))
-                                                }
+                                            <div className="size-box">
+                                                <Divider style={{margin: 0}} >
+                                                    <div className="title">
+                                                        <GiFlowerPot color='#e91e63' />
+                                                        <span>Thể loại</span>
+                                                    </div>
+                                                </Divider>
+                                                <div className="size-item-wrapper">
+                                                    {
+                                                        proItem.productItemDetail.map((pItem, i) => (
+                                                            <div key={i} className='item-detail'>{pItem.size.sizeName}</div>
+                                                        ))
+                                                    }
+                                                </div>
                                             </div>
                                         </Link>
                                     </Col>

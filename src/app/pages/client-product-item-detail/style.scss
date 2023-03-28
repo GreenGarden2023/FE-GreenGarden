@@ -29,10 +29,16 @@
             }
         }
         .right{
+            .title-name-wrapper{
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
             .title{
                 margin-bottom: 50px;
                 h1{
-                    color: $default-green;
+                    color: #e91e63;
+                    // color: $default-green;
                     font-weight: 600;
                     font-size: 30px;
                     line-height: normal;

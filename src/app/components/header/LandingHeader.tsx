@@ -5,6 +5,7 @@ import { CartProps, setCartSlice } from 'app/slices/cart';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { AiFillCaretDown, AiOutlineShoppingCart, AiOutlineUserAdd } from 'react-icons/ai';
+import { BiGitPullRequest } from 'react-icons/bi';
 import { BsBagCheckFill } from 'react-icons/bs';
 import { FaUserCircle } from 'react-icons/fa';
 import { GiExitDoor } from 'react-icons/gi';
@@ -18,6 +19,7 @@ import { setEmptyUser } from '../../slices/user-infor';
 import CONSTANT from '../../utils/constant';
 import ErrorMessage from '../message.tsx/ErrorMessage';
 import './style.scss';
+
 
 /* eslint-disable no-useless-escape */
 const schema = yup.object().shape({
@@ -129,6 +131,10 @@ const LandingHeader: React.FC = () =>{
                               {
                                   userState.token ? 
                                   <>
+                                      <div className='user-infor-box' onClick={() => navigate('/take-care-service/me')}>
+                                          <BiGitPullRequest size={20} />
+                                          <span>Yêu cầu của bạn</span>
+                                      </div>
                                       <div className='user-infor-box' onClick={() => navigate('/orders')}>
                                           <BsBagCheckFill size={20} />
                                           <span>Đơn hàng của bạn</span>
@@ -139,17 +145,17 @@ const LandingHeader: React.FC = () =>{
                                       </div>
                                       <div className="log-out" onClick={handleLogout}>
                                           <GiExitDoor size={20} />
-                                          <span>Logout</span>
+                                          <span>Đăng xuất</span>
                                       </div>
                                   </> :
                                   <>
                                   <Link to='/register' >
                                       <AiOutlineUserAdd size={20} />
-                                      <span>Regsiter</span>
+                                      <span>Đăng ký</span>
                                   </Link>
                                   <Link to='/login' state={{history: location.pathname}} >
                                       <GiExitDoor size={20} />
-                                      <span>Login</span>
+                                      <span>Đăng nhập</span>
                                   </Link>
                                   </>
                               }

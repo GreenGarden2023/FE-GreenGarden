@@ -58,18 +58,15 @@ const ClientProduct: React.FC = () => {
                   <Link to='/' >{CONSTANT.APP_NAME}</Link>
                 </Breadcrumb.Item>
                 <Breadcrumb.Item>
-                  <Link to='/category' >Category</Link>
-                </Breadcrumb.Item>
-                <Breadcrumb.Item>
                   {category?.name}
                 </Breadcrumb.Item>
               </Breadcrumb>
             </section>
             <section className="cp-product-infor">
-              <h1>Reference list</h1>
+              <h1>Danh sách cây tham khảo</h1>
               <div className="cp-tree-type">
-                <span className={`cp-for-rent ${isRent === 'rent' ? 'active' : ''}`} onClick={() => setIsRent('rent')}>For Rent</span>
-                <span className={`cp-for-sale ${isRent === 'sale' ? 'active' : ''}`} onClick={() => setIsRent('sale')}>For Sale</span>
+                <span className={`cp-for-rent ${isRent === 'rent' ? 'active' : ''}`} onClick={() => setIsRent('rent')}>Thuê</span>
+                <span className={`cp-for-sale ${isRent === 'sale' ? 'active' : ''}`} onClick={() => setIsRent('sale')}>Bán</span>
               </div>
             </section>
             <section className="cp-box">
@@ -89,10 +86,10 @@ const ClientProduct: React.FC = () => {
                             </p>
                             <div className="tags-box">
                               {
-                                product.isForRent && <Tag color='#87d068' >For Rent</Tag>
+                                product.isForRent && <Tag color='#87d068' >Thuê</Tag>
                               }
                               {
-                                product.isForSale && <Tag color='#108ee9' >For Sale</Tag>
+                                product.isForSale && <Tag color='#108ee9' >Bán</Tag>
                               }
                             </div>
                           </div>

@@ -1,6 +1,5 @@
 import { notification } from 'antd';
 import CheckoutSuccess from 'app/pages/check-out/CheckoutSuccess';
-import ClientCategory from 'app/pages/client-category/ClientCategory';
 import ClientManageTakeCareService from 'app/pages/client-manage-take-care-service/ClientManageTakeCareService';
 import ClientManageTakeCareServiceDetail from 'app/pages/client-manage-take-care-service/detail/ClientManageTakeCareServiceDetail';
 import ClientOrder from 'app/pages/client-order/ClientOrder';
@@ -24,6 +23,8 @@ import React, { useEffect } from 'react';
 import { AiFillCheckCircle, AiFillWarning } from 'react-icons/ai';
 import { MdError } from 'react-icons/md';
 import { Route, Routes, useNavigate } from 'react-router-dom';
+import "slick-carousel/slick/slick-theme.css";
+import "slick-carousel/slick/slick.css";
 import useDispatch from '../hooks/use-dispatch';
 import useSelector from '../hooks/use-selector';
 import FileNotFound from '../pages/404/FileNotFound';
@@ -41,7 +42,6 @@ import { setLoading, setUser } from '../slices/user-infor';
 import CONSTANT from '../utils/constant';
 import AdminRoute from './AdminRoute';
 import AuthGuard from './AuthGuard';
-
 
 const Routers: React.FC = () =>{
     const dispatch = useDispatch();
@@ -120,7 +120,6 @@ const Routers: React.FC = () =>{
                 <Route path='/term-of-services' element={<TermOfService />} />
                 <Route path='/cart' element={<CartPage />} />
                 <Route path='/thanks' element={<ThankYou />} />
-                <Route path='/category' element={<ClientCategory />} />
                 <Route path='/category/:categoryId' element={<ClientProduct />} />
                 <Route path='/product/:productId' element={<ClientProductItem />} />
                 <Route path='/product-item/:productItemId' element={<ClientProductItemDetail />} />
