@@ -26,7 +26,7 @@ export const ServiceStatusToTag = (status: ServiceStatus) =>{
         case 'processing': return <Tag className='center' icon={<SyncOutlined  />} color='default' >Đang xử lý</Tag>
         case 'accepted': return <Tag className='center' icon={<FaCheck  />} color='#2db7f5' >Đã xác nhận</Tag>
         case 'rejected': return <Tag className='center' icon={<MdOutlineCancel  />} color='#f50'>Từ chối</Tag>
-        case 'confirmed': return <Tag className='center' icon={<MdOutlineFileDownloadDone  />} color='#87d068'>Đợi chấp nhận</Tag>
+        case 'confirmed': return <Tag className='center' icon={<MdOutlineFileDownloadDone  />} color='#87d068'>Đang chăm sóc</Tag>
         case 'user approved': return <Tag className='center' icon={<MdOutlineFileDownloadDone  />} color='#87d068'>Đã chấp nhận</Tag>
         default: return <Tag className='center' icon={<MdOutlineKeyboardReturn />} color='#108ee9'>Đang xử lý lại</Tag>
     }
@@ -81,7 +81,7 @@ const ManageTakeCareService: React.FC = () => {
                     </div>
                 }
                 {
-                    (record.status === 'confirmed' || record.status === 'reprocess') &&
+                    (record.status === 'accepted' || record.status === 'reprocess') &&
                     <div className="item" 
                         onClick={() => {
                             setActionMethod({orderId: record.id, actionType: 'assign', orderType: 'service', openIndex: -1})
@@ -92,7 +92,7 @@ const ManageTakeCareService: React.FC = () => {
                     </div>
                 }
                 {
-                    (record.status === 'accepted' || record.status === 'reprocess' || record.status === 'confirmed') &&
+                    (record.status === 'accepted' || record.status === 'reprocess') &&
                     <div className="item" 
                         onClick={() => {
                             setActionMethod({orderId: record.id, actionType: 'update infor', orderType: 'service', openIndex: -1})
