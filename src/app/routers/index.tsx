@@ -7,6 +7,7 @@ import ClientProductItemDetail from 'app/pages/client-product-item-detail/Client
 import ClientProductItem from 'app/pages/client-product-item/ClientProductItem';
 import ClientProduct from 'app/pages/client-product/ClientProduct';
 import ClientRentOrderGroup from 'app/pages/client-rent-order-group/ClientRentOrderGroup';
+import ClientTakeCareServiceConfirm from 'app/pages/client-take-care-service-confirm/ClientTakeCareServiceConfirm';
 import ClientTakeCareService from 'app/pages/client-take-care-service/ClientTakeCareService';
 import ManageOrder from 'app/pages/manage-order/ManageOrder';
 import ManageProductItem from 'app/pages/manage-product-item/ManageProductItem';
@@ -128,6 +129,7 @@ const Routers: React.FC = () =>{
                 <Route path='/checkout-success' element={<CheckoutSuccess />} />
                 <Route path='/take-care-service' element={<ClientTakeCareService />} />
                 <Route path='/take-care-service/me' element={<ClientManageTakeCareService />} />
+                <Route path='/take-care-service/me/:serviceId' element={<ClientTakeCareServiceConfirm />} />
                 <Route path='/order/service/:orderId' element={<ClientManageTakeCareServiceDetail />} />
 
                 <Route path='panel' >

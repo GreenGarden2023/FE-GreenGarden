@@ -26,7 +26,8 @@ export const ServiceStatusToTag = (status: ServiceStatus) =>{
         case 'processing': return <Tag className='center' icon={<SyncOutlined  />} color='default' >Đang xử lý</Tag>
         case 'accepted': return <Tag className='center' icon={<FaCheck  />} color='#2db7f5' >Đã xác nhận</Tag>
         case 'rejected': return <Tag className='center' icon={<MdOutlineCancel  />} color='#f50'>Từ chối</Tag>
-        case 'confirmed': return <Tag className='center' icon={<MdOutlineFileDownloadDone  />} color='#87d068'>Đã tạo đơn hàng</Tag>
+        case 'confirmed': return <Tag className='center' icon={<MdOutlineFileDownloadDone  />} color='#87d068'>Đợi chấp nhận</Tag>
+        case 'user approved': return <Tag className='center' icon={<MdOutlineFileDownloadDone  />} color='#87d068'>Đã chấp nhận</Tag>
         default: return <Tag className='center' icon={<MdOutlineKeyboardReturn />} color='#108ee9'>Đang xử lý lại</Tag>
     }
 }
@@ -50,87 +51,68 @@ const ManageTakeCareService: React.FC = () => {
         init()
     }, [])
 
-    const handleAction = (data: PaymentControlState) =>{
-        const { actionType, orderId } = data
-        const [service] = serviceOrders.filter(x => x.id === orderId)
-
-        if(actionType === 'assign'){
-            switch(service.status){
-                case 'rejected':  return dispatch(setNoti({type: 'info', message: 'Không thể chọn người chăm sóc cho dịch vụ đã bị từ chối'}))
-                case 'confirmed':  return dispatch(setNoti({type: 'info', message: 'Không thể chọn người chăm sóc cho dịch vụ đang hoạt động'}))
-                case 'processing':  return dispatch(setNoti({type: 'info', message: 'Không thể chọn người chăm sóc cho dịch vụ chưa được xác nhận'}))
-            }
-        }
-        if(actionType === 'accept service' && (service.status !== 'processing')){
-            return dispatch(setNoti({type: 'info', message: 'Không thể xác nhận dịch vụ đang xử lý hoặc bị hủy'}))
-        }
-        if(actionType === 'reject service' && (service.status !== 'processing')){
-           
-            return dispatch(setNoti({type: 'info', message: 'Không thể từ chối dịch vụ đã được xử lý'}))
-        }
-        if(actionType === 'update infor') {
-            switch(service.status){
-                case 'processing':  return dispatch(setNoti({type: 'info', message: 'Không thể cập nhật thông tin cho dịch vụ chưa được xác nhận'}))
-                case 'rejected':  return dispatch(setNoti({type: 'info', message: 'Không thể cập nhật thông tin cho dịch vụ đã bị từ chối'}))
-                case 'confirmed':  return dispatch(setNoti({type: 'info', message: 'Không thể cập nhật thông tin cho dịch vụ đang hoạt động'}))
-            }
-        }
-        if(actionType === 'create order'){
-            switch(service.status){
-                case 'processing':  return dispatch(setNoti({type: 'info', message: 'Không thể tạo đơn hàng cho dịch vụ chưa được xác nhận'}))
-                case 'rejected':  return dispatch(setNoti({type: 'info', message: 'Không thể tạo đơn hàng cho dịch vụ đã bị từ chối'}))
-                case 'confirmed':  return dispatch(setNoti({type: 'info', message: 'Không thể tạo đơn hàng cho dịch vụ đang hoạt động'}))
-            }
-        }
-
-        setActionMethod(data)
-    }
+   
 
     const contextService = (record) =>{
         return (
             <div className='context-menu-wrapper'>
                 <div className="item" onClick={() => {
-                    handleAction({orderId: record.id, actionType: 'detail', orderType: 'service', openIndex: -1})
+                    setActionMethod({orderId: record.id, actionType: 'detail', orderType: 'service', openIndex: -1})
                 }}>
                     <BiCommentDetail size={25} className='icon'/>
                     <span>Chi tiết dịch vụ</span>
                 </div>
-                <div className="item" onClick={() => {
-                    handleAction({orderId: record.id, actionType: 'accept service', orderType: 'service', openIndex: -1})
-                }}>
-                    <BiCommentDetail size={25} className='icon'/>
-                    <span>Xác nhận yêu cầu</span>
-                </div>
-                <div className="item" onClick={() => {
-                    handleAction({orderId: record.id, actionType: 'reject service', orderType: 'service', openIndex: -1})
-                }}>
-                    <BiCommentDetail size={25} className='icon'/>
-                    <span>Từ chối yêu cầu</span>
-                </div>
-                <div className="item" 
-                    onClick={() => {
-                        handleAction({orderId: record.id, actionType: 'assign', orderType: 'service', openIndex: -1})
-                    }}
-                 >
-                    <BiDetail size={25} className='icon'/>
-                    <span>Chọn người chăm sóc</span>
-                </div>
-                <div className="item" 
-                    onClick={() => {
-                        handleAction({orderId: record.id, actionType: 'update infor', orderType: 'service', openIndex: -1})
-                    }}
-                 >
-                    <BiDetail size={25} className='icon'/>
-                    <span>Cập nhật thông tin dịch vụ</span>
-                </div>
-                <div className="item" 
-                    onClick={() => {
-                        handleAction({orderId: record.id, actionType: 'create order', orderType: 'service', openIndex: -1})
-                    }}
-                 >
-                    <BiDetail size={25} className='icon'/>
-                    <span>Tạo đơn hàng</span>
-                </div>
+                {
+                    (record.status === 'processing' || record.status === 'reprocess') && 
+                    <div className="item" onClick={() => {
+                        setActionMethod({orderId: record.id, actionType: 'accept service', orderType: 'service', openIndex: -1})
+                    }}>
+                        <BiCommentDetail size={25} className='icon'/>
+                        <span>Xác nhận yêu cầu</span>
+                    </div>
+                }
+                {
+                    (record.status === 'processing' || record.status === 'reprocess') &&
+                    <div className="item" onClick={() => {
+                        setActionMethod({orderId: record.id, actionType: 'reject service', orderType: 'service', openIndex: -1})
+                    }}>
+                        <BiCommentDetail size={25} className='icon'/>
+                        <span>Từ chối yêu cầu</span>
+                    </div>
+                }
+                {
+                    (record.status === 'confirmed' || record.status === 'reprocess') &&
+                    <div className="item" 
+                        onClick={() => {
+                            setActionMethod({orderId: record.id, actionType: 'assign', orderType: 'service', openIndex: -1})
+                        }}
+                    >
+                        <BiDetail size={25} className='icon'/>
+                        <span>Chọn người chăm sóc</span>
+                    </div>
+                }
+                {
+                    (record.status === 'accepted' || record.status === 'reprocess' || record.status === 'confirmed') &&
+                    <div className="item" 
+                        onClick={() => {
+                            setActionMethod({orderId: record.id, actionType: 'update infor', orderType: 'service', openIndex: -1})
+                        }}
+                    >
+                        <BiDetail size={25} className='icon'/>
+                        <span>Cập nhật thông tin dịch vụ</span>
+                    </div>
+                }
+                {
+                    record.status === 'user approved' &&
+                    <div className="item" 
+                        onClick={() => {
+                            setActionMethod({orderId: record.id, actionType: 'create order', orderType: 'service', openIndex: -1})
+                        }}
+                    >
+                        <BiDetail size={25} className='icon'/>
+                        <span>Tạo đơn hàng</span>
+                    </div>
+                }
             </div>
         )
     }

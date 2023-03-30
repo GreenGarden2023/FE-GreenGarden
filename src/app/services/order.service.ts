@@ -1,4 +1,4 @@
-import { OrderStatus } from "app/models/general-type";
+import { OrderStatus, OrderType } from "app/models/general-type";
 import { CreateServiceOrder, OrderCalculate, OrderCreate, OrderExtendDetail, RentOrder, RentOrderDetailList, RentOrderResponse, SaleOrderResponse } from "app/models/order";
 import { Paging } from "app/models/paging";
 import { Response } from "app/models/response";
@@ -96,6 +96,11 @@ const getAServiceOrderDetail = async (orderID: string) =>{
     return res.data
 }
 
+const cancelOrder = async (orderID: string, orderType: OrderType) =>{
+    const res = await golbalAxios.post('/order/cancel-order', { orderID, orderType })
+    return res.data
+}
+
 const orderService = {
     createOrder,
     getRentOrders,
@@ -114,7 +119,8 @@ const orderService = {
     getAllServiceOrders,
     createServiceOrder,
     getServiceOrdersByTechnician,
-    getAServiceOrderDetail
+    getAServiceOrderDetail,
+    cancelOrder
 }
 
 export default orderService

@@ -299,7 +299,7 @@ const TechManageServiceOrderDetail: React.FC = () => {
                                 <Col span={8}>
                                     <div className="item">
                                         <span className="label">Thời gian chăm sóc</span>
-                                        <span className="content">{utilDateTime.dateToString(serviceOrder.service.startDate)} - {utilDateTime.dateToString(serviceOrder.service.endDate)}</span>
+                                        <span className="content">{utilDateTime.dateToString(serviceOrder.service.startDate.toString())} - {utilDateTime.dateToString(serviceOrder.service.endDate.toString())}</span>
                                     </div>
                                 </Col>
                                 <Col span={8}>

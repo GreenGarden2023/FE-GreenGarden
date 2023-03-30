@@ -2,7 +2,9 @@ import { Checkbox, Modal, Popover } from 'antd'
 import { CheckboxChangeEvent } from 'antd/es/checkbox'
 import Table, { ColumnsType } from 'antd/es/table'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
+import CancelOrder from 'app/components/modal/cancel-order/CancelOrder'
 import ModalClientSaleOrderDetai from 'app/components/modal/client-sale-order-detail/ModalClientSaleOrderDetai'
+import RefundOrder from 'app/components/modal/refundOrder.tsx/RefundOrder'
 import MoneyFormat from 'app/components/money/MoneyFormat'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
 import useDispatch from 'app/hooks/use-dispatch'
@@ -178,18 +180,42 @@ const ManageSaleOrder: React.FC = () => {
                     <BiDetail size={25} className='icon'/>
                     <span>Chi tiết đơn hàng</span>
                 </div>
-                <div className="item" onClick={() => {
-                    handleSetAction({orderId: record.orderId, actionType: 'deposit', orderType: 'sale', openIndex: -1})
-                }}>
-                    <MdOutlinePayments size={25} className='icon'/>
-                    <span>Thanh toán tiền cọc</span>
-                </div>
-                <div className="item" onClick={() => {
-                    handleSetAction({orderId: record.orderId, actionType: 'remaining', orderType: 'sale', openIndex: -1})
-                }}>
-                    <RiBillLine size={25} className='icon'/>
-                    <span>Thanh toán đơn hàng</span>
-                </div>
+                {
+                    (record.status === 'unpaid') &&
+                    <div className="item" onClick={() => {
+                        handleSetAction({orderId: record.orderId, actionType: 'deposit', orderType: 'sale', openIndex: -1})
+                    }}>
+                        <MdOutlinePayments size={25} className='icon'/>
+                        <span>Thanh toán tiền cọc</span>
+                    </div>
+                }
+                {
+                    (record.status === 'ready' || record.status === 'unpaid') &&
+                    <div className="item" onClick={() => {
+                        handleSetAction({orderId: record.orderId, actionType: 'remaining', orderType: 'sale', openIndex: -1})
+                    }}>
+                        <RiBillLine size={25} className='icon'/>
+                        <span>Thanh toán đơn hàng</span>
+                    </div>
+                }
+                {
+                    (record.status !== 'completed' && record.status !== 'cancel') && 
+                    <div className="item" onClick={() => {
+                        handleSetAction({orderId: record.orderId, actionType: 'cancel', orderType: 'sale', openIndex: -1})
+                    }}>
+                        <RiBillLine size={25} className='icon'/>
+                        <span>Hủy đơn hàng</span>
+                    </div>
+                }
+                {
+                    record.status === 'cancel' &&
+                    <div className="item" onClick={() => {
+                        handleSetAction({orderId: record.orderId, actionType: 'refund', orderType: 'sale', openIndex: -1})
+                    }}>
+                        <BiDetail size={25} className='icon'/>
+                        <span>Hoàn tiền</span>
+                    </div>
+                }
             </div>
         )
     }
@@ -262,6 +288,15 @@ const ManageSaleOrder: React.FC = () => {
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
     }
+    const handleCancelOrder = async () =>{
+        const [order] = saleOrders.filter(x => x.id === actionMethod?.orderId)
+        order.status = 'cancel'
+        setSaleOrders([...saleOrders])
+        handleCancel()
+    }
+    const handleRefundOrder = async () =>{
+        handleCancel()
+    }
     return (
         <div className="mso-wrapper">
             <HeaderInfor title='Quản lý đơn hàng mua' />
@@ -326,7 +361,26 @@ const ManageSaleOrder: React.FC = () => {
                     <Checkbox checked={checkFullAmount} onChange={handleChangeCheck}>Đủ số tiền cần thanh toán</Checkbox>
                 </Modal>
             }
-            
+            {
+                actionMethod?.actionType === 'cancel' &&
+                <CancelOrder
+                    onClose={handleCancel}
+                    onSubmit={handleCancelOrder}
+                    orderCode={saleOrders.filter(x => x.id === actionMethod?.orderId)[0].orderCode}
+                    orderId={saleOrders.filter(x => x.id === actionMethod?.orderId)[0].id}
+                    orderType='sale'
+                />
+            }
+            {
+                actionMethod?.actionType === 'refund' &&
+                <RefundOrder 
+                    onClose={handleCancel}
+                    onSubmit={handleRefundOrder}
+                    orderCode={saleOrders.filter(x => x.id === actionMethod.orderId)[0].orderCode}
+                    orderId={saleOrders.filter(x => x.id === actionMethod.orderId)[0].id}
+                    orderType='sale'
+                />
+            }
         </div>
     )
 }

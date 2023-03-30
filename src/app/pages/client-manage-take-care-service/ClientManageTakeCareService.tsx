@@ -3,11 +3,9 @@ import Table, { ColumnsType } from 'antd/es/table'
 import LandingFooter from 'app/components/footer/LandingFooter'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import LandingHeader from 'app/components/header/LandingHeader'
-import useDispatch from 'app/hooks/use-dispatch'
 import { PaymentControlState } from 'app/models/payment'
 import { Service, ServiceDetailList } from 'app/models/service'
 import serviceService from 'app/services/service.service'
-import { setNoti } from 'app/slices/notification'
 import utilDateTime from 'app/utils/date-time'
 import React, { useEffect, useMemo, useState } from 'react'
 import { BiCommentDetail } from 'react-icons/bi'
@@ -15,7 +13,6 @@ import { GrMore } from 'react-icons/gr'
 import { useNavigate } from 'react-router-dom'
 
 const ClientManageTakeCareService: React.FC = () => {
-    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const [services, setServices] = useState<Service[]>([])
@@ -100,7 +97,8 @@ const ClientManageTakeCareService: React.FC = () => {
         return (
             <div className='context-menu-wrapper'>
                 <div className="item" onClick={() => {
-                    handleAction({orderId: record.id, actionType: 'detail', orderType: 'service', openIndex: -1})
+                    // handleAction({orderId: record.id, actionType: 'detail', orderType: 'service', openIndex: -1})
+                    navigate(`/take-care-service/me/${record.id}`)
                 }}>
                     <BiCommentDetail size={25} className='icon'/>
                     <span>Chi tiết dịch vụ</span>
@@ -150,40 +148,6 @@ const ClientManageTakeCareService: React.FC = () => {
                 </div> */}
             </div>
         )
-    }
-    const handleAction = (data: PaymentControlState) =>{
-        const { actionType, orderId } = data
-        const [service] = services.filter(x => x.id === orderId)
-
-        if(actionType === 'assign'){
-            switch(service.status){
-                case 'rejected':  return dispatch(setNoti({type: 'info', message: 'Không thể chọn người chăm sóc cho dịch vụ đã bị từ chối'}))
-                case 'confirmed':  return dispatch(setNoti({type: 'info', message: 'Không thể chọn người chăm sóc cho dịch vụ đang hoạt động'}))
-                case 'processing':  return dispatch(setNoti({type: 'info', message: 'Không thể chọn người chăm sóc cho dịch vụ chưa được xác nhận'}))
-            }
-        }
-        if(actionType === 'accept service' && (service.status !== 'processing')){
-            return dispatch(setNoti({type: 'info', message: 'Không thể xác nhận dịch vụ đang xử lý hoặc bị hủy'}))
-        }
-        if(actionType === 'reject service' && (service.status !== 'processing')){
-           
-            return dispatch(setNoti({type: 'info', message: 'Không thể từ chối dịch vụ đã được xử lý'}))
-        }
-        if(actionType === 'update infor') {
-            switch(service.status){
-                case 'processing':  return dispatch(setNoti({type: 'info', message: 'Không thể cập nhật thông tin cho dịch vụ chưa được xác nhận'}))
-                case 'rejected':  return dispatch(setNoti({type: 'info', message: 'Không thể cập nhật thông tin cho dịch vụ đã bị từ chối'}))
-                case 'confirmed':  return dispatch(setNoti({type: 'info', message: 'Không thể cập nhật thông tin cho dịch vụ đang hoạt động'}))
-            }
-        }
-        if(actionType === 'create order'){
-            switch(service.status){
-                case 'processing':  return dispatch(setNoti({type: 'info', message: 'Không thể tạo đơn hàng cho dịch vụ chưa được xác nhận'}))
-                case 'rejected':  return dispatch(setNoti({type: 'info', message: 'Không thể tạo đơn hàng cho dịch vụ đã bị từ chối'}))
-                case 'confirmed':  return dispatch(setNoti({type: 'info', message: 'Không thể tạo đơn hàng cho dịch vụ đang hoạt động'}))
-            }
-        }
-        setActionMethod(data)
     }
     const calTotalQuantity = (data: ServiceDetailList[]) =>{
         let count = 0;

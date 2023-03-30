@@ -3,6 +3,7 @@ import Table, { ColumnsType } from 'antd/es/table';
 import LandingFooter from 'app/components/footer/LandingFooter';
 import HeaderInfor from 'app/components/header-infor/HeaderInfor';
 import LandingHeader from 'app/components/header/LandingHeader';
+import CancelOrder from 'app/components/modal/cancel-order/CancelOrder';
 import ClientExtendOrder from 'app/components/modal/client-extend-order/ClientExtendOrder';
 import ModalClientRentOrderDetai from 'app/components/modal/client-rent-order-detail/ModalClientRentOrderDetai';
 import ModalClientSaleOrderDetai from 'app/components/modal/client-sale-order-detail/ModalClientSaleOrderDetai';
@@ -264,18 +265,33 @@ const ClientOrder: React.FC = () =>{
                     <BiCommentDetail size={25} className='icon'/>
                     <span>Chi tiết đơn hàng</span>
                 </div>
-                <div className="item" onClick={() => {
-                    handlePaymentSale({orderId: record.orderId, actionType: 'deposit', orderType: 'sale', openIndex: -1})
-                }} >
-                    <MdOutlinePayments size={25} className='icon'/>
-                    <span>Thanh toán cọc bằng Momo</span>
-                </div>
-                <div className="item" onClick={() => {
-                    handlePaymentSale({orderId: record.orderId, actionType: 'remaining', orderType: 'sale', openIndex: -1})
-                }} >
-                    <MdOutlinePayments size={25} className='icon'/>
-                    <span>Thanh toán đơn hàng bằng Momo</span>
-                </div>
+                {
+                    record.status === 'unpaid' &&
+                    <div className="item" onClick={() => {
+                        handlePaymentSale({orderId: record.orderId, actionType: 'deposit', orderType: 'sale', openIndex: -1})
+                    }} >
+                        <MdOutlinePayments size={25} className='icon'/>
+                        <span>Thanh toán cọc bằng Momo</span>
+                    </div>
+                }
+                {
+                    (record.status === 'unpaid' || record.status === 'ready') &&
+                    <div className="item" onClick={() => {
+                        handlePaymentSale({orderId: record.orderId, actionType: 'remaining', orderType: 'sale', openIndex: -1})
+                    }} >
+                        <MdOutlinePayments size={25} className='icon'/>
+                        <span>Thanh toán đơn hàng bằng Momo</span>
+                    </div>
+                }
+                {
+                    record.status === 'unpaid' &&
+                    <div className="item" onClick={() => {
+                        setActionMethod({orderId: record.orderId, actionType: 'cancel', orderType: 'sale', openIndex: -1})
+                    }} >
+                        <MdOutlinePayments size={25} className='icon'/>
+                        <span>Hủy đơn hàng</span>
+                    </div>
+                }
             </div>
         )
     }
@@ -394,29 +410,42 @@ const ClientOrder: React.FC = () =>{
                     <BiDetail size={25} className='icon'/>
                     <span>Xem nhóm đơn hàng</span>
                 </div>
-                <div className="item" onClick={() => {
-                    // xong demo thì bỏ comment
-                    // if(record.status !== 'completed'){
-                    //     setActionMethod({orderId: '', actionType: '', orderType: '', openIndex: -1})
-                    //     return dispatch(setNoti({type: 'info', message: 'Không thể gia hạn đơn hàng khi chưa hoàn tất'}))
-                    // }
-                    setActionMethod({orderId: record.orderId, actionType: 'extend', orderType: 'rent', openIndex: -1})
-                }}>
-                    <SiGitextensions size={25} className='icon'/>
-                    <span>Gia hạn đơn hàng</span>
-                </div>
-                <div className="item" onClick={() => {
-                    handlePaymentRent({orderId: record.orderId, actionType: 'deposit', orderType: 'rent', openIndex: -1})
-                }} >
-                    <MdOutlinePayments size={25} className='icon'/>
-                    <span>Thanh toán cọc bằng Momo</span>
-                </div>
-                <div className="item" onClick={() => {
-                    handlePaymentRent({orderId: record.orderId, actionType: 'remaining', orderType: 'rent', openIndex: -1})
-                }} >
-                    <MdOutlinePayments size={25} className='icon'/>
-                    <span>Thanh toán đơn hàng bằng Momo</span>
-                </div>
+                {
+                    record.status === 'completed' && 
+                    <div className="item" onClick={() => {
+                        setActionMethod({orderId: record.orderId, actionType: 'extend', orderType: 'rent', openIndex: -1})
+                    }}>
+                        <SiGitextensions size={25} className='icon'/>
+                        <span>Gia hạn đơn hàng</span>
+                    </div>
+                }
+                {
+                    record.status === 'unpaid' &&
+                    <div className="item" onClick={() => {
+                        handlePaymentRent({orderId: record.orderId, actionType: 'deposit', orderType: 'rent', openIndex: -1})
+                    }} >
+                        <MdOutlinePayments size={25} className='icon'/>
+                        <span>Thanh toán cọc bằng Momo</span>
+                    </div>
+                }
+                {
+                    (record.status === 'unpaid' || record.status === 'ready') &&
+                    <div className="item" onClick={() => {
+                        handlePaymentRent({orderId: record.orderId, actionType: 'remaining', orderType: 'rent', openIndex: -1})
+                    }} >
+                        <MdOutlinePayments size={25} className='icon'/>
+                        <span>Thanh toán đơn hàng bằng Momo</span>
+                    </div>
+                }
+                {
+                    record.status === 'unpaid' && 
+                    <div className="item" onClick={() => {
+                        setActionMethod({orderId: record.orderId, actionType: 'cancel', orderType: 'rent', openIndex: -1})
+                    }} >
+                        <MdOutlinePayments size={25} className='icon'/>
+                        <span>Hủy đơn hàng</span>
+                    </div>
+                }
             </div>
         )
     }
@@ -483,28 +512,33 @@ const ClientOrder: React.FC = () =>{
                     <BiCommentDetail size={25} className='icon'/>
                     <span>Chi tiết đơn hàng</span>
                 </div>
-                {/* <div className="item" onClick={() => navigate(`/order-group/${record.groupID}`)}>
-                    <BiDetail size={25} className='icon'/>
-                    <span>Xem nhóm đơn hàng</span>
-                </div>
-                <div className="item" onClick={() => {
-                    setActionMethod({orderId: record.orderId, actionType: 'extend', orderType: 'rent', openIndex: -1})
-                }}>
-                    <SiGitextensions size={25} className='icon'/>
-                    <span>Gia hạn đơn hàng</span>
-                </div>*/}
-                <div className="item" onClick={() => {
-                    handlePaymentService({orderId: record.orderId, actionType: 'deposit', orderType: 'service', openIndex: -1})
-                }} >
-                    <MdOutlinePayments size={25} className='icon'/>
-                    <span>Thanh toán cọc bằng Momo</span>
-                </div>
-                <div className="item" onClick={() => {
-                    handlePaymentService({orderId: record.orderId, actionType: 'remaining', orderType: 'service', openIndex: -1})
-                }} >
-                    <MdOutlinePayments size={25} className='icon'/>
-                    <span>Thanh toán đơn hàng bằng Momo</span>
-                </div> 
+                {
+                    record.status === 'unpaid' &&
+                    <div className="item" onClick={() => {
+                        handlePaymentService({orderId: record.orderId, actionType: 'deposit', orderType: 'service', openIndex: -1})
+                    }} >
+                        <MdOutlinePayments size={25} className='icon'/>
+                        <span>Thanh toán cọc bằng Momo</span>
+                    </div>
+                }
+                {
+                    (record.status === 'unpaid' || record.status === 'ready') && 
+                    <div className="item" onClick={() => {
+                        handlePaymentService({orderId: record.orderId, actionType: 'remaining', orderType: 'service', openIndex: -1})
+                    }} >
+                        <MdOutlinePayments size={25} className='icon'/>
+                        <span>Thanh toán đơn hàng bằng Momo</span>
+                    </div> 
+                }
+                {
+                    record.status === 'unpaid' &&
+                    <div className="item" onClick={() => {
+                        setActionMethod({orderId: record.orderId, actionType: 'cancel', orderType: 'service', openIndex: -1})
+                    }} >
+                        <MdOutlinePayments size={25} className='icon'/>
+                        <span>Hủy đơn hàng</span>
+                    </div>
+                }
             </div>
         )
     }
@@ -651,6 +685,24 @@ const ClientOrder: React.FC = () =>{
     const handleCancel = () =>{
         setActionMethod(undefined)
     }
+    const handleCancelRentOrder = () =>{
+        const [order] = rentOrders.filter(x => x.rentOrderList[0].id === actionMethod?.orderId)[0].rentOrderList
+        order.status = 'cancel'
+        setRentOrders([...rentOrders])
+        handleCancel()
+    }
+    const handleCancelSaleOrder = () =>{
+        const [order] = saleOrders.filter(x => x.id === actionMethod?.orderId)
+        order.status = 'cancel'
+        setSaleOrders([...saleOrders])
+        handleCancel()
+    }
+    const handleCancelServiceOrder = () =>{
+        const [order] = serviceOrders.filter(x => x.id === actionMethod?.orderId)
+        order.status = 'cancel'
+        setServiceOrders([...serviceOrders])
+        handleCancel()
+    }
     return (
         <div>
             <LandingHeader />
@@ -749,6 +801,36 @@ const ClientOrder: React.FC = () =>{
                     rentOrderList={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0]}
                     onExtend={() => {}}
                 /> 
+            }
+            {
+                (actionMethod?.actionType === 'cancel' && actionMethod.orderType === 'rent') &&
+                <CancelOrder 
+                    onClose={handleCancel}
+                    onSubmit={handleCancelRentOrder}
+                    orderCode={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0].orderCode}
+                    orderId={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0].id}
+                    orderType='rent'
+                />
+            }
+            {
+                (actionMethod?.actionType === 'cancel' && actionMethod.orderType === 'sale') && 
+                <CancelOrder 
+                    onClose={handleCancel}
+                    onSubmit={handleCancelSaleOrder}
+                    orderCode={saleOrders.filter(x => x.id === actionMethod.orderId)[0].orderCode}
+                    orderId={saleOrders.filter(x => x.id === actionMethod.orderId)[0].id}
+                    orderType='sale'
+                />
+            }
+            {
+                (actionMethod?.actionType === 'cancel' && actionMethod.orderType === 'service') && 
+                <CancelOrder 
+                    onClose={handleCancel}
+                    onSubmit={handleCancelServiceOrder}
+                    orderCode={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].orderCode}
+                    orderId={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].id}
+                    orderType='service'
+                />
             }
         </div>
     );

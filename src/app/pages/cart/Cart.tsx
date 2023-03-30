@@ -150,7 +150,7 @@ const CartPage: React.FC = () => {
                         dispatch(setNoti({type: 'warning', message: `Số điểm sử dụng cho đơn hàng mua không được nhiều hơn ${res.data.maxPoint}`}))
                         return;
                     }
-                    setSaleValid(false)
+                    setSaleValid(true)
                     setFinalSalePrice(res.data)
                     // listRequestOrder.push(orderService.calculateOrder(data))
                 }
@@ -574,6 +574,7 @@ const CartPage: React.FC = () => {
         if(cart?.rentItems.length !== 0 && !dateRange) return;
 
         if(!saleValid || !rentValid){
+            console.log({saleValid, rentValid})
             return dispatch(setNoti({type: 'info', message: 'Vui lòng nhập đủ và đúng thông tin để có thể đặt hàng'}))
         }
 
@@ -615,6 +616,28 @@ const CartPage: React.FC = () => {
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
     }
+    const TotalRentPrice = useMemo(() =>{
+        let price = 0
+
+        if(!cart) return 0
+
+        for (const item of cart.rentItems) {
+            price += item.quantity * item.productItemDetail.rentPrice
+        }
+
+        return price
+    }, [cart])
+    const TotalSalePrice = useMemo(() =>{
+        let price = 0
+
+        if(!cart) return 0
+
+        for (const item of cart.saleItems) {
+            price += item.quantity * item.productItemDetail.salePrice
+        }
+
+        return price
+    }, [cart])
     return (
         <div>
             <LandingHeader />
@@ -649,21 +672,22 @@ const CartPage: React.FC = () => {
                                         <div className="price-box">
                                             <div className="left">
                                                 <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Tổng tiền hàng</span>
+                                            </div>
+                                            <div className="right">
+                                                <MoneyFormat value={TotalSalePrice} />
+                                            </div>
+                                        </div>
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
                                                 <span>Phí vận chuyển</span>
                                             </div>
                                             <div className="right">
                                                 <MoneyFormat value={finalSalePrice.transportFee} />
                                             </div>
                                         </div>
-                                        <div className="price-box">
-                                            <div className="left">
-                                                <FaMoneyBillAlt color='#00a76f' size={25} />
-                                                <span>Tiền cọc</span>
-                                            </div>
-                                            <div className="right">
-                                                <MoneyFormat value={finalSalePrice.deposit} />
-                                            </div>
-                                        </div>
+                                        
                                         <div className="price-box">
                                             <div className="left">
                                                 <FaMoneyBillAlt color='#00a76f' size={25} />
@@ -676,10 +700,19 @@ const CartPage: React.FC = () => {
                                         <div className="price-box">
                                             <div className="left">
                                                 <FaMoneyBillAlt color='#00a76f' size={25} />
-                                                <span>Tổng tiền</span>
+                                                <span>Tổng tiền thanh toán</span>
                                             </div>
                                             <div className="right">
-                                                <MoneyFormat value={finalSalePrice.totalPrice} isHighlight color='Orange' />
+                                                <MoneyFormat value={finalSalePrice.totalPrice} isHighlight color='Blue' />
+                                            </div>
+                                        </div>
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Tiền cọc</span>
+                                            </div>
+                                            <div className="right">
+                                                <MoneyFormat value={finalSalePrice.deposit} isHighlight color='Orange' />
                                             </div>
                                         </div>
                                     </div>
@@ -691,15 +724,7 @@ const CartPage: React.FC = () => {
                                 {
                                     (finalRentPrice && dateRange) && 
                                     <div className="price-infor">
-                                        <div className="price-box">
-                                            <div className="left">
-                                                <FaMoneyBillAlt color='#00a76f' size={25} />
-                                                <span>Tổng số ngày thuê</span>
-                                            </div>
-                                            <div className="right">
-                                                {dateRange[1].diff(dateRange[0], 'days')}
-                                            </div>
-                                        </div>
+                                        
                                         <div className="price-box">
                                             <div className="left">
                                                 <FaMoneyBillAlt color='#00a76f' size={25} />
@@ -721,21 +746,31 @@ const CartPage: React.FC = () => {
                                         <div className="price-box">
                                             <div className="left">
                                                 <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Tổng số ngày thuê</span>
+                                            </div>
+                                            <div className="right">
+                                                {dateRange[1].diff(dateRange[0], 'days')}
+                                            </div>
+                                        </div>
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Tổng số tiền thuê</span>
+                                            </div>
+                                            <div className="right">
+                                                <MoneyFormat value={dateRange[1].diff(dateRange[0], 'days') * TotalRentPrice} />
+                                            </div>
+                                        </div>
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
                                                 <span>Phí vận chuyển</span>
                                             </div>
                                             <div className="right">
                                                 <MoneyFormat value={finalRentPrice.transportFee} />
                                             </div>
                                         </div>
-                                        <div className="price-box">
-                                            <div className="left">
-                                                <FaMoneyBillAlt color='#00a76f' size={25} />
-                                                <span>Tiền cọc</span>
-                                            </div>
-                                            <div className="right">
-                                                <MoneyFormat value={finalRentPrice.deposit} />
-                                            </div>
-                                        </div>
+                                       
                                         <div className="price-box">
                                             <div className="left">
                                                 <FaMoneyBillAlt color='#00a76f' size={25} />
@@ -748,10 +783,19 @@ const CartPage: React.FC = () => {
                                         <div className="price-box">
                                             <div className="left">
                                                 <FaMoneyBillAlt color='#00a76f' size={25} />
-                                                <span>Tổng tiền</span>
+                                                <span>Tổng tiền thanh toán</span>
                                             </div>
                                             <div className="right">
-                                                <MoneyFormat value={finalRentPrice.totalPrice} isHighlight color='Orange' />
+                                                <MoneyFormat value={finalRentPrice.totalPrice} isHighlight color='Blue' />
+                                            </div>
+                                        </div>
+                                        <div className="price-box">
+                                            <div className="left">
+                                                <FaMoneyBillAlt color='#00a76f' size={25} />
+                                                <span>Tiền cọc</span>
+                                            </div>
+                                            <div className="right">
+                                                <MoneyFormat value={finalRentPrice.deposit} isHighlight color='Orange' />
                                             </div>
                                         </div>
                                     </div>

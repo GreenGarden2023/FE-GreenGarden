@@ -1,7 +1,11 @@
+import { SyncOutlined } from '@ant-design/icons'
 import { Checkbox, Modal, Popover, Tag } from 'antd'
 import { CheckboxChangeEvent } from 'antd/es/checkbox'
 import Table, { ColumnsType } from 'antd/es/table'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
+import CancelOrder from 'app/components/modal/cancel-order/CancelOrder'
+import RefundOrder from 'app/components/modal/refundOrder.tsx/RefundOrder'
+import MoneyFormat from 'app/components/money/MoneyFormat'
 import TechnicianName from 'app/components/renderer/technician/TechnicianName'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
 import useDispatch from 'app/hooks/use-dispatch'
@@ -18,12 +22,10 @@ import pagingPath from 'app/utils/paging-path'
 import React, { useEffect, useMemo, useState } from 'react'
 import CurrencyFormat from 'react-currency-format'
 import { BiCommentDetail, BiDetail } from 'react-icons/bi'
-import { GrMore } from 'react-icons/gr'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import {SyncOutlined} from '@ant-design/icons'
 import { FaCheck } from 'react-icons/fa'
+import { GrMore } from 'react-icons/gr'
 import { MdAttachMoney, MdDoneAll, MdOutlineCancel } from 'react-icons/md'
-import MoneyFormat from 'app/components/money/MoneyFormat'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
 export const OrderStatusToTag = (status: OrderStatus) =>{
     switch(status){
@@ -31,7 +33,7 @@ export const OrderStatusToTag = (status: OrderStatus) =>{
         case 'ready': return <Tag className='center' color='#108ee9' icon={<MdAttachMoney />} >Đã thanh toán cọc</Tag>
         case 'paid': return <Tag className='center' color='#87d068' icon={<FaCheck />} >Đã thanh toán đủ</Tag>
         case 'completed': return <Tag className='center' color='#2db7f5' icon={<MdDoneAll />} >Đã hoàn thành</Tag>
-        case 'cancel': return <Tag className='center' color='f50' icon={<MdOutlineCancel />} >Đã bị hủy</Tag>
+        case 'cancel': return <Tag className='center' color='#528B8B' icon={<MdOutlineCancel />} >Đã bị hủy</Tag>
     }
 }
 
@@ -46,6 +48,7 @@ const ManageTakeCareOrder: React.FC = () => {
     const [amount, setAmount] = useState(0);
     const [checkFullAmount, setCheckFullAmount] = useState(false);
     const [recall, setRecall] = useState(true)
+
 
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
 
@@ -105,24 +108,42 @@ const ManageTakeCareOrder: React.FC = () => {
                     <BiCommentDetail size={25} className='icon'/>
                     <span>Chi tiết đơn hàng</span>
                 </div>
-                <div className="item" onClick={() => {
-                    handleAction({orderId: record.orderId, actionType: 'deposit', orderType: 'service', openIndex: -1})
-                }}>
-                    <BiDetail size={25} className='icon'/>
-                    <span>Thanh toán tiền cọc</span>
-                </div>
-                <div className="item" onClick={() => {
-                    handleAction({orderId: record.orderId, actionType: 'remaining', orderType: 'service', openIndex: -1})
-                }}>
-                    <BiDetail size={25} className='icon'/>
-                    <span>Thanh toán đơn hàng</span>
-                </div>
-                <div className="item" onClick={() => {
-                    handleAction({orderId: record.orderId, actionType: 'cancel', orderType: 'service', openIndex: -1})
-                }}>
-                    <BiDetail size={25} className='icon'/>
-                    <span>Hủy đơn hàng</span>
-                </div>
+                {
+                    (record.status === 'unpaid') && 
+                    <div className="item" onClick={() => {
+                        handleAction({orderId: record.orderId, actionType: 'deposit', orderType: 'service', openIndex: -1})
+                    }}>
+                        <BiDetail size={25} className='icon'/>
+                        <span>Thanh toán tiền cọc</span>
+                    </div>
+                }
+                {
+                    (record.status === 'ready' || record.status === 'unpaid') &&
+                    <div className="item" onClick={() => {
+                        handleAction({orderId: record.orderId, actionType: 'remaining', orderType: 'service', openIndex: -1})
+                    }}>
+                        <BiDetail size={25} className='icon'/>
+                        <span>Thanh toán đơn hàng</span>
+                    </div>
+                }
+                {
+                    (record.status !== 'completed' && record.status !== 'cancel') &&
+                    <div className="item" onClick={() => {
+                        handleAction({orderId: record.orderId, actionType: 'cancel', orderType: 'service', openIndex: -1})
+                    }}>
+                        <BiDetail size={25} className='icon'/>
+                        <span>Hủy đơn hàng</span>
+                    </div>
+                }
+                {
+                    record.status === 'cancel' &&
+                    <div className="item" onClick={() => {
+                        handleAction({orderId: record.orderId, actionType: 'refund', orderType: 'service', openIndex: -1})
+                    }}>
+                        <BiDetail size={25} className='icon'/>
+                        <span>Hoàn tiền</span>
+                    </div>
+                }
             </div>
         )
     }
@@ -322,13 +343,12 @@ const ManageTakeCareOrder: React.FC = () => {
     const handleCancelOrder = () =>{
         const [order] = serviceOrders.filter(x => x.id === actionMethod?.orderId)
 
-        try{
-
-            dispatch(setNoti({type: 'success', message: `Hủy đơn hàng "${order.orderCode}" thành công`}))
-            handleClose()
-        }catch{
-
-        }
+        order.status = 'cancel'
+        setServiceOrders([...serviceOrders])
+        handleClose()
+    }
+    const handleRefund = () =>{
+        handleClose()
     }
     return (
         <div className="mtko-wrapper">
@@ -386,15 +406,24 @@ const ManageTakeCareOrder: React.FC = () => {
                 </Modal>
             }
             {
-                actionMethod?.actionType === 'cancel' &&
-                <Modal
-                    title={`Xác nhận hủy đơn hàng "${serviceOrders.filter(x => x.id === actionMethod.orderId)[0].orderCode}"`}
-                    open
-                    onCancel={handleClose}
-                    onOk={handleCancelOrder}
-                >
-
-                </Modal>
+                actionMethod?.actionType === 'cancel' && 
+                <CancelOrder 
+                    onClose={handleClose}
+                    onSubmit={handleCancelOrder}
+                    orderCode={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].orderCode}
+                    orderId={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].id}
+                    orderType='service'
+                />
+            }
+            {
+                actionMethod?.actionType === 'refund' &&
+                <RefundOrder 
+                    onClose={handleClose}
+                    onSubmit={handleRefund}
+                    orderCode={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].orderCode}
+                    orderId={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].id}
+                    orderType='service'
+                />
             }
         </div>
     )

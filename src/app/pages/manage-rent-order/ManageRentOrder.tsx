@@ -1,7 +1,9 @@
 import { Popover } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
+import CancelOrder from 'app/components/modal/cancel-order/CancelOrder'
 import ModalClientRentOrderDetai from 'app/components/modal/client-rent-order-detail/ModalClientRentOrderDetai'
+import RefundOrder from 'app/components/modal/refundOrder.tsx/RefundOrder'
 import RentOrderPaymentCash from 'app/components/modal/rent-oder-payment-cash/RentOrderPaymentCash'
 import RentOrderPaymentDeposit from 'app/components/modal/rent-order-payment-deposit/RentOrderPaymentDeposit'
 import ReturnDepositRentOrder from 'app/components/modal/return-deposit-rent-order/ReturnDepositRentOrder'
@@ -180,28 +182,51 @@ const ManageRentOrder:React.FC = () => {
                     <FaLayerGroup size={25} className='icon'/>
                     <span>Xem nhóm đơn hàng</span>
                 </div>
-                <div className="item" onClick={() => {
-                    handleSetAction({orderId: record.orderId, actionType: 'deposit', orderType: 'rent', openIndex: -1})
-                }}>
-                    <MdOutlinePayments size={25} className='icon'/>
-                    <span>Thanh toán tiền cọc</span>
-                </div>
-                <div className="item" onClick={() => {
-                    handleSetAction({orderId: record.orderId, actionType: 'remaining', orderType: 'rent', openIndex: -1})
-                }}>
-                    <RiBillLine size={25} className='icon'/>
-                    <span>Thanh toán đơn hàng</span>
-                </div>
-                <div className="item" onClick={() => {
-                    if(record.status !== 'paid'){
-                        handleSetAction({orderId: '', actionType: '', orderType: '', openIndex: -1})
-                        return dispatch(setNoti({type: 'info', message: 'Chưa đủ điều kiện hoàn cọc'}))
-                    }
-                    handleSetAction({orderId: record.orderId, actionType: 'return deposit', orderType: 'rent', openIndex: -1})
-                }}>
-                    <GiReturnArrow size={25} className='icon'/>
-                    <span>Xác nhận hoàn cọc</span>
-                </div>
+                {
+                    (record.status === 'unpaid') &&
+                    <div className="item" onClick={() => {
+                        handleSetAction({orderId: record.orderId, actionType: 'deposit', orderType: 'rent', openIndex: -1})
+                    }}>
+                        <MdOutlinePayments size={25} className='icon'/>
+                        <span>Thanh toán tiền cọc</span>
+                    </div>
+                }
+                {
+                    (record.status === 'ready' || record.status === 'unpaid') && 
+                    <div className="item" onClick={() => {
+                        handleSetAction({orderId: record.orderId, actionType: 'remaining', orderType: 'rent', openIndex: -1})
+                    }}>
+                        <RiBillLine size={25} className='icon'/>
+                        <span>Thanh toán đơn hàng</span>
+                    </div>
+                }
+                {
+                    record.status === 'paid' && 
+                    <div className="item" onClick={() => {
+                        handleSetAction({orderId: record.orderId, actionType: 'return deposit', orderType: 'rent', openIndex: -1})
+                    }}>
+                        <GiReturnArrow size={25} className='icon'/>
+                        <span>Xác nhận hoàn cọc</span>
+                    </div>
+                }
+                {
+                    (record.status !== 'completed' && record.status !== 'cancel') && 
+                    <div className="item" onClick={() => {
+                        handleSetAction({orderId: record.orderId, actionType: 'cancel', orderType: 'rent', openIndex: -1})
+                    }}>
+                        <RiBillLine size={25} className='icon'/>
+                        <span>Hủy đơn hàng</span>
+                    </div>
+                }
+                {
+                    record.status === 'cancel' &&
+                    <div className="item" onClick={() => {
+                        handleSetAction({orderId: record.orderId, actionType: 'refund', orderType: 'rent', openIndex: -1})
+                    }}>
+                        <BiDetail size={25} className='icon'/>
+                        <span>Hoàn tiền</span>
+                    </div>
+                }
             </div>
         )
     }
@@ -280,6 +305,16 @@ const ManageRentOrder:React.FC = () => {
         setRentOrders([...rentOrders])
         setActionMethod(undefined)
     }
+    const handleCancelOrder = () =>{
+        const [order] = rentOrders.filter(x => x.rentOrderList[0].id === actionMethod?.orderId)[0].rentOrderList
+
+        order.status = 'cancel'
+        setRentOrders([...rentOrders])
+        handleClose()
+    }
+    const handleRefundOrder = () =>{
+        handleClose()
+    }
     return (
         <div className="mro-wrapper">
             <HeaderInfor title='Quản lý đơn hàng thuê' />
@@ -328,6 +363,26 @@ const ManageRentOrder:React.FC = () => {
                     rentOrderList={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0]}
                     onClose={handleClose}
                     onSubmit={handleReturnDeposit}
+                />
+            }
+            {
+                actionMethod?.actionType === 'cancel' &&
+                <CancelOrder
+                    onClose={handleClose}
+                    onSubmit={handleCancelOrder}
+                    orderCode={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0].orderCode}
+                    orderId={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0].id}
+                    orderType='rent'
+                />
+            }
+            {
+                actionMethod?.actionType === 'refund' &&
+                <RefundOrder
+                    onClose={handleClose}
+                    onSubmit={handleRefundOrder}
+                    orderCode={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0].orderCode}
+                    orderId={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0].id}
+                    orderType='rent'
                 />
             }
         </div>

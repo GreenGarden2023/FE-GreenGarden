@@ -1,4 +1,4 @@
-import { Button, Col, Form, Image, Input, Modal, Row } from 'antd';
+import { Button, Col, DatePicker, Form, Image, Input, Modal, Row, Select } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 import useDispatch from 'app/hooks/use-dispatch';
 import { Service, ServiceUpdate, UpdateServiceDetail } from 'app/models/service';
@@ -7,6 +7,10 @@ import { setNoti } from 'app/slices/notification';
 import React, { useEffect, useState } from 'react';
 import CurrencyFormat from 'react-currency-format';
 import { Controller, useForm } from 'react-hook-form';
+import locale from 'antd/es/date-picker/locale/vi_VN'
+import Dayjs from 'dayjs'
+
+const dateFormatList = ['DD/MM/YYYY', 'DD/MM/YY', 'DD-MM-YYYY', 'DD-MM-YY'];
 
 interface UpdateConfirmServiceDetailProps{
     service: Service;
@@ -17,19 +21,20 @@ interface UpdateConfirmServiceDetailProps{
 const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({service, onClose, onSubmit}) => {
     const dispatch = useDispatch()
 
-    const { setValue, formState: {errors, isSubmitting}, control, trigger, handleSubmit } = useForm<ServiceUpdate>({
+    const { setValue, formState: {errors, isSubmitting, isSubmitted}, control, trigger, handleSubmit, setError, clearErrors, getValues } = useForm<ServiceUpdate>({
 
     })
 
     console.log({errors, trigger})
 
+    const [transport, setTransport] = useState(false)
 
     const [serviceDetail, setServiceDetail] = useState(service)
     const [listQuan, setListQuan] = useState<string[]>([])
     const [listPrice, setListPrice] = useState<string[]>([])
 
     useEffect(() =>{
-        const { id, name, phone, email, address, rewardPointUsed } = service
+        const { id, name, phone, email, address, rewardPointUsed, startDate, endDate, isTransport, rules } = service
         setValue('serviceID', id)
         setValue('name', name)
         setValue('phone', phone)
@@ -37,7 +42,17 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
         setValue('address', address)
         setValue('transportFee', 0)
         setValue('rewardPointUsed', rewardPointUsed)
-    }, [service, setValue])
+        setValue('startDate', startDate)
+        setValue('endDate', endDate)
+
+        setValue('rules', rules)
+
+        setTransport(isTransport)
+
+        trigger('startDate')
+        trigger('endDate')
+
+    }, [service, setValue, trigger])
 
     const ColumnTree: ColumnsType<any> = [
         {
@@ -175,7 +190,23 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
 
         }
     }
-
+    const handleChangeDateRange = (dates, dateStrings) =>{
+        if(!dates){
+            setValue('startDate', undefined)
+            setValue('endDate', undefined)
+            if(isSubmitted){
+                setError('startDate', {
+                    message: 'Ngày chăm sóc không được để trống',
+                    type: 'pattern'
+                })
+            }
+            return;
+        }
+        const [start, end] = dates
+        setValue('startDate', start.toDate())
+        setValue('endDate', end.toDate())
+        clearErrors('startDate')
+    }
     return (
         <Modal
             open
@@ -234,7 +265,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                 <Controller
                                     control={control}
                                     name='transportFee'
-                                    render={({field}) => (<Input {...field} />)}
+                                    render={({field}) => (<Input disabled={transport} {...field} />)}
                                 />
                             </Form.Item>
                         </Col>
@@ -244,6 +275,46 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                     control={control}
                                     name='rewardPointUsed'
                                     render={({field}) => (<Input {...field} />)}
+                                />
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item label='Nơi chăm sóc cây' >
+                                <Select value={transport} onChange={(e) => {
+                                    setValue('transportFee', 0)
+                                    setTransport(e)
+                                }}>
+                                    <Select.Option value={true}>Chăm sóc tại nhà</Select.Option>
+                                    <Select.Option value={false}>Chăm sóc tại cửa hàng</Select.Option>
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item label='Chọn ngày chăm sóc' required>
+                                <DatePicker.RangePicker 
+                                    locale={locale} 
+                                    placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
+                                    format={dateFormatList}
+                                    disabledDate={(current) => current && current.valueOf()  < Date.now()}
+                                    onChange={handleChangeDateRange}
+                                    style={{width: '100%'}}
+                                    value={[Dayjs(Dayjs(getValues('startDate')).format('DD/MM/YYYY'), 'DD/MM/YYYY'), Dayjs(Dayjs(getValues('endDate')).format('DD/MM/YYYY'), 'DD/MM/YYYY')]}
+                                    clearIcon={null}
+                                />
+                                {/* {errors.startDate && <ErrorMessage message={errors.startDate.message} />} */}
+                            </Form.Item>
+                        </Col>
+                        <Col span={24}>
+                            <Form.Item label='Thông tin hợp đồng' required>
+                                <div>
+                                    Text
+                                </div>
+                                <Controller
+                                    control={control}
+                                    name='rules'
+                                    render={({field}) => (
+                                        <Input.TextArea {...field} autoSize={{minRows: 4, maxRows: 6}}></Input.TextArea>
+                                    )}
                                 />
                             </Form.Item>
                         </Col>

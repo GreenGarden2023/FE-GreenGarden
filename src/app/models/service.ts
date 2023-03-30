@@ -33,6 +33,9 @@ export interface ServiceUpdate {
     address: string
     transportFee: number
     rewardPointUsed: number
+    startDate?: Date
+    endDate?: Date
+    rules: string;
 }
   
 export interface ServiceDetailUpdate {
@@ -50,8 +53,8 @@ export interface Service {
     userID: string
     userCurrentPoint: number
     createDate: string
-    startDate: string
-    endDate: string
+    startDate: Date
+    endDate: Date
     name: string
     phone: string
     email: string
@@ -63,6 +66,7 @@ export interface Service {
     technicianID: string
     technicianName: string
     serviceDetailList: ServiceDetailList[]
+    rules: string
 }
   
 export interface ServiceDetailList {
