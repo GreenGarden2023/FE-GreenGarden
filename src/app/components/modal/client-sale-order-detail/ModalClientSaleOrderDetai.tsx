@@ -13,6 +13,8 @@ import { HiOutlineStatusOnline } from 'react-icons/hi';
 import { IoInformationCircleOutline } from 'react-icons/io5';
 import { MdOutlineDriveFileRenameOutline } from 'react-icons/md';
 import './style.scss';
+import TreeName from 'app/components/renderer/tree-name/TreeName';
+import MoneyFormat from 'app/components/money/MoneyFormat';
 
 interface ModalClientSaleOrderDetaiProps{
     // orderId: string
@@ -47,7 +49,7 @@ const ModalClientSaleOrderDetai: React.FC<ModalClientSaleOrderDetaiProps> = ({ s
             title: 'Tên sản phẩm',
             key: 'productItemName',
             dataIndex: 'productItemName',
-            render: (v) => (v)
+            render: (v) => (<TreeName name={v} />)
         },
         {
             title: 'Hình ảnh',
@@ -56,9 +58,10 @@ const ModalClientSaleOrderDetai: React.FC<ModalClientSaleOrderDetaiProps> = ({ s
             align: 'center',
             render: (v) => (
                 <Image 
-                    width={150}
-                    height={150}
+                    width={100}
+                    height={100}
                     src={v}
+                    style={{objectFit: 'cover'}}
                 />
             )
         },
@@ -70,6 +73,13 @@ const ModalClientSaleOrderDetai: React.FC<ModalClientSaleOrderDetaiProps> = ({ s
             render: (v) => (v)
         },
         {
+            title: 'Giá tiền',
+            key: 'salePricePerUnit',
+            dataIndex: 'salePricePerUnit',
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} isHighlight color='Light Blue' />)
+        },
+        {
             title: 'Số lượng',
             key: 'quantity',
             dataIndex: 'quantity',
@@ -77,18 +87,11 @@ const ModalClientSaleOrderDetai: React.FC<ModalClientSaleOrderDetaiProps> = ({ s
             render: (v) => (v)
         },
         {
-            title: 'Giá tiền',
-            key: 'salePricePerUnit',
-            dataIndex: 'salePricePerUnit',
-            align: 'right',
-            render: (v) => (<CurrencyFormat className='value' value={v} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />)
-        },
-        {
             title: 'Tổng tiền',
             key: 'totalPrice',
             dataIndex: 'totalPrice',
             align: 'right',
-            render: (v) => (<CurrencyFormat className='value' value={v} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />)
+            render: (v) => (<MoneyFormat value={v} isHighlight color='Blue' />)
         },
     ]
     const DataSource = useMemo(() =>{

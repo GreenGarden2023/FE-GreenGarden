@@ -71,7 +71,10 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productId, numberOfC
             try{
                 const res = await productItemService.createProductItem(data);
                 handleCloseModal()
-                onSubmit(res.data)
+                const content = res.data
+                content.imageURL = data.imageURL || ''
+                content.productItemDetail = []
+                onSubmit(content)
                 reset()
                 dispatch(setNoti({type: 'success', message: `Tạo mới thành công`}))
             }catch{
@@ -132,6 +135,8 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productId, numberOfC
             footer={null}
             title={`${productItem ? 'Chỉnh sửa' : 'Tạo mới'} sản phẩm`}
             width={1200}
+            style={{overflow: 'hidden auto'}}
+            bodyStyle={{maxHeight: '650px', overflow: 'hidden auto'}}
         >
             <Form
                 layout='vertical'

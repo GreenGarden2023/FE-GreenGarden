@@ -17,8 +17,8 @@ import userTreeService from 'app/services/user-tree.service';
 const schema = yup.object().shape({
   treeName: yup.string().required('Tên của cây không được để trống').max(50, 'Tên của cây không nhiều hơn 50 ký tự'),
   description: yup.string().required('Mô tả không được để trống').max(500, 'Mô tả không nhiều hơn 500 ký tự'),
-  quantity: yup.number().required('Số lượng không được để trống').min(1, 'Số lượng có ít nhất 1 cây').typeError('Kiểu giá trị của số lượng là số'),
-  imgUrls: yup.array().required('Có ít nhất 1 hình ảnh cho thông tin này').min(1, 'Có ít nhất 1 hình ảnh cho thông tin này')
+  imgUrls: yup.array().required('Có ít nhất 1 hình ảnh cho thông tin này').min(1, 'Có ít nhất 1 hình ảnh cho thông tin này'),
+  quantity: yup.number().min(1, 'Số lượng cây ít nhất là 1')
 })
 
 interface ModalTakeCareCreateTreeProps{
@@ -33,7 +33,7 @@ const ModalTakeCareCreateTree:React.FC<ModalTakeCareCreateTreeProps> = ({ tree, 
   const { setValue, formState: { errors, isSubmitting }, control, handleSubmit, setError, trigger, getValues } = useForm<Partial<UserTree>>({
     defaultValues: {
       status: 'active',
-      quantity: 1,
+      quantity: 0,
     },
     resolver: yupResolver(schema)
   })
@@ -53,7 +53,16 @@ const ModalTakeCareCreateTree:React.FC<ModalTakeCareCreateTreeProps> = ({ tree, 
   }, [tree, setValue, trigger])
 
   const handleSubmitForm = async (data: Partial<UserTree>) =>{
-    console.log(data)
+    if(!data) return;
+
+    if((data.quantity || 0) > (data.imgUrls ? data.imgUrls.length : 0)){
+      setError('imgUrls', {
+        type: 'pattern',
+        message: 'Số lượng ảnh không đủ so với số lượng cây'
+      })
+      return
+    }
+    
     if(!data.id){
       // create
       try{
@@ -141,7 +150,11 @@ const ModalTakeCareCreateTree:React.FC<ModalTakeCareCreateTreeProps> = ({ tree, 
               <Controller
                 control={control}
                 name='quantity'
-                render={({ field }) => (<Input {...field} />)}
+                render={({ field: { value } }) => (<Input type='number' min={0} value={value} onChange={(e) =>{
+                  const data = Number(e.target.value || 0)
+                  setValue('quantity', data)
+                  trigger('quantity')
+                }} />)}
               />
               {errors.quantity && <ErrorMessage message={errors.quantity.message} />}
             </Form.Item>

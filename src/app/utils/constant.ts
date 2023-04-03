@@ -62,6 +62,24 @@ const PAYMENT_MESSAGE = {
     PAID_DEPOSIT: 'Đơn hàng này đã thanh toán tiền cọc',
     PAID_REMAINING: 'Đơn hàng này đã thanh toán đủ'
 }
+const PHONE_REGEX = /(0[3|5|7|8|9])+([0-9]{8})\b/g
+const EMAIL_REGEX = /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
+const DATE_FORMAT_LIST = ['DD/MM/YYYY', 'DD/MM/YY', 'DD-MM-YYYY', 'DD-MM-YY'];
+
+// 1000vnđ / điểm
+const POINT_TO_MONEY = 1000
+// total price / 100000
+const REWARD_POINT_RATE = 10000
+// đơn thuê ít nhất 200k mới có deposit
+const RENT_DEPOSIT_RATE = 200000
+// đơn mua ít nhất 200k mới có deposit
+const SALE_DEPOSIT_RATE = 500000
+// giá order >= 50k mới cho nhập tích điểm
+const MIN_ORDER = 50000
+// / 10k tối thiểu
+const MONEY_RATE = 10000
+// trả trước ít nhất 20% order
+const DEPOSIT_MIN_RATE = 0.2
 
 const CONSTANT = {
     STORAGE,
@@ -82,7 +100,17 @@ const CONSTANT = {
     MANAGE_ORDER,
     PAYMENT_MESSAGE,
     MANAGE_SHIPPING_FEE,
-    TAKE_CARE_ORDER
+    TAKE_CARE_ORDER,
+    PHONE_REGEX,
+    EMAIL_REGEX,
+    DATE_FORMAT_LIST,
+    POINT_TO_MONEY,
+    REWARD_POINT_RATE,
+    RENT_DEPOSIT_RATE,
+    SALE_DEPOSIT_RATE,
+    MIN_ORDER,
+    MONEY_RATE,
+    DEPOSIT_MIN_RATE
 }
 
 export default CONSTANT

@@ -19,8 +19,9 @@ interface CartSizeProductItem{
     status: string;
     size: Size;
     imgUrl: string[]
+    transportFee: number
 }
-interface CartItemDetail{
+export interface CartItemDetail{
     productItemDetail: CartSizeProductItem;
     productItem: CartProductItem;
     quantity: number;
@@ -40,9 +41,33 @@ export interface CartItem{
     quantity: number
 }
 
-export interface CartUserData{
-    recipientAddress: string;
-    recipientPhone: string;
-    recipientName: string;
-    shippingID: number;
+// export interface CartUserData{
+//     recipientAddress: string;
+//     recipientPhone: string;
+//     recipientName: string;
+//     shippingID: number;
+// }
+
+export interface OrderUserInfor{
+    startDateRent?: Date
+    endDateRent?: Date
+    shippingID: number
+    rewardPointUsed: number
+    recipientAddress: string
+    recipientPhone: string
+    recipientName: string
+    rentOrderGroupID?: string
+    itemList: CartItem[]
+    isTransport: boolean;
+}
+
+export interface OrderPreview{
+    pointUsed: number;
+    rewardPoint: number;
+    totalPriceOrder: number;
+    transportFee: number;
+    discountAmount: number;
+    totalPricePayment: number;
+    deposit: number;
+    totalRentDays?: number;
 }

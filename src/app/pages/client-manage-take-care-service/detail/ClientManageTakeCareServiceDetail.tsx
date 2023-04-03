@@ -1,10 +1,11 @@
-import { Col, Image, Popover, Row, Table } from 'antd'
+import { Col, Popover, Row, Table } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import LandingFooter from 'app/components/footer/LandingFooter'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import LandingHeader from 'app/components/header/LandingHeader'
 import MoneyFormat from 'app/components/money/MoneyFormat'
 import Description from 'app/components/renderer/description/Description'
+import ListImage from 'app/components/renderer/list-image/ListImage'
 import TreeName from 'app/components/renderer/tree-name/TreeName'
 import { PaymentControlState } from 'app/models/payment'
 import { ServiceOrderDetail } from 'app/models/service'
@@ -16,6 +17,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { BiCommentDetail } from 'react-icons/bi'
 import { GrMore } from 'react-icons/gr'
 import { useParams } from 'react-router-dom'
+import './style.scss'
 
 const ClientManageTakeCareServiceDetail: React.FC = () => {
     const { orderId } = useParams()
@@ -72,22 +74,7 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
             title: 'Hình ảnh',
             key: 'imgUrls',
             dataIndex: 'imgUrls',
-            render: (v) => (
-                <Image.PreviewGroup>
-                    {
-                        v.map((item, index) => (
-                            <div key={index} style={{display: index === 0 ? 'initial' : 'none'}}>
-                                <Image 
-                                width={150}
-                                height={150}
-                                src={item}
-                                style={{objectFit: 'cover'}}
-                            />
-                            </div>
-                        ))
-                    }
-                </Image.PreviewGroup>
-            )
+            render: (v) => (<ListImage listImgs={v} />)
         },
         {
             title: 'Số lượng',
@@ -223,6 +210,10 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
                                 <Col span={8}>
                                     <span className="label">Email:</span>
                                     <span className="content">{serviceOrder.technician.technicianMail}</span>
+                                </Col>
+                                <Col span={8}>
+                                    <span className="label">Trạng thái đơn hàng</span>
+                                    <span className="content">{serviceOrder.status}</span>
                                 </Col>
                             </Row>
                         </div>

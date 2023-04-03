@@ -1,10 +1,11 @@
-import { Col, Image, Input, Modal, Row } from 'antd'
+import { Col, Input, Modal, Row } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import LandingFooter from 'app/components/footer/LandingFooter'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import LandingHeader from 'app/components/header/LandingHeader'
 import MoneyFormat from 'app/components/money/MoneyFormat'
 import Description from 'app/components/renderer/description/Description'
+import ListImage from 'app/components/renderer/list-image/ListImage'
 import TreeName from 'app/components/renderer/tree-name/TreeName'
 import useDispatch from 'app/hooks/use-dispatch'
 import { Service } from 'app/models/service'
@@ -14,6 +15,7 @@ import utilDateTime from 'app/utils/date-time'
 import React, { useEffect, useMemo, useState } from 'react'
 import { AiOutlineCheck } from 'react-icons/ai'
 import { useNavigate, useParams } from 'react-router-dom'
+import { ServiceStatusToTag } from '../manage-take-care-service/ManageTakeCareService'
 import './style.scss'
 
 const ClientTakeCareServiceConfirm: React.FC = () => {
@@ -54,22 +56,7 @@ const ClientTakeCareServiceConfirm: React.FC = () => {
             title: 'Hình ảnh',
             key: 'imgUrls',
             dataIndex: 'imgUrls',
-            render: (v) => (
-                <Image.PreviewGroup>
-                    {
-                        v.map((item, index) => (
-                            <div key={index} style={{display: index === 0 ? 'initial' : 'none'}}>
-                                <Image 
-                                width={150}
-                                height={150}
-                                src={item}
-                                style={{objectFit: 'cover'}}
-                            />
-                            </div>
-                        ))
-                    }
-                </Image.PreviewGroup>
-            )
+            render: (v) => (<ListImage listImgs={v} />)
         },
         {
             title: 'Số lượng',
@@ -127,12 +114,15 @@ const ClientTakeCareServiceConfirm: React.FC = () => {
             <div className="main-content-not-home">
                 <div className="container-wrapper ctcsc-wrapper">
                     <HeaderInfor title='Xác nhận thông tin chi tiết yêu cầu chăm sóc' />
-                    <section className="default-layout">
-                        <button className='btn btn-create' onClick={() => setOpenModal(1)}>
-                            <AiOutlineCheck />
-                            <span>Xác nhận thông tin</span>
-                        </button>
-                    </section>
+                    {
+                        service?.status === 'accepted' &&
+                        <section className="default-layout">
+                            <button className='btn btn-create' onClick={() => setOpenModal(1)}>
+                                <AiOutlineCheck />
+                                <span>Xác nhận thông tin</span>
+                            </button>
+                        </section>
+                    }
                     <section className="default-layout">
                         {
                             service && 
@@ -154,7 +144,7 @@ const ClientTakeCareServiceConfirm: React.FC = () => {
                                     <span className="content">{service.email}</span>
                                 </Col>
                                 <Col span={8}>
-                                    <span className="title">Thời gian chăm sóc cây </span>
+                                    <span className="title">Thời gian chăm sóc cây: </span>
                                     <span className="content">{utilDateTime.dateToString(service.startDate.toString())} - {utilDateTime.dateToString(service.endDate.toString())}</span>
                                 </Col>
                                 <Col span={8}>
@@ -165,13 +155,16 @@ const ClientTakeCareServiceConfirm: React.FC = () => {
                                     <span className="title">Phí vận chuyển: </span>
                                     <span className="content">{service.transportFee}</span>
                                 </Col>
-                                <Col span={8}>
+                                <Col span={8} style={{display: 'flex'}}>
                                     <span className="title">Trạng thái yêu cầu: </span>
-                                    <span className="content">{service.status}</span>
+                                    <span className="content">
+                                        {ServiceStatusToTag(service.status)}
+                                        {/* {service.status} */}
+                                    </span>
                                 </Col>
                                 <Col span={24}>
-                                    <span className="title">Thông tin hợp đồng chăm sóc cây</span>
-                                    <Input.TextArea disabled>{service.rules}</Input.TextArea>
+                                    <span className="title" style={{marginBottom: '10px', display: 'block'}}>Thông tin hợp đồng chăm sóc cây</span>
+                                    <Input.TextArea autoSize={{minRows: 4, maxRows: 10}} disabled>{service.rules}</Input.TextArea>
                                 </Col>
                             </Row>
                         }

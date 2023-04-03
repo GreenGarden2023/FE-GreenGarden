@@ -112,14 +112,15 @@ const ModalProduct: React.FC<ModalProductProps> = ({ categoryId, product, action
             open={open}
             footer={null}
             onCancel={handleCloseModal}
-            title={`${action} product ${product ? product.name : ''}`}
+            title={`${action === 'Create' ? 'Tạo mới' : 'Cập nhật'} sản phẩm ${product ? `"${product.name}"` : ''}`}
+            width={800}
         >
             <Form
                 layout='vertical'
                 onFinish={handleSubmit(handleSubmitForm)}
                 className='form-infor-header'
             >
-                <Form.Item label='Product name' required>
+                <Form.Item label='Tên sản phẩm' required>
                     <Controller
                         control={control}
                         name='name'
@@ -127,7 +128,7 @@ const ModalProduct: React.FC<ModalProductProps> = ({ categoryId, product, action
                     />
                     {errors.name && <ErrorMessage message={errors.name.message} />}
                 </Form.Item>
-                <Form.Item label='Description'>
+                <Form.Item label='Mô tả'>
                     <Controller
                         control={control}
                         name='description'
@@ -137,7 +138,7 @@ const ModalProduct: React.FC<ModalProductProps> = ({ categoryId, product, action
                 </Form.Item>
                 <Row gutter={24}>
                     <Col span={12}>
-                        <Form.Item label='For sale'>
+                        <Form.Item label='Cho bán'>
                             <Controller
                                 control={control}
                                 name='isForSale'
@@ -146,7 +147,7 @@ const ModalProduct: React.FC<ModalProductProps> = ({ categoryId, product, action
                         </Form.Item>
                     </Col>
                     <Col span={12}>
-                        <Form.Item label='For rent'>
+                        <Form.Item label='Cho thuê'>
                             <Controller
                                 control={control}
                                 name='isForRent'
@@ -155,7 +156,7 @@ const ModalProduct: React.FC<ModalProductProps> = ({ categoryId, product, action
                         </Form.Item>
                     </Col>
                 </Row>
-                <Form.Item label='Thumbnail' required>
+                <Form.Item label='Ảnh bìa' required>
                     <Controller
                         control={control}
                         name='imgUrl'
@@ -183,10 +184,8 @@ const ModalProduct: React.FC<ModalProductProps> = ({ categoryId, product, action
                     />
                 </Form.Item>
                 <Form.Item className='btn-form-wrapper' >
-                    <Button disabled={isSubmitting} type='default' htmlType='button' className='btn-cancel' size='large' onClick={handleCloseModal}>
-                    Cancel
-                    </Button>
-                    <Button loading={isSubmitting} type='primary' htmlType='submit' className='btn-update' size='large'>{action}</Button>
+                    <Button disabled={isSubmitting} type='default' htmlType='button' className='btn-cancel' size='large' onClick={handleCloseModal}>Hủy</Button>
+                    <Button loading={isSubmitting} type='primary' htmlType='submit' className='btn-update' size='large'>{action === 'Create' ? 'Tạo mới' : 'Cập nhật'}</Button>
                 </Form.Item>
             </Form>
         </Modal>

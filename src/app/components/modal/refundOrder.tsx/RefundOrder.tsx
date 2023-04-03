@@ -1,4 +1,5 @@
 import { Input, Modal } from 'antd';
+import CurrencyInput from 'app/components/renderer/currency-input/CurrencyInput';
 import useDispatch from 'app/hooks/use-dispatch';
 import { OrderType } from 'app/models/general-type';
 import { TransactionHandle } from 'app/models/transaction';
@@ -42,6 +43,11 @@ const RefundOrder: React.FC<RefundOrderProps> = ({orderId, orderCode, orderType,
 
         }
     }
+    const handleChangeAmount = (values: CurrencyFormat.Values) =>{
+        const { floatValue } = values
+        const data = Number(floatValue || 0)
+        setAmount(data)
+    }
 
     return (
         <Modal
@@ -50,13 +56,10 @@ const RefundOrder: React.FC<RefundOrderProps> = ({orderId, orderCode, orderType,
             onCancel={onClose}
             onOk={handleRefundOrder}
         >
-            <p>Nhập số tiền cần trả</p>
-            <CurrencyFormat value={amount} thousandSeparator={true}  onValueChange={(values) => {
-                const value = values.floatValue || 0
-                setAmount(value)
-            }} />
-            <p>Ghi chú</p>
-            <Input.TextArea value={desc} onChange={(e) => setDesc(e.target.value)} ></Input.TextArea>
+            <p>Nhập số tiền cần trả (VND)</p>
+            <CurrencyInput min={0} value={amount} onChange={handleChangeAmount} />
+            <p style={{marginTop: '10px'}}>Ghi chú</p>
+            <Input.TextArea autoSize={{minRows: 4, maxRows: 6}} value={desc} onChange={(e) => setDesc(e.target.value)} ></Input.TextArea>
         </Modal>
     )
 }

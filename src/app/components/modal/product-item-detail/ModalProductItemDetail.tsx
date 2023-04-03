@@ -1,25 +1,26 @@
-import { Button, Col, Form, Image, Input, InputNumber, Modal, Row, Select, Switch } from 'antd';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Button, Col, Form, Image, Input, Modal, Row, Select, Switch } from 'antd';
+import ErrorMessage from 'app/components/message.tsx/ErrorMessage';
+import CurrencyInput from 'app/components/renderer/currency-input/CurrencyInput';
 import useDispatch from 'app/hooks/use-dispatch';
+import { ProductItemType } from 'app/models/general-type';
 import { ProductItemDetail, ProductItemDetailHandle } from 'app/models/product-item';
 import { Size } from 'app/models/size';
+import productItemService from 'app/services/product-item.service';
 import sizeService from 'app/services/size.service';
 import uploadService from 'app/services/upload.service';
 import { setNoti } from 'app/slices/notification';
 import CONSTANT from 'app/utils/constant';
+import utilGeneral from 'app/utils/general';
 import React, { useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { AiFillCaretDown, AiOutlineCloudUpload } from 'react-icons/ai';
+import { CiSquareRemove } from 'react-icons/ci';
 import * as yup from 'yup';
 import './style.scss';
-import { yupResolver } from '@hookform/resolvers/yup';
-import ErrorMessage from 'app/components/message.tsx/ErrorMessage';
-import productItemService from 'app/services/product-item.service';
-import { ProductItemType } from 'app/models/general-type';
-import { CiSquareRemove } from 'react-icons/ci';
 
 const schema = yup.object().shape({
     sizeId: yup.string().required('Kích thước không được để trống'),
-    quantity: yup.number().required('Số lượng không được để trống').min(1, 'Số lượng có ít nhất 1 cây').typeError('Kiểu giá trị của số lượng là số'),
     transportFee: yup.number().required('Phí vận chuyển không được để trống').typeError('Phí vận chuyển chỉ chấp nhận số'),
     salePrice: yup.string().nullable(),
     rentPrice: yup.string().nullable(),
@@ -36,7 +37,7 @@ interface ModalSizeProductItemProps{
 
 const ModalProductItemDetail: React.FC<ModalSizeProductItemProps> = ({ productItemId, productItemType, productItemDetail, onClose, onSubmit }) => {
     const dispatch = useDispatch();
-console.log({productItemId})
+
     const [sizes, setSizes]= useState<Size[]>([]);
     const [sizesFilter, setSizesFilter]= useState<Size[]>([]);
     const ref = useRef<HTMLInputElement>(null);
@@ -64,8 +65,8 @@ console.log({productItemId})
         setValue('productItemID', productItemId)
         setValue('imagesUrls', imagesURL)
         setValue('quantity', quantity)
-        setValue('rentPrice', rentPrice || null)
-        setValue('salePrice', salePrice || null)
+        setValue('rentPrice', rentPrice)
+        setValue('salePrice', salePrice)
         setValue('sizeId', size.id)
         setValue('status', status)
         setValue('transportFee', transportFee)
@@ -148,8 +149,8 @@ console.log({productItemId})
         }
         const finalData: ProductItemDetailHandle = {
             ...data,
-            rentPrice: data.rentPrice ? data.rentPrice : null,
-            salePrice: data.salePrice ? data.salePrice : null,
+            rentPrice: data.rentPrice,
+            salePrice: data.salePrice,
         }
         console.log(finalData)
         if(!data.id){
@@ -174,6 +175,7 @@ console.log({productItemId})
             }
         }
     }
+    
     return (
         <Modal
             title={`${productItemDetail ? 'Chỉnh sửa' : 'Tạo mới'} thông tin chi tiết`}
@@ -212,7 +214,10 @@ console.log({productItemId})
                             <Controller
                                 control={control}
                                 name='quantity'
-                                render={({ field }) => <Input type='number' disabled={productItemType === 'unique'} {...field} />}
+                                render={({ field: { value } }) => <Input type='number' min={0} disabled={productItemType === 'unique'} value={value} onChange={(e) =>{
+                                    const data = Number(e.target.value || 0)
+                                    setValue('quantity', data)
+                                }} />}
                             />
                             {errors.quantity && <ErrorMessage message={errors.quantity.message} />}
                         </Form.Item>
@@ -222,7 +227,7 @@ console.log({productItemId})
                             <Controller
                                 control={control}
                                 name='salePrice'
-                                render={({ field }) => <InputNumber min={0} type='number' {...field} style={{width: '100%'}} />}
+                                render={({ field: { value } }) => <CurrencyInput value={value || 0} min={0} onChange={(e) => utilGeneral.setCurrency(setValue, 'salePrice', e)}/>}
                             />
                             {errors.salePrice && <ErrorMessage message={errors.salePrice.message} />}
                         </Form.Item>
@@ -232,7 +237,7 @@ console.log({productItemId})
                             <Controller
                                 control={control}
                                 name='rentPrice'
-                                render={({ field }) => <InputNumber min={0} type='number' {...field} style={{width: '100%'}} />}
+                                render={({ field: { value } }) => <CurrencyInput value={value || 0} min={0} onChange={(e) => utilGeneral.setCurrency(setValue, 'rentPrice', e)}/>}
                             />
                             {errors.rentPrice && <ErrorMessage message={errors.rentPrice.message} />}
                         </Form.Item>
@@ -248,11 +253,11 @@ console.log({productItemId})
                         </Form.Item>
                     </Col>
                     <Col span={12}>
-                        <Form.Item label='Phí vận chuyển'>
+                        <Form.Item label='Phí vận chuyển (VND)'>
                             <Controller
                                 control={control}
                                 name='transportFee'
-                                render={({ field }) => <InputNumber min={0} type='number' {...field} style={{width: '100%'}} />}
+                                render={({ field: { value } }) => <CurrencyInput value={value} min={0} onChange={(e) => utilGeneral.setCurrency(setValue, 'transportFee', e)}/>}
                             />
                             {errors.rentPrice && <ErrorMessage message={errors.rentPrice.message} />}
                         </Form.Item>

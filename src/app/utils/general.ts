@@ -1,4 +1,5 @@
 import { OrderStatus } from "app/models/general-type"
+import CurrencyFormat from "react-currency-format"
 
 const statusToColor = (status: OrderStatus) =>{
     switch(status){
@@ -24,10 +25,18 @@ const setDefaultImage = ({currentTarget}) =>{
     currentTarget.src = '/assets/inventory-empty.png'
 }
 
+const setCurrency = (setValue, key: string, values: CurrencyFormat.Values) =>{
+    const { floatValue } = values
+        const data = Number(floatValue || 0)
+        console.log(data)
+        setValue(key as any, data)
+}
+
 const utilGeneral = {
     statusToColor,
     statusToViLanguage,
-    setDefaultImage
+    setDefaultImage,
+    setCurrency
 }
 
 export default utilGeneral

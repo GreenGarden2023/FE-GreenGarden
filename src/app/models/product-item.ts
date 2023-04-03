@@ -8,8 +8,8 @@ export interface ProductItemDetailHandle{
     id?: string;
     sizeId: string;
     productItemID: string;
-    rentPrice: number | null;
-    salePrice: number | null;
+    rentPrice?: number;
+    salePrice?: number;
     quantity: number;
     transportFee: number;
     status: Status;

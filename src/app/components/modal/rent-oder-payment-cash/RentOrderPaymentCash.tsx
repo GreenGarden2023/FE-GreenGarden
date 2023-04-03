@@ -1,5 +1,6 @@
 import { Checkbox, Modal } from 'antd';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
+import CurrencyInput from 'app/components/renderer/currency-input/CurrencyInput';
 import useDispatch from 'app/hooks/use-dispatch';
 import { RentOrderList } from 'app/models/order';
 import { setNoti } from 'app/slices/notification';
@@ -35,6 +36,12 @@ const RentOrderPaymentCash: React.FC<RentOrderPaymentCashProps> = ({rentOrderLis
         onClose()
     }
 
+    const handleChangeAmount = (values: CurrencyFormat.Values) =>{
+        const { floatValue } = values
+        const data = Number(floatValue || 0)
+        setAmount(data)
+    }
+
     return (
         <Modal
             title={`Thanh toán tiền cho đơn hàng "${rentOrderList.orderCode}"`}
@@ -43,18 +50,9 @@ const RentOrderPaymentCash: React.FC<RentOrderPaymentCashProps> = ({rentOrderLis
             onOk={handlePaymentCash}
             width={800}
         >
-            <p>Nhập số tiền cần thanh toán</p>
-            <CurrencyFormat disabled={checkFullAmount} value={amount} thousandSeparator={true} suffix={' VNĐ'} isAllowed={(values) => {
-                        const value = values.floatValue || 0
-                        const remain = rentOrderList.remainMoney
-                        if(value >= remain) {
-                            setAmount(remain)
-                        }else{
-                            setAmount(Number(value))
-                        }
-                        return value <= remain
-                    }}/>
-            <Checkbox checked={checkFullAmount} onChange={handleChangeCheck}>Đủ số tiền cần thanh toán</Checkbox>
+            <p>Nhập số tiền cần thanh toán (VND)</p>
+            <CurrencyInput min={0} value={amount} onChange={handleChangeAmount} disbaled={checkFullAmount} />
+            <Checkbox checked={checkFullAmount} onChange={handleChangeCheck}>Đã thanh toán đủ</Checkbox>
         </Modal>
     )
 }

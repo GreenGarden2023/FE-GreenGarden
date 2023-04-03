@@ -4,47 +4,52 @@ import { Paging } from "./paging";
 import { ProductItemDetail } from "./product-item";
 
 export interface OrderCreate{
-    startDateRent?: Date;
-    endDateRent?: Date;
-    shippingID: number;
-    rewardPointUsed: number;
-    recipientAddress: string;
-    recipientPhone: string;
-    recipientName: string;
-    rentOrderGroupID: string | null;
-    itemList: CartItem[];
+    startDateRent?: Date
+    endDateRent?: Date
+    shippingID: number
+    rewardPointUsed: number
+    recipientAddress: string
+    recipientPhone: string
+    recipientName: string
+    rentOrderGroupID?: string
+    isTransport: boolean
+    itemList: CartItem[]
 }
 
 // order get
 export interface RentOrderDetailList {
     id: string;
-    totalPrice: number;
-    quantity: number;
-    salePricePerUnit: number;
-    rentPricePerUnit?: number
-    sizeName: string;
-    productItemName: string;
     imgURL: string;
+    productItemDetailID: string;
+    productItemName: string;
+    quantity: number;
+    rentPricePerUnit: number
+    sizeName: string;
+    totalPrice: number;
+    salePricePerUnit: number;
 }
 export interface RentOrderList {
-    id: string;
-    orderCode: string;
-    transportFee: number;
-    createDate: Date;
-    startDateRent: Date;
-    endDateRent: Date;
-    deposit: number;
-    totalPrice: number;
-    status: OrderStatus;
-    remainMoney: number;
-    rewardPointGain: number;
-    rewardPointUsed: number;
-    rentOrderGroupID: string;
-    discountAmount: number;
-    recipientAddress: string;
-    recipientPhone: string;
-    recipientName: string;
-    rentOrderDetailList: RentOrderDetailList[];
+    id: string
+    isTransport: boolean
+    transportFee: number
+    createDate: Date
+    startRentDate: Date
+    endRentDate: Date
+    createdBy: string
+    userId: string
+    deposit: number
+    totalPrice: number
+    status: OrderStatus
+    remainMoney: number
+    rewardPointGain: number
+    rewardPointUsed: number
+    rentOrderGroupID: string
+    discountAmount: number
+    recipientAddress: string
+    recipientPhone: string
+    recipientName: string
+    orderCode: string
+    rentOrderDetailList: RentOrderDetailList[]
 }
 export interface RentOrder{
     id: string;
@@ -74,6 +79,7 @@ export interface SaleOrderList {
     recipientPhone: string;
     recipientName: string;
     orderCode: string;
+    isTransport: boolean;
     rentOrderDetailList: RentOrderDetailList[];
 }
 export interface SaleOrderResponse{

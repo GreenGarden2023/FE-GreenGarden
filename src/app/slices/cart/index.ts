@@ -15,6 +15,14 @@ type CR<T> = CaseReducer<CartProps, PayloadAction<T>>;
 const setCartCR: CR<CartProps> = (_, action) => ({
     ...action.payload
 })
+const setEmptySaleCartCR: CR<void> = (state) => ({
+    ...state,
+    saleItems: []
+})
+const setEmptyRentCartCR: CR<void> = (state) => ({
+    ...state,
+    rentItems: []
+})
 // const resendCartCR: CR<void> = (_, action) => {
     
 // }
@@ -23,9 +31,11 @@ const slice = createSlice({
     name: 'cart/slice',
     initialState,
     reducers: {
-        setCartSlice: setCartCR
+        setCartSlice: setCartCR,
+        setEmptySaleCart: setEmptySaleCartCR,
+        setEmptyRentCart: setEmptyRentCartCR
     },
 });
 
-export const { setCartSlice } = slice.actions
+export const { setCartSlice, setEmptySaleCart, setEmptyRentCart } = slice.actions
 export default slice.reducer

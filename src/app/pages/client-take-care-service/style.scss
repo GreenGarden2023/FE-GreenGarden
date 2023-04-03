@@ -31,6 +31,25 @@
         border: 1px solid $default-green;
         border-radius: 5px;
         padding: 10px;
+        position: relative;
+        .actions-wrapper{
+            position: absolute;
+            top: 10px;
+            right: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            svg{
+                color: $deep-pink;
+                opacity: .5;
+                cursor: pointer;
+                border: 1px solid $deep-pink;
+                border-radius: 3px;
+                &:hover{
+                    opacity: 1;
+                }
+            }
+        }
         img{
             width: 100%;
             height: 220px;
@@ -38,7 +57,11 @@
         }
         .item-infor{
             h1{
-                font-size: 20px;
+                font-size: 17px;
+                min-height: 50px;
+                color: #f95441;
+                text-align: center;
+                padding: 15px 15px 20px 15px;
                 span{
                     font-size: 20px;
                     margin-left: 5px;

@@ -1,0 +1,12 @@
+@import 'app/styles/variable.scss';
+
+.currency-input{
+    width: 100%;
+    outline: none;
+    border: 1px solid #d3d3d3;
+    border-radius: 5px;
+    padding: 1px 5px;
+    &:active, &:focus, &:hover{
+        border-color: $color-link;
+    }
+}

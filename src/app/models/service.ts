@@ -33,6 +33,7 @@ export interface ServiceUpdate {
     address: string
     transportFee: number
     rewardPointUsed: number
+    isTranSport: boolean;
     startDate?: Date
     endDate?: Date
     rules: string;

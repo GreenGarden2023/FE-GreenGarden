@@ -1,10 +1,10 @@
 @import 'app/styles/variable.scss';
 
-.ctcsc-wrapper{
-    .title{
+.cmtcs-wrapper{
+    .label{
         color: $soft-text;
-        min-width: 180px;
         display: inline-block;
+        min-width: 150px;
     }
     .content{
         color: $color-link;

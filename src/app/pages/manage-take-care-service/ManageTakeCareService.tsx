@@ -72,7 +72,7 @@ const ManageTakeCareService: React.FC = () => {
                     </div>
                 }
                 {
-                    (record.status === 'processing' || record.status === 'reprocess') &&
+                    (record.status === 'processing' || record.status === 'reprocess' || record.status === 'accepted') &&
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.id, actionType: 'reject service', orderType: 'service', openIndex: -1})
                     }}>
@@ -81,7 +81,7 @@ const ManageTakeCareService: React.FC = () => {
                     </div>
                 }
                 {
-                    (record.status === 'accepted' || record.status === 'reprocess') &&
+                    (record.status === 'accepted') &&
                     <div className="item" 
                         onClick={() => {
                             setActionMethod({orderId: record.id, actionType: 'assign', orderType: 'service', openIndex: -1})
@@ -92,7 +92,7 @@ const ManageTakeCareService: React.FC = () => {
                     </div>
                 }
                 {
-                    (record.status === 'accepted' || record.status === 'reprocess') &&
+                    (record.status === 'accepted') &&
                     <div className="item" 
                         onClick={() => {
                             setActionMethod({orderId: record.id, actionType: 'update infor', orderType: 'service', openIndex: -1})

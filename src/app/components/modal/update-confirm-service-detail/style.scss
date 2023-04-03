@@ -1,0 +1,36 @@
+@import 'app/styles/variable.scss';
+
+.user-infor-form{
+    border: 1px solid $default-green;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 20px 10px 0 0;
+    position: relative;
+    .form-title{
+        position: absolute;
+        top: -18px;
+        left: 15px;
+        background: #fff;
+        padding: 0 10px;
+        font-size: 20px;
+        color: $color-create;
+    }
+}
+.policy-wrapper{
+    margin-bottom: 10px;
+    .policy-item{
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        gap: 5px;
+        .icon{
+            width: 30px;
+            cursor: pointer;
+        }
+        span{
+            // color: $soft-text;
+            font-size: 18px;
+            flex: 1;
+        }
+    }
+}

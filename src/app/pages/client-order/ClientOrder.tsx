@@ -15,8 +15,10 @@ import { RentOrder, SaleOrderList } from 'app/models/order';
 import { Paging } from 'app/models/paging';
 import { PaymentControlState } from 'app/models/payment';
 import { ServiceDetailList, ServiceOrderList } from 'app/models/service';
+import { ShippingFee } from 'app/models/shipping-fee';
 import orderService from 'app/services/order.service';
 import paymentService from 'app/services/payment.service';
+import shippingFeeService from 'app/services/shipping-fee.service';
 import { setNoti } from 'app/slices/notification';
 import CONSTANT from 'app/utils/constant';
 import utilDateTime from 'app/utils/date-time';
@@ -51,6 +53,20 @@ const ClientOrder: React.FC = () =>{
     const [serviceOrders, setServiceOrders] = useState<ServiceOrderList[]>([])
 
     const [paging, setPaging] = useState<Partial<Paging>>({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.CLIENT_ORDER_RENT})
+
+    const [shipping, setShipping] = useState<ShippingFee[]>([])
+
+    useEffect(() =>{
+        const init = async () =>{
+            try{
+                const res = await shippingFeeService.getList()
+                setShipping(res.data)
+            }catch{
+                
+            }
+        }
+        init()
+    }, [])
 
     useEffect(() =>{
         pagingPath.scrollTop()
@@ -192,6 +208,7 @@ const ClientOrder: React.FC = () =>{
             key: 'status',
             dataIndex: 'status',
             align: 'center',
+            width: 200,
             render: (v) => (OrderStatusToTag(v))
         },
         {
@@ -335,6 +352,7 @@ const ClientOrder: React.FC = () =>{
             title: 'Trạng thái',
             key: 'status',
             dataIndex: 'status',
+            width: 200,
             render: (v) => (OrderStatusToTag(v))
         },
         {
@@ -397,6 +415,7 @@ const ClientOrder: React.FC = () =>{
             )
         },
     ]
+
     const contextRent = (record) => {
         return (
             <div className='context-menu-wrapper'>
@@ -411,7 +430,7 @@ const ClientOrder: React.FC = () =>{
                     <span>Xem nhóm đơn hàng</span>
                 </div>
                 {
-                    record.status === 'completed' && 
+                    (record.status === 'paid' && utilDateTime.isDisplayExtendRentOrder(new Date())) && 
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.orderId, actionType: 'extend', orderType: 'rent', openIndex: -1})
                     }}>
@@ -455,8 +474,8 @@ const ClientOrder: React.FC = () =>{
             orderId: x.rentOrderList[0].id,
             groupID: x.id,
             totalPrice: x.totalGroupAmount,
-            startDateRent: x.rentOrderList[0].startDateRent,
-            endDateRent: x.rentOrderList[0].endDateRent,
+            startDateRent: x.rentOrderList[0].startRentDate,
+            endDateRent: x.rentOrderList[0].endRentDate,
             status: x.rentOrderList[0].status,
             remainMoney: x.rentOrderList[0].remainMoney,
             deposit: x.rentOrderList[0].deposit,
@@ -576,6 +595,7 @@ const ClientOrder: React.FC = () =>{
             title: 'Trạng thái',
             key: 'status',
             dataIndex: 'status',
+            width: 200,
             render: (v) => (OrderStatusToTag(v))
         },
         {
@@ -703,6 +723,19 @@ const ClientOrder: React.FC = () =>{
         setServiceOrders([...serviceOrders])
         handleCancel()
     }
+    const handleExtendRentOrder = async () =>{
+        handleCancel()
+        const currentPage = searchParams.get('page');
+        if(!Number(currentPage)) return;
+
+        try{
+            const res = await orderService.getRentOrders({curPage: Number(currentPage), pageSize: paging.pageSize})
+            setRentOrders(res.data.rentOrderGroups)
+            setPaging(res.data.paging)
+        }catch{
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+        }
+    }
     return (
         <div>
             <LandingHeader />
@@ -797,9 +830,10 @@ const ClientOrder: React.FC = () =>{
             {
                 (actionMethod?.actionType === 'extend') &&
                 <ClientExtendOrder
-                    onClose={handleCancel}
                     rentOrderList={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0]}
-                    onExtend={() => {}}
+                    shipping={shipping}
+                    onClose={handleCancel}
+                    onExtend={handleExtendRentOrder}
                 /> 
             }
             {

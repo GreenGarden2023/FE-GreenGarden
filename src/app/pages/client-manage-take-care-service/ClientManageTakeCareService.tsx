@@ -3,6 +3,7 @@ import Table, { ColumnsType } from 'antd/es/table'
 import LandingFooter from 'app/components/footer/LandingFooter'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import LandingHeader from 'app/components/header/LandingHeader'
+import TechnicianName from 'app/components/renderer/technician/TechnicianName'
 import { PaymentControlState } from 'app/models/payment'
 import { Service, ServiceDetailList } from 'app/models/service'
 import serviceService from 'app/services/service.service'
@@ -11,6 +12,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { BiCommentDetail } from 'react-icons/bi'
 import { GrMore } from 'react-icons/gr'
 import { useNavigate } from 'react-router-dom'
+import { ServiceStatusToTag } from '../manage-take-care-service/ManageTakeCareService'
 
 const ClientManageTakeCareService: React.FC = () => {
     const navigate = useNavigate();
@@ -57,11 +59,14 @@ const ClientManageTakeCareService: React.FC = () => {
             title: 'Trạng thái',
             key: 'status',
             dataIndex: 'status',
+            width: 200,
+            render: (v) => (ServiceStatusToTag(v))
         },
         {
             title: 'Người chăm sóc',
             key: 'technicianName',
             dataIndex: 'technicianName',
+            render: (v) => (<TechnicianName name={v} />)
         },
         {
             title: 'Tổng số cây',
@@ -103,13 +108,16 @@ const ClientManageTakeCareService: React.FC = () => {
                     <BiCommentDetail size={25} className='icon'/>
                     <span>Chi tiết dịch vụ</span>
                 </div>
-                <div className="item" onClick={() => {
-                    navigate(`/order/service/${record.serviceOrderID}`)
-                    // handleAction({orderId: record.id, actionType: 'detail', orderType: 'service', openIndex: -1})
-                }}>
-                    <BiCommentDetail size={25} className='icon'/>
-                    <span>Xem đơn hàng</span>
-                </div>
+                {
+                    record.serviceOrderID &&
+                    <div className="item" onClick={() => {
+                        navigate(`/order/service/${record.serviceOrderID}`)
+                        // handleAction({orderId: record.id, actionType: 'detail', orderType: 'service', openIndex: -1})
+                    }}>
+                        <BiCommentDetail size={25} className='icon'/>
+                        <span>Xem đơn hàng</span>
+                    </div>
+                }
                 {/* <div className="item" onClick={() => {
                     handleAction({orderId: record.id, actionType: 'accept service', orderType: 'service', openIndex: -1})
                 }}>
@@ -173,7 +181,7 @@ const ClientManageTakeCareService: React.FC = () => {
                     <div className="container-wrapper cmtcs-wrapper">
                         <HeaderInfor title='Yêu cầu chăm sóc cây của bạn' />
                         <div className="default-layout">
-                            <Table columns={Column} dataSource={DataSource} />
+                            <Table columns={Column} dataSource={DataSource} scroll={{x: 1500}} />
                         </div>
                     </div>
                 </div>

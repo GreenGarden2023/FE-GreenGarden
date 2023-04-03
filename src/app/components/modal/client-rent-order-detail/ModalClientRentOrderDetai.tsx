@@ -14,6 +14,8 @@ import { HiOutlineStatusOnline } from 'react-icons/hi';
 import { IoInformationCircleOutline } from 'react-icons/io5';
 import { MdOutlineDriveFileRenameOutline } from 'react-icons/md';
 import './style.scss';
+import TreeName from 'app/components/renderer/tree-name/TreeName';
+import MoneyFormat from 'app/components/money/MoneyFormat';
 
 interface ModalClientRentOrderDetaiProps{
     rentOrderList: RentOrderList;
@@ -36,7 +38,7 @@ const ModalClientRentOrderDetai: React.FC<ModalClientRentOrderDetaiProps> = ({re
             title: 'Tên sản phẩm',
             key: 'productItemName',
             dataIndex: 'productItemName',
-            render: (v) => (v)
+            render: (v) => (<TreeName name={v} />)
         },
         {
             title: 'Hình ảnh',
@@ -45,9 +47,10 @@ const ModalClientRentOrderDetai: React.FC<ModalClientRentOrderDetaiProps> = ({re
             align: 'center',
             render: (v) => (
                 <Image
-                    width={150}
-                    height={150}
+                    width={100}
+                    height={100}
                     src={v}
+                    style={{objectFit: 'cover'}}
                 />
             )
         },
@@ -59,6 +62,13 @@ const ModalClientRentOrderDetai: React.FC<ModalClientRentOrderDetaiProps> = ({re
             render: (v) => (v)
         },
         {
+            title: 'Giá tiền',
+            key: 'rentPricePerUnit',
+            dataIndex: 'rentPricePerUnit',
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} isHighlight color='Light Blue' />)
+        },
+        {
             title: 'Số lượng',
             key: 'quantity',
             dataIndex: 'quantity',
@@ -66,18 +76,11 @@ const ModalClientRentOrderDetai: React.FC<ModalClientRentOrderDetaiProps> = ({re
             render: (v) => (v)
         },
         {
-            title: 'Giá tiền',
-            key: 'rentPricePerUnit',
-            dataIndex: 'rentPricePerUnit',
-            align: 'right',
-            render: (v) => (<CurrencyFormat className='value' value={v || 0} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />)
-        },
-        {
             title: 'Tổng tiền',
             key: 'totalPrice',
             dataIndex: 'totalPrice',
             align: 'right',
-            render: (v) => (<CurrencyFormat className='value' value={v} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />)
+            render: (v) => (<MoneyFormat value={v} isHighlight color='Blue' />)
         },
     ]
 
@@ -158,7 +161,7 @@ const ModalClientRentOrderDetai: React.FC<ModalClientRentOrderDetaiProps> = ({re
                         <span>Ngày bắt đầu thuê</span>
                     </div>
                     <div className="right">
-                        <span>{utilDateTime.dateToString(rentOrderList.startDateRent.toString())}</span>
+                        <span>{utilDateTime.dateToString(rentOrderList.startRentDate.toString())}</span>
                     </div>
                 </div>
                 <div className="name">
@@ -167,7 +170,7 @@ const ModalClientRentOrderDetai: React.FC<ModalClientRentOrderDetaiProps> = ({re
                         <span>Ngày kết thúc thuê</span>
                     </div>
                     <div className="right">
-                        <span>{utilDateTime.dateToString(rentOrderList.endDateRent.toString())}</span>
+                        <span>{utilDateTime.dateToString(rentOrderList.endRentDate.toString())}</span>
                     </div>
                 </div>
                 <div className="name">
@@ -185,7 +188,7 @@ const ModalClientRentOrderDetai: React.FC<ModalClientRentOrderDetaiProps> = ({re
                         <span>Tiền còn thiếu</span>
                     </div>
                     <div className="right">
-                        <CurrencyFormat className='value' value={rentOrderList.remainMoney} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
+                    <MoneyFormat value={rentOrderList.remainMoney} color='Blue' isHighlight />
                     </div>
                 </div>
                 <div className="name">
@@ -194,7 +197,7 @@ const ModalClientRentOrderDetai: React.FC<ModalClientRentOrderDetaiProps> = ({re
                         <span>Tổng đơn hàng</span>
                     </div>
                     <div className="right">
-                        <CurrencyFormat className='value' value={rentOrderList.totalPrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
+                        <MoneyFormat value={rentOrderList.totalPrice} color='Light Blue' isHighlight />
                     </div>
                 </div>
             </div>

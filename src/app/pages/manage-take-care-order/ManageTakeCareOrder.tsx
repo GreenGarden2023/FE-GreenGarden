@@ -389,7 +389,7 @@ const ManageTakeCareOrder: React.FC = () => {
                     onOk={handlePaymentCash}
                     width={800}
                 >
-                    <p>Nhập số tiền cần thanh toán</p>
+                    <p>Nhập số tiền cần thanh toán (VND)</p>
                     <CurrencyFormat disabled={checkFullAmount} isAllowed={(values) => {
                         const value = values.floatValue || 0
                         const remain = serviceOrders.filter(x => x.id === actionMethod.orderId)[0].remainAmount
@@ -400,9 +400,10 @@ const ManageTakeCareOrder: React.FC = () => {
                         }
                         return value <= remain
                     }}
+                    className='currency-input'
                     value={amount} 
-                    max={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].remainAmount} thousandSeparator={true} suffix={' VNĐ'}/>
-                    <Checkbox checked={checkFullAmount} onChange={handleChangeCheck}>Đủ số tiền cần thanh toán</Checkbox>
+                    max={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].remainAmount} thousandSeparator/>
+                    <Checkbox checked={checkFullAmount} onChange={handleChangeCheck}>Đã thanh toán đủ</Checkbox>
                 </Modal>
             }
             {

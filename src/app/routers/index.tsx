@@ -138,8 +138,8 @@ const Routers: React.FC = () =>{
                     <Route path='manage-product-item/:productId' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_PRODUCT_ITEM} ><AdminRoute><ManageProductItem /></AdminRoute></AuthGuard>} />
                     <Route path='manage-size' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_SIZE} ><AdminRoute><ManageSize /></AdminRoute></AuthGuard>} />
                     <Route path='manage-order' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageOrder /></AdminRoute></AuthGuard>} />
-                    <Route path='sale-order' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageSaleOrder /></AdminRoute></AuthGuard>} />
                     <Route path='rent-order' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageRentOrder /></AdminRoute></AuthGuard>} />
+                    <Route path='sale-order' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageSaleOrder /></AdminRoute></AuthGuard>} />
                     <Route path='take-care-order' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageTakeCareOrder /></AdminRoute></AuthGuard>} />
                     <Route path='manage-take-care-service' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageTakeCareService /></AdminRoute></AuthGuard>} />
                     <Route path='rent-order/:groupId' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageRentOrderGroup /></AdminRoute></AuthGuard>} />

@@ -29,6 +29,9 @@ import { RiBillLine } from 'react-icons/ri'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { OrderStatusToTag } from '../manage-take-care-order/ManageTakeCareOrder'
 import './style.scss'
+import ExtendRentOrderManager from './extend-rent-order-manager/ExtendRentOrderManager'
+import { ShippingFee } from 'app/models/shipping-fee'
+import shippingFeeService from 'app/services/shipping-fee.service'
 
 const ManageRentOrder:React.FC = () => {
     const dispatch = useDispatch();
@@ -42,6 +45,19 @@ const ManageRentOrder:React.FC = () => {
 
     const [paging, setPaging] = useState<Partial<Paging>>({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_RENT})
     const [recall, setRecall] = useState(true)
+    const [shipping, setShipping] = useState<ShippingFee[]>([])
+
+    useEffect(() =>{
+        const init = async () =>{
+            try{
+                const res = await shippingFeeService.getList()
+                setShipping(res.data)
+            }catch{
+                
+            }
+        }
+        init()
+    }, [])
 
     useEffect(() =>{
         pagingPath.scrollTop()
@@ -128,7 +144,7 @@ const ManageRentOrder:React.FC = () => {
             render: (v) => <MoneyFormat value={v} color='Yellow' isHighlight />
         },
         {
-            title: 'Tổng tiền',
+            title: 'Tổng tất cả đơn hàng',
             key: 'totalPrice',
             dataIndex: 'totalPrice',
             align: 'right',
@@ -227,6 +243,12 @@ const ManageRentOrder:React.FC = () => {
                         <span>Hoàn tiền</span>
                     </div>
                 }
+                <div className="item" onClick={() => {
+                    handleSetAction({orderId: record.orderId, actionType: 'extend', orderType: 'rent', openIndex: -1})
+                }}>
+                    <BiDetail size={25} className='icon'/>
+                    <span>Gia hạn đơn hàng</span>
+                </div>
             </div>
         )
     }
@@ -250,8 +272,8 @@ const ManageRentOrder:React.FC = () => {
             orderCode: x.rentOrderList[0].orderCode,
             groupID: x.id,
             totalPrice: x.totalGroupAmount,
-            startDateRent: x.rentOrderList[0].startDateRent,
-            endDateRent: x.rentOrderList[0].endDateRent,
+            startDateRent: x.rentOrderList[0].startRentDate,
+            endDateRent: x.rentOrderList[0].endRentDate,
             status: x.rentOrderList[0].status,
             remainMoney: x.rentOrderList[0].remainMoney,
             deposit: x.rentOrderList[0].deposit,
@@ -314,6 +336,10 @@ const ManageRentOrder:React.FC = () => {
     }
     const handleRefundOrder = () =>{
         handleClose()
+    }
+    const handleExtendOrder = async () =>{
+        handleClose()
+        setRecall(!recall)
     }
     return (
         <div className="mro-wrapper">
@@ -383,6 +409,15 @@ const ManageRentOrder:React.FC = () => {
                     orderCode={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0].orderCode}
                     orderId={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0].id}
                     orderType='rent'
+                />
+            }
+            {
+                actionMethod?.actionType === 'extend' &&
+                <ExtendRentOrderManager
+                    rentOrderList={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0]}
+                    shipping={shipping}
+                    onClose={handleClose}
+                    onExtend={handleExtendOrder}
                 />
             }
         </div>

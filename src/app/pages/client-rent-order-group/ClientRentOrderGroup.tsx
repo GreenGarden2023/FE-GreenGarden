@@ -1,24 +1,29 @@
-import { Popover, Tag } from 'antd'
+import { Popover } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import LandingFooter from 'app/components/footer/LandingFooter'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import LandingHeader from 'app/components/header/LandingHeader'
+import ClientExtendOrder from 'app/components/modal/client-extend-order/ClientExtendOrder'
 import ModalClientRentOrderDetai from 'app/components/modal/client-rent-order-detail/ModalClientRentOrderDetai'
 import MoneyFormat from 'app/components/money/MoneyFormat'
 import useDispatch from 'app/hooks/use-dispatch'
 import { RentOrder } from 'app/models/order'
 import { PaymentControlState } from 'app/models/payment'
+import { ShippingFee } from 'app/models/shipping-fee'
 import orderService from 'app/services/order.service'
 import paymentService from 'app/services/payment.service'
+import shippingFeeService from 'app/services/shipping-fee.service'
 import { setNoti } from 'app/slices/notification'
 import CONSTANT from 'app/utils/constant'
 import utilDateTime from 'app/utils/date-time'
-import utilGeneral from 'app/utils/general'
+import pagingPath from 'app/utils/paging-path'
 import React, { useEffect, useMemo, useState } from 'react'
 import { BiCommentDetail } from 'react-icons/bi'
 import { GrMore } from 'react-icons/gr'
 import { MdOutlinePayments } from 'react-icons/md'
+import { SiGitextensions } from 'react-icons/si'
 import { useParams } from 'react-router-dom'
+import { OrderStatusToTag } from '../manage-take-care-order/ManageTakeCareOrder'
 import './style.scss'
 
 const ClientRentOrderGroup: React.FC = () => {
@@ -27,8 +32,21 @@ const ClientRentOrderGroup: React.FC = () => {
 
     const [rentOrderGroup, setRentOrderGroup] = useState<RentOrder>()
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
+    const [shipping, setShipping] = useState<ShippingFee[]>([])
 
     useEffect(() =>{
+        const init = async () =>{
+            try{
+                const res = await shippingFeeService.getList()
+                setShipping(res.data)
+            }catch{
+                
+            }
+        }
+        init()
+    }, [])
+    useEffect(() =>{
+        pagingPath.scrollTop()
         if(!groupId) return;
 
         const init = async () =>{
@@ -67,28 +85,29 @@ const ClientRentOrderGroup: React.FC = () => {
             key: 'status',
             dataIndex: 'status',
             align: 'center',
-            render: (v) => (<Tag color={utilGeneral.statusToColor(v)}>{utilGeneral.statusToViLanguage(v)}</Tag>)
+            width: 200,
+            render: (v) => (OrderStatusToTag(v))
         },
         {
             title: 'Phí vận chuyển',
             key: 'transportFee',
             dataIndex: 'transportFee',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} />)
+            render: (v) => (<MoneyFormat value={v} color='Default' />)
         },
         {
             title: 'Tiền cọc',
             key: 'deposit',
             dataIndex: 'deposit',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} />)
+            render: (v) => (<MoneyFormat value={v} color='Orange' />)
         },
         {
-            title: 'Tiền cần trả',
-            key: 'remainMoney',
-            dataIndex: 'remainMoney',
+            title: 'Tiền được giảm',
+            key: 'discountAmount',
+            dataIndex: 'discountAmount',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} />)
+            render: (v) => (<MoneyFormat value={v} color='Yellow' />)
         },
         {
             title: 'Tổng đơn hàng',
@@ -96,6 +115,13 @@ const ClientRentOrderGroup: React.FC = () => {
             dataIndex: 'totalPrice',
             align: 'right',
             render: (v) => (<MoneyFormat value={v} />)
+        },
+        {
+            title: 'Số tiền cần trả',
+            key: 'remainMoney',
+            dataIndex: 'remainMoney',
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} color='Blue' />)
         },
         {
             title: 'Xử lý',
@@ -131,18 +157,33 @@ const ClientRentOrderGroup: React.FC = () => {
                     <BiCommentDetail size={25} className='icon'/>
                     <span>Chi tiết đơn hàng</span>
                 </div>
-                <div className="item" onClick={() => {
-                    handleSetAction({orderId: record.orderId, actionType: 'deposit', orderType: 'rent', openIndex: -1})
-                }} >
-                    <MdOutlinePayments size={25} className='icon'/>
-                    <span>Thanh toán cọc bằng Momo</span>
-                </div>
-                <div className="item" onClick={() => {
-                    handleSetAction({orderId: record.orderId, actionType: 'remaining', orderType: 'rent', openIndex: -1})
-                }} >
-                    <MdOutlinePayments size={25} className='icon'/>
-                    <span>Thanh toán đơn hàng bằng Momo</span>
-                </div>
+                {
+                    record.status === 'unpaid' && 
+                    <div className="item" onClick={() => {
+                        handleSetAction({orderId: record.orderId, actionType: 'deposit', orderType: 'rent', openIndex: -1})
+                    }} >
+                        <MdOutlinePayments size={25} className='icon'/>
+                        <span>Thanh toán cọc bằng Momo</span>
+                    </div>
+                }
+                {
+                    (record.status === 'unpaid' || record.status === 'ready') &&
+                    <div className="item" onClick={() => {
+                        handleSetAction({orderId: record.orderId, actionType: 'remaining', orderType: 'rent', openIndex: -1})
+                    }} >
+                        <MdOutlinePayments size={25} className='icon'/>
+                        <span>Thanh toán đơn hàng bằng Momo</span>
+                    </div>
+                }
+                {
+                    (record.status === 'paid' && utilDateTime.isDisplayExtendRentOrder(record.endDateRent) && index === 0) && 
+                    <div className="item" onClick={() => {
+                        setActionMethod({orderId: record.orderId, actionType: 'extend', orderType: 'rent', openIndex: -1})
+                    }}>
+                        <SiGitextensions size={25} className='icon'/>
+                        <span>Gia hạn đơn hàng</span>
+                    </div>
+                }
             </div>
         )
     }
@@ -152,12 +193,13 @@ const ClientRentOrderGroup: React.FC = () => {
             orderId: x.id,
             orderCode: x.orderCode,
             totalPrice: x.totalPrice,
-            startDateRent: x.startDateRent,
-            endDateRent: x.endDateRent,
+            startDateRent: x.startRentDate,
+            endDateRent: x.endRentDate,
             status: x.status,
             remainMoney: x.remainMoney,
             deposit: x.deposit,
-            transportFee: x.transportFee
+            transportFee: x.transportFee,
+            discountAmount: x.discountAmount
         }))
     }, [rentOrderGroup])
     const handleSetAction = async (data: PaymentControlState) =>{
@@ -211,6 +253,15 @@ const ClientRentOrderGroup: React.FC = () => {
                     rentOrderList={rentOrderGroup.rentOrderList.filter(x => x.id === actionMethod.orderId)[0]}
                     onClose={handleCancel}
                 />
+            }
+            {
+                (actionMethod?.actionType === 'extend' && rentOrderGroup) &&
+                <ClientExtendOrder
+                    rentOrderList={rentOrderGroup.rentOrderList.filter(x => x.id === actionMethod.orderId)[0]}
+                    shipping={shipping}
+                    onClose={handleCancel}
+                    onExtend={() => {}}
+                /> 
             }
         </div>
     )

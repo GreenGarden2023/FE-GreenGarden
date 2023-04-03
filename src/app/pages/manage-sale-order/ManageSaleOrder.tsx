@@ -26,6 +26,8 @@ import { RiBillLine } from 'react-icons/ri'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { OrderStatusToTag } from '../manage-take-care-order/ManageTakeCareOrder'
 import './style.scss'
+import Transport from 'app/components/renderer/transport/Transport'
+import CurrencyInput from 'app/components/renderer/currency-input/CurrencyInput'
 
 const ManageSaleOrder: React.FC = () => {
     const dispatch = useDispatch();
@@ -97,13 +99,18 @@ const ManageSaleOrder: React.FC = () => {
             dataIndex: 'createDate',
             render: (v) => (utilDateTime.dateToString(v))
         },
-        
         {
             title: 'Trạng thái',
             key: 'status',
             dataIndex: 'status',
             width: 200,
             render: (v) => (OrderStatusToTag(v))
+        },
+        {
+            title: 'Nơi nhận cây',
+            key: 'isTransport',
+            dataIndex: 'isTransport',
+            render: (v) => (<Transport isTransport={v} />)
         },
         {
             title: 'Phí vận chuyển',
@@ -233,7 +240,8 @@ const ManageSaleOrder: React.FC = () => {
             recipientPhone: x.recipientPhone,
             recipientName: x.recipientName,
             createDate: x.createDate,
-            discountAmount: x.discountAmount
+            discountAmount: x.discountAmount,
+            isTransport: x.isTransport,
         }))
     }, [saleOrders])
 
@@ -345,7 +353,7 @@ const ManageSaleOrder: React.FC = () => {
                     onOk={handlePaymentCash}
                     width={800}
                 >
-                    <p>Nhập số tiền cần thanh toán</p>
+                    <p>Nhập số tiền cần thanh toán (VND)</p>
                     <CurrencyFormat disabled={checkFullAmount} isAllowed={(values) => {
                         const value = values.floatValue || 0
                         const remain = saleOrders.filter(x => x.id === actionMethod?.orderId)[0].remainMoney
@@ -356,9 +364,10 @@ const ManageSaleOrder: React.FC = () => {
                         }
                         return value <= remain
                     }}
+                    className='currency-input'
                     value={amount} 
-                    max={saleOrders.filter(x => x.id === actionMethod?.orderId)[0].remainMoney} thousandSeparator={true} suffix={' VNĐ'}/>
-                    <Checkbox checked={checkFullAmount} onChange={handleChangeCheck}>Đủ số tiền cần thanh toán</Checkbox>
+                    max={saleOrders.filter(x => x.id === actionMethod?.orderId)[0].remainMoney} thousandSeparator={true}/>
+                    <Checkbox checked={checkFullAmount} onChange={handleChangeCheck}>Đã thanh toán đủ</Checkbox>
                 </Modal>
             }
             {

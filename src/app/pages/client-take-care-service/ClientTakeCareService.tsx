@@ -1,8 +1,10 @@
-import { Button, Checkbox, Col, DatePicker, Form, Input, Modal, Row, Select, Switch } from 'antd'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { Button, Checkbox, Col, DatePicker, Form, Input, Modal, Row, Select } from 'antd'
 import locale from 'antd/es/date-picker/locale/vi_VN'
 import LandingFooter from 'app/components/footer/LandingFooter'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import LandingHeader from 'app/components/header/LandingHeader'
+import ErrorMessage from 'app/components/message.tsx/ErrorMessage'
 import ModalTakeCareCreateTree from 'app/components/modal/takecare-create-tree/ModalTakeCareCreateTree'
 import useDispatch from 'app/hooks/use-dispatch'
 import useSelector from 'app/hooks/use-selector'
@@ -14,21 +16,20 @@ import { setNoti } from 'app/slices/notification'
 import pagingPath from 'app/utils/paging-path'
 import React, { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { AiOutlinePlusSquare } from 'react-icons/ai'
-import { IoCreateOutline } from 'react-icons/io5'
+import { AiOutlineEdit, AiOutlinePlusSquare } from 'react-icons/ai'
+import { IoCloseSharp, IoCreateOutline } from 'react-icons/io5'
 import { MdMiscellaneousServices } from 'react-icons/md'
 import { useNavigate } from 'react-router-dom'
+import * as yup from 'yup'
 import './style.scss'
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import ErrorMessage from 'app/components/message.tsx/ErrorMessage'
+import utilDateTime from 'app/utils/date-time'
+import CONSTANT from 'app/utils/constant'
 
-const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
-const mailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+
 const schema = yup.object().shape({
     name: yup.string().required('Tên không được để trống').max(50, 'Tối đa 50 ký tự'),
-    phone: yup.string().required('Số điện thoại không được để trống').matches(phoneRegExp, 'Số điện thoại không hợp lệ'),
-    email: yup.string().required('Email không được để trống').matches(mailRegex, 'Email không hợp lệ'),
+    phone: yup.string().required('Số điện thoại không được để trống').matches(CONSTANT.PHONE_REGEX, 'Số điện thoại không hợp lệ'),
+    email: yup.string().required('Email không được để trống').matches(CONSTANT.EMAIL_REGEX, 'Email không hợp lệ'),
     address: yup.string().required('Địa chỉ không được để trống').max(200, 'Tối đa 200 ký tự'),
 })
 
@@ -108,14 +109,15 @@ const ClientTakeCareService: React.FC = () => {
             setTreesSelect([...treesSelect])
         }
     }
-    const handleUpdateStatus = async (checked: boolean, item: UserTree) =>{
+    const handleUpdateStatus = async () =>{
+        const [item] = listTrees.filter(x => x.id === modalState.tree?.id)
         try{
-            const status = checked ? 'active' : 'disable'
+            const status = 'disable'
             await userTreeService.updateUserTreeStatus(item.id, status)
             const index = listTrees.findIndex(x => x.id === item.id)
             listTrees[index].status = status
             setListTrees([...listTrees])
-            dispatch(setNoti({type: 'success', message: 'Cập nhật trạng thái thành công'}))
+            dispatch(setNoti({type: 'success', message: 'Xóa cây khỏi kho thành công'}))
         }catch{
 
         }
@@ -128,9 +130,17 @@ const ClientTakeCareService: React.FC = () => {
         setModalState({openModal: 3})
     }
     const handleSubmitForm = async (data: ServiceCreate) =>{
-        if(!data.startDate){
+        const { startDate, endDate } = data
+        if(!startDate || !endDate){
             setError('startDate', {
                 message: 'Ngày chăm sóc không được để trống',
+                type: 'pattern'
+            })
+            return;
+        }
+        if(utilDateTime.getDiff2Days(startDate, endDate) < 7){
+            setError('startDate', {
+                message: 'Thời gian chăm sóc tối thiểu 7 ngày',
                 type: 'pattern'
             })
             return;
@@ -154,12 +164,6 @@ const ClientTakeCareService: React.FC = () => {
         if(!dates){
             setValue('startDate', undefined)
             setValue('endDate', undefined)
-            if(isSubmitted){
-                setError('startDate', {
-                    message: 'Ngày chăm sóc không được để trống',
-                    type: 'pattern'
-                })
-            }
             return;
         }
         const [start, end] = dates
@@ -173,23 +177,23 @@ const ClientTakeCareService: React.FC = () => {
             <div className="main-content-not-home">
                 <div className="container-wrapper ts-wrapper">
                     <HeaderInfor title='Dịch vụ chăm sóc cây cảnh' />
+                    <section className="default-layout ts-create-service">
+                        <div>
+                            <button className="ts-btn-create btn btn-create" onClick={handleCreateNewTree}>
+                                <AiOutlinePlusSquare size={25} />
+                                Tạo mới cây của bạn
+                            </button>
+                        </div>
+                    </section>
                     <section className="ts-box default-layout">
                         <button className="ts-btn-create btn btn-create" onClick={() => navigate('/take-care-service/me')}>
                             <MdMiscellaneousServices size={25} />
                             Quản lý dịch vụ của bạn
                         </button>
-                        <button className="ts-btn-create btn btn-create" onClick={handleCreateNewTree}>
-                            <AiOutlinePlusSquare size={25} />
-                            Tạo mới cây của bạn
+                        <button className='btn btn-create' onClick={handleCreateTakeCareService}>
+                            <IoCreateOutline size={25} />
+                            Tạo dịch vụ chăm sóc cây
                         </button>
-                    </section>
-                    <section className="default-layout ts-create-service">
-                        <div>
-                            <button className='btn btn-create' onClick={handleCreateTakeCareService}>
-                                <IoCreateOutline size={25} />
-                                Tạo dịch vụ chăm sóc cây
-                            </button>
-                        </div>
                     </section>
                     <section className="ts-infor default-layout">
                         {
@@ -209,6 +213,16 @@ const ClientTakeCareService: React.FC = () => {
                                         (viewAll ? treesSelect : listTrees).map((item, index) => (
                                             <Col key={index} span={6}>
                                                 <div className="item-detail">
+                                                    <div className="actions-wrapper">
+                                                        <AiOutlineEdit size={20} onClick={() => setModalState({openModal: 2, tree: item})} />
+                                                        <IoCloseSharp size={20} onClick={() => {
+                                                            if(treesSelect.find(x => x.id === item.id)){
+                                                                dispatch(setNoti({type: 'warning', message: 'Vui lòng bỏ chọn cây trước khi xóa khỏi kho'}))
+                                                                return
+                                                            }
+                                                            setModalState({openModal: 4, tree: item})
+                                                        }} />
+                                                    </div>
                                                     <img src={item.imgUrls[0]} alt="/" />
                                                     <div className="item-infor">
                                                         <h1>
@@ -219,14 +233,6 @@ const ClientTakeCareService: React.FC = () => {
                                                             Mô tả 
                                                             <span>{item.description}</span>
                                                         </p>
-                                                    </div>
-                                                    <div className="item-action">
-                                                        <div className="status">
-                                                            <Switch checked={item.status === 'active'} onChange={(checked: boolean) => handleUpdateStatus(checked, item)} />
-                                                        </div>
-                                                        <div className="detail ">
-                                                            <button className='btn btn-create' onClick={() => setModalState({openModal: 2, tree: item})}>Chi tiết cây</button>
-                                                        </div>
                                                     </div>
                                                     <div className="select-tree">
                                                         <Checkbox onChange={() => handleSelectTree(item)} checked={treesSelect.findIndex(x => x.id === item.id) > -1} >Chọn cây để chăm sóc</Checkbox>
@@ -324,19 +330,23 @@ const ClientTakeCareService: React.FC = () => {
                                 </Form.Item>
                             </Col>
                             <Col span={12}>
-                                <Form.Item label={`Sử dụng điểm thưởng (Số điểm bạn đang có là ${userState.user.currentPoint})`} required>
+                                <Form.Item label={`Sử dụng điểm thưởng (Số điểm bạn đang có là ${userState.user.currentPoint})`}>
                                     <Controller 
                                         control={control}
                                         name='rewardPointUsed'
                                         render={({field: { value }}) => (<Input type='number' min={0} value={value} onChange={(e) => {
                                             const data = Number(e.target.value || 0)
-                                            setValue('rewardPointUsed', data)
+                                            if(data >= userState.user.currentPoint){
+                                                setValue('rewardPointUsed', userState.user.currentPoint)
+                                            }else{
+                                                setValue('rewardPointUsed', data)
+                                            }
                                         }} />)}
                                     />
                                 </Form.Item>
                             </Col>
                             <Col span={12}>
-                                <Form.Item label='Chọn nơi chăm sóc cây' required>
+                                <Form.Item label='Chọn nơi chăm sóc cây'>
                                     <Controller 
                                         control={control}
                                         name='isTransport'
@@ -353,15 +363,23 @@ const ClientTakeCareService: React.FC = () => {
                                 <div className='btn-form-wrapper'>
                                     <Button htmlType='button' disabled={isSubmitting} type='default' className='btn-cancel' size='large' onClick={() => setModalState({openModal: 0, tree: undefined})}>Hủy bỏ</Button>
                                     <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large' onClick={() => console.log(errors)}>
-                                        {/* {
-                                            tree ? 'Cập nhật' : 'Tạo mới'
-                                        } */}
-                                        Cập nhật
+                                        Tạo yêu cầu
                                     </Button>
                                 </div>
                             </Col>
                         </Row>
                     </Form>
+                </Modal>
+            }
+            {
+                modalState.openModal === 4 && 
+                <Modal
+                    open
+                    title={`Xác nhận xóa cây "${modalState.tree?.treeName}" khỏi kho của bạn?`}
+                    onCancel={() => setModalState({openModal: 0, tree: undefined})}
+                    onOk={handleUpdateStatus}
+                >
+
                 </Modal>
             }
         </div>

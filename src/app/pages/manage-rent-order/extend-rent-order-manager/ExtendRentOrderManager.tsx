@@ -1,26 +1,24 @@
-import { yupResolver } from '@hookform/resolvers/yup'
-import { Button, Col, DatePicker, Form, Image, Input, Modal, Row, Select, Table } from 'antd'
-import locale from 'antd/es/date-picker/locale/vi_VN'
-import { ColumnsType } from 'antd/es/table'
-import ErrorMessage from 'app/components/message.tsx/ErrorMessage'
-import MoneyFormat from 'app/components/money/MoneyFormat'
 import useDispatch from 'app/hooks/use-dispatch'
-import useSelector from 'app/hooks/use-selector'
 import { OrderPreview, OrderUserInfor } from 'app/models/cart'
 import { OrderCreate, RentOrderList } from 'app/models/order'
 import { ShippingFee } from 'app/models/shipping-fee'
-import { setNoti } from 'app/slices/notification'
-import CONSTANT from 'app/utils/constant'
-import Dayjs from 'dayjs'
-import 'dayjs/locale/vi'
 import React, { useEffect, useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from 'yup'
+import CONSTANT from 'app/utils/constant'
+import { Button, Col, DatePicker, Form, Image, Input, Modal, Row, Select, Table } from 'antd'
+import { ColumnsType } from 'antd/es/table'
+import MoneyFormat from 'app/components/money/MoneyFormat'
+import { GrFormSubtract } from 'react-icons/gr'
 import { BiPlus } from 'react-icons/bi'
+import { setNoti } from 'app/slices/notification'
 import { CiSquareRemove } from 'react-icons/ci'
 import { FaMoneyBillAlt } from 'react-icons/fa'
-import { GrFormSubtract } from 'react-icons/gr'
-import * as yup from 'yup'
-import './style.scss'
+import Dayjs from 'dayjs'
+import ErrorMessage from 'app/components/message.tsx/ErrorMessage'
+import locale from 'antd/es/date-picker/locale/vi_VN'
+import utilDateTime from 'app/utils/date-time'
 import orderService from 'app/services/order.service'
 
 const schema = yup.object().shape({
@@ -33,16 +31,15 @@ const schema = yup.object().shape({
     isTransport: yup.boolean(),
 })
 
-interface ClientExtendOrderProps{
+interface ExtendRentOrderManagerProps{
     rentOrderList: RentOrderList
     shipping: ShippingFee[]
-    onClose: () => void
-    onExtend: () => void
+    onClose: () => void;
+    onExtend: () => void;
 }
 
-const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shipping, onClose, onExtend}) => {
+const ExtendRentOrderManager: React.FC<ExtendRentOrderManagerProps> = ({rentOrderList, shipping, onClose, onExtend}) => {
     const dispatch = useDispatch();
-    const userSate = useSelector(state => state.userInfor)
 
     const startDate = new Date(rentOrderList.endRentDate)
     startDate.setDate(startDate.getDate() + 1);
@@ -65,19 +62,16 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
     const [historyQuantities, setHistoryQuantites] = useState<number[]>([])
 
     useEffect(() =>{
-        if(!userSate.token) return;
+        const { recipientName, recipientPhone, recipientAddress, isTransport } = rentOrderList
 
-        const { address, fullName, phone, districtID } = userSate.user
+        setValue('recipientAddress', recipientAddress)
+        setValue('recipientName', recipientName)
+        setValue('recipientPhone', recipientPhone)
+        setValue('isTransport', isTransport)
+        setValue('shippingID', 1)
 
-        setValue('recipientAddress', address)
-        setValue('recipientName', fullName)
-        setValue('recipientPhone', phone)
-        setValue('shippingID', districtID)
-        setValue('isTransport', rentOrderList.isTransport)
+    }, [rentOrderList, setValue])
 
-        trigger()
-    }, [setValue, trigger, userSate, rentOrderList])
-   
     useEffect(() =>{
         const historyQuantites = rentOrderList.rentOrderDetailList.map(x => x.quantity)
         setHistoryQuantites(historyQuantites)
@@ -101,7 +95,6 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
                     width={100}
                     height={100}
                     src={v}
-                    className='img-preview'
                 />
             )
         },
@@ -164,7 +157,6 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
             render: (_, record) => (<CiSquareRemove size={30} color='#FF3333' style={{cursor: 'pointer'}} onClick={() => setIdRemove(record.id)} />)
         }
     ]
-
     const DataSource = useMemo(() =>{
         return rentOrderListData.rentOrderDetailList.map((x, index) => ({
             key: String(index + 1),
@@ -177,17 +169,6 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
             imgURL: x.imgURL,
         }))
     }, [rentOrderListData])
-
-    const handleRemoveItem = () =>{
-        const index = rentOrderListData.rentOrderDetailList.findIndex(x => x.id === idRemove)
-        rentOrderListData.rentOrderDetailList.splice(index, 1)
-        setRentOrderListData({...rentOrderListData})
-
-        historyQuantities.slice(index, 1)
-        setHistoryQuantites([...historyQuantities])
-
-        handleCloseModal()
-    }
     const controlRent = (id: string, common: string) =>{
         const index = rentOrderListData.rentOrderDetailList.findIndex(x => x.id === id)
         const item = rentOrderListData.rentOrderDetailList[index]
@@ -200,62 +181,23 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
             setRentOrderListData({...rentOrderListData})
         }else{
             if(item.quantity === historyQuantitiesAtIndex){
-                dispatch(setNoti({type: 'warning', message: 'Không thể tăng số lượng cây hơn số cây bạn đã thuê trước đó'})) 
+                dispatch(setNoti({type: 'warning', message: 'Không thể tăng số lượng cây hơn số cây khách hàng đã thuê trước đó'})) 
             }else{
                 rentOrderListData.rentOrderDetailList[index].quantity = rentOrderListData.rentOrderDetailList[index].quantity + 1
                 setRentOrderListData({...rentOrderListData})
             }
         }
     }
-    const handleSubmitForm = async (data: OrderUserInfor) =>{
-        const { startDateRent, endDateRent} = data
-        // validate right here
-        if(!startDateRent || !endDateRent){
-            setError('startDateRent', {
-                type: 'pattern',
-                message: 'Thời gian thuê không được để trống'
-            })
-            return;
-        }
-        const start = Dayjs(startDateRent)
-        const end = Dayjs(endDateRent)
-        if(start.diff(end, 'days') === 0){
-            setError('startDateRent', {
-                type: 'pattern',
-                message: 'Chọn khoảng thời gian thuê ít nhất 1 ngày'
-            })
-            return;
-        }
+    const handleRemoveItem = () =>{
+        const index = rentOrderListData.rentOrderDetailList.findIndex(x => x.id === idRemove)
+        rentOrderListData.rentOrderDetailList.splice(index, 1)
+        setRentOrderListData({...rentOrderListData})
 
-        const { isTransport, recipientAddress, recipientName, recipientPhone, rewardPointUsed, shippingID, rentOrderGroupID } = data
+        historyQuantities.slice(index, 1)
+        setHistoryQuantites([...historyQuantities])
 
-        const body: OrderCreate = {
-            isTransport, recipientAddress, recipientName, recipientPhone, rewardPointUsed, shippingID, endDateRent, startDateRent, rentOrderGroupID,
-            itemList: rentOrderListData.rentOrderDetailList.map(x => ({productItemDetailID: x.productItemDetailID, quantity: x.quantity}))
-        }
-        try{
-            await orderService.createOrder(body)
-            dispatch(setNoti({type: 'success', message: 'Gia hạn đơn hàng thành công'}))
-            onExtend()
-        }catch{
-
-        }
-
+        handleCloseModal()
     }
-
-    const handleChangeDateRange = (dates, dateStrings)=>{
-        if(!dates){
-            setValue('startDateRent', undefined)
-            setValue('endDateRent', undefined)
-        }else{
-            const [start, end] = dates
-            setValue('startDateRent', start.toDate())
-            setValue('endDateRent', end.toDate())
-            clearErrors('startDateRent')
-        }
-        clearPoint()
-    }
-
     const handleCloseModal = () =>{
         setIdRemove('')
     }
@@ -267,7 +209,6 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
 
         return end.diff(start, 'days')
     }
-
     const OrderPreview = () =>{
         const { rewardPointUsed, shippingID, isTransport, startDateRent, endDateRent } = getValues()
 
@@ -307,7 +248,8 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
     }
     const MaxPointCanUse = () => {
         const { isTransport } = getValues()
-        const { currentPoint } = userSate.user
+        const currentPoint = 0
+        // const { currentPoint } = rentOrderListData.
 
         const { totalPriceOrder, transportFee } = OrderPreview()
 
@@ -329,19 +271,63 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
     const clearPoint = () =>{
         setValue('rewardPointUsed', 0)
     }
+    const handleSubmitForm = async (data: OrderUserInfor) =>{
+        const { startDateRent, endDateRent } = data
+        if(!startDateRent || !endDateRent){
+            setError('startDateRent', {
+                type: 'pattern',
+                message: 'Thời gian không được để trống'
+            })
+            return;
+        }
+        if(utilDateTime.getDiff2Days(startDateRent, endDateRent) === 0){
+            setError('startDateRent', {
+                type: 'pattern',
+                message: 'Khoảng thời gian cách nhau ít nhất 1 ngày'
+            })
+            return;
+        }
+        const { isTransport, recipientAddress, recipientName, recipientPhone, rewardPointUsed, shippingID, rentOrderGroupID } = data
+
+        const body: OrderCreate = {
+            isTransport, recipientAddress, recipientName, recipientPhone, rewardPointUsed, shippingID, endDateRent, startDateRent, rentOrderGroupID,
+            itemList: rentOrderListData.rentOrderDetailList.map(x => ({productItemDetailID: x.productItemDetailID, quantity: x.quantity}))
+        }
+        try{
+            await orderService.createOrder(body)
+            dispatch(setNoti({type: 'success', message: 'Gia hạn đơn hàng thành công'}))
+            onExtend()
+        }catch{
+
+        }
+        console.log({data})
+        // validate
+    }
+    const handleChangeDateRange = (dates, dateStrings)=>{
+        if(!dates){
+            setValue('startDateRent', undefined)
+            setValue('endDateRent', undefined)
+        }else{
+            const [start, end] = dates
+            setValue('startDateRent', start.toDate())
+            setValue('endDateRent', end.toDate())
+            clearErrors('startDateRent')
+        }
+        clearPoint()
+    }
     return (
         <>
             <Modal
-                open
-                title={`Gian hạn đơn hàng ${rentOrderList.orderCode}`}
-                onCancel={onClose}
-                width={1200}
-                footer={false}
-            >
-                <Table dataSource={DataSource} columns={Column} pagination={false} />
-                <div className="extend-rent-order">
-                    <h3 className='title-form'>Thông tin gia hạn</h3>
-                    <div className="left">
+            open
+            title={`Gian hạn đơn hàng ${rentOrderList.orderCode}`}
+            onCancel={onClose}
+            width={1200}
+            footer={false}
+        >
+            <Table dataSource={DataSource} columns={Column} pagination={false} />
+            <div className="extend-rent-order">
+                <h3 className='title-form'>Thông tin gia hạn</h3>
+                <div className="left">
                         <div className="left-field">
                             <div className="label">
                                 <FaMoneyBillAlt color='#00a76f' size={25} />
@@ -471,10 +457,11 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
                                             locale={locale}
                                             placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
                                             format={CONSTANT.DATE_FORMAT_LIST}
-                                            disabledDate={(current) => current && current.valueOf()  < startDate.getTime()}
+                                            // disabledDate={(current) => current && current.valueOf()  < startDate.getTime()}
                                             defaultValue={[Dayjs(Dayjs(getValues('startDateRent')).format('DD/MM/YYYY'), 'DD/MM/YYYY'), Dayjs(Dayjs(getValues('endDateRent')).format('DD/MM/YYYY'), 'DD/MM/YYYY')]}
                                             onChange={handleChangeDateRange}
-                                            disabled={[true, false]}
+                                            style={{width: '100%'}}
+                                            // disabled={[true, false]}
                                         />
                                         {errors.startDateRent && <ErrorMessage message={errors.startDateRent.message} />}
                                     </Form.Item>
@@ -521,7 +508,7 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
                                         </Col>
                                     </>
                                 }
-                                <Col span={24}><p>Số điểm bạn đang có là ({userSate.user.currentPoint}) Số điểm bạn có thể dùng là ({MaxPointCanUse()})</p></Col>
+                                <Col span={24}><p>Số điểm bạn đang có là ({0}) Số điểm bạn có thể dùng là ({MaxPointCanUse()})</p></Col>
                                 <Col span={24}>
                                     <Form.Item label='Số điểm sử dụng cho đơn hàng'>
                                         <Controller 
@@ -541,7 +528,7 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
                                 </Col>
                                 <Col span={24} >
                                     <div className='btn-form-wrapper'>
-                                        <Button htmlType='button' loading={isSubmitting} type='default' size='large' className='btn-cancel'>Hủy</Button>
+                                        <Button htmlType='button' loading={isSubmitting} type='default' size='large' className='btn-cancel' onClick={onClose}>Hủy</Button>
                                         <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large'>
                                             Gia hạn
                                         </Button>
@@ -550,20 +537,20 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
                             </Row>
                         </Form>
                     </div>
-                </div>
+            </div>
+        </Modal>
+        {
+            idRemove &&
+            <Modal
+                title={`Xác nhận xóa "${rentOrderList.rentOrderDetailList.filter(x => x.id === idRemove)[0].productItemName}" khỏi đơn hàng`}
+                open
+                onCancel={handleCloseModal}
+                onOk={handleRemoveItem}
+            >
             </Modal>
-            {
-                idRemove &&
-                <Modal
-                    title={`Xác nhận xóa "${rentOrderList.rentOrderDetailList.filter(x => x.id === idRemove)[0].productItemName}" khỏi đơn hàng`}
-                    open
-                    onCancel={handleCloseModal}
-                    onOk={handleRemoveItem}
-                >
-                </Modal>
-            }
+        }
         </>
     )
 }
 
-export default ClientExtendOrder
+export default ExtendRentOrderManager

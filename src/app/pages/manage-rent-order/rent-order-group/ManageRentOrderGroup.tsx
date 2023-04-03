@@ -204,7 +204,7 @@ const ManageRentOrderGroup: React.FC = () => {
           </div>
         }
         {
-          record.status === 'completed' &&
+          record.status === 'paid' &&
           <div className="item" onClick={() => {
               handleSetAction({orderId: record.orderId, actionType: 'return deposit', orderType: 'rent', openIndex: -1})
           }}>
@@ -255,8 +255,8 @@ const ManageRentOrderGroup: React.FC = () => {
       orderId: x.id,
       orderCode: x.orderCode,
       totalPrice: x.totalPrice,
-      startDateRent: x.startDateRent,
-      endDateRent: x.endDateRent,
+      startDateRent: x.startRentDate,
+      endDateRent: x.endRentDate,
       status: x.status,
       remainMoney: x.remainMoney,
       deposit: x.deposit,
