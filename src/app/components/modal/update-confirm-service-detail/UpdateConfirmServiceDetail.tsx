@@ -51,7 +51,7 @@ interface UpdateConfirmServiceDetailProps{
 const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({service, onClose, onSubmit}) => {
     const dispatch = useDispatch()
 
-    const { setValue, formState: {errors, isSubmitting, isSubmitted}, control, trigger, handleSubmit, setError, clearErrors, getValues } = useForm<ServiceUpdate>({
+    const { setValue, formState: {errors, isSubmitting}, control, trigger, handleSubmit, setError, clearErrors, getValues } = useForm<ServiceUpdate>({
         resolver: yupResolver(schema)
     })
 
@@ -182,7 +182,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
         return result
     }
     const handleSubmitForm = async (data: ServiceUpdate) =>{
-        const { startDate, endDate, rewardPointUsed, isTranSport } = data
+        const { startDate, endDate, rewardPointUsed } = data
         if(!startDate || !endDate){
             setError('startDate', {
                 type: 'pattern',

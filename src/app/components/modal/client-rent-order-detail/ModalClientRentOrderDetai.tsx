@@ -1,10 +1,11 @@
 import { Image, Modal, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
+import MoneyFormat from 'app/components/money/MoneyFormat';
+import TreeName from 'app/components/renderer/tree-name/TreeName';
 import { RentOrderList } from 'app/models/order';
 import utilDateTime from 'app/utils/date-time';
 import utilGeneral from 'app/utils/general';
 import React, { useMemo } from 'react';
-import CurrencyFormat from 'react-currency-format';
 import { AiOutlinePhone } from 'react-icons/ai';
 import { BiArrowFromBottom, BiArrowFromTop } from 'react-icons/bi';
 import { BsFillCartCheckFill } from 'react-icons/bs';
@@ -14,8 +15,6 @@ import { HiOutlineStatusOnline } from 'react-icons/hi';
 import { IoInformationCircleOutline } from 'react-icons/io5';
 import { MdOutlineDriveFileRenameOutline } from 'react-icons/md';
 import './style.scss';
-import TreeName from 'app/components/renderer/tree-name/TreeName';
-import MoneyFormat from 'app/components/money/MoneyFormat';
 
 interface ModalClientRentOrderDetaiProps{
     rentOrderList: RentOrderList;

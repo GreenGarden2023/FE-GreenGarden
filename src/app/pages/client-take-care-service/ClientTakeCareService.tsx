@@ -53,7 +53,7 @@ const ClientTakeCareService: React.FC = () => {
 
     const [viewAll, setViewAll] = useState(false)
 
-    const { formState: { errors, isSubmitting, isSubmitted }, handleSubmit, setValue, control, setError, clearErrors } = useForm<ServiceCreate>({
+    const { formState: { errors, isSubmitting }, handleSubmit, setValue, control, setError, clearErrors } = useForm<ServiceCreate>({
         resolver: yupResolver(schema)
     })
 

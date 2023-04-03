@@ -6,6 +6,7 @@ import CancelOrder from 'app/components/modal/cancel-order/CancelOrder'
 import ModalClientSaleOrderDetai from 'app/components/modal/client-sale-order-detail/ModalClientSaleOrderDetai'
 import RefundOrder from 'app/components/modal/refundOrder.tsx/RefundOrder'
 import MoneyFormat from 'app/components/money/MoneyFormat'
+import Transport from 'app/components/renderer/transport/Transport'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
 import useDispatch from 'app/hooks/use-dispatch'
 import { SaleOrderList } from 'app/models/order'
@@ -26,8 +27,6 @@ import { RiBillLine } from 'react-icons/ri'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { OrderStatusToTag } from '../manage-take-care-order/ManageTakeCareOrder'
 import './style.scss'
-import Transport from 'app/components/renderer/transport/Transport'
-import CurrencyInput from 'app/components/renderer/currency-input/CurrencyInput'
 
 const ManageSaleOrder: React.FC = () => {
     const dispatch = useDispatch();
