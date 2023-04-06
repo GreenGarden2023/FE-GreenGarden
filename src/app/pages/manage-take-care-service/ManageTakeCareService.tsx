@@ -10,9 +10,11 @@ import useDispatch from 'app/hooks/use-dispatch'
 import { ServiceStatus } from 'app/models/general-type'
 import { PaymentControlState } from 'app/models/payment'
 import { Service, ServiceDetailList } from 'app/models/service'
+import { ShippingFee } from 'app/models/shipping-fee'
 import { UserGetByRole } from 'app/models/user'
 import orderService from 'app/services/order.service'
 import serviceService from 'app/services/service.service'
+import shippingFeeService from 'app/services/shipping-fee.service'
 import { setNoti } from 'app/slices/notification'
 import utilDateTime from 'app/utils/date-time'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -26,7 +28,7 @@ export const ServiceStatusToTag = (status: ServiceStatus) =>{
         case 'processing': return <Tag className='center' icon={<SyncOutlined  />} color='default' >Đang xử lý</Tag>
         case 'accepted': return <Tag className='center' icon={<FaCheck  />} color='#2db7f5' >Đã xác nhận</Tag>
         case 'rejected': return <Tag className='center' icon={<MdOutlineCancel  />} color='#f50'>Từ chối</Tag>
-        case 'confirmed': return <Tag className='center' icon={<MdOutlineFileDownloadDone  />} color='#87d068'>Đang chăm sóc</Tag>
+        case 'confirmed': return <Tag className='center' icon={<MdOutlineFileDownloadDone  />} color='#FF0066'>Đang chăm sóc</Tag>
         case 'user approved': return <Tag className='center' icon={<MdOutlineFileDownloadDone  />} color='#87d068'>Đã chấp nhận</Tag>
         default: return <Tag className='center' icon={<MdOutlineKeyboardReturn />} color='#108ee9'>Đang xử lý lại</Tag>
     }
@@ -36,8 +38,21 @@ const ManageTakeCareService: React.FC = () => {
     const dispatch = useDispatch();
 
     const [serviceOrders, setServiceOrders] = useState<Service[]>([])
+    const [shipping, setShipping] = useState<ShippingFee[]>([])
 
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
+
+    useEffect(() =>{
+        const init = async () =>{
+            try{
+                const res = await shippingFeeService.getList()
+                setShipping(res.data)
+            }catch{
+
+            }
+        }
+        init()
+    }, [])
 
     useEffect(() =>{
         const init = async () =>{
@@ -92,7 +107,7 @@ const ManageTakeCareService: React.FC = () => {
                     </div>
                 }
                 {
-                    (record.status === 'accepted') &&
+                    (record.status === 'accepted' && record.technicianID) &&
                     <div className="item" 
                         onClick={() => {
                             setActionMethod({orderId: record.id, actionType: 'update infor', orderType: 'service', openIndex: -1})
@@ -283,6 +298,7 @@ const ManageTakeCareService: React.FC = () => {
                 actionMethod?.actionType === 'update infor' &&
                 <UpdateConfirmServiceDetail
                     service={serviceOrders.filter(x => x.id === actionMethod.orderId)[0]}
+                    shipping={shipping}
                     onClose={handleClose}
                     onSubmit={handleUpdateService}
                 />

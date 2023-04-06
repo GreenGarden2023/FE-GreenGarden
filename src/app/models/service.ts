@@ -10,6 +10,7 @@ export interface ServiceCreate {
     address: string
     isTransport: boolean
     rewardPointUsed: number
+    districtID: number;
     userTreeIDList: string[]
 }
   
@@ -37,6 +38,7 @@ export interface ServiceUpdate {
     startDate?: Date
     endDate?: Date
     rules: string;
+    districtID: number;
 }
   
 export interface ServiceDetailUpdate {

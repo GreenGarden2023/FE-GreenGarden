@@ -21,6 +21,10 @@ import ListImage from 'app/components/renderer/list-image/ListImage';
 import CurrencyInput from 'app/components/renderer/currency-input/CurrencyInput';
 import utilGeneral from 'app/utils/general';
 import utilDateTime from 'app/utils/date-time';
+import { ShippingFee } from 'app/models/shipping-fee';
+import { OrderPreview } from 'app/models/cart';
+import { FaMoneyBillAlt } from 'react-icons/fa';
+import MoneyFormat from 'app/components/money/MoneyFormat';
 
 const schema = yup.object().shape({
     name: yup.string().trim().required('Tên không được để trống').max(50, 'Tối đa 50 ký tự'),
@@ -44,14 +48,19 @@ const dateFormatList = ['DD/MM/YYYY', 'DD/MM/YY', 'DD-MM-YYYY', 'DD-MM-YY'];
 
 interface UpdateConfirmServiceDetailProps{
     service: Service;
+    shipping: ShippingFee[]
     onClose: () => void;
     onSubmit: (service: Service) => void;
 }
 
-const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({service, onClose, onSubmit}) => {
+const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({service, shipping, onClose, onSubmit}) => {
     const dispatch = useDispatch()
 
     const { setValue, formState: {errors, isSubmitting}, control, trigger, handleSubmit, setError, clearErrors, getValues } = useForm<ServiceUpdate>({
+        defaultValues: {
+            startDate: service.startDate,
+            endDate: service.endDate
+        },
         resolver: yupResolver(schema)
     })
 
@@ -63,6 +72,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
 
     useEffect(() =>{
         const { id, name, phone, email, address, rewardPointUsed, startDate, endDate, isTransport, rules } = service
+        console.log({startDate, endDate})
         setValue('serviceID', id)
         setValue('name', name)
         setValue('phone', phone)
@@ -70,16 +80,15 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
         setValue('address', address)
         setValue('transportFee', 0)
         setValue('rewardPointUsed', rewardPointUsed)
-        setValue('startDate', startDate)
-        setValue('endDate', endDate)
 
-        setValue('rules', rules)
+        setValue('rules', rules || '')
         setValue('isTranSport', isTransport)
+
+        setValue('districtID', 1)
 
         // setTransport(isTransport)
 
-        trigger('startDate')
-        trigger('endDate')
+        // trigger()
 
     }, [service, setValue, trigger])
 
@@ -114,7 +123,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
             render: (v) => (<Description content={v}  />)
         },
         {
-            title: 'Mô tả của bạn',
+            title: 'Mô tả của kỹ thuật viên',
             key: 'managerDescription',
             dataIndex: 'managerDescription',
             render: (v, record) => (<Input.TextArea value={v} onChange={(e) => {
@@ -197,6 +206,13 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
             })
             return;
         }
+        if(utilDateTime.getDiff2Days(new Date(), startDate) > 14){
+            setError('startDate', {
+                message: 'Thời gian đặt trước lịch chăm sóc tối đa 14 ngày',
+                type: 'pattern'
+            })
+            return;
+        }
 
         let totalPrice = 0
         // let transportFee = 0
@@ -235,6 +251,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
         }
     }
     const handleChangeDateRange = (dates, dateStrings) =>{
+        clearPoint()
         if(!dates){
             setValue('startDate', undefined)
             setValue('endDate', undefined)
@@ -250,16 +267,152 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
         setValue('rules', data)
         trigger('rules')
     }
+    const clearPoint = () =>{
+        setValue('rewardPointUsed', 0)
+        trigger('rewardPointUsed')
+    }
+
+    const OrderPreview = () =>{
+        const { startDate, endDate, transportFee, rewardPointUsed } = getValues()
+
+        let diff = 0
+
+        if(!startDate || !endDate) {
+            diff = 0
+        }else{
+            diff = utilDateTime.getDiff2Days(startDate, endDate)
+        }
+
+        let totalPriceOrder = 0
+
+        for (const item of serviceDetail.serviceDetailList) {
+            totalPriceOrder += item.quantity * item.servicePrice
+        }
+        
+        totalPriceOrder = totalPriceOrder * diff
+
+        const totalPricePayment = (totalPriceOrder + transportFee) - (rewardPointUsed * CONSTANT.POINT_TO_MONEY)
+
+        const deposit = totalPricePayment * 0.5
+
+        const data: OrderPreview = {
+            rewardPoint: 0,
+            deposit,
+            totalPriceOrder,
+            transportFee,
+            discountAmount: rewardPointUsed * CONSTANT.POINT_TO_MONEY,
+            totalPricePayment: (totalPriceOrder + transportFee) - (rewardPointUsed * CONSTANT.POINT_TO_MONEY),
+            pointUsed: rewardPointUsed,
+            totalRentDays: diff
+        }
+        return data
+    }
+    const MaxPointCanUse = () =>{
+        const { totalPriceOrder, transportFee, totalRentDays } = OrderPreview()
+
+        console.log({ totalPriceOrder, transportFee, totalRentDays })
+
+        const totalPricePayment = totalPriceOrder + transportFee
+
+        return Math.floor((totalPricePayment - 50000) / 10000) * 10
+    }
+
     return (
         <Modal
             open
             title={`Cập nhật thông tin dịch vụ chăm sóc cho đơn hàng "${service.serviceCode}"`}
             width='100%'
             onCancel={onClose}
-            bodyStyle={{maxHeight: '650px', overflow: 'hidden auto'}}
+            bodyStyle={{maxHeight: '750px', overflow: 'hidden auto'}}
             footer={null}
         >
             <Table columns={ColumnTree} dataSource={DataSourceTree} pagination={false} />
+            <div className="order-infor">
+                <h3 className='order-infor-title'>Thông tin yêu cầu</h3>
+                <Row gutter={[24, 24]}>
+                    <Col span={6}>
+                        <div className='order-infor-item'>
+                            <div className="left">
+                                <FaMoneyBillAlt size={25} color='#00a76f' /> 
+                                <span>Tổng số ngày chăm sóc</span>
+                            </div>
+                            <div className="right">
+                                <span className='right-content'>{OrderPreview().totalRentDays}</span>
+                            </div>
+                        </div>
+                    </Col>
+                    <Col span={6}>
+                        <div className='order-infor-item'>
+                            <div className="left">
+                                <span>Số điểm đã dùng</span>
+                            </div>
+                            <div className="right">
+                                <span className='right-content'>{OrderPreview().pointUsed}</span>
+                            </div>
+                        </div>
+                    </Col>
+                    <Col span={6}>
+                        <div className='order-infor-item'>
+                            <div className="left">
+                                <span>Tích điểm</span>
+                            </div>
+                            <div className="right">
+                                <span className='right-content'>{OrderPreview().rewardPoint}</span>
+                            </div>
+                        </div>
+                    </Col>
+                    <Col span={6}>
+                        <div className='order-infor-item'>
+                            <div className="left">
+                                <span>Tổng tiền hàng</span>
+                            </div>
+                            <div className="right">
+                                <MoneyFormat value={OrderPreview().totalPriceOrder} isHighlight color='Light Blue' />
+                            </div>
+                        </div>
+                    </Col>
+                    <Col span={6}>
+                        <div className='order-infor-item'>
+                            <div className="left">
+                                <span>Phí vận chuyển</span>
+                            </div>
+                            <div className="right">
+                                <MoneyFormat value={OrderPreview().transportFee} isHighlight color='Default' />
+                            </div>
+                        </div>
+                    </Col>
+                    <Col span={6}>
+                        <div className='order-infor-item'>
+                            <div className="left">
+                                <span>Tiền được giảm</span>
+                            </div>
+                            <div className="right">
+                                <MoneyFormat value={OrderPreview().discountAmount} isHighlight color='Green' />
+                            </div>
+                        </div>
+                    </Col>
+                    <Col span={6}>
+                        <div className='order-infor-item'>
+                            <div className="left">
+                                <span>Tổng tiền thanh toán</span>
+                            </div>
+                            <div className="right">
+                                <MoneyFormat value={OrderPreview().totalPricePayment} isHighlight color='Blue' />
+                            </div>
+                        </div>
+                    </Col>
+                    <Col span={6}>
+                        <div className='order-infor-item'>
+                            <div className="left">
+                                <span>Tiền cọc</span>
+                            </div>
+                            <div className="right">
+                                <MoneyFormat value={OrderPreview().deposit} isHighlight color='Orange' />
+                            </div>
+                        </div>
+                    </Col>
+                </Row>
+            </div>
             <div className="user-infor-form">
                 <h3 className='form-title'>Xác nhận thông tin của khách hàng</h3>
                 <Form
@@ -298,6 +451,43 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                             </Form.Item>
                         </Col>
                         <Col span={8}>
+                            <Form.Item label='Nơi chăm sóc cây' >
+                                <Controller
+                                    control={control}
+                                    name='isTranSport'
+                                    render={({field: { value }}) => (
+                                        <Select value={value} onChange={(e) => {
+                                            setValue('isTranSport', e)
+                                            trigger('isTranSport')
+                                            clearPoint()
+                                        }}>
+                                            <Select.Option value={true}>Chăm sóc tại nhà</Select.Option>
+                                            <Select.Option value={false}>Chăm sóc tại cửa hàng</Select.Option>
+                                        </Select>
+                                    )}
+                                />
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item label='Vị trí' required>
+                                <Controller
+                                    control={control}
+                                    name='districtID'
+                                    render={({field}) => (
+                                        <Select {...field}>
+                                            {
+                                                shipping.map((item, index) => (
+                                                    <Select.Option value={item.districtID} key={index} >
+                                                        {item.district}
+                                                    </Select.Option>
+                                                ))
+                                            }
+                                        </Select>
+                                    )}
+                                />
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
                             <Form.Item label='Địa chỉ' required>
                                 <Controller
                                     control={control}
@@ -312,38 +502,10 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                 <Controller
                                     control={control}
                                     name='transportFee'
-                                    render={({ field: { value } }) => <CurrencyInput disbaled={getValues('isTranSport')} value={value} min={0} onChange={(e) => utilGeneral.setCurrency(setValue, 'transportFee', e)}/>}
-                                />
-                            </Form.Item>
-                        </Col>
-                        <Col span={8}>
-                            <Form.Item label={`Sử dụng điểm thưởng (Số điểm đang có là ${service.userCurrentPoint})`}>
-                                <Controller
-                                    control={control}
-                                    name='rewardPointUsed'
-                                    render={({field: { value }}) => (<Input type='number' min={0} value={value} onChange={(e) =>{
-                                        const data = Number(e.target.value || 0) < service.userCurrentPoint ? Number(e.target.value || 0) : service.userCurrentPoint
-                                        setValue('rewardPointUsed', data)
-                                    }} />)}
-                                />
-                                {errors.rewardPointUsed && <ErrorMessage message={errors.rewardPointUsed.message} />}
-                            </Form.Item>
-                        </Col>
-                        <Col span={8}>
-                            <Form.Item label='Nơi chăm sóc cây' >
-                                <Controller
-                                    control={control}
-                                    name='isTranSport'
-                                    render={({field: { value }}) => (
-                                        <Select value={value} onChange={(e) => {
-                                            setValue('transportFee', 0)
-                                            setValue('isTranSport', e)
-                                            trigger('isTranSport')
-                                        }}>
-                                            <Select.Option value={true}>Chăm sóc tại nhà</Select.Option>
-                                            <Select.Option value={false}>Chăm sóc tại cửa hàng</Select.Option>
-                                        </Select>
-                                    )}
+                                    render={({ field: { value } }) => <CurrencyInput value={value} min={0} onChange={(e) => {
+                                        clearPoint()
+                                        utilGeneral.setCurrency(setValue, 'transportFee', e)
+                                    }}/>}
                                 />
                             </Form.Item>
                         </Col>
@@ -353,13 +515,31 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                     locale={locale} 
                                     placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
                                     format={dateFormatList}
-                                    disabledDate={(current) => current && current.valueOf()  < Date.now()}
+                                    // disabledDate={(current) => current && current.valueOf()  < Date.now()}
                                     onChange={handleChangeDateRange}
                                     style={{width: '100%'}}
                                     defaultValue={[Dayjs(Dayjs(getValues('startDate')).format('DD/MM/YYYY'), 'DD/MM/YYYY'), Dayjs(Dayjs(getValues('endDate')).format('DD/MM/YYYY'), 'DD/MM/YYYY')]}
                                     // clearIcon={null}
                                 />
                                 {errors.startDate && <ErrorMessage message={errors.startDate.message} />}
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item label={`(Số điểm hiện tại ${service.userCurrentPoint}). Điểm có thể dùng (${MaxPointCanUse()}). Điểm khách hàng đã dùng (${service.rewardPointUsed})`}>
+                                <Controller
+                                    control={control}
+                                    name='rewardPointUsed'
+                                    render={({field: { value }}) => (<Input type='number' min={0} value={value} onChange={(e) =>{
+                                        const data = Number(e.target.value || 0) < service.userCurrentPoint ? Number(e.target.value || 0) : service.userCurrentPoint
+                                        if(data <= MaxPointCanUse()){
+                                            setValue('rewardPointUsed', data)
+                                        }else{
+                                            setValue('rewardPointUsed', MaxPointCanUse())
+                                        }
+                                        trigger('rewardPointUsed')
+                                    }} />)}
+                                />
+                                {errors.rewardPointUsed && <ErrorMessage message={errors.rewardPointUsed.message} />}
                             </Form.Item>
                         </Col>
                         <Col span={24}>

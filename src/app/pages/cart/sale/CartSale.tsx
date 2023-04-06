@@ -31,7 +31,7 @@ interface CartSaleProps{
     items: CartItemDetail[]
     shipping: ShippingFee[]
     onChange: (type: string, items: CartItemDetail[], id: string) => void
-    onSubmit: (type: string, data: OrderUserInfor) => void
+    onSubmit: (type: string, data: OrderUserInfor, orderPreview: OrderPreview) => void
 }
 
 const CartSale: React.FC<CartSaleProps> = ({items, shipping, onChange, onSubmit}) => {
@@ -173,9 +173,9 @@ const CartSale: React.FC<CartSaleProps> = ({items, shipping, onChange, onSubmit}
 
     const onSubmitForm = (data: OrderUserInfor) =>{
         // validate right here
-
+        data.itemList = items.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity}))
         // console.log({data})
-        onSubmit('sale', data)
+        onSubmit('sale', data, OrderPreview())
     }
 
     const OrderPreview = () =>{
@@ -199,7 +199,7 @@ const CartSale: React.FC<CartSaleProps> = ({items, shipping, onChange, onSubmit}
 
         const rewardPoint = Math.ceil(totalPricePayment / CONSTANT.REWARD_POINT_RATE)
 
-        const deposit = totalPricePayment <= CONSTANT.SALE_DEPOSIT_RATE ? 0 : Math.ceil(totalPricePayment * CONSTANT.DEPOSIT_MIN_RATE)
+        const deposit = totalPricePayment < CONSTANT.SALE_DEPOSIT_RATE ? 0 : Math.ceil(totalPricePayment * CONSTANT.DEPOSIT_MIN_RATE)
 
         const data: OrderPreview = {
             rewardPoint,

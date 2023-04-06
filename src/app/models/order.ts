@@ -20,7 +20,7 @@ export interface OrderCreate{
 export interface RentOrderDetailList {
     id: string;
     imgURL: string;
-    productItemDetailID: string;
+    productItemDetail: ProductItemDetail;
     productItemName: string;
     quantity: number;
     rentPricePerUnit: number
@@ -49,6 +49,7 @@ export interface RentOrderList {
     recipientPhone: string
     recipientName: string
     orderCode: string
+    recipientDistrict: number;
     rentOrderDetailList: RentOrderDetailList[]
 }
 export interface RentOrder{

@@ -1,4 +1,4 @@
-import { Col, DatePicker, DatePickerProps, Image, Input, Modal, Popover, Row } from 'antd';
+import { Button, Col, DatePicker, DatePickerProps, Form, Image, Input, Modal, Popover, Row } from 'antd';
 import locale from 'antd/es/date-picker/locale/vi_VN';
 import Table, { ColumnsType } from 'antd/es/table';
 import HeaderInfor from 'app/components/header-infor/HeaderInfor';
@@ -19,6 +19,14 @@ import { BiCommentDetail } from 'react-icons/bi';
 import { GrMore } from 'react-icons/gr';
 import { useParams } from 'react-router-dom';
 import './style.scss';
+import CONSTANT from 'app/utils/constant';
+import ErrorMessage from 'app/components/message.tsx/ErrorMessage';
+import { CiSquareRemove } from 'react-icons/ci';
+import ListImage from 'app/components/renderer/list-image/ListImage';
+import Description from 'app/components/renderer/description/Description';
+import TreeName from 'app/components/renderer/tree-name/TreeName';
+import MoneyFormat from 'app/components/money/MoneyFormat';
+import ServiceReportDetail from 'app/components/modal/service-report-detail/ServiceReportDetail';
 
 const dateFormatList = ['DD/MM/YYYY', 'DD/MM/YY', 'DD-MM-YYYY', 'DD-MM-YY'];
 
@@ -29,11 +37,14 @@ const TechManageServiceOrderDetail: React.FC = () => {
     // data
     const [serviceOrder, setServiceOrder] = useState<ServiceOrderDetail>();
     const [calendars, setCalendars] = useState<ServiceCalendar[]>([])
+    const [errorImgs, setErrorImgs] = useState('')
+    const [errorCalendar, setErrorCalendar] = useState('')
 
     // action
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
 
     const [date, setDate] = useState<Dayjs | null>(null)
+
     // CalendarUpdate type
     const [update, setUpdate] = useState<any>()
 
@@ -80,14 +91,17 @@ const TechManageServiceOrderDetail: React.FC = () => {
             render:(v) => (utilDateTime.dateToString(v))
         },
         {
-            title: 'File',
-            key: 'reportFileURL',
-            dataIndex: 'reportFileURL',
+            title: 'Hình ảnh',
+            key: 'images',
+            dataIndex: 'images',
+            render: (v) => (v && <ListImage listImgs={v} />)
         },
         {
             title: 'Mô tả ngắn gọn',
             key: 'sumary',
             dataIndex: 'sumary',
+            width: 300,
+            render: (v) => (<Description content={v} />)
         },
         {
             title: 'Trạng thái',
@@ -122,14 +136,26 @@ const TechManageServiceOrderDetail: React.FC = () => {
     const contextCalendar = (record) =>{
         return (
             <div className='context-menu-wrapper'>
-                <div className="item" onClick={() => {
-                    setActionMethod({orderId: record.id, actionType: 'update calendar', orderType: 'service', openIndex: -1})
-                    // handleAction({orderId: record.orderId, actionType: 'detail', orderType: 'service', openIndex: -1})
-                    // navigate(`/panel/take-care-order-assigned/${record.orderId}`)
-                }}>
-                    <BiCommentDetail size={25} className='icon'/>
-                    <span>Chi tiết báo cáo</span>
-                </div>
+                {
+                    record.status === 'done' && 
+                    <div className="item" onClick={() => {
+                        setActionMethod({orderId: record.id, actionType: 'detail', orderType: 'service', openIndex: -1})
+                    }}>
+                        <BiCommentDetail size={25} className='icon'/>
+                        <span>Chi tiết báo cáo</span>
+                    </div>
+                }
+                {/* && !record.nextServiceDate && utilDateTime.getDiff2Days(record.serviceDate, new Date()) */}
+                {/* utilDateTime.getDiff2Days(record.serviceDate, new Date()) === 0 */}
+                {
+                    record.status === 'pending' &&
+                    <div className="item" onClick={() => {
+                        setActionMethod({orderId: record.id, actionType: 'update calendar', orderType: 'service', openIndex: -1})
+                    }}>
+                        <BiCommentDetail size={25} className='icon'/>
+                        <span>Đăng tải báo cáo</span>
+                    </div>
+                }
             </div>
         )
     }
@@ -144,27 +170,13 @@ const TechManageServiceOrderDetail: React.FC = () => {
             title: 'Tên cây',
             key: 'treeName',
             dataIndex: 'treeName',
+            render: (v) => (<TreeName name={v} />)
         },
         {
             title: 'Hình ảnh',
             key: 'imgUrls',
             dataIndex: 'imgUrls',
-            render: (v) => (
-                <Image.PreviewGroup>
-                    {
-                        v.map((item, index) => (
-                            <div key={index} style={{display: index === 0 ? 'initial' : 'none'}}>
-                                <Image 
-                                width={150}
-                                height={150}
-                                src={item}
-                                style={{objectFit: 'cover'}}
-                            />
-                            </div>
-                        ))
-                    }
-                </Image.PreviewGroup>
-            )
+            render: (v) => (<ListImage listImgs={v} />)
         },
         {
             title: 'Số lượng',
@@ -175,16 +187,20 @@ const TechManageServiceOrderDetail: React.FC = () => {
             title: 'Mô tả của khách hàng',
             key: 'description',
             dataIndex: 'description',
+            render: (v) => (<Description content={v} />)
         },
         {
             title: 'Mô tả của quản trị',
             key: 'managerDescription',
             dataIndex: 'managerDescription',
+            render: (v) => (<Description content={v} />)
         },
         {
             title: 'Giá tiền',
             key: 'servicePrice',
             dataIndex: 'servicePrice',
+            align: 'right',
+            render: (v) => (<MoneyFormat value={v} isHighlight color='Blue' />)
         },
     ]
     const DataSourceServiceOrder = useMemo(() =>{
@@ -206,11 +222,13 @@ const TechManageServiceOrderDetail: React.FC = () => {
         }
         if(!serviceOrder) return;
         try{
-            await serviceCalendar.createServiceCalendar({calendarInitial: {
+            const res = await serviceCalendar.createServiceCalendar({calendarInitial: {
                 serviceDate: date.toDate(),
                 serviceOrderId: serviceOrder.id
             }})
             dispatch(setNoti({type: 'success', message: 'Tạo mới ngày chăm sóc đầu tiên thành công'}))
+            handleCloseModal()
+            setCalendars([...calendars, res.data.nextCalendar])
             // set data for array right here
         }catch{
 
@@ -221,40 +239,93 @@ const TechManageServiceOrderDetail: React.FC = () => {
         console.log(date, dateString);
     };
     const handleUpdateCalendar = async () =>{
-        const [calendar] = calendars.filter(x => x.id === actionMethod?.orderId)
-        
+        if(!serviceOrder) return;
+
+        let [calendar] = calendars.filter(x => x.id === actionMethod?.orderId)
+
+        if(!update){
+            setErrorImgs('Hình ảnh không được để trống')
+            return;
+        }
+
         // validate
-        if(!update) return;
+        if(update.images.length === 0){
+            setErrorImgs('Hình ảnh không được để trống')
+            return;
+        }
+        if(utilDateTime.getDiff2Days(serviceOrder.service.endDate, new Date()) !== 0){
+            if(!update.nextServiceDate){
+                setErrorCalendar('Lịch chăm sóc không được để trống')
+                return;
+            }
+        }
+
 
         try{
             const body: CalendarUpdate = {
                 ...update,
                 serviceCalendarId: calendar.id
             }
+            // console.log({body})
             await serviceCalendar.createServiceCalendar({calendarUpdate: body})
             dispatch(setNoti({type: 'success', message: 'Cập nhật thành công'}))
             setUpdate(undefined)
+            handleCloseModal()
+            const res = await serviceCalendar.getServiceCalendarByServiceOrder(orderId || '')
+            setCalendars(res.data)
+            // truong hop ngay cuoi se update lai order
+            if(utilDateTime.getDiff2Days(serviceOrder.service.endDate, new Date()) !== 0){
+                const res = await orderService.getAServiceOrderDetail(orderId || '')
+                setServiceOrder(res.data)
+            }
             // append data
         }catch{
 
         }
     }
     const handleChangeDateUpdateCalendar: DatePickerProps['onChange'] = (date, dateString) =>{
+        if(!date){
+            setUpdate({
+                ...update,
+                nextServiceDate: undefined
+            })
+            return;
+        }
+        setErrorCalendar('')
         setUpdate({
             ...update,
-            nextServiceDate: date ? date.toDate() : undefined 
+            nextServiceDate: date ? date.toDate().toLocaleDateString() : undefined 
         })
     }
     const handleUploadFile = async (e: React.ChangeEvent<HTMLInputElement>) =>{
-        if(!e.target.files) return;
-        const file = e.target.files[0]
+        const files = e.target.files
+        if(!files) return;
 
+        const finalFiles: File[] = []
+        for (let i = 0; i < files.length; i++) {
+            
+            const file = files[i];
+
+            if(!CONSTANT.SUPPORT_FORMATS.includes(file.type)){
+                setErrorImgs(`Định dạng ảnh chỉ chấp nhận ${CONSTANT.SUPPORT_FORMATS.join(' - ')}`)
+                return;
+            }
+            finalFiles.push(file)
+        }
+        setErrorImgs('')
         // validate File
-        const res = await uploadService.uploadListFiles([file])
-        setUpdate({
-            ...update,
-            reportFileURL: res.data[0]
-        })
+        const res = await uploadService.uploadListFiles(finalFiles)
+        if(update && update.images && update.images.length !== 0){
+            setUpdate({
+                ...update,
+                images: [...update.images, ...res.data]
+            })
+        }else{
+            setUpdate({
+                ...update,
+                images: res.data
+            })
+        }
     }
     const handleChangeSummary = (e) =>{
         setUpdate({
@@ -262,6 +333,11 @@ const TechManageServiceOrderDetail: React.FC = () => {
             sumary: e.target.value
         })
     }
+    const handleRemoveImage = (index: number) =>{
+        update.images.splice(index, 1)
+        setUpdate({...update})
+    }
+    console.log({update})
     return (
         <div className='tmsod-wrapper'>
             {
@@ -321,10 +397,13 @@ const TechManageServiceOrderDetail: React.FC = () => {
                         <h3>Thông tin của các cây cần chăm sóc</h3>
                         <Table style={{marginTop: '20px'}} columns={ColumnServiceOrder} dataSource={DataSourceServiceOrder} pagination={false} />
                     </div>
-                    <div className="default-layout">
-                        <h3>Bạn chưa có lịch chăm sóc nào. Hãy tạo mới 1 lịch chăm sóc</h3>
-                        <button onClick={() => setActionMethod({orderId: '', actionType: 'create calendar', openIndex: -1, orderType: 'service'})}>Tạo mới 1 lịch chăm sóc</button>
-                    </div>
+                    {
+                        (calendars.length === 0 && serviceOrder.status === 'paid') &&
+                        <div className="default-layout no-calendar">
+                            <h3>Bạn chưa có lịch chăm sóc nào. Hãy tạo mới 1 lịch chăm sóc</h3>
+                            <button className='btn btn-create' onClick={() => setActionMethod({orderId: '', actionType: 'create calendar', openIndex: -1, orderType: 'service'})}>Tạo mới 1 lịch chăm sóc</button>
+                        </div>
+                    }
                     <div className="default-layout">
                         <h3>Thông tin báo cáo</h3>
                         <Table style={{marginTop: '20px'}} columns={ColumnCalendar} dataSource={DataSourceCalendar} pagination={false} />
@@ -337,15 +416,31 @@ const TechManageServiceOrderDetail: React.FC = () => {
                     title={`Tạo mới 1 lịch chăm sóc cho đơn hàng ${serviceOrder?.orderCode}`}
                     open
                     onCancel={handleCloseModal}
-                    onOk={handleCreateNewCalendar}
+                    footer={false}
                 >
-                    <p>Chọn ngày chăm sóc đầu tiên</p>
-                    <DatePicker
-                        locale={locale} 
-                        format={dateFormatList}
-                        disabledDate={(current) => current && current.valueOf()  < (Date.now())}
-                        onChange={handleChangeDateRange}
-                    />
+                    <Form
+                        layout='vertical'
+                        onFinish={handleCreateNewCalendar}
+                    >
+                        <Form.Item label='Chọn ngày chăm sóc đầu tiên'>
+                            {
+                                serviceOrder &&
+                                // chỉ enable khoảng ngày đc phép
+                                <DatePicker
+                                    locale={locale} 
+                                    format={dateFormatList}
+                                    disabledDate={(current) => current && current.valueOf()  < (Date.now()) && current.valueOf() > serviceOrder?.service.endDate.valueOf()}
+                                    onChange={handleChangeDateRange}
+                                />
+                            }
+                        </Form.Item>
+                        <div className='btn-form-wrapper'>
+                            <Button htmlType='button'  type='default' className='btn-cancel' size='large' onClick={handleCloseModal}>Hủy bỏ</Button>
+                            <Button htmlType='submit'  type='primary' className='btn-update' size='large'>
+                                Tạo mới
+                            </Button>
+                        </div>
+                    </Form>
                 </Modal>
             }
             {
@@ -354,33 +449,67 @@ const TechManageServiceOrderDetail: React.FC = () => {
                     open
                     title={`Cập nhật báo cáo cho ngày chăm sóc "${utilDateTime.dateToString(calendars.filter(x => x.id === actionMethod.orderId)[0].serviceDate.toString())}"`}
                     onCancel={handleCloseModal}
-                    onOk={handleUpdateCalendar}
+                    footer={false}
+                    width={1000}
                 >
-                    <input type='file' hidden ref={ref} accept='.doc,.docx,.pdf' onChange={handleUploadFile} />
-                    <button type='button' onClick={() => ref.current?.click()}>
-                        <AiOutlineCloudUpload size={30} />
-                        <span>
-                            {
-                                update?.reportFileURL ? update.reportFileURL : 'Chọn file báo cáo'
-                            }
-                        </span>
-                    </button>
-                    <div>
-                        <div className="update-item">
-                            <p>Chọn ngày tiếp theo chăm sóc</p>
+                    <Form
+                        layout='vertical'
+                        onFinish={handleUpdateCalendar}
+                    >
+                        <input type='file' hidden ref={ref} accept='.png,.jpg,.jpeg' multiple onChange={handleUploadFile} />
+                        <button type='button' onClick={() => ref.current?.click()} className='btn btn-upload'>
+                            <AiOutlineCloudUpload size={30} />
+                            Đăng tải hình ảnh chăm sóc
+                        </button>
+                        {errorImgs && <ErrorMessage message={errorImgs} />}
+                        {
+                            (update && update.images) && 
+                            <Row style={{marginTop: '20px'}} gutter={[24, 0]}>
+                                <Image.PreviewGroup>
+                                    {
+                                        update.images?.map((item, index) => (
+                                            <Col span={6} key={index} className='preview-wrapper'>
+                                                <Image 
+                                                    src={item}
+                                                    alt='/'
+                                                    className='img-preview'
+                                                />
+                                                <CiSquareRemove size={30} onClick={() => handleRemoveImage(index)} className='btn-remove' />
+                                            </Col>
+                                        ))
+                                    }
+                                </Image.PreviewGroup>
+                            </Row>
+                        }
+                        <Form.Item label='Chọn ngày chăm sóc tiếp theo'>
                             <DatePicker
                                 locale={locale} 
                                 format={dateFormatList}
                                 disabledDate={(current) => current && current.valueOf()  < Date.now()}
                                 onChange={handleChangeDateUpdateCalendar}
                             />
+                            {errorCalendar && <ErrorMessage message={errorCalendar} />}
+                        </Form.Item>
+                        <Form.Item className='Mô tả ngắn gọn'>
+                            <Input.TextArea autoSize={{minRows: 4, maxRows: 6}} value={update?.sumary} onChange={handleChangeSummary} ></Input.TextArea>
+                        </Form.Item>
+                        <div className='btn-form-wrapper'>
+                            <Button htmlType='button'  type='default' className='btn-cancel' size='large' onClick={handleCloseModal}>Hủy bỏ</Button>
+                            <Button htmlType='submit'  type='primary' className='btn-update' size='large'>
+                                Tạo mới
+                            </Button>
                         </div>
-                        <div className="update-item">
-                            <p>Mô tả ngắn gọn</p>
-                            <Input.TextArea value={update?.sumary} onChange={handleChangeSummary} ></Input.TextArea>
-                        </div>
-                    </div>
+                    </Form>
                 </Modal>
+            }
+            {
+                actionMethod?.actionType === 'detail' &&
+                <ServiceReportDetail
+                    orderCode={serviceOrder?.orderCode || ''}
+                    serviceCalendar={calendars.filter(x => x.id === actionMethod.orderId)[0]}
+                    onClose={handleCloseModal}
+                
+                />
             }
         </div>
     )

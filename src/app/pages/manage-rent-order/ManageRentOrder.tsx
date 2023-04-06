@@ -32,6 +32,7 @@ import './style.scss'
 import ExtendRentOrderManager from './extend-rent-order-manager/ExtendRentOrderManager'
 import { ShippingFee } from 'app/models/shipping-fee'
 import shippingFeeService from 'app/services/shipping-fee.service'
+import TransactionDetail from 'app/components/modal/transaction-detail/TransactionDetail'
 
 const ManageRentOrder:React.FC = () => {
     const dispatch = useDispatch();
@@ -194,6 +195,12 @@ const ManageRentOrder:React.FC = () => {
                     <BiDetail size={25} className='icon'/>
                     <span>Chi tiết đơn hàng</span>
                 </div>
+                <div className="item" onClick={() => {
+                    handleSetAction({orderId: record.orderId, actionType: 'view transaction', orderType: 'rent', openIndex: -1})
+                }}>
+                    <BiDetail size={25} className='icon'/>
+                    <span>Xem giao dịch</span>
+                </div>
                 <div className="item" onClick={() => navigate(`/panel/rent-order/${record.groupID}`)}>
                     <FaLayerGroup size={25} className='icon'/>
                     <span>Xem nhóm đơn hàng</span>
@@ -222,7 +229,7 @@ const ManageRentOrder:React.FC = () => {
                         handleSetAction({orderId: record.orderId, actionType: 'return deposit', orderType: 'rent', openIndex: -1})
                     }}>
                         <GiReturnArrow size={25} className='icon'/>
-                        <span>Xác nhận hoàn cọc</span>
+                        <span>Xác nhận tất toán</span>
                     </div>
                 }
                 {
@@ -243,12 +250,12 @@ const ManageRentOrder:React.FC = () => {
                         <span>Hoàn tiền</span>
                     </div>
                 }
-                <div className="item" onClick={() => {
+                {/* <div className="item" onClick={() => {
                     handleSetAction({orderId: record.orderId, actionType: 'extend', orderType: 'rent', openIndex: -1})
                 }}>
                     <BiDetail size={25} className='icon'/>
                     <span>Gia hạn đơn hàng</span>
-                </div>
+                </div> */}
             </div>
         )
     }
@@ -409,6 +416,7 @@ const ManageRentOrder:React.FC = () => {
                     orderCode={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0].orderCode}
                     orderId={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0].id}
                     orderType='rent'
+                    transactionType='rent refund'
                 />
             }
             {
@@ -418,6 +426,15 @@ const ManageRentOrder:React.FC = () => {
                     shipping={shipping}
                     onClose={handleClose}
                     onExtend={handleExtendOrder}
+                />
+            }
+            {
+                actionMethod?.actionType === 'view transaction' &&
+                <TransactionDetail
+                    orderId={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0].id}
+                    orderCode={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0].orderCode}
+                    orderType='rent'
+                    onClose={handleClose}
                 />
             }
         </div>

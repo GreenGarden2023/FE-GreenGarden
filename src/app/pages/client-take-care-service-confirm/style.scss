@@ -10,4 +10,12 @@
         color: $color-link;
         font-weight: 500;
     }
+    .rule-wrapper{
+        border: 1px solid #0099FF;
+        border-radius: 5px;
+        padding: 5px 10px;
+        p{
+            margin-bottom: 5px;
+        }
+    }
 }

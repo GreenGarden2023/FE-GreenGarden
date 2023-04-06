@@ -18,6 +18,9 @@ import { BiCommentDetail } from 'react-icons/bi'
 import { GrMore } from 'react-icons/gr'
 import { useParams } from 'react-router-dom'
 import './style.scss'
+import pagingPath from 'app/utils/paging-path'
+import ServiceReportDetail from 'app/components/modal/service-report-detail/ServiceReportDetail'
+import { OrderStatusToTag } from 'app/pages/manage-take-care-order/ManageTakeCareOrder'
 
 const ClientManageTakeCareServiceDetail: React.FC = () => {
     const { orderId } = useParams()
@@ -29,6 +32,7 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
 
     useEffect(() =>{
+        pagingPath.scrollTop()
         if(!orderId) return;
 
         const init = async () =>{
@@ -127,14 +131,16 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
             render:(v) => (utilDateTime.dateToString(v))
         },
         {
-            title: 'File',
-            key: 'reportFileURL',
-            dataIndex: 'reportFileURL',
+            title: 'Hình ảnh',
+            key: 'images',
+            dataIndex: 'images',
+            render: (v) => (v && <ListImage listImgs={v} />)
         },
         {
             title: 'Mô tả ngắn gọn',
             key: 'sumary',
             dataIndex: 'sumary',
+            render: (v) => (<Description content={v} />)
         },
         {
             title: 'Trạng thái',
@@ -170,13 +176,10 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
         return (
             <div className='context-menu-wrapper'>
                 <div className="item" onClick={() => {
-                    window.open(record.reportFileURL, '_blank')
-                    setActionMethod({orderId: '', actionType: '', orderType: 'service', openIndex: -1})
-                    // handleAction({orderId: record.orderId, actionType: 'detail', orderType: 'service', openIndex: -1})
-                    // navigate(`/panel/take-care-order-assigned/${record.orderId}`)
+                    setActionMethod({orderId: record.id, actionType: 'detail', orderType: 'service', openIndex: -1})
                 }}>
                     <BiCommentDetail size={25} className='icon'/>
-                    <span>Tải xuống báo cáo</span>
+                    <span>Chi tiết báo cáo</span>
                 </div>
             </div>
         )
@@ -187,6 +190,10 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
             ...x
         }))
     }, [calendars])
+
+    const handleClose = () =>{
+        setActionMethod(undefined)
+    }
 
     return (
         <div>
@@ -211,9 +218,9 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
                                     <span className="label">Email:</span>
                                     <span className="content">{serviceOrder.technician.technicianMail}</span>
                                 </Col>
-                                <Col span={8}>
+                                <Col span={8} style={{display: 'flex'}}>
                                     <span className="label">Trạng thái đơn hàng</span>
-                                    <span className="content">{serviceOrder.status}</span>
+                                    <span className="content">{OrderStatusToTag(serviceOrder.status)}</span>
                                 </Col>
                             </Row>
                         </div>
@@ -225,6 +232,14 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
                         </div>
                     </div>
                 </div>
+            }
+            {
+                (actionMethod?.actionType === 'detail' && serviceOrder) &&
+                <ServiceReportDetail
+                    orderCode={serviceOrder.orderCode}
+                    serviceCalendar={calendars.filter(x => x.id === actionMethod.orderId)[0]}
+                    onClose={handleClose}
+                />
             }
             <LandingFooter />
         </div>

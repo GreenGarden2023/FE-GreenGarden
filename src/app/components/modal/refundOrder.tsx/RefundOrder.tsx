@@ -1,7 +1,7 @@
-import { Input, Modal } from 'antd';
+import { Button, Form, Input, Modal } from 'antd';
 import CurrencyInput from 'app/components/renderer/currency-input/CurrencyInput';
 import useDispatch from 'app/hooks/use-dispatch';
-import { OrderType } from 'app/models/general-type';
+import { OrderType, TransactionType } from 'app/models/general-type';
 import { TransactionHandle } from 'app/models/transaction';
 import transactionService from 'app/services/transaction.service';
 import { setNoti } from 'app/slices/notification';
@@ -12,11 +12,12 @@ interface RefundOrderProps{
     orderId: string;
     orderCode: string;
     orderType: OrderType;
+    transactionType: TransactionType
     onClose: () => void;
     onSubmit: () => void;
 }
 
-const RefundOrder: React.FC<RefundOrderProps> = ({orderId, orderCode, orderType, onClose, onSubmit}) => {
+const RefundOrder: React.FC<RefundOrderProps> = ({orderId, orderCode, orderType, transactionType, onClose, onSubmit}) => {
     const dispatch = useDispatch()
     const [amount, setAmount] = useState(0)
     const [desc, setDesc] = useState('')
@@ -32,7 +33,9 @@ const RefundOrder: React.FC<RefundOrderProps> = ({orderId, orderCode, orderType,
                 amount: amount,
                 description: desc,
                 orderType: orderType,
-                paymentType: 'cash'
+                paymentType: 'cash',
+                status: 'refund',
+                transactionType: transactionType
             }
             await transactionService.createTransaction(body)
             dispatch(setNoti({type: 'success', message: `Đã hoàn ${amount}VNĐ cho đơn hàng ${orderCode}`}))
@@ -54,12 +57,26 @@ const RefundOrder: React.FC<RefundOrderProps> = ({orderId, orderCode, orderType,
             open
             title={`Hoàn tiền cho đơn hàng "${orderCode}"`}
             onCancel={onClose}
-            onOk={handleRefundOrder}
+            width={800}
+            footer={false}
         >
-            <p>Nhập số tiền cần trả (VND)</p>
-            <CurrencyInput min={0} value={amount} onChange={handleChangeAmount} />
-            <p style={{marginTop: '10px'}}>Ghi chú</p>
-            <Input.TextArea autoSize={{minRows: 4, maxRows: 6}} value={desc} onChange={(e) => setDesc(e.target.value)} ></Input.TextArea>
+            <Form
+                layout='vertical'
+                onFinish={handleRefundOrder}
+            >
+                <Form.Item label='Nhập số tiền cần trả (VND)'>
+                    <CurrencyInput min={0} value={amount} onChange={handleChangeAmount} />
+                </Form.Item>
+                <Form.Item label='Ghi chú'>
+                    <Input.TextArea autoSize={{minRows: 4, maxRows: 6}} value={desc} onChange={(e) => setDesc(e.target.value)} ></Input.TextArea>
+                </Form.Item>
+                <div className='btn-form-wrapper'>
+                    <Button htmlType='button' type='default' className='btn-cancel' size='large' >Hủy bỏ</Button>
+                    <Button htmlType='submit' type='primary' className='btn-update' size='large'>
+                        Xác nhận
+                    </Button>
+                </div>
+            </Form>
         </Modal>
     )
 }

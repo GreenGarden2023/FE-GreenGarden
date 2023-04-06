@@ -19,7 +19,7 @@ import { setEmptyUser } from '../../slices/user-infor';
 import CONSTANT from '../../utils/constant';
 import ErrorMessage from '../message.tsx/ErrorMessage';
 import './style.scss';
-
+import { Role } from 'app/models/general-type'
 
 /* eslint-disable no-useless-escape */
 const schema = yup.object().shape({
@@ -107,6 +107,18 @@ const LandingHeader: React.FC = () =>{
       }
       return quantity
     }, [rentItems, saleItems])
+
+    const navigateToPanel = () =>{
+      const roleName = userState.user.roleName as Role
+      switch(roleName){
+        case 'Admin': navigate('/panel/manage-shipping-fee')
+          break;
+        case 'Manager': navigate('/panel/manage-category')
+          break;
+        case 'Technician': navigate('/panel/take-care-order-assigned')
+          break;
+      }
+    }
     return (
         <>
             <header className='landing-header'>
@@ -131,6 +143,13 @@ const LandingHeader: React.FC = () =>{
                               {
                                   userState.token ? 
                                   <>
+                                  {
+                                    userState.user.roleName !== 'Customer' &&
+                                    <div className='user-infor-box' onClick={navigateToPanel}>
+                                      <BiGitPullRequest size={20} />
+                                      <span>Bảng điều khiển</span>
+                                    </div>
+                                  }
                                       <div className='user-infor-box' onClick={() => navigate('/take-care-service/me')}>
                                           <BiGitPullRequest size={20} />
                                           <span>Yêu cầu của bạn</span>

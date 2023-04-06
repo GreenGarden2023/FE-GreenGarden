@@ -1,10 +1,11 @@
 import { Image, Modal } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
+import MoneyFormat from 'app/components/money/MoneyFormat';
+import TreeName from 'app/components/renderer/tree-name/TreeName';
 import { SaleOrderList } from 'app/models/order';
 import utilDateTime from 'app/utils/date-time';
 import utilGeneral from 'app/utils/general';
 import React, { useMemo } from 'react';
-import CurrencyFormat from 'react-currency-format';
 import { AiOutlinePhone } from 'react-icons/ai';
 import { BsFillCartCheckFill } from 'react-icons/bs';
 import { CiLocationOn } from 'react-icons/ci';
@@ -13,29 +14,13 @@ import { HiOutlineStatusOnline } from 'react-icons/hi';
 import { IoInformationCircleOutline } from 'react-icons/io5';
 import { MdOutlineDriveFileRenameOutline } from 'react-icons/md';
 import './style.scss';
-import TreeName from 'app/components/renderer/tree-name/TreeName';
-import MoneyFormat from 'app/components/money/MoneyFormat';
 
 interface ModalClientSaleOrderDetaiProps{
-    // orderId: string
     saleOrderList: SaleOrderList;
     onClose: () => void;
 }
 
 const ModalClientSaleOrderDetai: React.FC<ModalClientSaleOrderDetaiProps> = ({ saleOrderList, onClose }) => {
-
-    // useEffect(() =>{
-    //     if(!orderId) return;
-
-    //     const init = async () =>{
-    //         try{
-    //             const res = await orderService.getSaleOrderDetail(orderId)
-    //         }catch{
-
-    //         }
-    //     }
-    //     init()
-    // }, [orderId])
 
     const Column: ColumnsType<any> = [
         {
@@ -107,6 +92,14 @@ const ModalClientSaleOrderDetai: React.FC<ModalClientSaleOrderDetaiProps> = ({ s
         }))
     }, [saleOrderList])
 
+    const TotalPrice = useMemo(() =>{
+        let total = 0
+        for (const item of saleOrderList.rentOrderDetailList) {
+            total += item.quantity * item.salePricePerUnit
+        }
+        return total
+    }, [saleOrderList])
+
     return (
         <Modal
             open
@@ -171,7 +164,16 @@ const ModalClientSaleOrderDetai: React.FC<ModalClientSaleOrderDetaiProps> = ({ s
                         <span>Phí vận chuyển</span>
                     </div>
                     <div className="right">
-                        <CurrencyFormat className='value' value={saleOrderList.transportFee} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
+                        <MoneyFormat value={saleOrderList.transportFee} isHighlight color='Orange' />
+                    </div>
+                </div>
+                <div className="name">
+                    <div className="left">
+                        <FaMoneyBillWave size={20} color='#0099FF' />
+                        <span>Tổng tiền hàng</span>
+                    </div>
+                    <div className="right">
+                        <MoneyFormat value={TotalPrice} isHighlight color='Light Blue' />
                     </div>
                 </div>
                 <div className="name">
@@ -180,7 +182,7 @@ const ModalClientSaleOrderDetai: React.FC<ModalClientSaleOrderDetaiProps> = ({ s
                         <span>Tổng đơn hàng</span>
                     </div>
                     <div className="right">
-                        <CurrencyFormat className='value' value={saleOrderList.totalPrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
+                        <MoneyFormat value={saleOrderList.totalPrice} isHighlight color='Blue' />
                     </div>
                 </div>
             </div>

@@ -1,4 +1,4 @@
-import { Col, Input, Modal, Row } from 'antd'
+import { Col, Modal, Row } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import LandingFooter from 'app/components/footer/LandingFooter'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
@@ -17,6 +17,7 @@ import { AiOutlineCheck } from 'react-icons/ai'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ServiceStatusToTag } from '../manage-take-care-service/ManageTakeCareService'
 import './style.scss'
+import pagingPath from 'app/utils/paging-path'
 
 const ClientTakeCareServiceConfirm: React.FC = () => {
     const { serviceId } = useParams()
@@ -27,6 +28,7 @@ const ClientTakeCareServiceConfirm: React.FC = () => {
     const [openModal, setOpenModal] = useState(0)
 
     useEffect(() =>{
+        pagingPath.scrollTop()
         if(!serviceId) return;
         const init = async () =>{
             try{
@@ -113,7 +115,7 @@ const ClientTakeCareServiceConfirm: React.FC = () => {
             <LandingHeader />
             <div className="main-content-not-home">
                 <div className="container-wrapper ctcsc-wrapper">
-                    <HeaderInfor title='Xác nhận thông tin chi tiết yêu cầu chăm sóc' />
+                    <HeaderInfor title={`Thông tin chi tiết yêu cầu chăm sóc cây (${service?.serviceCode})`} />
                     {
                         service?.status === 'accepted' &&
                         <section className="default-layout">
@@ -164,7 +166,14 @@ const ClientTakeCareServiceConfirm: React.FC = () => {
                                 </Col>
                                 <Col span={24}>
                                     <span className="title" style={{marginBottom: '10px', display: 'block'}}>Thông tin hợp đồng chăm sóc cây</span>
-                                    <Input.TextArea autoSize={{minRows: 4, maxRows: 10}} disabled>{service.rules}</Input.TextArea>
+                                    <div className='rule-wrapper'>
+                                        {
+                                            service.rules.split('\n').map((x, index) => (
+                                                <p key={index}>{x}</p>
+                                            ))
+                                        }
+                                    </div>
+                                    {/* <Input.TextArea autoSize={{minRows: 4, maxRows: 10}} value={service.rules} disabled></Input.TextArea> */}
                                 </Col>
                             </Row>
                         }

@@ -109,7 +109,7 @@ const ClientManageTakeCareService: React.FC = () => {
                     <span>Chi tiết dịch vụ</span>
                 </div>
                 {
-                    record.serviceOrderID &&
+                    record.serviceOrderID !== '00000000-0000-0000-0000-000000000000' &&
                     <div className="item" onClick={() => {
                         navigate(`/order/service/${record.serviceOrderID}`)
                         // handleAction({orderId: record.id, actionType: 'detail', orderType: 'service', openIndex: -1})

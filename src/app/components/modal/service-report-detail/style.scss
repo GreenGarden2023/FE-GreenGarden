@@ -1,0 +1,38 @@
+@import 'app/styles/variable.scss';
+
+.report-wrapper{
+    .report-time{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        .title{
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .content{
+            font-size: 20px;
+            font-weight: 500;
+            color: $color-link;
+        }
+    }
+    .report-images{
+        border: 1px solid $color-link;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        .image-item{
+            padding: 10px;
+            width: 230px;
+            height: 230px;
+            object-fit: cover;
+        }
+    }
+    .report-description{
+        border: 1px solid $color-link;
+        padding: 10px;
+        border-radius: 5px;
+        color: $color-link;
+        font-weight: 500;
+    }
+}

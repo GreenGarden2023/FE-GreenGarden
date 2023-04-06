@@ -14,4 +14,26 @@
             }
         }
     }
+    .no-calendar{
+        text-align: center;
+        h3{
+            font-size: 26px;
+        }
+        button{
+            margin: 10px auto auto auto;
+        }
+    }
+}
+.preview-wrapper-tech{
+    position: relative;
+}
+.img-preview-tech{
+    width: 200px !important;
+    height: 150px!important;
+    object-fit: cover;
+}
+.btn-remove{
+    position: absolute;
+    top: 0;
+    right: 0;
 }

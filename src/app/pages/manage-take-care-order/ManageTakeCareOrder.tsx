@@ -5,6 +5,7 @@ import Table, { ColumnsType } from 'antd/es/table'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import CancelOrder from 'app/components/modal/cancel-order/CancelOrder'
 import RefundOrder from 'app/components/modal/refundOrder.tsx/RefundOrder'
+import TransactionDetail from 'app/components/modal/transaction-detail/TransactionDetail'
 import MoneyFormat from 'app/components/money/MoneyFormat'
 import TechnicianName from 'app/components/renderer/technician/TechnicianName'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
@@ -47,7 +48,6 @@ const ManageTakeCareOrder: React.FC = () => {
 
     const [amount, setAmount] = useState(0);
     const [checkFullAmount, setCheckFullAmount] = useState(false);
-    const [recall, setRecall] = useState(true)
 
 
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
@@ -55,13 +55,12 @@ const ManageTakeCareOrder: React.FC = () => {
     useEffect(() =>{
         pagingPath.scrollTop()
         const currentPage = searchParams.get('page');
-
+        console.log({currentPage})
         if(!pagingPath.isValidPaging(currentPage)){
             setPaging({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_RENT})
             return navigate('/panel/take-care-order?page=1')
         }
         
-        if(!recall) return;
 
         const init = async () =>{
             try{
@@ -71,10 +70,9 @@ const ManageTakeCareOrder: React.FC = () => {
             }catch{
 
             }
-            setRecall(false)
         }
         init()
-    }, [recall, navigate, searchParams, paging])
+    }, [navigate, searchParams, paging.pageSize])
 
     const handleAction = (data: PaymentControlState) =>{
         const { actionType, orderId } = data
@@ -107,6 +105,12 @@ const ManageTakeCareOrder: React.FC = () => {
                 }}>
                     <BiCommentDetail size={25} className='icon'/>
                     <span>Chi tiết đơn hàng</span>
+                </div>
+                <div className="item" onClick={() => {
+                    handleAction({orderId: record.orderId, actionType: 'view transaction', orderType: 'service', openIndex: -1})
+                }}>
+                    <BiCommentDetail size={25} className='icon'/>
+                    <span>Xem giao dịch</span>
                 </div>
                 {
                     (record.status === 'unpaid') && 
@@ -153,6 +157,7 @@ const ManageTakeCareOrder: React.FC = () => {
             title: 'Mã đơn hàng',
             key: 'orderCode',
             dataIndex: 'orderCode',
+            fixed: 'left'
         },
         {
             title: 'Mã dịch vụ',
@@ -203,7 +208,7 @@ const ManageTakeCareOrder: React.FC = () => {
             dataIndex: 'transportFee',
             align:'right',
             width: 200,
-            render: (v) => <MoneyFormat value={v} color='Default' isHighlight />
+            render: (v) => <MoneyFormat value={v} color='Default'  />
         },
         {
             title: 'Tiền cọc',
@@ -211,7 +216,7 @@ const ManageTakeCareOrder: React.FC = () => {
             dataIndex: 'deposit',
             align:'right',
             width: 200,
-            render: (v) => <MoneyFormat value={v} color='Orange' isHighlight />
+            render: (v) => <MoneyFormat value={v} color='Orange'  />
         },
         
         {
@@ -220,7 +225,7 @@ const ManageTakeCareOrder: React.FC = () => {
             dataIndex: 'discountAmount',
             align:'right',
             width: 200,
-            render: (v) => <MoneyFormat value={v} color='Yellow' isHighlight />
+            render: (v) => <MoneyFormat value={v} color='Yellow'  />
         },
         {
             title: 'Tổng tiền',
@@ -228,7 +233,7 @@ const ManageTakeCareOrder: React.FC = () => {
             dataIndex: 'totalPrice',
             align:'right',
             width: 200,
-            render: (v) => <MoneyFormat value={v} color='Light Blue' isHighlight />
+            render: (v) => <MoneyFormat value={v} color='Light Blue'  />
         },
         {
             title: 'Tiền còn thiếu',
@@ -328,7 +333,11 @@ const ManageTakeCareOrder: React.FC = () => {
             }
             await paymentService.paymentCash(actionMethod?.orderId || '', amountOrder, 'service', checkFullAmount ? 'whole' : '')
             // recall 
-            setRecall(true)
+            const currentPage = searchParams.get('page');
+            const res = await orderService.getAllServiceOrders({curPage: Number(currentPage), pageSize: paging.pageSize})
+            setServiceOrders(res.data.serviceOrderList)
+            setPaging(res.data.paging)
+            // 
             handleClose()
             dispatch(setNoti({type: 'success', message: 'Cập nhật đơn hàng thành công'}))
             setCheckFullAmount(false)
@@ -359,15 +368,14 @@ const ManageTakeCareOrder: React.FC = () => {
                     columns={ColumnServiceOrder} 
                     dataSource={DataSourceServiceOrder} 
                     scroll={{ y: 680, x: 3000 }}
-                    // pagination={{
-                    //     current: paging.curPage,
-                    //     pageSize: paging.pageSize,
-                    //     total: paging.recordCount,
-                    //     onChange: (page: number) =>{
-                    //         setRecall(true)
-                    //         navigate(`/panel/sale-order?page=${page}`)
-                    //     }
-                    // }}
+                    pagination={{
+                        current: paging.curPage,
+                        pageSize: paging.pageSize,
+                        total: paging.recordCount,
+                        onChange: (page: number) =>{
+                            navigate(`/panel/take-care-order?page=${page}`)
+                        }
+                    }}
                 />
             </section>
             {
@@ -424,6 +432,16 @@ const ManageTakeCareOrder: React.FC = () => {
                     orderCode={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].orderCode}
                     orderId={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].id}
                     orderType='service'
+                    transactionType='service refund'
+                />
+            }
+            {
+                actionMethod?.actionType === 'view transaction' &&
+                <TransactionDetail
+                    orderId={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].id}
+                    orderCode={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].orderCode}
+                    orderType='service'
+                    onClose={handleClose}
                 />
             }
         </div>

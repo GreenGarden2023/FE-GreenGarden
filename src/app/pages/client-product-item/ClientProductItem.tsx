@@ -44,7 +44,7 @@ const ClientProductItem: React.FC = () => {
                     productID: productId,
                     status: 'active',
                 })
-                setProductItems(res.data.productItems.filter(x => x.productItemDetail.length !== 0))
+                setProductItems(res.data.productItems)
                 setPaging(res.data.paging)
                 setProduct(res.data.product)
                 setCategory(res.data.category)

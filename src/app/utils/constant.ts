@@ -55,7 +55,7 @@ const MANAGE_PRODUCT: Role[] = ['Admin', 'Staff', 'Manager']
 const MANAGE_PRODUCT_ITEM: Role[] = ['Admin', 'Staff', 'Manager']
 const MANAGE_SIZE: Role[] = ['Admin', 'Staff', 'Manager']
 const MANAGE_ORDER: Role[] = ['Admin', 'Staff', 'Manager']
-const MANAGE_SHIPPING_FEE: Role[] = ['Admin', 'Staff', 'Manager']
+const MANAGE_SHIPPING_FEE: Role[] = ['Admin']
 const TAKE_CARE_ORDER: Role[] = ['Technician']
 
 const PAYMENT_MESSAGE = {
@@ -72,7 +72,7 @@ const POINT_TO_MONEY = 1000
 const REWARD_POINT_RATE = 10000
 // đơn thuê ít nhất 200k mới có deposit
 const RENT_DEPOSIT_RATE = 200000
-// đơn mua ít nhất 200k mới có deposit
+// đơn mua ít nhất 500k mới có deposit
 const SALE_DEPOSIT_RATE = 500000
 // giá order >= 50k mới cho nhập tích điểm
 const MIN_ORDER = 50000

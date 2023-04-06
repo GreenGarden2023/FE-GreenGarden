@@ -27,6 +27,7 @@ import { RiBillLine } from 'react-icons/ri'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { OrderStatusToTag } from '../manage-take-care-order/ManageTakeCareOrder'
 import './style.scss'
+import TransactionDetail from 'app/components/modal/transaction-detail/TransactionDetail'
 
 const ManageSaleOrder: React.FC = () => {
     const dispatch = useDispatch();
@@ -117,7 +118,7 @@ const ManageSaleOrder: React.FC = () => {
             dataIndex: 'transportFee',
             align: 'right',
             width: 200,
-            render: (v) => <MoneyFormat value={v} color='Default' isHighlight />
+            render: (v) => <MoneyFormat value={v} color='Default' />
         },
         {
             title: 'Tiền cọc',
@@ -125,7 +126,7 @@ const ManageSaleOrder: React.FC = () => {
             dataIndex: 'deposit',
             align: 'right',
             width: 200,
-            render: (v) => <MoneyFormat value={v} color='Orange' isHighlight />
+            render: (v) => <MoneyFormat value={v} color='Orange' />
         },
         {
             title: 'Tiền được giảm',
@@ -133,7 +134,7 @@ const ManageSaleOrder: React.FC = () => {
             dataIndex: 'discountAmount',
             align: 'right',
             width: 200,
-            render: (v) => <MoneyFormat value={v} color='Yellow' isHighlight />
+            render: (v) => <MoneyFormat value={v} color='Yellow' />
         },
         {
             title: 'Tổng tiền',
@@ -141,7 +142,7 @@ const ManageSaleOrder: React.FC = () => {
             dataIndex: 'totalPrice',
             align: 'right',
             width: 200,
-            render: (v) => <MoneyFormat value={v} color='Light Blue' isHighlight />
+            render: (v) => <MoneyFormat value={v} color='Light Blue' />
         },
         {
             title: 'Tiền còn thiếu',
@@ -185,6 +186,12 @@ const ManageSaleOrder: React.FC = () => {
                 }}>
                     <BiDetail size={25} className='icon'/>
                     <span>Chi tiết đơn hàng</span>
+                </div>
+                <div className="item" onClick={() => {
+                    handleSetAction({orderId: record.orderId, actionType: 'view transaction', orderType: 'sale', openIndex: -1})
+                }}>
+                    <BiDetail size={25} className='icon'/>
+                    <span>Xem giao dịch</span>
                 </div>
                 {
                     (record.status === 'unpaid') &&
@@ -387,6 +394,16 @@ const ManageSaleOrder: React.FC = () => {
                     orderCode={saleOrders.filter(x => x.id === actionMethod.orderId)[0].orderCode}
                     orderId={saleOrders.filter(x => x.id === actionMethod.orderId)[0].id}
                     orderType='sale'
+                    transactionType='sale refund'
+                />
+            }
+            {
+                actionMethod?.actionType === 'view transaction' &&
+                <TransactionDetail 
+                    orderId={saleOrders.filter(x => x.id === actionMethod.orderId)[0].id}
+                    orderCode={saleOrders.filter(x => x.id === actionMethod.orderId)[0].orderCode}
+                    orderType='sale'
+                    onClose={handleCancel}
                 />
             }
         </div>

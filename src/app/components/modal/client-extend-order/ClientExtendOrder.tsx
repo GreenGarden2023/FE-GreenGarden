@@ -231,7 +231,7 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
 
         const body: OrderCreate = {
             isTransport, recipientAddress, recipientName, recipientPhone, rewardPointUsed, shippingID, endDateRent, startDateRent, rentOrderGroupID,
-            itemList: rentOrderListData.rentOrderDetailList.map(x => ({productItemDetailID: x.productItemDetailID, quantity: x.quantity}))
+            itemList: rentOrderListData.rentOrderDetailList.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity}))
         }
         try{
             await orderService.createOrder(body)

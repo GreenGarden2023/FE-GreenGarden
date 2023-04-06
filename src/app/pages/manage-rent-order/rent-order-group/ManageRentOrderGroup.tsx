@@ -442,6 +442,7 @@ const ManageRentOrderGroup: React.FC = () => {
           orderCode={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0].orderCode}
           orderId={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0].id}
           orderType='rent'
+          transactionType='rent refund'
         />
       }
     </div>

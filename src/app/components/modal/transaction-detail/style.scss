@@ -1,0 +1,13 @@
+@import 'app/styles/variable.scss';
+
+.no-transaction{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    span{
+        font-size: 26px;
+        font-weight: 500;
+        color: $color-link;
+    }
+}

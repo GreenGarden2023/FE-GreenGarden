@@ -1,4 +1,4 @@
-import { Button, Col, DatePicker, Form, Input, Modal, Row, Select, Table } from 'antd'
+import { Button, Checkbox, Col, DatePicker, Form, Input, Modal, Row, Select, Table } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import MoneyFormat from 'app/components/money/MoneyFormat'
 import ListImage from 'app/components/renderer/list-image/ListImage'
@@ -18,6 +18,10 @@ import CONSTANT from 'app/utils/constant'
 import ErrorMessage from 'app/components/message.tsx/ErrorMessage'
 import locale from 'antd/es/date-picker/locale/vi_VN';
 import Dayjs from 'dayjs'
+import { Link } from 'react-router-dom'
+import { MdNavigateNext } from 'react-icons/md'
+import useDispatch from 'app/hooks/use-dispatch'
+import { setNoti } from 'app/slices/notification'
 
 const schema = yup.object().shape({
     recipientAddress: yup.string().when("isTransport", {
@@ -33,10 +37,11 @@ interface CartRentProps{
     items: CartItemDetail[]
     shipping: ShippingFee[]
     onChange: (type: string, items: CartItemDetail[], id: string) => void
-    onSubmit: (type: string, data: OrderUserInfor) => void
+    onSubmit: (type: string, data: OrderUserInfor, orderPreview: OrderPreview) => void
 }
 
 const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}) => {
+    const dispatch = useDispatch()
     const userState = useSelector(state => state.userInfor)
 
     const [idRemove, setIdRemove] = useState('')
@@ -57,6 +62,8 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
         },
         resolver: yupResolver(schema)
     })
+
+    const [isConfirm, setIsConfirm] = useState(false)
     
     useEffect(() =>{
         if(!userState.token) return;
@@ -213,8 +220,13 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
             return;
         }
 
-        console.log({data})
-        onSubmit('rent', data)
+        if(!isConfirm){
+            dispatch(setNoti({type: 'info', message: 'Bạn hãy đồng ý với các điều khoản của chúng tôi trước khi thuê cây'}))
+            return
+        }
+        
+        data.itemList = items.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity}))
+        onSubmit('rent', data, OrderPreview())
     }
 
     const clearPoint = () =>{
@@ -253,7 +265,7 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
 
         const rewardPoint = Math.ceil(totalPricePayment / CONSTANT.REWARD_POINT_RATE)
 
-        const deposit = totalPricePayment <= CONSTANT.RENT_DEPOSIT_RATE ? 0 : Math.ceil(totalPricePayment * CONSTANT.DEPOSIT_MIN_RATE)
+        const deposit = totalPricePayment < CONSTANT.RENT_DEPOSIT_RATE ? 0 : Math.ceil(totalPricePayment * CONSTANT.DEPOSIT_MIN_RATE)
 
         const data: OrderPreview = {
             rewardPoint,
@@ -494,6 +506,15 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
                                                     }} />)}
                                                 />
                                             </Form.Item>
+                                        </Col>
+                                        <Col span={24}>
+                                            <Checkbox checked={isConfirm} onChange={(e) => setIsConfirm(e.target.checked)} >Đồng ý với tất cả điều khoản khi thuê cây</Checkbox>
+                                            <div className="rent-policy">
+                                                <Link to='/rent-policy' className='view-policy'>
+                                                    <span>Xem điều khoản thuê cây</span>
+                                                    <MdNavigateNext size={20} />
+                                                </Link>
+                                            </div>
                                         </Col>
                                         <Col span={24} >
                                             <div className='btn-form-wrapper'>

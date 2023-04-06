@@ -97,12 +97,12 @@ const ModalSize: React.FC<ModalSizeProps> = ({size, open, onClose, onSubmit}) =>
           />
           {errors.sizeName && <ErrorMessage message={errors.sizeName.message} />}
         </Form.Item>
-        <Form.Item label='Loại kích thước' required >
+        <Form.Item label='Loại kích thước'>
           <Controller 
             control={control}
             name='sizeType'
             render={({ field }) => (
-              <Select suffixIcon={<AiFillCaretDown />} {...field}>
+              <Select disabled suffixIcon={<AiFillCaretDown />} {...field}>
                 <Select.Option value={true}>Duy nhất</Select.Option>
                 <Select.Option value={false}>Số lượng lớn</Select.Option>
               </Select>

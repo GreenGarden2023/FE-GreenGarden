@@ -1,4 +1,4 @@
-import { Input, Modal } from 'antd';
+import { Button, Form, Input, Modal } from 'antd';
 import useDispatch from 'app/hooks/use-dispatch';
 import { OrderType } from 'app/models/general-type';
 import orderService from 'app/services/order.service';
@@ -31,10 +31,23 @@ const CancelOrder: React.FC<CancelOrderProps> = ({ orderId, orderCode, orderType
             open
             title={`Xác nhận hủy đơn hàng ${orderCode}`}
             onCancel={onClose}
-            onOk={handleSubmit}
+            width={800}
+            footer={false}
         >
-            <p>Lý do hủy đơn hàng</p>
-            <Input.TextArea value={reason} onChange={(e) => setReason(e.target.value)} ></Input.TextArea>
+            <Form
+                layout='vertical'
+                onFinish={handleSubmit}
+            >
+                <Form.Item label='Lý do hủy đơn hàng'>
+                    <Input.TextArea autoSize={{minRows: 4, maxRows: 6}} value={reason} onChange={(e) => setReason(e.target.value)} ></Input.TextArea>
+                </Form.Item>
+                <div className='btn-form-wrapper'>
+                    <Button htmlType='button' type='default' className='btn-cancel' size='large' onClick={onClose}>Hủy bỏ</Button>
+                    <Button htmlType='submit' type='primary' className='btn-update' size='large'>
+                        Xác nhận
+                    </Button>
+                </div>
+            </Form>
         </Modal>
     )
 }

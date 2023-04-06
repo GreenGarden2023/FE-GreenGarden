@@ -106,11 +106,11 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
         CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/take-care-order'>Đơn chăm sóc</Link>, '7', <BiCategoryAlt size={18} />) : null,
     ]
     const items: MenuItem[] = [
-       CONSTANT.MANAGE_CATEGORY.includes(roleName as Role) ? getItem(<Link to='/panel/manage-category'>Manage Category</Link>, '1', <BiCategoryAlt size={18} />) : null,
-       CONSTANT.MANAGE_PRODUCT.includes(roleName as Role) ? getItem(<Link to='/panel/manage-product'>Manage Product</Link>, '2', <MdOutlineInventory2 size={18} />) : null,
-       CONSTANT.MANAGE_SIZE.includes(roleName as Role) ? getItem(<Link to='/panel/manage-size'>Manage Size</Link>, '3', <MdOutlineInventory2 size={18} />) : null,
-       CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem('Manage Order', '4', <BiCategoryAlt size={18} />, childrenOrder) : null,
-       CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/manage-take-care-service'>Dịch vụ chăm sóc</Link>, '8', <MdOutlineInventory2 size={18} />) : null,
+       CONSTANT.MANAGE_CATEGORY.includes(roleName as Role) ? getItem(<Link to='/panel/manage-category'>Danh mục</Link>, '1', <BiCategoryAlt size={18} />) : null,
+       CONSTANT.MANAGE_PRODUCT.includes(roleName as Role) ? getItem(<Link to='/panel/manage-product'>Loại cây</Link>, '2', <MdOutlineInventory2 size={18} />) : null,
+       CONSTANT.MANAGE_SIZE.includes(roleName as Role) ? getItem(<Link to='/panel/manage-size'>Kích thước</Link>, '3', <MdOutlineInventory2 size={18} />) : null,
+       CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem('Đơn hàng', '4', <BiCategoryAlt size={18} />, childrenOrder) : null,
+       CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/manage-take-care-service'>Yêu cầu chăm sóc</Link>, '8', <MdOutlineInventory2 size={18} />) : null,
        CONSTANT.MANAGE_SHIPPING_FEE.includes(roleName as Role) ? getItem(<Link to='/panel/manage-shipping-fee'>Phí vận chuyển</Link>, '9', <MdOutlineInventory2 size={18} />) : null,
        CONSTANT.TAKE_CARE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/take-care-order-assigned'>Đơn chăm sóc</Link>, '10', <MdOutlineInventory2 size={18} />) : null,
     ];

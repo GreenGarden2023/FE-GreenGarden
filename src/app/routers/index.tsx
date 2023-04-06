@@ -43,6 +43,7 @@ import { setLoading, setUser } from '../slices/user-infor';
 import CONSTANT from '../utils/constant';
 import AdminRoute from './AdminRoute';
 import AuthGuard from './AuthGuard';
+import RentPolicy from 'app/pages/rent-policy/RentPolicy';
 
 const Routers: React.FC = () =>{
     const dispatch = useDispatch();
@@ -131,6 +132,7 @@ const Routers: React.FC = () =>{
                 <Route path='/take-care-service/me' element={<ClientManageTakeCareService />} />
                 <Route path='/take-care-service/me/:serviceId' element={<ClientTakeCareServiceConfirm />} />
                 <Route path='/order/service/:orderId' element={<ClientManageTakeCareServiceDetail />} />
+                <Route path='/rent-policy' element={<RentPolicy />} />
 
                 <Route path='panel' >
                     <Route path='manage-category' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_CATEGORY} ><AdminRoute><ManageCategory /></AdminRoute></AuthGuard>} />

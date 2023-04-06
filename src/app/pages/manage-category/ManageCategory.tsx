@@ -268,7 +268,7 @@ const ManageCategory: React.FC = () => {
   return (
     <div className='mc-wrapper'>
       <section className="mc-infor default-layout">
-        <h1>Quản lý thể loại cây</h1>
+        <h1>Quản lý danh mục cây</h1>
       </section>
       <section className="mc-search-wrapper default-layout">
         <button className='btn-create' onClick={() => {

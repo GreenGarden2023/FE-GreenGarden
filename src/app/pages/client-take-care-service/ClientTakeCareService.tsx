@@ -24,6 +24,8 @@ import * as yup from 'yup'
 import './style.scss'
 import utilDateTime from 'app/utils/date-time'
 import CONSTANT from 'app/utils/constant'
+import { ShippingFee } from 'app/models/shipping-fee'
+import shippingFeeService from 'app/services/shipping-fee.service'
 
 
 const schema = yup.object().shape({
@@ -48,16 +50,33 @@ const ClientTakeCareService: React.FC = () => {
 
     const [modalState, setModalState] = useState<ModalProps>({openModal: 0})
 
+    const [shipping, setShipping] = useState<ShippingFee[]>([])
+
     const [listTrees, setListTrees] = useState<UserTree[]>([])
     const [treesSelect, setTreesSelect] = useState<UserTree[]>([])
 
     const [viewAll, setViewAll] = useState(false)
 
     const { formState: { errors, isSubmitting }, handleSubmit, setValue, control, setError, clearErrors } = useForm<ServiceCreate>({
+        defaultValues: {
+
+        },
         resolver: yupResolver(schema)
     })
 
     const userState = useSelector(state => state.userInfor)
+
+    useEffect(() =>{
+        const init = async () =>{
+            try{
+                const res = await shippingFeeService.getList()
+                setShipping(res.data)
+            }catch{
+
+            }
+        }
+        init()
+    }, [])
 
     useEffect(() =>{
         pagingPath.scrollTop()
@@ -75,13 +94,14 @@ const ClientTakeCareService: React.FC = () => {
     }, [])
 
     useEffect(() =>{
-        const { fullName, phone, address, mail } = userState.user
+        const { fullName, phone, address, mail, districtID } = userState.user
         setValue('name', fullName)
         setValue('phone', phone)
         setValue('email', mail)
         setValue('address', address)
         setValue('rewardPointUsed', 0)
         setValue('isTransport', false)
+        setValue('districtID', districtID)
 
     }, [setValue, userState])
 
@@ -141,6 +161,13 @@ const ClientTakeCareService: React.FC = () => {
         if(utilDateTime.getDiff2Days(startDate, endDate) < 7){
             setError('startDate', {
                 message: 'Thời gian chăm sóc tối thiểu 7 ngày',
+                type: 'pattern'
+            })
+            return;
+        }
+        if(utilDateTime.getDiff2Days(new Date(), startDate) > 14){
+            setError('startDate', {
+                message: 'Thời gian đặt trước lịch chăm sóc tối đa 14 ngày',
                 type: 'pattern'
             })
             return;
@@ -307,6 +334,39 @@ const ClientTakeCareService: React.FC = () => {
                                 </Form.Item>
                             </Col>
                             <Col span={12}>
+                                <Form.Item label='Chọn nơi chăm sóc cây'>
+                                    <Controller 
+                                        control={control}
+                                        name='isTransport'
+                                        render={({field: { value, onChange }}) => (
+                                            <Select value={value} onChange={onChange} >
+                                                <Select.Option value={true} >Chăm sóc tại cửa hàng</Select.Option>
+                                                <Select.Option value={false} >Chăm sóc tại nhà</Select.Option>
+                                            </Select>
+                                        )}
+                                    />
+                                </Form.Item>
+                            </Col>
+                            <Col span={12}>
+                                <Form.Item label='Nơi chăm sóc' required>
+                                    <Controller
+                                        control={control}
+                                        name='districtID'
+                                        render={({field}) => (
+                                            <Select {...field}>
+                                                {
+                                                    shipping.map((item, index) => (
+                                                        <Select.Option value={item.districtID} key={index} >
+                                                            {item.district}
+                                                        </Select.Option>
+                                                    ))
+                                                }
+                                            </Select>
+                                        )}
+                                    />
+                                </Form.Item>
+                            </Col>
+                            <Col span={12}>
                                 <Form.Item label='Địa chỉ' required>
                                     <Controller 
                                         control={control}
@@ -342,20 +402,6 @@ const ClientTakeCareService: React.FC = () => {
                                                 setValue('rewardPointUsed', data)
                                             }
                                         }} />)}
-                                    />
-                                </Form.Item>
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item label='Chọn nơi chăm sóc cây'>
-                                    <Controller 
-                                        control={control}
-                                        name='isTransport'
-                                        render={({field: { value, onChange }}) => (
-                                            <Select value={value} onChange={onChange} >
-                                                <Select.Option value={true} >Chăm sóc tại cửa hàng</Select.Option>
-                                                <Select.Option value={false} >Chăm sóc tại nhà</Select.Option>
-                                            </Select>
-                                        )}
                                     />
                                 </Form.Item>
                             </Col>

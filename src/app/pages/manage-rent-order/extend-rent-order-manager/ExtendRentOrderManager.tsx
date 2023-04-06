@@ -62,13 +62,13 @@ const ExtendRentOrderManager: React.FC<ExtendRentOrderManagerProps> = ({rentOrde
     const [historyQuantities, setHistoryQuantites] = useState<number[]>([])
 
     useEffect(() =>{
-        const { recipientName, recipientPhone, recipientAddress, isTransport } = rentOrderList
+        const { recipientName, recipientPhone, recipientAddress, isTransport, recipientDistrict } = rentOrderList
 
         setValue('recipientAddress', recipientAddress)
         setValue('recipientName', recipientName)
         setValue('recipientPhone', recipientPhone)
         setValue('isTransport', isTransport)
-        setValue('shippingID', 1)
+        setValue('shippingID', recipientDistrict)
 
     }, [rentOrderList, setValue])
 
@@ -221,7 +221,7 @@ const ExtendRentOrderManager: React.FC<ExtendRentOrderManagerProps> = ({rentOrde
 
         for (const item of rentOrderListData.rentOrderDetailList) {
             totalPriceOrder += item.quantity * item.rentPricePerUnit * totalRentDays
-            transportFee += ((shippingFeeTemp ? shippingFeeTemp.feeAmount : 0) + (rentOrderListData.transportFee * item.quantity))
+            transportFee += ((shippingFeeTemp ? shippingFeeTemp.feeAmount : 0) + (item.productItemDetail.transportFee * item.quantity))
         }
 
         if(!isTransport){
@@ -291,7 +291,7 @@ const ExtendRentOrderManager: React.FC<ExtendRentOrderManagerProps> = ({rentOrde
 
         const body: OrderCreate = {
             isTransport, recipientAddress, recipientName, recipientPhone, rewardPointUsed, shippingID, endDateRent, startDateRent, rentOrderGroupID,
-            itemList: rentOrderListData.rentOrderDetailList.map(x => ({productItemDetailID: x.productItemDetailID, quantity: x.quantity}))
+            itemList: rentOrderListData.rentOrderDetailList.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity}))
         }
         try{
             await orderService.createOrder(body)
