@@ -44,6 +44,10 @@ const updateProductItemDetail = async (item: ProductItemDetailHandle) =>{
     const result = await golbalAxios.post<Response<ProductItemDetailHandle>>(`/product-item/update-product-item-detail`, item);
     return result.data
 }
+const changeStatusProductDetail = async (productItemDetailId: string, status: Status) =>{
+    const result = await golbalAxios.post(`/product-item/change-status-productDetail`, { productItemDetailId, status })
+    return result.data
+}
 
 const productItemService = {
     getAllProductItem,
@@ -51,7 +55,8 @@ const productItemService = {
     updateProductItem,
     getProductItemDetail,
     createProductItemDetail,
-    updateProductItemDetail
+    updateProductItemDetail,
+    changeStatusProductDetail
 }
 
 export default productItemService

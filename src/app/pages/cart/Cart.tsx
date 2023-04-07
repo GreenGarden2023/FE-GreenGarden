@@ -10,7 +10,7 @@ import orderService from 'app/services/order.service';
 import shippingFeeService from 'app/services/shipping-fee.service';
 import { CartProps, setCartSlice, setEmptyRentCart, setEmptySaleCart } from 'app/slices/cart';
 import { setNoti } from 'app/slices/notification';
-import utilCalculate from 'app/utils/order-calculate';
+// import utilCalculate from 'app/utils/order-calculate';
 import pagingPath from 'app/utils/paging-path';
 import 'dayjs/locale/vi';
 import React, { useEffect, useState } from 'react';
@@ -124,18 +124,18 @@ const CartPage: React.FC = () => {
             try{
                 const { itemList, shippingID, rewardPointUsed, recipientAddress, isTransport, recipientName, recipientPhone } = data
                 const body: OrderCreate = {itemList, shippingID, rewardPointUsed, recipientAddress, recipientName, recipientPhone, isTransport}
-                const calculatorSale = await orderService.calculateOrder(body)
-                console.log(calculatorSale.data)
-                console.log(orderPreview)
-                if(utilCalculate.compare2Orders(calculatorSale.data, orderPreview)){
-                    await orderService.createOrder(body)
-                    dispatch(setNoti({type: 'success', message: 'Tạo đơn hàng mua thành công. Vui lòng kiểm tra đơn hàng và thanh toán để nhận cây'}))
-                    cart.saleItems = []
-                    setCart({...cart})
-                    dispatch(setEmptySaleCart())
-                }else{
-                    dispatch(setNoti({type: 'info', message: 'Đã có sự thay đổi về giá. Quý khách vui lòng tải lại trang để đặt hàng'}))
-                }
+                await orderService.createOrder(body)
+                dispatch(setNoti({type: 'success', message: 'Tạo đơn hàng mua thành công. Vui lòng kiểm tra đơn hàng và thanh toán để nhận cây'}))
+                cart.saleItems = []
+                setCart({...cart})
+                dispatch(setEmptySaleCart())
+                // const calculatorSale = await orderService.calculateOrder(body)
+                // console.log(calculatorSale.data)
+                // console.log(orderPreview)
+                // if(utilCalculate.compare2Orders(calculatorSale.data, orderPreview)){
+                // }else{
+                //     dispatch(setNoti({type: 'info', message: 'Đã có sự thay đổi về giá. Quý khách vui lòng tải lại trang để đặt hàng'}))
+                // }
             }catch{
                 dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
@@ -143,18 +143,18 @@ const CartPage: React.FC = () => {
             try{
                 const { startDateRent, endDateRent, shippingID, itemList, rewardPointUsed, recipientAddress, recipientName, recipientPhone, isTransport } = data
                 const body: OrderCreate = {startDateRent, endDateRent, shippingID, itemList, rewardPointUsed, recipientAddress, recipientName, recipientPhone, isTransport}
-                const calculatorRent = await orderService.calculateOrder(body)
-                console.log(calculatorRent.data)
-                console.log(orderPreview)
-                if(utilCalculate.compare2Orders(calculatorRent.data, orderPreview)){
-                    await orderService.createOrder(body)
-                    dispatch(setNoti({type: 'success', message: 'Tạo đơn hàng thuê thành công. Vui lòng kiểm tra đơn hàng và thanh toán để nhận cây'}))
-                    cart.rentItems = []
-                    setCart({...cart})
-                    dispatch(setEmptyRentCart())
-                }else{
-                    dispatch(setNoti({type: 'info', message: 'Đã có sự thay đổi về giá. Quý khách vui lòng tải lại trang để đặt hàng'}))
-                }
+                await orderService.createOrder(body)
+                dispatch(setNoti({type: 'success', message: 'Tạo đơn hàng thuê thành công. Vui lòng kiểm tra đơn hàng và thanh toán để nhận cây'}))
+                cart.rentItems = []
+                setCart({...cart})
+                dispatch(setEmptyRentCart())
+                // const calculatorRent = await orderService.calculateOrder(body)
+                // console.log(calculatorRent.data)
+                // console.log(orderPreview)
+                // if(utilCalculate.compare2Orders(calculatorRent.data, orderPreview)){
+                // }else{
+                //     dispatch(setNoti({type: 'info', message: 'Đã có sự thay đổi về giá. Quý khách vui lòng tải lại trang để đặt hàng'}))
+                // }
             }catch{
                 dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }

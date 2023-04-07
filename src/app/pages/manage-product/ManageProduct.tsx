@@ -253,17 +253,20 @@ const ManageProduct: React.FC = () => {
           }} />
         }
       </section>
-      <ModalProduct 
-        action={action} 
-        open={action !== ''} 
-        product={productSelected} 
-        categoryId={categoryIdSelected}
-        onClose={() => {
-          setAction('')
-          setProductSelected(undefined)
-        }}
-        onSubmit={handleSubmitProduct}
-      />
+      {
+        action !== '' &&
+        <ModalProduct 
+          action={action} 
+          open
+          product={productSelected} 
+          categoryId={categoryIdSelected}
+          onClose={() => {
+            setAction('')
+            setProductSelected(undefined)
+          }}
+          onSubmit={handleSubmitProduct}
+        />
+      }
     </div>
   )
 }

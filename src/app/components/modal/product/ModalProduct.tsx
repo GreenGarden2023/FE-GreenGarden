@@ -46,6 +46,7 @@ const ModalProduct: React.FC<ModalProductProps> = ({ categoryId, product, action
     })
     
     useEffect(() =>{
+        console.log('mount')
         setValue('categoryId', categoryId)
 
         if(!product) return;
@@ -72,9 +73,9 @@ const ModalProduct: React.FC<ModalProductProps> = ({ categoryId, product, action
                 onSubmit(res.data, action)
                 reset()
                 onClose()
-                dispatch(setNoti({type: 'success', message: `Create product success`}))
+                dispatch(setNoti({type: 'success', message: `Tạo mới "${data.name}" thành công`}))
             }catch(err){
-                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
         }else if(action === 'Update'){
             try{
@@ -92,9 +93,9 @@ const ModalProduct: React.FC<ModalProductProps> = ({ categoryId, product, action
                 onSubmit(p, action)
                 reset()
                 onClose()
-                dispatch(setNoti({type: 'success', message: `Update product success`}))
+                dispatch(setNoti({type: 'success', message: `Cập nhật "${data.name}" thành công`}))
             }catch(err){
-                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
         }
     }

@@ -306,7 +306,7 @@ const ManageCategory: React.FC = () => {
       </section>
       <Modal
         open={Boolean(categorySelected) || action === CONSTANT.ACTION.CREATE}
-        title={`${action} category ${categorySelected?.name || ''}`}
+        title={`${action === 'Create' ? 'Tạo mới' : 'Cập nhật'} danh mục ${categorySelected?.name || ''}`}
         onCancel={closeModal}
         footer={null}
         width={800}
@@ -317,7 +317,7 @@ const ManageCategory: React.FC = () => {
           onFinish={handleSubmit(onSubmitForm)}
           action='#'
         >
-          <Form.Item label='Name' required validateStatus={errors.Name ? 'error' : ''}>
+          <Form.Item label='Tên danh mục' required validateStatus={errors.Name ? 'error' : ''}>
             <Controller
               control={control}
               name='Name'
@@ -325,7 +325,7 @@ const ManageCategory: React.FC = () => {
             />
             {errors.Name && <ErrorMessage message={errors.Name.message} />}
           </Form.Item>
-          <Form.Item label='Description' validateStatus={errors.Description ? 'error' : ''}>
+          <Form.Item label='Mô tả' validateStatus={errors.Description ? 'error' : ''}>
             <Controller
               control={control}
               name='Description'
@@ -333,7 +333,7 @@ const ManageCategory: React.FC = () => {
             />
             {errors.Description && <ErrorMessage message={errors.Description.message} />}
           </Form.Item>
-          <Form.Item label='Thumbnail' required>
+          <Form.Item label='Ảnh đại diện' required>
             <Controller
               control={control}
               name='imgUrl'
@@ -348,7 +348,7 @@ const ManageCategory: React.FC = () => {
                     {
                       value ? <img src={value} style={{width: '200px', cursor: 'pointer'}} alt='/' /> : <div className='mc-upload-box'>
                       <AiOutlinePlus />
-                      <span>Upload</span>
+                      <span>Đăng tải</span>
                     </div>
                     }
                   </Upload>
@@ -361,9 +361,9 @@ const ManageCategory: React.FC = () => {
           </Form.Item>
           <Form.Item className='btn-box' >
             <Button type='default' htmlType='button' className='btn-cancel' size='large' onClick={closeModal}>
-              Cancel
+              Hủy bỏ
             </Button>
-            <Button loading={isSubmitting} type='primary' htmlType='submit' className='btn-update' size='large'>{action}</Button>
+            <Button loading={isSubmitting} type='primary' htmlType='submit' className='btn-update' size='large'>{action === 'Create' ? 'Tạo mới' : 'Cập nhật'}</Button>
           </Form.Item>
         </Form>
       </Modal>

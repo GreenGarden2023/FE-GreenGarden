@@ -262,7 +262,7 @@ const ClientProductItemDetail: React.FC = () => {
                                             {/* proItem.description */}
                                             <ul>
                                                 {
-                                                    proItem.description.split('\n').map((item, index) => (
+                                                    proItem?.description?.split('\n').map((item, index) => (
                                                         <li key={index}>
                                                             {item}
                                                         </li>

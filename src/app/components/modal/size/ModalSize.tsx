@@ -102,7 +102,7 @@ const ModalSize: React.FC<ModalSizeProps> = ({size, open, onClose, onSubmit}) =>
             control={control}
             name='sizeType'
             render={({ field }) => (
-              <Select disabled suffixIcon={<AiFillCaretDown />} {...field}>
+              <Select disabled={Boolean(size)} suffixIcon={<AiFillCaretDown />} {...field}>
                 <Select.Option value={true}>Duy nhất</Select.Option>
                 <Select.Option value={false}>Số lượng lớn</Select.Option>
               </Select>

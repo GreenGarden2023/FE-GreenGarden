@@ -18,6 +18,7 @@ import { MdPointOfSale } from 'react-icons/md';
 import { SiConvertio } from 'react-icons/si';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import './style.scss';
+import { Status } from 'app/models/general-type';
 
 const ManageProductItem: React.FC = () => {
     const { productId } = useParams()
@@ -105,6 +106,19 @@ const ManageProductItem: React.FC = () => {
         setOpenModal(2)
         setProductItemIdSelected(productItemId)
     }
+
+    const handleChangeStatus = async (pIndex: number, Cindex: number, checked: boolean) =>{
+        try{
+            const productItemDetailId = productItems[pIndex].productItemDetail[Cindex].id
+            const status: Status = checked ? 'active' : 'disable'
+            await productItemService.changeStatusProductDetail(productItemDetailId, status)
+            dispatch(setNoti({type: 'success', message: 'Cập nhật trạng thái thành công'}))
+            productItems[pIndex].productItemDetail[Cindex].status = status
+            setProductItems([...productItems])
+        }catch{
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+        }
+    }
     return (
         <div className="mpi-wrapper">
             <section className="mpi-product-infor default-layout">
@@ -152,7 +166,7 @@ const ManageProductItem: React.FC = () => {
                                                             </p>
                                                         }
                                                         <div className="actions-wrapper">
-                                                            <Switch checked className="status" />
+                                                            <Switch onChange={(e) => handleChangeStatus(index, indexItem, e)} checked={item.status === 'active'} className="status" />
                                                             <button className='btn btn-update' onClick={() => {
                                                                 setOpenModal(2)
                                                                 setProductItemIdSelected(pt.id)
