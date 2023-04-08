@@ -49,11 +49,12 @@ const dateFormatList = ['DD/MM/YYYY', 'DD/MM/YY', 'DD-MM-YYYY', 'DD-MM-YY'];
 interface UpdateConfirmServiceDetailProps{
     service: Service;
     shipping: ShippingFee[]
+    isOnlyView: boolean;
     onClose: () => void;
     onSubmit: (service: Service) => void;
 }
 
-const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({service, shipping, onClose, onSubmit}) => {
+const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({service, shipping, isOnlyView, onClose, onSubmit}) => {
     const dispatch = useDispatch()
 
     const { setValue, formState: {errors, isSubmitting}, control, trigger, handleSubmit, setError, clearErrors, getValues } = useForm<ServiceUpdate>({
@@ -82,7 +83,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
         setValue('rewardPointUsed', rewardPointUsed)
 
         setValue('rules', rules || '')
-        setValue('isTranSport', isTransport)
+        setValue('isTranSport', isTransport || false)
 
         setValue('districtID', 1)
 
@@ -104,7 +105,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
             key: 'quantity',
             dataIndex: 'quantity',
             render: (v, record) => (
-                <CurrencyFormat value={v} style={{border: listQuan.includes(record.id) ? '1px solid red' : '1px solid #6cdce7'}} 
+                <CurrencyFormat disabled={isOnlyView} value={v} style={{border: listQuan.includes(record.id) ? '1px solid red' : '1px solid #6cdce7'}} 
                     onValueChange={(values) => handleChangeTree(values, record.id, 'quantity')} className='currency-input-field'
                 />
             )
@@ -126,7 +127,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
             title: 'Mô tả của kỹ thuật viên',
             key: 'managerDescription',
             dataIndex: 'managerDescription',
-            render: (v, record) => (<Input.TextArea value={v} onChange={(e) => {
+            render: (v, record) => (<Input.TextArea disabled={isOnlyView} value={v} onChange={(e) => {
                 const value = e.target.value
                 const index = serviceDetail.serviceDetailList.findIndex(x => x.id === record.id)
                 serviceDetail.serviceDetailList[index].managerDescription = value
@@ -138,7 +139,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
             key: 'servicePrice',
             dataIndex: 'servicePrice',
             render: (v, record) => (
-                <CurrencyFormat value={v} style={{border: listPrice.includes(record.id) ? '1px solid red' : '1px solid #6cdce7'}} 
+                <CurrencyFormat value={v} disabled={isOnlyView} style={{border: listPrice.includes(record.id) ? '1px solid red' : '1px solid #6cdce7'}} 
                 onValueChange={(values) => handleChangeTree(values, record.id, 'price')} className='currency-input-field' thousandSeparator
                 />
             )
@@ -191,6 +192,11 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
         return result
     }
     const handleSubmitForm = async (data: ServiceUpdate) =>{
+        if(!isValidDataTree()){
+            dispatch(setNoti({type: 'warning', message: 'Vui lòng điền đầy đủ thông tin của cây cần chăm sóc. Số lượng, giá tiền...'}))
+            return;
+        }
+
         const { startDate, endDate, rewardPointUsed } = data
         if(!startDate || !endDate){
             setError('startDate', {
@@ -214,15 +220,14 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
             return;
         }
 
-        let totalPrice = 0
-        // let transportFee = 0
-        for (const item of serviceDetail.serviceDetailList) {
-            totalPrice += item.servicePrice
-        }
-        if(totalPrice - (rewardPointUsed * 10000) < 50000){
+        const { transportFee, totalPriceOrder } = OrderPreview()
+        
+        // console.log({totalPrice})
+        // console.log(totalPrice < 50000)
+        if((transportFee + totalPriceOrder) - (rewardPointUsed * 10000) < 50000){
             setError('rewardPointUsed', {
                 type: 'pattern',
-                message: `Số điểm tối đa có thể dùng là ${Math.round(totalPrice - 50000) / 10000}`
+                message: `Số điểm tối đa có thể dùng là ${Math.round((transportFee + totalPriceOrder) - 50000) / 10000}`
             })
             return
         }
@@ -263,6 +268,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
         clearErrors('startDate')
     }
     const setPolicy = (item: string) =>{
+        if(isOnlyView) return;
         const data = getValues('rules') ? (getValues('rules') + `\n- ${item}`) : `- ${item}`
         setValue('rules', data)
         trigger('rules')
@@ -314,7 +320,9 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
 
         const totalPricePayment = totalPriceOrder + transportFee
 
-        return Math.floor((totalPricePayment - 50000) / 10000) * 10
+        const result = Math.floor((totalPricePayment - 50000) / 10000) * 10
+
+        return result >= 0 ? result : 0
     }
 
     return (
@@ -347,7 +355,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                 <span>Số điểm đã dùng</span>
                             </div>
                             <div className="right">
-                                <span className='right-content'>{OrderPreview().pointUsed}</span>
+                                <span className='right-content'>{OrderPreview().pointUsed || 0}</span>
                             </div>
                         </div>
                     </Col>
@@ -377,7 +385,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                 <span>Phí vận chuyển</span>
                             </div>
                             <div className="right">
-                                <MoneyFormat value={OrderPreview().transportFee} isHighlight color='Default' />
+                                <MoneyFormat value={OrderPreview().transportFee || 0} isHighlight color='Default' />
                             </div>
                         </div>
                     </Col>
@@ -387,7 +395,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                 <span>Tiền được giảm</span>
                             </div>
                             <div className="right">
-                                <MoneyFormat value={OrderPreview().discountAmount} isHighlight color='Green' />
+                                <MoneyFormat value={OrderPreview().discountAmount || 0} isHighlight color='Green' />
                             </div>
                         </div>
                     </Col>
@@ -397,7 +405,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                 <span>Tổng tiền thanh toán</span>
                             </div>
                             <div className="right">
-                                <MoneyFormat value={OrderPreview().totalPricePayment} isHighlight color='Blue' />
+                                <MoneyFormat value={OrderPreview().totalPricePayment || 0} isHighlight color='Blue' />
                             </div>
                         </div>
                     </Col>
@@ -407,7 +415,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                 <span>Tiền cọc</span>
                             </div>
                             <div className="right">
-                                <MoneyFormat value={OrderPreview().deposit} isHighlight color='Orange' />
+                                <MoneyFormat value={OrderPreview().deposit || 0} isHighlight color='Orange' />
                             </div>
                         </div>
                     </Col>
@@ -425,7 +433,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                 <Controller
                                     control={control}
                                     name='name'
-                                    render={({field}) => (<Input {...field} />)}
+                                    render={({field}) => (<Input disabled={isOnlyView} {...field} />)}
                                 />
                                 {errors.name && <ErrorMessage message={errors.name.message} />}
                             </Form.Item>
@@ -435,7 +443,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                 <Controller
                                     control={control}
                                     name='phone'
-                                    render={({field}) => (<Input {...field} />)}
+                                    render={({field}) => (<Input disabled={isOnlyView} {...field} />)}
                                 />
                                 {errors.phone && <ErrorMessage message={errors.phone.message} />}
                             </Form.Item>
@@ -445,7 +453,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                 <Controller
                                     control={control}
                                     name='email'
-                                    render={({field}) => (<Input {...field} />)}
+                                    render={({field}) => (<Input disabled={isOnlyView} {...field} />)}
                                 />
                                 {errors.email && <ErrorMessage message={errors.email.message} />}
                             </Form.Item>
@@ -456,7 +464,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                     control={control}
                                     name='isTranSport'
                                     render={({field: { value }}) => (
-                                        <Select value={value} onChange={(e) => {
+                                        <Select disabled={isOnlyView} value={value} onChange={(e) => {
                                             setValue('isTranSport', e)
                                             trigger('isTranSport')
                                             clearPoint()
@@ -474,7 +482,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                     control={control}
                                     name='districtID'
                                     render={({field}) => (
-                                        <Select {...field}>
+                                        <Select disabled={isOnlyView} {...field}>
                                             {
                                                 shipping.map((item, index) => (
                                                     <Select.Option value={item.districtID} key={index} >
@@ -492,7 +500,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                 <Controller
                                     control={control}
                                     name='address'
-                                    render={({field}) => (<Input {...field} />)}
+                                    render={({field}) => (<Input disabled={isOnlyView} {...field} />)}
                                 />
                                 {errors.address && <ErrorMessage message={errors.address.message} />}
                             </Form.Item>
@@ -502,7 +510,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                 <Controller
                                     control={control}
                                     name='transportFee'
-                                    render={({ field: { value } }) => <CurrencyInput value={value} min={0} onChange={(e) => {
+                                    render={({ field: { value } }) => <CurrencyInput disbaled={isOnlyView} value={value} min={0} onChange={(e) => {
                                         clearPoint()
                                         utilGeneral.setCurrency(setValue, 'transportFee', e)
                                     }}/>}
@@ -520,16 +528,17 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                     style={{width: '100%'}}
                                     defaultValue={[Dayjs(Dayjs(getValues('startDate')).format('DD/MM/YYYY'), 'DD/MM/YYYY'), Dayjs(Dayjs(getValues('endDate')).format('DD/MM/YYYY'), 'DD/MM/YYYY')]}
                                     // clearIcon={null}
+                                    disabled={isOnlyView}
                                 />
                                 {errors.startDate && <ErrorMessage message={errors.startDate.message} />}
                             </Form.Item>
                         </Col>
                         <Col span={8}>
-                            <Form.Item label={`(Số điểm hiện tại ${service.userCurrentPoint}). Điểm có thể dùng (${MaxPointCanUse()}). Điểm khách hàng đã dùng (${service.rewardPointUsed})`}>
+                            <Form.Item label={isOnlyView ? 'Số điểm sử dụng' : `(Số điểm hiện tại ${service.userCurrentPoint}). Điểm có thể dùng (${MaxPointCanUse() > service.userCurrentPoint ? service.userCurrentPoint : MaxPointCanUse()}). Điểm khách hàng đã dùng (${service.rewardPointUsed})`}>
                                 <Controller
                                     control={control}
                                     name='rewardPointUsed'
-                                    render={({field: { value }}) => (<Input type='number' min={0} value={value} onChange={(e) =>{
+                                    render={({field: { value }}) => (<Input disabled={isOnlyView} type='number' min={0} value={value} onChange={(e) =>{
                                         const data = Number(e.target.value || 0) < service.userCurrentPoint ? Number(e.target.value || 0) : service.userCurrentPoint
                                         if(data <= MaxPointCanUse()){
                                             setValue('rewardPointUsed', data)
@@ -558,7 +567,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                     control={control}
                                     name='rules'
                                     render={({field}) => (
-                                        <Input.TextArea {...field} autoSize={{minRows: 4, maxRows: 10}}></Input.TextArea>
+                                        <Input.TextArea disabled={isOnlyView} {...field} autoSize={{minRows: 4, maxRows: 10}}></Input.TextArea>
                                     )}
                                 />
                                 {errors.rules && <ErrorMessage message={errors.rules.message} />}
@@ -567,9 +576,15 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                         <Col span={24} >
                             <div className='btn-form-wrapper'>
                                 <Button htmlType='button' disabled={isSubmitting} type='default' className='btn-cancel' size='large' onClick={onClose}>Hủy bỏ</Button>
-                                <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large'>
-                                    Cập nhật thông tin
-                                </Button>
+                                {
+                                    isOnlyView ? 
+                                    <Button htmlType='button' loading={isSubmitting} type='primary' className='btn-update' size='large' onClick={onClose}>
+                                        Đóng
+                                    </Button> : 
+                                    <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large'>
+                                        Cập nhật thông tin
+                                    </Button>
+                                }
                             </div>
                         </Col>
                     </Row>

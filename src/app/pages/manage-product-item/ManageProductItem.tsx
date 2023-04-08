@@ -137,7 +137,7 @@ const ManageProductItem: React.FC = () => {
                 <Row gutter={[12, 12]}>
                     {
                         productItems.map((pt, index) => (
-                            <Col xs={24} xl={6} key={index}>
+                            <Col xs={24} xl={4} key={index}>
                                 <Badge.Ribbon color={pt.type === 'normal' ? 'blue' : 'green'} placement='start' text={pt.type === 'normal' ? 'Số lượng lớn' : 'Duy nhất'} >
                                     <div className="mpi-item">
                                         <img src={pt.imageURL} alt='/' />
@@ -148,22 +148,22 @@ const ManageProductItem: React.FC = () => {
                                                     <div className="item-detail" key={indexItem}>
                                                         <p className="size-name">{item.size.sizeName} ({item.quantity})</p>
                                                         {
-                                                            item.salePrice && 
+                                                            (item.salePrice && item.salePrice !== 0) ?
                                                             <>
                                                                 <p className="sale-price">
                                                                     <SiConvertio color='#00a76f' size={20} />
                                                                     <span className='label'>Giá bán</span>
                                                                     <CurrencyFormat value={item.salePrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} className='price' />
                                                                 </p>
-                                                            </>
+                                                            </> : ''
                                                         }
                                                         {
-                                                            item.rentPrice && 
+                                                            (item.rentPrice && item.rentPrice !== 0) ?
                                                             <p className="rent-price">
                                                                 <MdPointOfSale color='#00a76f' size={20} />
                                                                 <span className="label">Giá thuê</span>
                                                                 <CurrencyFormat value={item.rentPrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} className='price' />
-                                                            </p>
+                                                            </p> : ''
                                                         }
                                                         <div className="actions-wrapper">
                                                             <Switch onChange={(e) => handleChangeStatus(index, indexItem, e)} checked={item.status === 'active'} className="status" />
@@ -223,6 +223,8 @@ const ManageProductItem: React.FC = () => {
                     productItemId={productItemIdSelected}
                     productItemType={productItems.filter(x => x.id === productItemIdSelected)[0].type}
                     productItemDetail={productItemDetailSelected}
+                    isRent={product?.isForRent || false}
+                    isSale={product?.isForSale || false}
                     onClose={handleCloseModalProductItemDetail}
                     onSubmit={handleSubmitProductItemDetail}
                 />

@@ -6,6 +6,7 @@ import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import CancelOrder from 'app/components/modal/cancel-order/CancelOrder'
 import RefundOrder from 'app/components/modal/refundOrder.tsx/RefundOrder'
 import TransactionDetail from 'app/components/modal/transaction-detail/TransactionDetail'
+import UpdateConfirmServiceDetail from 'app/components/modal/update-confirm-service-detail/UpdateConfirmServiceDetail'
 import MoneyFormat from 'app/components/money/MoneyFormat'
 import TechnicianName from 'app/components/renderer/technician/TechnicianName'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
@@ -14,8 +15,10 @@ import { OrderStatus } from 'app/models/general-type'
 import { Paging } from 'app/models/paging'
 import { PaymentControlState } from 'app/models/payment'
 import { ServiceDetailList, ServiceOrderList } from 'app/models/service'
+import { ShippingFee } from 'app/models/shipping-fee'
 import orderService from 'app/services/order.service'
 import paymentService from 'app/services/payment.service'
+import shippingFeeService from 'app/services/shipping-fee.service'
 import { setNoti } from 'app/slices/notification'
 import CONSTANT from 'app/utils/constant'
 import utilDateTime from 'app/utils/date-time'
@@ -48,9 +51,21 @@ const ManageTakeCareOrder: React.FC = () => {
 
     const [amount, setAmount] = useState(0);
     const [checkFullAmount, setCheckFullAmount] = useState(false);
-
+    const [shipping, setShipping] = useState<ShippingFee[]>([])
 
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
+
+    useEffect(() =>{
+        const init = async () =>{
+            try{
+                const res = await shippingFeeService.getList()
+                setShipping(res.data)
+            }catch{
+
+            }
+        }
+        init()
+    }, [])
 
     useEffect(() =>{
         pagingPath.scrollTop()
@@ -442,6 +457,16 @@ const ManageTakeCareOrder: React.FC = () => {
                     orderCode={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].orderCode}
                     orderType='service'
                     onClose={handleClose}
+                />
+            }
+            {
+                actionMethod?.actionType === 'detail' &&
+                <UpdateConfirmServiceDetail
+                    isOnlyView
+                    onClose={handleClose}
+                    onSubmit={handleClose}
+                    service={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].service}
+                    shipping={shipping}
                 />
             }
         </div>

@@ -295,10 +295,11 @@ const ManageTakeCareService: React.FC = () => {
                 </Modal>
             }
             {
-                actionMethod?.actionType === 'update infor' &&
+                (actionMethod?.actionType === 'update infor' || actionMethod?.actionType === 'detail') &&
                 <UpdateConfirmServiceDetail
                     service={serviceOrders.filter(x => x.id === actionMethod.orderId)[0]}
                     shipping={shipping}
+                    isOnlyView={actionMethod?.actionType === 'detail'}
                     onClose={handleClose}
                     onSubmit={handleUpdateService}
                 />

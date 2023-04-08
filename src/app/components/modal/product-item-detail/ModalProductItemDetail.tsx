@@ -22,8 +22,9 @@ import './style.scss';
 const schema = yup.object().shape({
     sizeId: yup.string().required('Kích thước không được để trống'),
     transportFee: yup.number().required('Phí vận chuyển không được để trống').typeError('Phí vận chuyển chỉ chấp nhận số'),
-    salePrice: yup.string().nullable(),
-    rentPrice: yup.string().nullable(),
+    quantity: yup.number().required('Số lượng không được để trống'),
+    salePrice: yup.number().nullable(),
+    rentPrice: yup.number().nullable(),
     imagesUrls: yup.array().required('Có ít nhất 1 hình ảnh cho thông tin này')
 })
 
@@ -31,11 +32,13 @@ interface ModalSizeProductItemProps{
     productItemId: string;
     productItemType: ProductItemType;
     productItemDetail?: ProductItemDetail;
+    isRent: boolean;
+    isSale: boolean;
     onClose: () => void;
     onSubmit: (productItemDetail: ProductItemDetailHandle) => void;
 }
 
-const ModalProductItemDetail: React.FC<ModalSizeProductItemProps> = ({ productItemId, productItemType, productItemDetail, onClose, onSubmit }) => {
+const ModalProductItemDetail: React.FC<ModalSizeProductItemProps> = ({ productItemId, productItemType, productItemDetail, isRent, isSale, onClose, onSubmit }) => {
     const dispatch = useDispatch();
 
     const [sizes, setSizes]= useState<Size[]>([]);
@@ -188,7 +191,7 @@ const ModalProductItemDetail: React.FC<ModalSizeProductItemProps> = ({ productIt
                 layout='vertical'
                 onFinish={handleSubmit(handleSubmitForm)}
             >
-                <Row gutter={24}>
+                <Row gutter={[24, 24]}>
                     <Col span={12}>
                         <Form.Item label='Kích thước sản phẩm' required>
                             <Controller
@@ -227,7 +230,7 @@ const ModalProductItemDetail: React.FC<ModalSizeProductItemProps> = ({ productIt
                             <Controller
                                 control={control}
                                 name='salePrice'
-                                render={({ field: { value } }) => <CurrencyInput value={value || 0} min={0} onChange={(e) => utilGeneral.setCurrency(setValue, 'salePrice', e)}/>}
+                                render={({ field: { value } }) => <CurrencyInput disbaled={!isSale} value={value || 0} min={0} onChange={(e) => utilGeneral.setCurrency(setValue, 'salePrice', e)}/>}
                             />
                             {errors.salePrice && <ErrorMessage message={errors.salePrice.message} />}
                         </Form.Item>
@@ -237,7 +240,7 @@ const ModalProductItemDetail: React.FC<ModalSizeProductItemProps> = ({ productIt
                             <Controller
                                 control={control}
                                 name='rentPrice'
-                                render={({ field: { value } }) => <CurrencyInput value={value || 0} min={0} onChange={(e) => utilGeneral.setCurrency(setValue, 'rentPrice', e)}/>}
+                                render={({ field: { value } }) => <CurrencyInput disbaled={!isRent} value={value || 0} min={0} onChange={(e) => utilGeneral.setCurrency(setValue, 'rentPrice', e)}/>}
                             />
                             {errors.rentPrice && <ErrorMessage message={errors.rentPrice.message} />}
                         </Form.Item>
