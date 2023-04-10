@@ -79,6 +79,7 @@ const ManageRentOrder:React.FC = () => {
             const initSearch = async () =>{
                 const res = await orderService.getRentOrderDetailByOrderCode(search.orderCode || '')
                 setRentOrders(res.data ? [res.data] : [])
+                setPaging({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_RENT})
             }
             initSearch()
         }else if(filter.isFiltering && filter.startDate && filter.endDate){

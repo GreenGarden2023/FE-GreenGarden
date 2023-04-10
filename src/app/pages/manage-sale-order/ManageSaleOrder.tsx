@@ -61,6 +61,7 @@ const ManageSaleOrder: React.FC = () => {
             const initSearch = async () =>{
                 const res = await orderService.getSaleOrderDetailByOrderCode(search.orderCode || '')
                 setSaleOrders(res.data ? [res.data] : [])
+                setPaging({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_SALE})
             }
             initSearch()
         }else{
