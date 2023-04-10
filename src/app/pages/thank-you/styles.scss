@@ -1,1 +1,36 @@
 @import 'app/styles/variable.scss';
+
+.thank-wrapper{
+    border: 2px solid $default-green;
+    background-color: #fff;
+    border-radius: 5px;
+    width: fit-content;
+    padding: 20px;
+    margin: auto auto 100px auto;
+    .content{
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: $default-green;
+        span{
+            font-size: 28px;
+            font-weight: 500;
+        }
+    }
+    .thank-buttons{
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-top: 20px;
+        .btn-go-back{
+            background-color: $color-link;
+            color: #fff;
+            padding: 10px;
+        }
+        .btn-view-order{
+            background-color: $color-create;
+            color: #fff;
+            padding: 10px;
+        }
+    }
+}

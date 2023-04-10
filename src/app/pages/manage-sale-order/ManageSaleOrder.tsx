@@ -28,11 +28,16 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { OrderStatusToTag } from '../manage-take-care-order/ManageTakeCareOrder'
 import './style.scss'
 import TransactionDetail from 'app/components/modal/transaction-detail/TransactionDetail'
+import useSelector from 'app/hooks/use-selector'
+import Searching from 'app/components/search-and-filter/search/Searching'
+import NoResult from 'app/components/search-and-filter/no-result/NoResult'
 
 const ManageSaleOrder: React.FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const { search } = useSelector(state => state.SearchFilter)
+
     // data
     const [saleOrders, setSaleOrders] = useState<SaleOrderList[]>([]);
 
@@ -51,20 +56,35 @@ const ManageSaleOrder: React.FC = () => {
             setPaging({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_SALE})
             return navigate('/panel/sale-order?page=1')
         }
-        if(!recall) return;
 
-        const init = async () =>{
-            try{
+        if(search.isSearching && search.orderCode){
+            const initSearch = async () =>{
+                const res = await orderService.getSaleOrderDetailByOrderCode(search.orderCode || '')
+                setSaleOrders(res.data ? [res.data] : [])
+            }
+            initSearch()
+        }else{
+            const init = async () =>{
                 const res = await orderService.getAllSaleOrders({curPage: Number(currentPage), pageSize: paging.pageSize})
                 setSaleOrders(res.data.saleOrderList)
                 setPaging(res.data.paging)
-            }catch{
-                
             }
-            setRecall(false)
+            init()
         }
-        init()
-    }, [navigate, searchParams, paging.pageSize, recall])
+        // if(!recall) return;
+
+        // const init = async () =>{
+        //     try{
+        //         const res = await orderService.getAllSaleOrders({curPage: Number(currentPage), pageSize: paging.pageSize})
+        //         setSaleOrders(res.data.saleOrderList)
+        //         setPaging(res.data.paging)
+        //     }catch{
+                
+        //     }
+        //     // setRecall(false)
+        // }
+        // init()
+    }, [navigate, searchParams, paging.pageSize, recall, search])
     const handleSetAction = (data: PaymentControlState) =>{
         const { orderId, actionType } = data
         const [order] = saleOrders.filter(x => x.id === orderId)
@@ -314,7 +334,12 @@ const ManageSaleOrder: React.FC = () => {
     return (
         <div className="mso-wrapper">
             <HeaderInfor title='Quản lý đơn hàng mua' />
+            <Searching
+                isOrderCode
+            />
             <section className="mso-box default-layout">
+            {
+                (search.isSearching && saleOrders && saleOrders.length === 0) ? <NoResult /> : 
                 <Table 
                     className='table' 
                     dataSource={DataSource} 
@@ -330,6 +355,7 @@ const ManageSaleOrder: React.FC = () => {
                         }
                     }}
                 />
+            }
             </section>
             {
                 actionMethod?.actionType === 'detail' &&

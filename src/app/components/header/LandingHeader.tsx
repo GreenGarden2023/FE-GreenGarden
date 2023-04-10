@@ -125,7 +125,7 @@ const LandingHeader: React.FC = () =>{
                 <div className='container-wrapper' >
                     <div className="left">
                         <Link to='/' >
-                            <img src="/assets/logo.jpg" alt="/" />
+                            <img src="/assets/logo.png" alt="/" />
                         </Link>
                     </div>
                     <div className="right">

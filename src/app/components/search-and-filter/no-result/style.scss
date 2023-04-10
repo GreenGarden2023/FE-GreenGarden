@@ -1,0 +1,11 @@
+@import 'app/styles/variable.scss';
+
+.no-result-wrapper{
+    text-align: center;
+    padding: 150px 0;
+    p{
+        font-size: 36px;
+        font-weight: 500;
+        color: $color-create;
+    }
+}

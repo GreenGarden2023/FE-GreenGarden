@@ -102,7 +102,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
     }, [location])
     const childrenOrder = [
         CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/rent-order'>Đơn thuê</Link>, '5', <BiCategoryAlt size={18} />) : null,
-        CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/sale-order'>Đơn mua</Link>, '6', <BiCategoryAlt size={18} />) : null,
+        CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/sale-order'>Đơn bán</Link>, '6', <BiCategoryAlt size={18} />) : null,
         CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/take-care-order'>Đơn chăm sóc</Link>, '7', <BiCategoryAlt size={18} />) : null,
     ]
     const items: MenuItem[] = [

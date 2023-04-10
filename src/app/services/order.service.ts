@@ -1,8 +1,8 @@
 import { OrderStatus, OrderType } from "app/models/general-type";
-import { CreateServiceOrder, OrderCalculate, OrderCreate, OrderExtendDetail, RentOrder, RentOrderDetailList, RentOrderResponse, SaleOrderResponse } from "app/models/order";
+import { CreateServiceOrder, OrderCalculate, OrderCreate, OrderExtendDetail, RentOrder, RentOrderDetailList, RentOrderResponse, SaleOrderList, SaleOrderResponse } from "app/models/order";
 import { Paging } from "app/models/paging";
 import { Response } from "app/models/response";
-import { ServiceOrderDetail, ServiceResponse } from "app/models/service";
+import { ServiceOrderDetail, ServiceOrderList, ServiceResponse } from "app/models/service";
 import queryString from "query-string";
 import golbalAxios from "../utils/http-client";
 
@@ -101,6 +101,27 @@ const cancelOrder = async (orderID: string, orderType: OrderType) =>{
     return res.data
 }
 
+const getRentOrderDetailByOrderCode = async (orderCode: string) =>{
+    const res = await golbalAxios.get<Response<RentOrder>>(`/order/get-rent-order-detail-by-order-code?orderCode=${orderCode}`)
+    return res.data
+}
+
+const getSaleOrderDetailByOrderCode = async (orderCode: string) =>{
+    const res = await golbalAxios.get<Response<SaleOrderList>>(`/order/get-sale-order-detail-by-order-code?orderCode=${orderCode}`)
+    return res.data
+}
+
+const getServiceOrderDetailByOrderCode = async (orderCode: string) =>{
+    const res = await golbalAxios.get<Response<ServiceOrderList>>(`/order/get-service-order-detail-by-order-code?orderCode=${orderCode}`)
+    return res.data
+}
+
+const getRentOrderDetailByRangeDate = async (paging: Partial<Paging>, fromDate: string, toDate: string) =>{
+    const params = { ...paging, fromDate, toDate }
+    const res = await golbalAxios.get<Response<RentOrderResponse>>(`/order/get-rent-order-detail-by-range-date?${queryString.stringify(params)}`)
+    return res.data
+}
+
 const orderService = {
     createOrder,
     getRentOrders,
@@ -120,7 +141,11 @@ const orderService = {
     createServiceOrder,
     getServiceOrdersByTechnician,
     getAServiceOrderDetail,
-    cancelOrder
+    cancelOrder,
+    getRentOrderDetailByOrderCode,
+    getSaleOrderDetailByOrderCode,
+    getServiceOrderDetailByOrderCode,
+    getRentOrderDetailByRangeDate
 }
 
 export default orderService

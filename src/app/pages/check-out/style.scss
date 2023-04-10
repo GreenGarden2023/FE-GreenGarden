@@ -20,19 +20,28 @@
         }
         .btn-box{
             margin-top: 10px;
-            .btn-back, .btn-view-order{
-                margin-right: 10px;
-                color: #00a76f;
-                background-color: #fff;
-                border: none;
-                border-radius: 5px;
-                font-size: 22px;
-                height: 40px;
-                padding: 0 20px;
-            }
-            .btn-view-order{
-                margin-right: 0
-            }
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn-back, .btn-view-order, .btn-continue-payment{
+            margin-right: 10px;
+            color: #00a76f;
+            background-color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 22px;
+            height: 40px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+        }
+        .btn-back{
+            color: $color-link;
+            margin: 20px auto auto auto;
+        }
+        .btn-view-order{
+            margin-right: 0
         }
     }
 }

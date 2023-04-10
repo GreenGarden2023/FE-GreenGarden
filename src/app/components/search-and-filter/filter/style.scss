@@ -1,0 +1,20 @@
+@import 'app/styles/variable.scss';
+
+.filtering-wrapper{
+    .filter-button-wrapper{
+        height: 100%;
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+        .btn-filtering{
+            background-color: #836FFF;
+            color: #fff;
+            padding: 6px 10px;
+        }
+        .btn-filtering-clear{
+            background-color: #4876FF;
+            color: #fff;
+            padding: 6px 10px;
+        }
+    }
+}

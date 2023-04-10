@@ -1,0 +1,20 @@
+@import 'app/styles/variable.scss';
+
+.searching-wrapper{
+    .search-button-wrapper{
+        height: 100%;
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+        .btn-searching{
+            background-color: #836FFF;
+            color: #fff;
+            padding: 6px 10px;
+        }
+        .btn-searching-clear{
+            background-color: #4876FF;
+            color: #fff;
+            padding: 6px 10px;
+        }
+    }
+}

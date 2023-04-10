@@ -4,6 +4,7 @@ import userInfor from "./user-infor";
 import adminLayout from "./admin-layout";
 import CartStore from './cart'
 import FilterStore from './filter'
+import SearchFilter from './search-and-filter'
 
 const slices = {
     notification,
@@ -11,7 +12,8 @@ const slices = {
     userInfor,
     adminLayout,
     CartStore,
-    FilterStore
+    FilterStore,
+    SearchFilter
 }
 
 export default slices;

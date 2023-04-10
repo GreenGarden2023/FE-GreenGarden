@@ -13,7 +13,7 @@ import { setNoti } from 'app/slices/notification';
 // import utilCalculate from 'app/utils/order-calculate';
 import pagingPath from 'app/utils/paging-path';
 import 'dayjs/locale/vi';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import useDispatch from '../../hooks/use-dispatch';
 import { setTitle } from '../../slices/window-title';
 import CONSTANT from '../../utils/constant';
@@ -31,7 +31,6 @@ const CartPage: React.FC = () => {
     const [cart, setCart] = useState<Cart>()
 
     const [shipping, setShipping] = useState<ShippingFee[]>([])
-
 
     const [pageType, setPageType] = useState('sale')
 
@@ -63,6 +62,13 @@ const CartPage: React.FC = () => {
                     saleItems: result.data.saleItems.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})),
                 }
                 dispatch(setCartSlice(cartProps))
+                const { saleItems, rentItems } = cartProps
+                if(saleItems && saleItems.length !== 0 && rentItems && rentItems.length !== 0) return;
+
+                if(rentItems && rentItems.length !== 0) {
+                    console.log('asds')
+                    setPageType('rent')
+                }
             }catch{
                 setCart({rentItems: [], saleItems: [], totalPrice: 0, totalRentPrice: 0, totalSalePrice: 0})
                 dispatch(setCartSlice({rentItems: [], saleItems: []}))
@@ -73,10 +79,8 @@ const CartPage: React.FC = () => {
     
     
     const handleChangeSegment = (value: string | number) =>{
-        switch(value){
-            case 'Cây thuê': return setPageType('rent')
-            case 'Cây bán': return setPageType('sale')
-        }
+        setPageType(`${value}`)
+        
     }
     const handleCartChange = async (type: string, items: CartItemDetail[], id: string) =>{
         if(!cart) return;
@@ -162,6 +166,47 @@ const CartPage: React.FC = () => {
             }
         }
     }
+
+    const SaleQuantity = useMemo(() =>{
+        let total = 0
+        if(!cart) return 0;
+
+        for (const item of cart.saleItems) {
+            total += item.quantity
+        }
+
+        return total
+    }, [cart])
+    const RentQuantity = useMemo(() =>{
+        let total = 0
+        if(!cart) return 0;
+
+        for (const item of cart.rentItems) {
+            total += item.quantity
+        }
+
+        return total
+    }, [cart])
+
+    
+
+    const SegmentedOptions = [
+        {
+            label: <div className='segmented-option'>
+                <span className='title'>Cây bán</span>
+                <span className='segmented-quantity'>({SaleQuantity})</span>
+            </div>,
+            value: 'sale'
+        },
+        {
+            label: <div className='segmented-option'>
+                <span className='title'>Cây thuê</span>
+                <span className='segmented-quantity'>({RentQuantity})</span>
+            </div>,
+            value: 'rent'
+        },
+    ]
+
     return (
         <div>
             <LandingHeader />
@@ -170,7 +215,7 @@ const CartPage: React.FC = () => {
                         <HeaderInfor title='Giỏ hàng' />
                         <section className="default-layout">
                             <h3>Loại cây</h3>
-                            <Segmented size="large" onChange={handleChangeSegment} options={['Cây bán', 'Cây thuê']} />
+                            <Segmented size="large" value={pageType} onChange={handleChangeSegment} options={SegmentedOptions} />
                         </section>
                         {
                             (pageType === 'sale' && cart) &&

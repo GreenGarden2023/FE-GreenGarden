@@ -7,14 +7,21 @@ import RefundOrder from 'app/components/modal/refundOrder.tsx/RefundOrder'
 import RentOrderPaymentCash from 'app/components/modal/rent-oder-payment-cash/RentOrderPaymentCash'
 import RentOrderPaymentDeposit from 'app/components/modal/rent-order-payment-deposit/RentOrderPaymentDeposit'
 import ReturnDepositRentOrder from 'app/components/modal/return-deposit-rent-order/ReturnDepositRentOrder'
+import TransactionDetail from 'app/components/modal/transaction-detail/TransactionDetail'
 import MoneyFormat from 'app/components/money/MoneyFormat'
+import Filtering from 'app/components/search-and-filter/filter/Filtering'
+import NoResult from 'app/components/search-and-filter/no-result/NoResult'
+import Searching from 'app/components/search-and-filter/search/Searching'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
 import useDispatch from 'app/hooks/use-dispatch'
+import useSelector from 'app/hooks/use-selector'
 import { RentOrder } from 'app/models/order'
 import { Paging } from 'app/models/paging'
 import { PaymentControlState } from 'app/models/payment'
+import { ShippingFee } from 'app/models/shipping-fee'
 import orderService from 'app/services/order.service'
 import paymentService from 'app/services/payment.service'
+import shippingFeeService from 'app/services/shipping-fee.service'
 import { setNoti } from 'app/slices/notification'
 import CONSTANT from 'app/utils/constant'
 import utilDateTime from 'app/utils/date-time'
@@ -28,16 +35,14 @@ import { MdOutlinePayments } from 'react-icons/md'
 import { RiBillLine } from 'react-icons/ri'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { OrderStatusToTag } from '../manage-take-care-order/ManageTakeCareOrder'
-import './style.scss'
 import ExtendRentOrderManager from './extend-rent-order-manager/ExtendRentOrderManager'
-import { ShippingFee } from 'app/models/shipping-fee'
-import shippingFeeService from 'app/services/shipping-fee.service'
-import TransactionDetail from 'app/components/modal/transaction-detail/TransactionDetail'
+import './style.scss'
 
 const ManageRentOrder:React.FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const { search, filter } = useSelector(state => state.SearchFilter)
 
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
     
@@ -61,27 +66,62 @@ const ManageRentOrder:React.FC = () => {
     }, [])
 
     useEffect(() =>{
-        pagingPath.scrollTop()
         const currentPage = searchParams.get('page');
-
         if(!pagingPath.isValidPaging(currentPage)){
             setPaging({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_RENT})
             return navigate('/panel/rent-order?page=1')
         }
-        if(!recall) return;
 
-        const init = async () =>{
-            try{
+        
+        // if(!recall) return;
+
+        if(search.isSearching && search.orderCode){
+            const initSearch = async () =>{
+                const res = await orderService.getRentOrderDetailByOrderCode(search.orderCode || '')
+                setRentOrders(res.data ? [res.data] : [])
+            }
+            initSearch()
+        }else if(filter.isFiltering && filter.startDate && filter.endDate){
+            const initFilter = async () =>{
+                const res = await orderService.getRentOrderDetailByRangeDate({curPage: Number(currentPage), pageSize: paging.pageSize}, filter.startDate || '', filter.endDate || '')
+                setRentOrders(res.data.rentOrderGroups)
+                setPaging(res.data.paging)
+            }
+            initFilter();
+        }else{
+            const init = async () =>{
                 const res = await orderService.getAllRentOrders({curPage: Number(currentPage), pageSize: paging.pageSize});
                 setRentOrders(res.data.rentOrderGroups)
                 setPaging(res.data.paging)
-            }catch{
-
             }
-            setRecall(false)
+            init()
         }
-        init()
-    }, [searchParams, navigate, paging.pageSize, recall])
+        // setRecall(false)
+
+    }, [filter, search, recall, navigate, paging.pageSize, searchParams])
+
+    // useEffect(() =>{
+    //     pagingPath.scrollTop()
+    //     const currentPage = searchParams.get('page');
+
+    //     if(!pagingPath.isValidPaging(currentPage)){
+    //         setPaging({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_RENT})
+    //         return navigate('/panel/rent-order?page=1')
+    //     }
+    //     if(!recall) return;
+
+    //     const init = async () =>{
+    //         try{
+    //             const res = await orderService.getAllRentOrders({curPage: Number(currentPage), pageSize: paging.pageSize});
+    //             setRentOrders(res.data.rentOrderGroups)
+    //             setPaging(res.data.paging)
+    //         }catch{
+
+    //         }
+    //         setRecall(false)
+    //     }
+    //     init()
+    // }, [searchParams, navigate, paging.pageSize, recall])
 
     const ColumnRentOrder: ColumnsType<any> = [
         {
@@ -351,21 +391,30 @@ const ManageRentOrder:React.FC = () => {
     return (
         <div className="mro-wrapper">
             <HeaderInfor title='Quản lý đơn hàng thuê' />
+            <Searching
+                isOrderCode
+            />
+            <Filtering
+                isRangeDate
+            />
             <section className="mso-box default-layout">
-                <Table 
-                    dataSource={DataSourceRentOrder} 
-                    columns={ColumnRentOrder} 
-                    scroll={{ y: 680, x: 2200 }}
-                    pagination={{
-                        current: paging.curPage || 1,
-                        pageSize: paging.pageSize || 1,
-                        total: paging.recordCount || 1,
-                        onChange: (page: number) =>{
-                            setRecall(true)
-                            navigate(`/panel/rent-order?page=${page}`)
-                        }
-                    }}
-                />
+                {
+                    ((search.isSearching || filter.isFiltering) && (!rentOrders || rentOrders.length === 0)) ? <NoResult /> : 
+                    <Table 
+                        dataSource={DataSourceRentOrder} 
+                        columns={ColumnRentOrder} 
+                        scroll={{ y: 680, x: 2200 }}
+                        pagination={{
+                            current: paging.curPage || 1,
+                            pageSize: paging.pageSize || 1,
+                            total: paging.recordCount || 1,
+                            onChange: (page: number) =>{
+                                setRecall(true)
+                                navigate(`/panel/rent-order?page=${page}`)
+                            }
+                        }}
+                    />
+                }
             </section>
             {
                 actionMethod?.actionType === 'detail' && 

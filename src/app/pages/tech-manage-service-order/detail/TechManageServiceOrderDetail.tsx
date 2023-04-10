@@ -294,7 +294,7 @@ const TechManageServiceOrderDetail: React.FC = () => {
         setErrorCalendar('')
         setUpdate({
             ...update,
-            nextServiceDate: date ? date.toDate().toLocaleDateString() : undefined 
+            nextServiceDate: date ? date.format('DD/MM/YYYY') : undefined 
         })
     }
     const handleUploadFile = async (e: React.ChangeEvent<HTMLInputElement>) =>{

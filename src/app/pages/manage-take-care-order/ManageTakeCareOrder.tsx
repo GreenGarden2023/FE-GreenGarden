@@ -9,8 +9,11 @@ import TransactionDetail from 'app/components/modal/transaction-detail/Transacti
 import UpdateConfirmServiceDetail from 'app/components/modal/update-confirm-service-detail/UpdateConfirmServiceDetail'
 import MoneyFormat from 'app/components/money/MoneyFormat'
 import TechnicianName from 'app/components/renderer/technician/TechnicianName'
+import NoResult from 'app/components/search-and-filter/no-result/NoResult'
+import Searching from 'app/components/search-and-filter/search/Searching'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
 import useDispatch from 'app/hooks/use-dispatch'
+import useSelector from 'app/hooks/use-selector'
 import { OrderStatus } from 'app/models/general-type'
 import { Paging } from 'app/models/paging'
 import { PaymentControlState } from 'app/models/payment'
@@ -45,6 +48,7 @@ const ManageTakeCareOrder: React.FC = () => {
     const dispatch = useDispatch()
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
+    const { search } = useSelector(state => state.SearchFilter)
 
     const [serviceOrders, setServiceOrders] = useState<ServiceOrderList[]>([])
     const [paging, setPaging] = useState<Partial<Paging>>({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_RENT})
@@ -70,24 +74,27 @@ const ManageTakeCareOrder: React.FC = () => {
     useEffect(() =>{
         pagingPath.scrollTop()
         const currentPage = searchParams.get('page');
-        console.log({currentPage})
+        
         if(!pagingPath.isValidPaging(currentPage)){
             setPaging({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_RENT})
             return navigate('/panel/take-care-order?page=1')
         }
         
-
-        const init = async () =>{
-            try{
+        if(search.isSearching && search.orderCode){
+            const initSearch = async () =>{
+                const res = await orderService.getServiceOrderDetailByOrderCode(search.orderCode || '')
+                setServiceOrders(res.data ? [res.data] : [])
+            }
+            initSearch()
+        }else{
+            const init = async () =>{
                 const res = await orderService.getAllServiceOrders({curPage: Number(currentPage), pageSize: paging.pageSize})
                 setServiceOrders(res.data.serviceOrderList)
                 setPaging(res.data.paging)
-            }catch{
-
             }
+            init()
         }
-        init()
-    }, [navigate, searchParams, paging.pageSize])
+    }, [navigate, searchParams, paging.pageSize, search])
 
     const handleAction = (data: PaymentControlState) =>{
         const { actionType, orderId } = data
@@ -377,21 +384,27 @@ const ManageTakeCareOrder: React.FC = () => {
     return (
         <div className="mtko-wrapper">
             <HeaderInfor title='Quản lý đơn hàng chăm sóc' />
+            <Searching
+                isOrderCode
+            />
             <section className="mtko-box default-layout">
-                <Table
-                    className='table' 
-                    columns={ColumnServiceOrder} 
-                    dataSource={DataSourceServiceOrder} 
-                    scroll={{ y: 680, x: 3000 }}
-                    pagination={{
-                        current: paging.curPage,
-                        pageSize: paging.pageSize,
-                        total: paging.recordCount,
-                        onChange: (page: number) =>{
-                            navigate(`/panel/take-care-order?page=${page}`)
-                        }
-                    }}
-                />
+                {
+                    (search.isSearching && serviceOrders.length === 0) ? <NoResult /> :
+                    <Table
+                        className='table' 
+                        columns={ColumnServiceOrder} 
+                        dataSource={DataSourceServiceOrder} 
+                        scroll={{ y: 680, x: 3000 }}
+                        pagination={{
+                            current: paging.curPage,
+                            pageSize: paging.pageSize,
+                            total: paging.recordCount,
+                            onChange: (page: number) =>{
+                                navigate(`/panel/take-care-order?page=${page}`)
+                            }
+                        }}
+                    />
+                }
             </section>
             {
                 (actionMethod?.actionType === 'deposit') &&

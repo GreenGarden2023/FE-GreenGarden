@@ -65,3 +65,12 @@
         gap: 10px;
     }
 }
+.segmented-option{
+    font-weight: 500;
+    .title{
+        margin-right: 5px;
+    }
+    .segmented-quantity{
+        color: $deep-pink;
+    }
+}

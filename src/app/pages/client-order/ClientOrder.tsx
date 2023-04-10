@@ -31,6 +31,7 @@ import { SiGitextensions } from 'react-icons/si';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { OrderStatusToTag } from '../manage-take-care-order/ManageTakeCareOrder';
 import './style.scss';
+import { setTitle } from 'app/slices/window-title';
 
 type OrderPage = 'rent' | 'sale' | 'service'
 
@@ -55,6 +56,10 @@ const ClientOrder: React.FC = () =>{
     const [paging, setPaging] = useState<Partial<Paging>>({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.CLIENT_ORDER_RENT})
 
     const [shipping, setShipping] = useState<ShippingFee[]>([])
+
+    useEffect(() =>{
+        dispatch(setTitle(`${CONSTANT.APP_NAME} | Đơn hàng`))
+    }, [dispatch])
 
     useEffect(() =>{
         const init = async () =>{
@@ -489,7 +494,7 @@ const ClientOrder: React.FC = () =>{
         navigate('/orders?page=1')
         switch(value){
             case 'Thuê': return setPageType('rent')
-            case 'Bán': return setPageType('sale')
+            case 'Mua': return setPageType('sale')
             default: setPageType('service')
         }
     }
@@ -744,7 +749,7 @@ const ClientOrder: React.FC = () =>{
                     <HeaderInfor title='Quản lý đơn hàng của bạn' />
                     <section className="default-layout">
                         <h3 style={{marginBottom: '5px'}}>Loại đơn hàng</h3>
-                        <Segmented size="large" onChange={handleChangeSegment} options={['Thuê', 'Bán', 'Dịch vụ']} />
+                        <Segmented size="large" onChange={handleChangeSegment} options={['Thuê', 'Mua', 'Dịch vụ']} />
                     </section>
                     {
                         pageType === 'rent' &&

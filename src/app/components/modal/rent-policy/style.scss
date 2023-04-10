@@ -1,0 +1,39 @@
+@import 'app/styles/variable.scss';
+
+.policy-modal{
+    border-top: 3px solid $color-link;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    .policy-wrapper{
+        .header{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            span{
+                font-size: 26px;
+                font-weight: 500;
+                color: $default-green;
+            }
+        }
+    }
+    .content{
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .confirmation{
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        span{
+            font-size: 23px;
+            font-weight: 500;
+        }
+        .deny{
+            color: $orange-text;
+        }
+        .accept{
+            color: $default-green;
+        }
+    }
+}

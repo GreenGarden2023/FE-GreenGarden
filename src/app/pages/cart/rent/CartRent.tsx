@@ -18,10 +18,10 @@ import CONSTANT from 'app/utils/constant'
 import ErrorMessage from 'app/components/message.tsx/ErrorMessage'
 import locale from 'antd/es/date-picker/locale/vi_VN';
 import Dayjs from 'dayjs'
-import { Link } from 'react-router-dom'
 import { MdNavigateNext } from 'react-icons/md'
 import useDispatch from 'app/hooks/use-dispatch'
 import { setNoti } from 'app/slices/notification'
+import RentPolicy from 'app/components/modal/rent-policy/RentPolicy'
 
 const schema = yup.object().shape({
     recipientAddress: yup.string().when("isTransport", {
@@ -64,6 +64,7 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
     })
 
     const [isConfirm, setIsConfirm] = useState(false)
+    const [isViewPolicy, setIsViewPolicy] = useState(false)
     
     useEffect(() =>{
         if(!userState.token) return;
@@ -302,6 +303,9 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
 
         return currentPoint > result ? result : currentPoint
     }
+    const onClosePolicy = () =>{
+        setIsViewPolicy(false)
+    }
 
     return (
         <div className='cart-rent-wrapper'>
@@ -510,10 +514,10 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
                                         <Col span={24}>
                                             <Checkbox checked={isConfirm} onChange={(e) => setIsConfirm(e.target.checked)} >Đồng ý với tất cả điều khoản khi thuê cây</Checkbox>
                                             <div className="rent-policy">
-                                                <Link to='/rent-policy' className='view-policy'>
+                                                <div className='view-policy' onClick={() => setIsViewPolicy(true)}>
                                                     <span>Xem điều khoản thuê cây</span>
                                                     <MdNavigateNext size={20} />
-                                                </Link>
+                                                </div>
                                             </div>
                                         </Col>
                                         <Col span={24} >
@@ -540,6 +544,13 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
                 >
                     
                 </Modal>
+            }
+            {
+                isViewPolicy &&
+                <RentPolicy
+                    checked={isConfirm}
+                    onConfirm={onClosePolicy}
+                />
             }
         </div>
     )
