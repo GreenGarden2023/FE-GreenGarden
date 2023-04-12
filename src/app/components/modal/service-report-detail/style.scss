@@ -29,10 +29,19 @@
         }
     }
     .report-description{
-        border: 1px solid $color-link;
+        border: 1px solid $soft-text;
         padding: 10px;
         border-radius: 5px;
-        color: $color-link;
+        color: $soft-text;
         font-weight: 500;
+    }
+}
+.image-item-wrapper{
+    padding: 5px;
+    .image-item-detail{
+        padding: 5px;
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
     }
 }

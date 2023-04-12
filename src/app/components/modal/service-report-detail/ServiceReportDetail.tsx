@@ -4,6 +4,8 @@ import utilDateTime from 'app/utils/date-time';
 import React from 'react';
 import { BiTimeFive } from 'react-icons/bi';
 import './style.scss';
+import { GrFormNext, GrFormPrevious } from 'react-icons/gr';
+import Slider from "react-slick";
 
 interface ServiceReportDetailProps{
     orderCode: string;
@@ -12,6 +14,15 @@ interface ServiceReportDetailProps{
 }
 
 const ServiceReportDetail: React.FC<ServiceReportDetailProps> = ({orderCode, serviceCalendar, onClose}) => {
+    var settings = {
+        dots: false,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 4,
+        slidesToScroll: 1,
+        nextArrow: <GrFormNext />,
+        prevArrow: <GrFormPrevious />
+    };
     return (
         <Modal
             open
@@ -33,17 +44,32 @@ const ServiceReportDetail: React.FC<ServiceReportDetailProps> = ({orderCode, ser
                 </div>
                 <h3>Hình ảnh</h3>
                 <div className="report-images">
-                    <Image.PreviewGroup>
-                        {
-                            serviceCalendar.images.map((x, index) => (
-                                <Image 
-                                    src={x}
-                                    key={index}
-                                    className='image-item'
-                                />
-                            ))
-                        }
-                    </Image.PreviewGroup>
+                    {
+                        (serviceCalendar && serviceCalendar.images.length > 4) &&
+                        <Slider {...settings}>
+                            {
+                                serviceCalendar.images.map((item, index) => (
+                                    <div key={index} className='image-item-wrapper'>
+                                        <img src={item} alt="/" className='image-item-detail' />
+                                    </div>
+                                ))
+                            }
+                        </Slider>
+                    }
+                    {
+                        (serviceCalendar && serviceCalendar.images.length <= 4) &&
+                        <Image.PreviewGroup>
+                            {
+                                serviceCalendar.images.map((x, index) => (
+                                    <Image 
+                                        src={x}
+                                        key={index}
+                                        className='image-item'
+                                    />
+                                ))
+                            }
+                        </Image.PreviewGroup>
+                    }
                 </div>
                 <h3>Ghi chú</h3>
                 <div className="report-description">

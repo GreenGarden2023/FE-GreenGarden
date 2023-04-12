@@ -265,7 +265,7 @@ const CartSale: React.FC<CartSaleProps> = ({items, shipping, onChange, onSubmit}
                                 <div className="left-field">
                                     <div className="label">
                                         <FaMoneyBillAlt color='#00a76f' size={25} />
-                                        <span className='title'>Tích điểm</span>
+                                        <span className='title'>Số điểm nhận được</span>
                                     </div>
                                     <div className="content">
                                         <span>{OrderPreview().rewardPoint}</span>

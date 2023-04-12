@@ -69,7 +69,7 @@ const DATE_FORMAT_LIST = ['DD/MM/YYYY', 'DD/MM/YY', 'DD-MM-YYYY', 'DD-MM-YY'];
 // 1000vnđ / điểm
 const POINT_TO_MONEY = 1000
 // total price / 100000
-const REWARD_POINT_RATE = 10000
+const REWARD_POINT_RATE = 100000
 // đơn thuê ít nhất 200k mới có deposit
 const RENT_DEPOSIT_RATE = 200000
 // đơn mua ít nhất 500k mới có deposit

@@ -294,7 +294,7 @@ const TechManageServiceOrderDetail: React.FC = () => {
         setErrorCalendar('')
         setUpdate({
             ...update,
-            nextServiceDate: date ? date.format('DD/MM/YYYY') : undefined 
+            nextServiceDate: date ? date.toDate() : undefined 
         })
     }
     const handleUploadFile = async (e: React.ChangeEvent<HTMLInputElement>) =>{
@@ -481,17 +481,18 @@ const TechManageServiceOrderDetail: React.FC = () => {
                                 </Image.PreviewGroup>
                             </Row>
                         }
+                        <Form.Item label='Mô tả ngắn gọn' style={{marginTop: '30px'}}>
+                            <Input.TextArea autoSize={{minRows: 4, maxRows: 6}} value={update?.sumary} onChange={handleChangeSummary} ></Input.TextArea>
+                        </Form.Item>
                         <Form.Item label='Chọn ngày chăm sóc tiếp theo'>
                             <DatePicker
                                 locale={locale} 
                                 format={dateFormatList}
                                 disabledDate={(current) => current && current.valueOf()  < Date.now()}
                                 onChange={handleChangeDateUpdateCalendar}
+                                style={{width: '200px'}}
                             />
                             {errorCalendar && <ErrorMessage message={errorCalendar} />}
-                        </Form.Item>
-                        <Form.Item className='Mô tả ngắn gọn'>
-                            <Input.TextArea autoSize={{minRows: 4, maxRows: 6}} value={update?.sumary} onChange={handleChangeSummary} ></Input.TextArea>
                         </Form.Item>
                         <div className='btn-form-wrapper'>
                             <Button htmlType='button'  type='default' className='btn-cancel' size='large' onClick={handleCloseModal}>Hủy bỏ</Button>

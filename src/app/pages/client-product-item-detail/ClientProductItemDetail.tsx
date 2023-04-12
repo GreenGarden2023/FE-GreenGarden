@@ -24,7 +24,7 @@ import { Category } from 'app/models/category';
 import pagingPath from 'app/utils/paging-path';
 import { IoFlowerOutline } from 'react-icons/io5';
 
-const text = `Đối với các sản phẩm cây/ bao gồm cây:\n- Chỉ giao hàng tại TP HCM\nĐối với các sản phẩm chậu, phụ kiện, vật tư:\n- Có giao hàng COD toàn quốc\n- Được kiểm tra hàng khi nhận hàng`
+const text = `Đối với các sản phẩm cây/ bao gồm cây:\n- Chỉ giao hàng tại TP HCM`
 const ClientProductItemDetail: React.FC = () => {
     const { productItemId } = useParams()
     const dispatch = useDispatch()
@@ -288,7 +288,7 @@ const ClientProductItemDetail: React.FC = () => {
                                                 {
                                                     proItemSelectBySize.rentPrice &&
                                                     <div className="rent-price">
-                                                        <p className='title-price'>Giá thuê</p>
+                                                        <p className='title-price'>Giá thuê / ngày</p>
                                                         <p className="price">
                                                             <CurrencyFormat value={proItemSelectBySize.rentPrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
                                                         </p>
