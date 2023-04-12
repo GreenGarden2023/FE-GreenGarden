@@ -12,6 +12,7 @@ import TechnicianName from 'app/components/renderer/technician/TechnicianName'
 import NoResult from 'app/components/search-and-filter/no-result/NoResult'
 import Searching from 'app/components/search-and-filter/search/Searching'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
+import UserInforOrder from 'app/components/user-infor/user-infor-order/UserInforOrder'
 import useDispatch from 'app/hooks/use-dispatch'
 import useSelector from 'app/hooks/use-selector'
 import { OrderStatus } from 'app/models/general-type'
@@ -58,6 +59,7 @@ const ManageTakeCareOrder: React.FC = () => {
     const [shipping, setShipping] = useState<ShippingFee[]>([])
 
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
+    const [recall, setRecall] = useState(true)
 
     useEffect(() =>{
         const init = async () =>{
@@ -95,7 +97,7 @@ const ManageTakeCareOrder: React.FC = () => {
             }
             init()
         }
-    }, [navigate, searchParams, paging.pageSize, search])
+    }, [navigate, searchParams, paging.pageSize, search, recall])
 
     const handleAction = (data: PaymentControlState) =>{
         const { actionType, orderId } = data
@@ -186,6 +188,7 @@ const ManageTakeCareOrder: React.FC = () => {
             title: 'Mã dịch vụ',
             key: 'serviceCode',
             dataIndex: 'serviceCode',
+            width: 220
         },
         {
             title: 'Thông tin khách hàng',
@@ -356,10 +359,11 @@ const ManageTakeCareOrder: React.FC = () => {
             }
             await paymentService.paymentCash(actionMethod?.orderId || '', amountOrder, 'service', checkFullAmount ? 'whole' : '')
             // recall 
-            const currentPage = searchParams.get('page');
-            const res = await orderService.getAllServiceOrders({curPage: Number(currentPage), pageSize: paging.pageSize})
-            setServiceOrders(res.data.serviceOrderList)
-            setPaging(res.data.paging)
+            setRecall(!recall)
+            // const currentPage = searchParams.get('page');
+            // const res = await orderService.getAllServiceOrders({curPage: Number(currentPage), pageSize: paging.pageSize})
+            // setServiceOrders(res.data.serviceOrderList)
+            // setPaging(res.data.paging)
             // 
             handleClose()
             dispatch(setNoti({type: 'success', message: 'Cập nhật đơn hàng thành công'}))
@@ -382,6 +386,39 @@ const ManageTakeCareOrder: React.FC = () => {
     const handleRefund = () =>{
         handleClose()
     }
+    const OrderDetail = useMemo(() =>{
+        if(!actionMethod) return {}
+
+        const [order] = serviceOrders.filter(x => x.id === actionMethod.orderId)
+        if(!order) return {};
+
+        const { service, createDate, status, deposit, transportFee, totalPrice, remainAmount } = order
+        const { name, phone, address } = service
+
+        return {
+            name,
+            phone,
+            address,
+            createOrderDate: utilDateTime.dateToString(createDate.toString()),
+            status: status,
+            transportFee,
+            totalOrder: totalPrice,
+            remainMoney: remainAmount,
+            deposit
+        }
+
+    }, [actionMethod, serviceOrders])
+
+    useEffect(() =>{
+        if(!actionMethod) return;
+
+        const [order] = serviceOrders.filter(x => x.id === actionMethod.orderId)
+
+        if(!order) return;
+
+        setAmount(order.remainAmount)
+    }, [actionMethod, serviceOrders])
+
     return (
         <div className="mtko-wrapper">
             <HeaderInfor title='Quản lý đơn hàng chăm sóc' />
@@ -410,11 +447,14 @@ const ManageTakeCareOrder: React.FC = () => {
             {
                 (actionMethod?.actionType === 'deposit') &&
                 <Modal
-                    title={`Xác nhận thanh toán tiền cọc cho đơn hàng ${serviceOrders.filter(x => x.id === actionMethod.orderId)[0].orderCode}`}
+                    title='Thanh toán tiền đặt cọc'
                     open
                     onCancel={handleClose}
                     onOk={handlePaymentDeposit}
+                    width={1000}
                 >
+                    <p>Xác nhận thanh toán tiền cọc cho đơn hàng ${serviceOrders.filter(x => x.id === actionMethod.orderId)[0].orderCode}</p>
+                    <UserInforOrder {...OrderDetail} />
                 </Modal>
             }
             {
@@ -424,7 +464,7 @@ const ManageTakeCareOrder: React.FC = () => {
                     open
                     onCancel={handleClose}
                     onOk={handlePaymentCash}
-                    width={800}
+                    width={1000}
                 >
                     <p>Nhập số tiền cần thanh toán (VND)</p>
                     <CurrencyFormat disabled={checkFullAmount} isAllowed={(values) => {
@@ -441,6 +481,7 @@ const ManageTakeCareOrder: React.FC = () => {
                     value={amount} 
                     max={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].remainAmount} thousandSeparator/>
                     <Checkbox checked={checkFullAmount} onChange={handleChangeCheck}>Đã thanh toán đủ</Checkbox>
+                    <UserInforOrder {...OrderDetail} />
                 </Modal>
             }
             {

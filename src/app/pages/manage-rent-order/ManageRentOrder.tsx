@@ -85,6 +85,7 @@ const ManageRentOrder:React.FC = () => {
         }else if(filter.isFiltering && filter.startDate && filter.endDate){
             const initFilter = async () =>{
                 const res = await orderService.getRentOrderDetailByRangeDate({curPage: Number(currentPage), pageSize: paging.pageSize}, filter.startDate || '', filter.endDate || '')
+                console.log(res.data)
                 setRentOrders(res.data.rentOrderGroups)
                 setPaging(res.data.paging)
             }
@@ -339,7 +340,7 @@ const ManageRentOrder:React.FC = () => {
         try{
             await paymentService.depositPaymentCash(orderId, 'rent')
             dispatch(setNoti({type: 'success', message: 'Thanh toán cọc thành công'}))
-            setRecall(true)
+            setRecall(!recall)
             handleClose()
         }catch{
 
@@ -363,7 +364,7 @@ const ManageRentOrder:React.FC = () => {
             }
             await paymentService.paymentCash(orderId, amountOrder, 'rent', order.status === 'unpaid' ? 'whole' : '')
             dispatch(setNoti({type: 'success', message: 'Thanh toán đơn hàng thành công'}))
-            setRecall(true)
+            setRecall(!recall)
             handleClose()
         }catch{
 
@@ -371,6 +372,7 @@ const ManageRentOrder:React.FC = () => {
     }
     const handleReturnDeposit = (rentOrderListId: string) =>{
         const index = rentOrders.findIndex(x => x.rentOrderList[0].id === rentOrderListId)
+        console.log(index)
         rentOrders[index].rentOrderList[0].status = 'completed'
         setRentOrders([...rentOrders])
         setActionMethod(undefined)

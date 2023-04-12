@@ -31,7 +31,7 @@ const schema = yup.object().shape({
     phone: yup.string().trim().required('Số điện thoại không được để trống').matches(CONSTANT.PHONE_REGEX, 'Số điện thoại không hợp lệ'),
     email: yup.string().trim().required('Email không được để trống').matches(CONSTANT.EMAIL_REGEX, 'Email không hợp lệ'),
     address: yup.string().trim().required('Địa chỉ không được để trống').max(200, 'Tối đa 200 ký tự'),
-    rules: yup.string().trim().required('Thông tin hợp đồng không được để trống').max(2000, 'Tối đa 2000 ký tự')
+    rules: yup.string().trim().required('Thông tin hợp đồng không được để trống').max(2000, 'Tối đa 2000 ký tự'),
 })
 
 const POLICY = [
@@ -292,17 +292,17 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
         let totalPriceOrder = 0
 
         for (const item of serviceDetail.serviceDetailList) {
-            totalPriceOrder += item.quantity * item.servicePrice
+            totalPriceOrder += item.servicePrice
         }
         
-        totalPriceOrder = totalPriceOrder * diff
+        // totalPriceOrder = totalPriceOrder * diff
 
         const totalPricePayment = (totalPriceOrder + transportFee) - (rewardPointUsed * CONSTANT.POINT_TO_MONEY)
 
         const deposit = totalPricePayment * 0.5
 
         const data: OrderPreview = {
-            rewardPoint: 0,
+            rewardPoint: Math.ceil(totalPriceOrder / 100000),
             deposit,
             totalPriceOrder,
             transportFee,

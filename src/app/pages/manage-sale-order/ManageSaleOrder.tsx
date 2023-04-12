@@ -31,6 +31,7 @@ import TransactionDetail from 'app/components/modal/transaction-detail/Transacti
 import useSelector from 'app/hooks/use-selector'
 import Searching from 'app/components/search-and-filter/search/Searching'
 import NoResult from 'app/components/search-and-filter/no-result/NoResult'
+import UserInforOrder from 'app/components/user-infor/user-infor-order/UserInforOrder'
 
 const ManageSaleOrder: React.FC = () => {
     const dispatch = useDispatch();
@@ -332,6 +333,32 @@ const ManageSaleOrder: React.FC = () => {
     const handleRefundOrder = async () =>{
         handleCancel()
     }
+
+    const OrderDetail = useMemo(() =>{
+        const data = saleOrders.filter(x => x.id === actionMethod?.orderId)[0]
+        if(!data) return {}
+    
+        const { recipientName, recipientPhone, recipientAddress, createDate, status, deposit, transportFee, totalPrice, remainMoney } = data
+
+        return {
+            name: recipientName,
+            phone: recipientPhone,
+            address: recipientAddress,
+            createOrderDate: utilDateTime.dateToString(createDate.toString()),
+            status: status,
+            transportFee,
+            totalOrder: totalPrice,
+            remainMoney,
+            deposit
+        }
+    }, [actionMethod, saleOrders])
+
+    useEffect(() =>{
+        const [order] = saleOrders.filter(x => x.id === actionMethod?.orderId)
+        if(!order) return;
+        setAmount(order.remainMoney)
+    }, [actionMethod, saleOrders])
+
     return (
         <div className="mso-wrapper">
             <HeaderInfor title='Quản lý đơn hàng mua' />
@@ -368,13 +395,14 @@ const ManageSaleOrder: React.FC = () => {
             {
                 actionMethod?.actionType === 'deposit' && 
                 <Modal
-                    title='Xác nhận thanh toán đặt cọc'
+                    title='Thanh toán tiền đặt cọc'
                     open
                     onOk={handlePaymentDeposit}
                     onCancel={handleCancel}
-                    width={800}
+                    width={1000}
                 >
-                    <h2>Xác nhận thanh toán đặt cọc cho đơn hàng {saleOrders.filter(x => x.id === actionMethod?.orderId)[0].orderCode}</h2>
+                    <h3>Xác nhận thanh toán đặt cọc cho đơn hàng {saleOrders.filter(x => x.id === actionMethod?.orderId)[0].orderCode}</h3>
+                    <UserInforOrder {...OrderDetail} />
                 </Modal>
             }
             {
@@ -384,7 +412,7 @@ const ManageSaleOrder: React.FC = () => {
                     open
                     onCancel={handleCancel}
                     onOk={handlePaymentCash}
-                    width={800}
+                    width={1000}
                 >
                     <p>Nhập số tiền cần thanh toán (VND)</p>
                     <CurrencyFormat disabled={checkFullAmount} isAllowed={(values) => {
@@ -401,6 +429,7 @@ const ManageSaleOrder: React.FC = () => {
                     value={amount} 
                     max={saleOrders.filter(x => x.id === actionMethod?.orderId)[0].remainMoney} thousandSeparator={true}/>
                     <Checkbox checked={checkFullAmount} onChange={handleChangeCheck}>Đã thanh toán đủ</Checkbox>
+                    <UserInforOrder {...OrderDetail} />
                 </Modal>
             }
             {

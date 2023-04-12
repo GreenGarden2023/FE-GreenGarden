@@ -1,10 +1,11 @@
 import { Checkbox, Modal } from 'antd';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
-import CurrencyInput from 'app/components/renderer/currency-input/CurrencyInput';
+import UserInforOrder from 'app/components/user-infor/user-infor-order/UserInforOrder';
 import useDispatch from 'app/hooks/use-dispatch';
 import { RentOrderList } from 'app/models/order';
 import { setNoti } from 'app/slices/notification';
-import React, { useState } from 'react'
+import utilDateTime from 'app/utils/date-time';
+import React, { useMemo, useState } from 'react';
 import CurrencyFormat from 'react-currency-format';
 
 interface RentOrderPaymentCashProps{
@@ -16,7 +17,7 @@ interface RentOrderPaymentCashProps{
 const RentOrderPaymentCash: React.FC<RentOrderPaymentCashProps> = ({rentOrderList, onClose, onSubmit}) => {
     const dispatch = useDispatch()
 
-    const [amount, setAmount] = useState(0);
+    const [amount, setAmount] = useState(rentOrderList.remainMoney);
     const [checkFullAmount, setCheckFullAmount] = useState(false);
 
     const handleChangeCheck = (e: CheckboxChangeEvent) =>{
@@ -37,10 +38,31 @@ const RentOrderPaymentCash: React.FC<RentOrderPaymentCashProps> = ({rentOrderLis
     }
 
     const handleChangeAmount = (values: CurrencyFormat.Values) =>{
+        const max = rentOrderList.remainMoney
         const { floatValue } = values
         const data = Number(floatValue || 0)
-        setAmount(data)
+
+        if(data >= max){
+            setAmount(max)
+        }else{
+            setAmount(data)
+        }
+        return data <= max
     }
+    const InforOrder = useMemo(() =>{
+        const { recipientName, recipientPhone, recipientAddress, createDate, status, transportFee, totalPrice, deposit, remainMoney } = rentOrderList
+        return {
+            name: recipientName,
+            phone: recipientPhone,
+            address: recipientAddress,
+            createOrderDate: utilDateTime.dateToString(createDate.toString()),
+            status,
+            transportFee,
+            totalOrder: totalPrice,
+            remainMoney,
+            deposit
+        }
+    }, [rentOrderList])
 
     return (
         <Modal
@@ -48,11 +70,12 @@ const RentOrderPaymentCash: React.FC<RentOrderPaymentCashProps> = ({rentOrderLis
             open
             onCancel={handleClose}
             onOk={handlePaymentCash}
-            width={800}
+            width={1000}
         >
             <p>Nhập số tiền cần thanh toán (VND)</p>
-            <CurrencyInput min={0} value={amount} onChange={handleChangeAmount} disbaled={checkFullAmount} />
+            <CurrencyFormat min={0} value={amount} isAllowed={handleChangeAmount} disbaled={checkFullAmount} className='currency-input' thousandSeparator={true} />
             <Checkbox checked={checkFullAmount} onChange={handleChangeCheck}>Đã thanh toán đủ</Checkbox>
+            <UserInforOrder {...InforOrder} />
         </Modal>
     )
 }
