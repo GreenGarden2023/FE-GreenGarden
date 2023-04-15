@@ -1,7 +1,10 @@
 import { createSlice, PayloadAction, CaseReducer } from '@reduxjs/toolkit';
+import { OrderStatus } from 'app/models/general-type';
 
 interface SearchProps{
     orderCode?: string;
+    phone?: string;
+    status?: OrderStatus
     isSearching: boolean;
 }
 interface FilterProps{
@@ -82,6 +85,24 @@ const setRangeDateCR: CR<{start: string, end: string}> = (state, action) => {
         }
     }
 }
+const setPhoneCR: CR<string> = (state, action) =>{
+    return {
+        ...state,
+        search: {
+            ...state.search,
+            phone: action.payload
+        }
+    }
+}
+const setStatusCR: CR<OrderStatus> = (state, action) =>{
+    return {
+        ...state,
+        search: {
+            ...state.search,
+            status: action.payload
+        }
+    }
+}
 
 const slice = createSlice({
     name: 'searchAndFilter/slice',
@@ -92,9 +113,11 @@ const slice = createSlice({
         setOrderCode: setOrderCodeCR,
         setRangeDate: setRangeDateCR,
         setEmptySearch: setEmptySearchCR,
-        setEmptyFilter: setEmptyFilterCR
+        setEmptyFilter: setEmptyFilterCR,
+        setPhone: setPhoneCR,
+        setStatus: setStatusCR
     },
 });
 
-export const { setSearch, setFilter, setOrderCode, setRangeDate, setEmptySearch, setEmptyFilter } = slice.actions
+export const { setSearch, setFilter, setOrderCode, setRangeDate, setEmptySearch, setEmptyFilter, setPhone, setStatus } = slice.actions
 export default slice.reducer

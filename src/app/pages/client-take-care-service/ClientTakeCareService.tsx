@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Button, Checkbox, Col, DatePicker, Form, Input, Modal, Row, Select } from 'antd'
+import { Button, Checkbox, Col, DatePicker, Form, Input, Modal, Row, Select, Tooltip } from 'antd'
 import locale from 'antd/es/date-picker/locale/vi_VN'
 import LandingFooter from 'app/components/footer/LandingFooter'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
@@ -215,11 +215,11 @@ const ClientTakeCareService: React.FC = () => {
                     <section className="ts-box default-layout">
                         <button className="ts-btn-create btn btn-create" onClick={() => navigate('/take-care-service/me')}>
                             <MdMiscellaneousServices size={25} />
-                            Quản lý dịch vụ của bạn
+                            Quản lý yêu cầu của bạn
                         </button>
                         <button className='btn btn-create' onClick={handleCreateTakeCareService}>
                             <IoCreateOutline size={25} />
-                            Tạo dịch vụ chăm sóc cây
+                            Tạo yêu cầu chăm sóc cây
                         </button>
                     </section>
                     <section className="ts-infor default-layout">
@@ -238,34 +238,43 @@ const ClientTakeCareService: React.FC = () => {
                                 <Row gutter={[12, 12]}>
                                     {
                                         (viewAll ? treesSelect : listTrees).map((item, index) => (
-                                            <Col key={index} span={6}>
-                                                <div className="item-detail">
-                                                    <div className="actions-wrapper">
-                                                        <AiOutlineEdit size={20} onClick={() => setModalState({openModal: 2, tree: item})} />
-                                                        <IoCloseSharp size={20} onClick={() => {
-                                                            if(treesSelect.find(x => x.id === item.id)){
-                                                                dispatch(setNoti({type: 'warning', message: 'Vui lòng bỏ chọn cây trước khi xóa khỏi kho'}))
-                                                                return
-                                                            }
-                                                            setModalState({openModal: 4, tree: item})
-                                                        }} />
-                                                    </div>
-                                                    <img src={item.imgUrls[0]} alt="/" />
-                                                    <div className="item-infor">
-                                                        <h1>
-                                                            {item.treeName}
-                                                            <span>({item.quantity})</span>
-                                                        </h1>
-                                                        <p className='description'>
-                                                            Mô tả 
-                                                            <span>{item.description}</span>
-                                                        </p>
-                                                    </div>
-                                                    <div className="select-tree">
-                                                        <Checkbox onChange={() => handleSelectTree(item)} checked={treesSelect.findIndex(x => x.id === item.id) > -1} >Chọn cây để chăm sóc</Checkbox>
-                                                    </div>
-                                                </div>
-                                            </Col>
+                                            <>
+                                                {
+                                                    item.status === 'active' &&
+                                                    <Col key={index} span={6}>
+                                                        <div className="item-detail">
+                                                            <div className="actions-wrapper">
+                                                                <Tooltip color='#f95441' title='Chỉnh sửa'>
+                                                                    <AiOutlineEdit size={20} onClick={() => setModalState({openModal: 2, tree: item})} />
+                                                                </Tooltip>
+                                                                <Tooltip color='#f95441' title='Xóa'>
+                                                                    <IoCloseSharp size={20} onClick={() => {
+                                                                        if(treesSelect.find(x => x.id === item.id)){
+                                                                            dispatch(setNoti({type: 'warning', message: 'Vui lòng bỏ chọn cây trước khi xóa khỏi kho'}))
+                                                                            return
+                                                                        }
+                                                                        setModalState({openModal: 4, tree: item})
+                                                                    }} />
+                                                                </Tooltip>
+                                                            </div>
+                                                            <img src={item.imgUrls[0]} alt="/" />
+                                                            <div className="item-infor">
+                                                                <h1>
+                                                                    {item.treeName}
+                                                                    <span>({item.quantity})</span>
+                                                                </h1>
+                                                                <p className='description'>
+                                                                    Mô tả 
+                                                                    <span>{item.description}</span>
+                                                                </p>
+                                                            </div>
+                                                            <div className="select-tree">
+                                                                <Checkbox onChange={() => handleSelectTree(item)} checked={treesSelect.findIndex(x => x.id === item.id) > -1} >Chọn cây để chăm sóc</Checkbox>
+                                                            </div>
+                                                        </div>
+                                                    </Col>
+                                                }
+                                            </>
                                         ))
                                     }
                                 </Row>
@@ -291,13 +300,26 @@ const ClientTakeCareService: React.FC = () => {
                     onCancel={() => setModalState({openModal: 0, tree: undefined})}
                     width={1000}
                 >
-                    {
-                        treesSelect.map((item, index) => (
-                            <div key={index}>
-                                {item.treeName}
-                            </div>
-                        ))
-                    }
+                    <div className='request-service-wrapper'>
+                        <h1>Các cây đã chọn</h1>
+                        {/* <div className='tree-item-select'> */}
+                        <Row gutter={[24, 24]}>
+                            {
+                                treesSelect.map((item, index) => (
+                                    <Col span={12} key={index} className='tree-select-wrapper'>
+                                        <div className="left">
+                                            <img src={item.imgUrls[0]} alt="/" />
+                                        </div>
+                                        <div className="right">
+                                            <p className="name">{item.treeName} ({item.quantity})</p>
+                                            <p className="description">{item.description}</p>
+                                        </div>
+                                    </Col>
+                                ))
+                            }
+                        </Row>
+                        {/* </div> */}
+                    </div>
                     <Form
                         layout='vertical'
                         onFinish={handleSubmit(handleSubmitForm)}

@@ -6,7 +6,7 @@ export type TypeOfSale = 'rent' | 'sale' | 'all'
 // 1-duy nhất-unique, 2-số lượng lớn-normal
 export type ProductItemType = 'normal' | 'unique' | ''
 export type CartType = 'Rent' | 'Sale'
-export type OrderStatus = 'unpaid' | 'ready' | 'paid' | 'completed' | 'cancel'
+export type OrderStatus = 'unpaid' | 'ready' | 'paid' | 'completed' | 'cancel' | ''
 export type OrderType = 'rent' | 'sale' | 'service' | ''
 export type PaymentActionType = 'detail' | 'deposit' | 'remaining' | 'extend' | 'return deposit' | 'assign' | 'accept service' | 'reject service' | 'update infor'  | 'create order' | 'cancel' | 'create calendar' | 'update calendar' | 'refund' | 'view transaction' | ''
 export type ServiceStatus = 'accepted' | 'rejected' | 'processing' | 'confirmed' | 'reprocess' | 'user approved' | 'completed'

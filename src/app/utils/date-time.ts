@@ -22,10 +22,17 @@ const getDiff2Days = (date1: Date, date2: Date) =>{
     return d2.diff(d1, 'days')
 }
 
+const dateTimeToString = (time: string | Date) =>{
+    const date = new Date(time);
+    const dateString = `${("0" + date.getDate()).slice(-2)}/${("0" + (date.getMonth() + 1)).slice(-2)}/${date.getFullYear()} ${("0" + date.getHours()).slice(-2)}:${("0" + date.getMinutes()).slice(-2)}:${("0" + date.getSeconds()).slice(-2)}`;
+    return dateString
+}
+
 const utilDateTime = {
     dateToString,
     isDisplayExtendRentOrder,
-    getDiff2Days
+    getDiff2Days,
+    dateTimeToString
 }
 
 export default utilDateTime;

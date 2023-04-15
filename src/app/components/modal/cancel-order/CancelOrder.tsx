@@ -10,7 +10,7 @@ interface CancelOrderProps{
     orderCode: string;
     orderType: OrderType;
     onClose: () => void;
-    onSubmit: () => void;
+    onSubmit: (reason: string) => void;
 }
 
 const CancelOrder: React.FC<CancelOrderProps> = ({ orderId, orderCode, orderType, onClose, onSubmit }) => {
@@ -19,9 +19,9 @@ const CancelOrder: React.FC<CancelOrderProps> = ({ orderId, orderCode, orderType
 
     const handleSubmit = async () =>{
         try{
-            await orderService.cancelOrder(orderId, orderType)
+            await orderService.cancelOrder(orderId, orderType, reason)
             dispatch(setNoti({type: 'success', message: `Hủy đơn hàng "${orderCode}" thành công`}))
-            onSubmit()
+            onSubmit(reason)
         }catch{
             
         }

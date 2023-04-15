@@ -15,7 +15,7 @@ const ListImage: React.FC<ListImageProps> = ({listImgs}) => {
                     width={100}
                     height={100}
                     src={item}
-                    style={{objectFit: 'cover'}}
+                    style={{objectFit: 'cover', borderRadius: '7px'}}
                 />
                 </div>
             ))

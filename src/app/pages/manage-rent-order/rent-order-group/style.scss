@@ -26,3 +26,15 @@
         }
     }
 }
+.parent-order-group{
+    background-color: #99CCFF;
+    .ant-table-cell-row-hover, .ant-table-cell-fix-right{
+        background-color: #99CCFF!important;
+    }
+}
+.current-order-group{
+    background-color: #FFFF99;
+    .ant-table-cell, .ant-table-cell-row-hover, .ant-table-cell-fix-right{
+        background-color: #FFFF99!important;
+    }
+}

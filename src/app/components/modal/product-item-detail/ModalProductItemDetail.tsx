@@ -3,8 +3,7 @@ import { Button, Col, Form, Image, Input, Modal, Row, Select, Switch } from 'ant
 import ErrorMessage from 'app/components/message.tsx/ErrorMessage';
 import CurrencyInput from 'app/components/renderer/currency-input/CurrencyInput';
 import useDispatch from 'app/hooks/use-dispatch';
-import { ProductItemType } from 'app/models/general-type';
-import { ProductItemDetail, ProductItemDetailHandle } from 'app/models/product-item';
+import { ProductItem, ProductItemDetailHandle } from 'app/models/product-item';
 import { Size } from 'app/models/size';
 import productItemService from 'app/services/product-item.service';
 import sizeService from 'app/services/size.service';
@@ -25,20 +24,20 @@ const schema = yup.object().shape({
     quantity: yup.number().required('Số lượng không được để trống'),
     salePrice: yup.number().nullable(),
     rentPrice: yup.number().nullable(),
-    imagesUrls: yup.array().required('Có ít nhất 1 hình ảnh cho thông tin này')
+    imagesUrls: yup.array().required('Có ít nhất 1 hình ảnh cho thông tin này').min(1, 'Có ít nhất 1 hình ảnh cho thông tin này')
 })
 
 interface ModalSizeProductItemProps{
-    productItemId: string;
-    productItemType: ProductItemType;
-    productItemDetail?: ProductItemDetail;
+    productItem: ProductItem
+    productDetailIndex: number;
+    // productItemDetail?: ProductItemDetail;
     isRent: boolean;
     isSale: boolean;
     onClose: () => void;
     onSubmit: (productItemDetail: ProductItemDetailHandle) => void;
 }
 
-const ModalProductItemDetail: React.FC<ModalSizeProductItemProps> = ({ productItemId, productItemType, productItemDetail, isRent, isSale, onClose, onSubmit }) => {
+const ModalProductItemDetail: React.FC<ModalSizeProductItemProps> = ({ productItem, productDetailIndex, isRent, isSale, onClose, onSubmit }) => {
     const dispatch = useDispatch();
 
     const [sizes, setSizes]= useState<Size[]>([]);
@@ -55,17 +54,16 @@ const ModalProductItemDetail: React.FC<ModalSizeProductItemProps> = ({ productIt
     })
 
     useEffect(() =>{
-        if(!productItemId) return;
-
-        setValue('productItemID', productItemId)
-    }, [productItemId, setValue])
+        setValue('productItemID', productItem.id)
+    }, [productItem, setValue])
 
     useEffect(() =>{
+        const productItemDetail = productItem.productItemDetail[productDetailIndex]
         if(!productItemDetail) return;
 
         const { id, imagesURL, quantity, rentPrice, salePrice, size, status, transportFee } = productItemDetail
         setValue('id', id)
-        setValue('productItemID', productItemId)
+        setValue('productItemID', productItem.id)
         setValue('imagesUrls', imagesURL)
         setValue('quantity', quantity)
         setValue('rentPrice', rentPrice)
@@ -74,21 +72,29 @@ const ModalProductItemDetail: React.FC<ModalSizeProductItemProps> = ({ productIt
         setValue('status', status)
         setValue('transportFee', transportFee)
 
-    }, [productItemDetail, setValue, productItemId])
+    }, [setValue, productItem, productDetailIndex])
 
     useEffect(() =>{
         const init = async () =>{
             try{
                 const res = await sizeService.getAllSize();
-                setSizes(res.data)
+                if(productDetailIndex < 0){
+                    setSizes(res.data)
+                }else{
+                    const sizeExsited = productItem.productItemDetail.map(x => x.size.id)
+                    const sizeFinal = res.data.filter(x => !sizeExsited.includes(x.id))
+                    sizeFinal.push(productItem.productItemDetail[productDetailIndex].size)
+                    setSizes(sizeFinal)
+                }
             }catch{
                 dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
         }
         init();
-    }, [dispatch])
+    }, [dispatch, productDetailIndex, productItem])
 
     useEffect(() =>{
+        const productItemType = productItem.type
         if(!productItemType) return;
 
         
@@ -99,7 +105,7 @@ const ModalProductItemDetail: React.FC<ModalSizeProductItemProps> = ({ productIt
             setSizesFilter(sizes.filter(x => x.sizeType === true))
         }
 
-    }, [sizes, productItemType, setValue])
+    }, [sizes, productItem, setValue])
 
     const handleCloseModal = () => {
         onClose()
@@ -181,7 +187,7 @@ const ModalProductItemDetail: React.FC<ModalSizeProductItemProps> = ({ productIt
     
     return (
         <Modal
-            title={`${productItemDetail ? 'Chỉnh sửa' : 'Tạo mới'} thông tin chi tiết`}
+            title={`${productDetailIndex > -1 ? 'Chỉnh sửa' : 'Tạo mới'} thông tin chi tiết`}
             open
             footer={null}
             onCancel={onClose}
@@ -217,7 +223,7 @@ const ModalProductItemDetail: React.FC<ModalSizeProductItemProps> = ({ productIt
                             <Controller
                                 control={control}
                                 name='quantity'
-                                render={({ field: { value } }) => <Input type='number' min={0} disabled={productItemType === 'unique'} value={value} onChange={(e) =>{
+                                render={({ field: { value } }) => <Input type='number' min={0} disabled={productItem.type === 'unique'} value={value} onChange={(e) =>{
                                     const data = Number(e.target.value || 0)
                                     setValue('quantity', data)
                                 }} />}
@@ -262,7 +268,7 @@ const ModalProductItemDetail: React.FC<ModalSizeProductItemProps> = ({ productIt
                                 name='transportFee'
                                 render={({ field: { value } }) => <CurrencyInput value={value} min={0} onChange={(e) => utilGeneral.setCurrency(setValue, 'transportFee', e)}/>}
                             />
-                            {errors.rentPrice && <ErrorMessage message={errors.rentPrice.message} />}
+                            {errors.transportFee && <ErrorMessage message={errors.transportFee.message} />}
                         </Form.Item>
                     </Col>
                     <Col span={24} style={{marginBottom: '20px'}}>
@@ -295,7 +301,7 @@ const ModalProductItemDetail: React.FC<ModalSizeProductItemProps> = ({ productIt
                             <Button htmlType='button' disabled={isSubmitting} type='default' className='btn-cancel' size='large' onClick={handleCloseModal}>Hủy bỏ</Button>
                             <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large' onClick={() => console.log(errors)}>
                                 {
-                                    productItemDetail ? 'Cập nhật' : 'Tạo mới'
+                                    productDetailIndex > -1 ? 'Cập nhật' : 'Tạo mới'
                                 }
                             </Button>
                         </div>

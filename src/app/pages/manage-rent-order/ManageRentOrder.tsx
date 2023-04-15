@@ -74,12 +74,13 @@ const ManageRentOrder:React.FC = () => {
 
         
         // if(!recall) return;
+        const { isSearching, orderCode, phone, status } = search
 
-        if(search.isSearching && search.orderCode){
+        if(isSearching && (orderCode || phone || status)){
             const initSearch = async () =>{
-                const res = await orderService.getRentOrderDetailByOrderCode(search.orderCode || '')
-                setRentOrders(res.data ? [res.data] : [])
-                setPaging({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_RENT})
+                const res = await orderService.getRentOrderDetailByOrderCode({curPage: Number(currentPage), pageSize: paging.pageSize}, {orderCode, phone, status})
+                setRentOrders(res.data.rentOrderGroups)
+                setPaging(res.data.paging)
             }
             initSearch()
         }else if(filter.isFiltering && filter.startDate && filter.endDate){
@@ -248,7 +249,7 @@ const ManageRentOrder:React.FC = () => {
                     <span>Xem nhóm đơn hàng</span>
                 </div>
                 {
-                    (record.status === 'unpaid') &&
+                    (record.status === 'unpaid' && record.deposit !== 0 && record.remainMoney === record.totalPrice) &&
                     <div className="item" onClick={() => {
                         handleSetAction({orderId: record.orderId, actionType: 'deposit', orderType: 'rent', openIndex: -1})
                     }}>
@@ -339,32 +340,31 @@ const ManageRentOrder:React.FC = () => {
     const handlePaymentDeposit = async (orderId: string) =>{
         try{
             await paymentService.depositPaymentCash(orderId, 'rent')
+            const [order] = rentOrders.filter(x => x.rentOrderList[0].id === orderId)[0].rentOrderList
+            order.remainMoney = order.remainMoney - order.deposit
+            order.status = 'ready'
+            setRentOrders([...rentOrders])
             dispatch(setNoti({type: 'success', message: 'Thanh toán cọc thành công'}))
-            setRecall(!recall)
+            // setRecall(!recall)
             handleClose()
         }catch{
 
         }
     }
-    const handlePaymentCash = async (orderId: string, amount: number, isFull: boolean) =>{
-        console.log(amount)
-        if(!isFull && amount < 1000){
-            dispatch(setNoti({type: 'error', message: 'Số tiền nhập vào ít nhất là 1.000 VNĐ'}))
-            return;
-        }
-        
+    const handlePaymentCash = async (orderId: string, amount: number) =>{
         const [order] = rentOrders.filter(x => x.rentOrderList[0].id === orderId)[0].rentOrderList
-
+        const total = order.remainMoney - amount
         try{
-            let amountOrder = 0;
-            if(isFull){
-                amountOrder = order.remainMoney
-            }else{
-                amountOrder = amount
+            await paymentService.paymentCash(orderId, amount, 'rent', total === 0 ? 'whole' : '')
+
+            if(total === 0){
+                order.status = 'paid'
             }
-            await paymentService.paymentCash(orderId, amountOrder, 'rent', order.status === 'unpaid' ? 'whole' : '')
+            order.remainMoney = total
+            setRentOrders([...rentOrders])
+
             dispatch(setNoti({type: 'success', message: 'Thanh toán đơn hàng thành công'}))
-            setRecall(!recall)
+            // setRecall(!recall)
             handleClose()
         }catch{
 
@@ -377,10 +377,11 @@ const ManageRentOrder:React.FC = () => {
         setRentOrders([...rentOrders])
         setActionMethod(undefined)
     }
-    const handleCancelOrder = () =>{
+    const handleCancelOrder = (reason: string) =>{
         const [order] = rentOrders.filter(x => x.rentOrderList[0].id === actionMethod?.orderId)[0].rentOrderList
 
         order.status = 'cancel'
+        order.reason = reason
         setRentOrders([...rentOrders])
         handleClose()
     }
@@ -396,6 +397,8 @@ const ManageRentOrder:React.FC = () => {
             <HeaderInfor title='Quản lý đơn hàng thuê' />
             <Searching
                 isOrderCode
+                isPhone
+                isStatus
             />
             <Filtering
                 isRangeDate

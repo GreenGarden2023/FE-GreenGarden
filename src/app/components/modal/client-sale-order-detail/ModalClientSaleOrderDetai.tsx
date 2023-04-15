@@ -2,17 +2,10 @@ import { Image, Modal } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 import MoneyFormat from 'app/components/money/MoneyFormat';
 import TreeName from 'app/components/renderer/tree-name/TreeName';
+import UserInforOrder from 'app/components/user-infor/user-infor-order/UserInforOrder';
 import { SaleOrderList } from 'app/models/order';
 import utilDateTime from 'app/utils/date-time';
-import utilGeneral from 'app/utils/general';
 import React, { useMemo } from 'react';
-import { AiOutlinePhone } from 'react-icons/ai';
-import { BsFillCartCheckFill } from 'react-icons/bs';
-import { CiLocationOn } from 'react-icons/ci';
-import { FaMoneyBillWave } from 'react-icons/fa';
-import { HiOutlineStatusOnline } from 'react-icons/hi';
-import { IoInformationCircleOutline } from 'react-icons/io5';
-import { MdOutlineDriveFileRenameOutline } from 'react-icons/md';
 import './style.scss';
 
 interface ModalClientSaleOrderDetaiProps{
@@ -92,14 +85,22 @@ const ModalClientSaleOrderDetai: React.FC<ModalClientSaleOrderDetaiProps> = ({ s
         }))
     }, [saleOrderList])
 
-    const TotalPrice = useMemo(() =>{
-        let total = 0
-        for (const item of saleOrderList.rentOrderDetailList) {
-            total += item.quantity * item.salePricePerUnit
-        }
-        return total
-    }, [saleOrderList])
+    const OrderDetail = useMemo(() =>{
+        const { recipientName, recipientPhone, recipientAddress, createDate, status, transportFee, totalPrice, remainMoney, deposit, reason } = saleOrderList
 
+        return {
+            name: recipientName,
+            phone: recipientPhone,
+            address: recipientAddress,
+            createOrderDate: utilDateTime.dateToString(createDate.toString()),
+            status,
+            transportFee,
+            totalOrder: totalPrice,
+            remainMoney,
+            deposit,
+            reason: status === 'cancel' ? reason : undefined
+        }
+    }, [saleOrderList])
     return (
         <Modal
             open
@@ -110,82 +111,7 @@ const ModalClientSaleOrderDetai: React.FC<ModalClientSaleOrderDetaiProps> = ({ s
             className='mcsod-wrapper'
         >
             <Table className='table' dataSource={DataSource} columns={Column} pagination={false} />
-            <div className="more-infor">
-                <p className='title'><IoInformationCircleOutline size={25} color='#0099FF' /><span>Thông tin khách hàng</span></p>
-
-                <div className="name">
-                    <div className="left">
-                        <MdOutlineDriveFileRenameOutline size={20} color='#0099FF' />
-                        <span>Tên</span>
-                    </div>
-                    <div className="right">
-                        <span>{saleOrderList.recipientName}</span>
-                    </div>
-                </div>
-                <div className="name">
-                    <div className="left">
-                        <AiOutlinePhone size={20} color='#0099FF' />
-                        <span>Số điện thoại</span>
-                    </div>
-                    <div className="right">
-                        <span>{saleOrderList.recipientPhone}</span>
-                    </div>
-                </div>
-                <div className="name">
-                    <div className="left">
-                        <CiLocationOn size={20} color='#0099FF' />
-                        <span>Địa chỉ</span>
-                    </div>
-                    <div className="right">
-                        <span>{saleOrderList.recipientAddress}</span>
-                    </div>
-                </div>
-                <div className="name">
-                    <div className="left">
-                        <BsFillCartCheckFill size={20} color='#0099FF' />
-                        <span>Ngày tạo đơn hàng</span>
-                    </div>
-                    <div className="right">
-                        <span>{utilDateTime.dateToString(saleOrderList.createDate.toString())}</span>
-                    </div>
-                </div>
-                <div className="name">
-                    <div className="left">
-                        <HiOutlineStatusOnline size={20} color='#0099FF' />
-                        <span>Trạng thái</span>
-                    </div>
-                    <div className="right">
-                        <span>{utilGeneral.statusToViLanguage(saleOrderList.status)}</span>
-                    </div>
-                </div>
-                <div className="name">
-                    <div className="left">
-                        <FaMoneyBillWave size={20} color='#0099FF' />
-                        <span>Phí vận chuyển</span>
-                    </div>
-                    <div className="right">
-                        <MoneyFormat value={saleOrderList.transportFee} isHighlight color='Orange' />
-                    </div>
-                </div>
-                <div className="name">
-                    <div className="left">
-                        <FaMoneyBillWave size={20} color='#0099FF' />
-                        <span>Tổng tiền hàng</span>
-                    </div>
-                    <div className="right">
-                        <MoneyFormat value={TotalPrice} isHighlight color='Light Blue' />
-                    </div>
-                </div>
-                <div className="name">
-                    <div className="left">
-                        <FaMoneyBillWave size={20} color='#0099FF' />
-                        <span>Tổng đơn hàng</span>
-                    </div>
-                    <div className="right">
-                        <MoneyFormat value={saleOrderList.totalPrice} isHighlight color='Blue' />
-                    </div>
-                </div>
-            </div>
+            <UserInforOrder {...OrderDetail} />
         </Modal>
     )
 }

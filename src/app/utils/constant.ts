@@ -60,7 +60,8 @@ const TAKE_CARE_ORDER: Role[] = ['Technician']
 
 const PAYMENT_MESSAGE = {
     PAID_DEPOSIT: 'Đơn hàng này đã thanh toán tiền cọc',
-    PAID_REMAINING: 'Đơn hàng này đã thanh toán đủ'
+    PAID_REMAINING: 'Đơn hàng này đã thanh toán đủ',
+    MIN_AMOUNT_PAYMENT: 'Số tiền nhập vào ít nhất là 1.000 VNĐ và phần còn lại phải nhiều hơn 1000'
 }
 const PHONE_REGEX = /(0[3|5|7|8|9])+([0-9]{8})\b/g
 const EMAIL_REGEX = /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;

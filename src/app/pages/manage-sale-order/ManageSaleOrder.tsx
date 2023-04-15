@@ -1,14 +1,18 @@
-import { Checkbox, Modal, Popover } from 'antd'
-import { CheckboxChangeEvent } from 'antd/es/checkbox'
+import { Modal, Popover } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import CancelOrder from 'app/components/modal/cancel-order/CancelOrder'
 import ModalClientSaleOrderDetai from 'app/components/modal/client-sale-order-detail/ModalClientSaleOrderDetai'
 import RefundOrder from 'app/components/modal/refundOrder.tsx/RefundOrder'
+import TransactionDetail from 'app/components/modal/transaction-detail/TransactionDetail'
 import MoneyFormat from 'app/components/money/MoneyFormat'
 import Transport from 'app/components/renderer/transport/Transport'
+import NoResult from 'app/components/search-and-filter/no-result/NoResult'
+import Searching from 'app/components/search-and-filter/search/Searching'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
+import UserInforOrder from 'app/components/user-infor/user-infor-order/UserInforOrder'
 import useDispatch from 'app/hooks/use-dispatch'
+import useSelector from 'app/hooks/use-selector'
 import { SaleOrderList } from 'app/models/order'
 import { Paging } from 'app/models/paging'
 import { PaymentControlState } from 'app/models/payment'
@@ -27,11 +31,6 @@ import { RiBillLine } from 'react-icons/ri'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { OrderStatusToTag } from '../manage-take-care-order/ManageTakeCareOrder'
 import './style.scss'
-import TransactionDetail from 'app/components/modal/transaction-detail/TransactionDetail'
-import useSelector from 'app/hooks/use-selector'
-import Searching from 'app/components/search-and-filter/search/Searching'
-import NoResult from 'app/components/search-and-filter/no-result/NoResult'
-import UserInforOrder from 'app/components/user-infor/user-infor-order/UserInforOrder'
 
 const ManageSaleOrder: React.FC = () => {
     const dispatch = useDispatch();
@@ -45,7 +44,6 @@ const ManageSaleOrder: React.FC = () => {
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
 
     const [amount, setAmount] = useState(0);
-    const [checkFullAmount, setCheckFullAmount] = useState(false);
 
     const [paging, setPaging] = useState<Partial<Paging>>({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_SALE})
     const [recall, setRecall] = useState(true)
@@ -58,11 +56,12 @@ const ManageSaleOrder: React.FC = () => {
             return navigate('/panel/sale-order?page=1')
         }
 
-        if(search.isSearching && search.orderCode){
+        const { isSearching, orderCode, phone, status } = search
+        if(isSearching && (orderCode || phone || status)){
             const initSearch = async () =>{
-                const res = await orderService.getSaleOrderDetailByOrderCode(search.orderCode || '')
-                setSaleOrders(res.data ? [res.data] : [])
-                setPaging({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_SALE})
+                const res = await orderService.getSaleOrderDetailByOrderCode({curPage: Number(currentPage), pageSize: paging.pageSize}, {orderCode, phone, status})
+                setSaleOrders(res.data.saleOrderList)
+                setPaging(res.data.paging)
             }
             initSearch()
         }else{
@@ -216,7 +215,7 @@ const ManageSaleOrder: React.FC = () => {
                     <span>Xem giao dịch</span>
                 </div>
                 {
-                    (record.status === 'unpaid') &&
+                    (record.status === 'unpaid' && record.deposit !== 0 && record.remainMoney === record.totalPrice) &&
                     <div className="item" onClick={() => {
                         handleSetAction({orderId: record.orderId, actionType: 'deposit', orderType: 'sale', openIndex: -1})
                     }}>
@@ -276,7 +275,6 @@ const ManageSaleOrder: React.FC = () => {
     const handleCancel = () =>{
         setActionMethod(undefined)
         setAmount(0)
-        setCheckFullAmount(false)
     }
 
     const handlePaymentDeposit = async () =>{
@@ -287,46 +285,42 @@ const ManageSaleOrder: React.FC = () => {
                 status: 'ready',
                 remainMoney: x.remainMoney - x.deposit
             }) : x))
+
+            dispatch(setNoti({type: 'success', message: 'Thanh toán cọc thành công'}))
             handleCancel()
-             
         }catch{
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
     }
-    const handleChangeCheck = (e: CheckboxChangeEvent) =>{
-        setCheckFullAmount(e.target.checked)
-    }
+    
 
     const handlePaymentCash = async () =>{
-        
-        if(!checkFullAmount && amount < 1000){
+        if(amount < 1000){
             dispatch(setNoti({type: 'error', message: 'Số tiền nhập vào ít nhất là 1.000 VNĐ'}))
             return;
         }
         
         const [order] = saleOrders.filter(x => x.id === actionMethod?.orderId)
+        const total = order.remainMoney - amount
         
         try{
-            let amountOrder = 0;
-            if(checkFullAmount){
-                amountOrder = order.remainMoney
-            }else{
-                amountOrder = amount
+            await paymentService.paymentCash(actionMethod?.orderId || '', amount, 'sale', total === 0 ? 'whole' : '')
+            if(total === 0){
+                order.status = 'paid'
             }
-            await paymentService.paymentCash(actionMethod?.orderId || '', amountOrder, 'sale', order.status === 'unpaid' ? 'whole' : '')
-            // recall 
-            setRecall(true)
-            handleCancel()
+            order.remainMoney = total
+            setSaleOrders([...saleOrders])
+
             dispatch(setNoti({type: 'success', message: 'Cập nhật đơn hàng thành công'}))
-            setCheckFullAmount(false)
-            setAmount(0)
+            handleCancel()
         }catch{
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
     }
-    const handleCancelOrder = async () =>{
+    const handleCancelOrder = async (reason: string) =>{
         const [order] = saleOrders.filter(x => x.id === actionMethod?.orderId)
         order.status = 'cancel'
+        order.reason = reason
         setSaleOrders([...saleOrders])
         handleCancel()
     }
@@ -364,6 +358,8 @@ const ManageSaleOrder: React.FC = () => {
             <HeaderInfor title='Quản lý đơn hàng mua' />
             <Searching
                 isOrderCode
+                isPhone
+                isStatus
             />
             <section className="mso-box default-layout">
             {
@@ -415,7 +411,7 @@ const ManageSaleOrder: React.FC = () => {
                     width={1000}
                 >
                     <p>Nhập số tiền cần thanh toán (VND)</p>
-                    <CurrencyFormat disabled={checkFullAmount} isAllowed={(values) => {
+                    <CurrencyFormat isAllowed={(values) => {
                         const value = values.floatValue || 0
                         const remain = saleOrders.filter(x => x.id === actionMethod?.orderId)[0].remainMoney
                         if(value >= remain) {
@@ -428,7 +424,6 @@ const ManageSaleOrder: React.FC = () => {
                     className='currency-input'
                     value={amount} 
                     max={saleOrders.filter(x => x.id === actionMethod?.orderId)[0].remainMoney} thousandSeparator={true}/>
-                    <Checkbox checked={checkFullAmount} onChange={handleChangeCheck}>Đã thanh toán đủ</Checkbox>
                     <UserInforOrder {...OrderDetail} />
                 </Modal>
             }

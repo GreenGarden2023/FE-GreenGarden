@@ -50,6 +50,7 @@ export interface RentOrderList {
     recipientName: string
     orderCode: string
     recipientDistrict: number;
+    reason: string;
     rentOrderDetailList: RentOrderDetailList[]
 }
 export interface RentOrder{
@@ -81,6 +82,7 @@ export interface SaleOrderList {
     recipientName: string;
     orderCode: string;
     isTransport: boolean;
+    reason: string;
     rentOrderDetailList: RentOrderDetailList[];
 }
 export interface SaleOrderResponse{

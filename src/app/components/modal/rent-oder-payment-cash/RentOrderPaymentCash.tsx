@@ -1,5 +1,4 @@
-import { Checkbox, Modal } from 'antd';
-import { CheckboxChangeEvent } from 'antd/es/checkbox';
+import { Modal } from 'antd';
 import UserInforOrder from 'app/components/user-infor/user-infor-order/UserInforOrder';
 import useDispatch from 'app/hooks/use-dispatch';
 import { RentOrderList } from 'app/models/order';
@@ -11,29 +10,23 @@ import CurrencyFormat from 'react-currency-format';
 interface RentOrderPaymentCashProps{
     rentOrderList: RentOrderList
     onClose: () => void;
-    onSubmit: (orderId: string, amount: number, isFull: boolean) => void
+    onSubmit: (orderId: string, amount: number) => void
 }
 
 const RentOrderPaymentCash: React.FC<RentOrderPaymentCashProps> = ({rentOrderList, onClose, onSubmit}) => {
     const dispatch = useDispatch()
 
     const [amount, setAmount] = useState(rentOrderList.remainMoney);
-    const [checkFullAmount, setCheckFullAmount] = useState(false);
-
-    const handleChangeCheck = (e: CheckboxChangeEvent) =>{
-        setCheckFullAmount(e.target.checked)
-    }
 
     const handlePaymentCash = () =>{
-        if(!checkFullAmount && amount < 1000){
+        if(amount < 1000){
             dispatch(setNoti({type: 'error', message: 'Số tiền nhập vào ít nhất là 1.000 VNĐ'}))
             return;
         }
-        onSubmit(rentOrderList.id, amount, checkFullAmount)
+        onSubmit(rentOrderList.id, amount)
     }
     const handleClose = () =>{
         setAmount(0)
-        setCheckFullAmount(false)
         onClose()
     }
 
@@ -73,8 +66,7 @@ const RentOrderPaymentCash: React.FC<RentOrderPaymentCashProps> = ({rentOrderLis
             width={1000}
         >
             <p>Nhập số tiền cần thanh toán (VND)</p>
-            <CurrencyFormat min={0} value={amount} isAllowed={handleChangeAmount} disbaled={checkFullAmount} className='currency-input' thousandSeparator={true} />
-            <Checkbox checked={checkFullAmount} onChange={handleChangeCheck}>Đã thanh toán đủ</Checkbox>
+            <CurrencyFormat min={0} value={amount} isAllowed={handleChangeAmount} className='currency-input' thousandSeparator={true} />
             <UserInforOrder {...InforOrder} />
         </Modal>
     )

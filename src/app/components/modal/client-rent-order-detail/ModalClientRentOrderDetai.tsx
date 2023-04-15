@@ -2,18 +2,10 @@ import { Image, Modal, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import MoneyFormat from 'app/components/money/MoneyFormat';
 import TreeName from 'app/components/renderer/tree-name/TreeName';
+import UserInforOrder from 'app/components/user-infor/user-infor-order/UserInforOrder';
 import { RentOrderList } from 'app/models/order';
 import utilDateTime from 'app/utils/date-time';
-import utilGeneral from 'app/utils/general';
 import React, { useMemo } from 'react';
-import { AiOutlinePhone } from 'react-icons/ai';
-import { BiArrowFromBottom, BiArrowFromTop } from 'react-icons/bi';
-import { BsFillCartCheckFill } from 'react-icons/bs';
-import { CiLocationOn } from 'react-icons/ci';
-import { FaMoneyBillWave, FaSlack } from 'react-icons/fa';
-import { HiOutlineStatusOnline } from 'react-icons/hi';
-import { IoInformationCircleOutline } from 'react-icons/io5';
-import { MdOutlineDriveFileRenameOutline } from 'react-icons/md';
 import './style.scss';
 
 interface ModalClientRentOrderDetaiProps{
@@ -96,6 +88,24 @@ const ModalClientRentOrderDetai: React.FC<ModalClientRentOrderDetaiProps> = ({re
         }))
     }, [rentOrderList])
 
+    const OrderDetail = useMemo(() =>{
+        const { recipientName, recipientPhone, recipientAddress, createDate, startRentDate, endRentDate, status, transportFee, totalPrice, remainMoney, deposit } = rentOrderList
+
+        return {
+            name: recipientName,
+            phone: recipientPhone,
+            address: recipientAddress,
+            createOrderDate: utilDateTime.dateToString(createDate.toString()),
+            startDate: utilDateTime.dateToString(startRentDate.toString()),
+            endDate: utilDateTime.dateToString(endRentDate.toString()),
+            status,
+            transportFee,
+            totalOrder: totalPrice,
+            remainMoney,
+            deposit,
+        }
+    }, [rentOrderList])
+
     return (
         <Modal
             open
@@ -106,100 +116,7 @@ const ModalClientRentOrderDetai: React.FC<ModalClientRentOrderDetaiProps> = ({re
             className='mcrod-wrapper'
         >
             <Table dataSource={DataSource} columns={Column} pagination={false} />
-            <div className="more-infor">
-                <p className='title'><IoInformationCircleOutline size={25} color='#0099FF' /><span>Thông tin khách hàng</span></p>
-
-                <div className="name">
-                    <div className="left">
-                        <MdOutlineDriveFileRenameOutline size={20} color='#0099FF' />
-                        <span>Tên</span>
-                    </div>
-                    <div className="right">
-                        <span>{rentOrderList.recipientName}</span>
-                    </div>
-                </div>
-                <div className="name">
-                    <div className="left">
-                        <AiOutlinePhone size={20} color='#0099FF' />
-                        <span>Số điện thoại</span>
-                    </div>
-                    <div className="right">
-                        <span>{rentOrderList.recipientPhone}</span>
-                    </div>
-                </div>
-                <div className="name">
-                    <div className="left">
-                        <CiLocationOn size={20} color='#0099FF' />
-                        <span>Địa chỉ</span>
-                    </div>
-                    <div className="right">
-                        <span>{rentOrderList.recipientAddress}</span>
-                    </div>
-                </div>
-                {/* <div className="name">
-                    <div className="left">
-                        <BsFillCartCheckFill size={20} color='#0099FF' />
-                        <span>Ngày tạo đơn hàng đầu tiên</span>
-                    </div>
-                    <div className="right">
-                        <span>{utilDateTime.dateToString(rentOrderList.createDate.toString())}</span>
-                    </div>
-                </div> */}
-                <div className="name">
-                    <div className="left">
-                        <BsFillCartCheckFill size={20} color='#0099FF' />
-                        <span>Ngày tạo đơn hàng</span>
-                    </div>
-                    <div className="right">
-                        <span>{utilDateTime.dateToString(rentOrderList.createDate.toString())}</span>
-                    </div>
-                </div>
-                <div className="name">
-                    <div className="left">
-                        <BiArrowFromBottom size={20} color='#0099FF' />
-                        <span>Ngày bắt đầu thuê</span>
-                    </div>
-                    <div className="right">
-                        <span>{utilDateTime.dateToString(rentOrderList.startRentDate.toString())}</span>
-                    </div>
-                </div>
-                <div className="name">
-                    <div className="left">
-                        <BiArrowFromTop  size={20} color='#0099FF' />
-                        <span>Ngày kết thúc thuê</span>
-                    </div>
-                    <div className="right">
-                        <span>{utilDateTime.dateToString(rentOrderList.endRentDate.toString())}</span>
-                    </div>
-                </div>
-                <div className="name">
-                    <div className="left">
-                        <HiOutlineStatusOnline size={20} color='#0099FF' />
-                        <span>Trạng thái</span>
-                    </div>
-                    <div className="right">
-                        <span>{utilGeneral.statusToViLanguage(rentOrderList.status)}</span>
-                    </div>
-                </div>
-                <div className="name">
-                    <div className="left">
-                        <FaSlack size={20} color='#0099FF' />
-                        <span>Tiền còn thiếu</span>
-                    </div>
-                    <div className="right">
-                    <MoneyFormat value={rentOrderList.remainMoney} color='Blue' isHighlight />
-                    </div>
-                </div>
-                <div className="name">
-                    <div className="left">
-                        <FaMoneyBillWave size={20} color='#0099FF' />
-                        <span>Tổng đơn hàng</span>
-                    </div>
-                    <div className="right">
-                        <MoneyFormat value={rentOrderList.totalPrice} color='Light Blue' isHighlight />
-                    </div>
-                </div>
-            </div>
+            <UserInforOrder {...OrderDetail} />
         </Modal>
     )
 }

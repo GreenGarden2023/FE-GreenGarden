@@ -15,14 +15,17 @@ interface UserInforOrderProps{
     phone?: string;
     address?: string;
     createOrderDate?: string;
+    startDate?: string;
+    endDate?: string;
     status?: OrderStatus;
     transportFee?: number;
     totalOrder?: number;
     remainMoney?: number;
     deposit?: number;
+    reason?: string;
 }
 
-const UserInforOrder: React.FC<UserInforOrderProps> = ({name, phone, address, createOrderDate, status, transportFee, totalOrder, remainMoney, deposit}) => {
+const UserInforOrder: React.FC<UserInforOrderProps> = ({name, phone, address, createOrderDate, startDate, endDate, status, transportFee, totalOrder, remainMoney, deposit, reason}) => {
   return (
     <div className='uio-wrapper'>
         <div className="uio-content">
@@ -81,6 +84,34 @@ const UserInforOrder: React.FC<UserInforOrderProps> = ({name, phone, address, cr
                                 </div>
                                 <div className="content">
                                     {createOrderDate}
+                                </div>
+                            </div>
+                        </Col>
+                    }
+                    {
+                        startDate && 
+                        <Col span={8}>
+                            <div className="item">
+                                <div className="label">
+                                    <MdDateRange color='#5cb9d8' size={20} />
+                                    <span>Ngày thuê</span>
+                                </div>
+                                <div className="content">
+                                    {startDate}
+                                </div>
+                            </div>
+                        </Col>
+                    }
+                    {
+                        endDate && 
+                        <Col span={8}>
+                            <div className="item">
+                                <div className="label">
+                                    <MdDateRange color='#5cb9d8' size={20} />
+                                    <span>Ngày kết thúc</span>
+                                </div>
+                                <div className="content">
+                                    {endDate}
                                 </div>
                             </div>
                         </Col>
@@ -151,6 +182,20 @@ const UserInforOrder: React.FC<UserInforOrderProps> = ({name, phone, address, cr
                                 </div>
                                 <div className="content">
                                     <MoneyFormat value={deposit} color='Orange' />
+                                </div>
+                            </div>
+                        </Col>
+                    }
+                    {
+                        reason && 
+                        <Col span={8}>
+                            <div className="item">
+                                <div className="label">
+                                    <FaMoneyBillWave color='#5cb9d8' size={20} />
+                                    <span>Lý do hủy đơn</span>
+                                </div>
+                                <div className="content">
+                                    <p>{reason}</p>
                                 </div>
                             </div>
                         </Col>

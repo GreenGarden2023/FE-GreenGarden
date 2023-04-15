@@ -8,7 +8,7 @@ import productItemService from 'app/services/product-item.service';
 import uploadService from 'app/services/upload.service';
 import { setNoti } from 'app/slices/notification';
 import CONSTANT from 'app/utils/constant';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { AiFillCaretDown, AiOutlineCloudUpload } from 'react-icons/ai';
 import * as yup from 'yup';
@@ -26,13 +26,12 @@ const schema = yup.object().shape({
 
 interface ModalProductItemProps{
     productId: string;
-    numberOfChild: number;
     productItem?: ProductItem;
     onClose: () => void;
     onSubmit: (productItem: ProductItem) => void;
 }
 
-const ModalProductItem: React.FC<ModalProductItemProps> = ({productId, numberOfChild, productItem, onClose, onSubmit}) => {
+const ModalProductItem: React.FC<ModalProductItemProps> = ({productId, productItem, onClose, onSubmit}) => {
     const dispatch = useDispatch();
 
     const ref = useRef<HTMLInputElement>(null);
@@ -127,6 +126,11 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productId, numberOfC
     //     left: 0,
     //     right: 0
     //   };
+    const NumberOfChild = useMemo(() =>{
+        if(!productItem) return 0;
+
+        return productItem.productItemDetail.length
+    }, [productItem])
     return (
         <Modal
             className='modal-pi-wrapper'
@@ -160,7 +164,7 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productId, numberOfC
                                 control={control}
                                 name='type'
                                 render={({ field: { value } }) => (
-                                    <Select disabled={(numberOfChild === 1 && productItem?.type === 'unique') || (numberOfChild > 1 && productItem?.type === 'normal')} suffixIcon={<AiFillCaretDown />} onChange={(value: string) => {
+                                    <Select disabled={(NumberOfChild === 1 && productItem?.type === 'unique') || (NumberOfChild > 1 && productItem?.type === 'normal')} suffixIcon={<AiFillCaretDown />} onChange={(value: string) => {
                                         setValue('type', value as ProductItemType)
                                         trigger('type')
                                     }} value={value} >

@@ -82,7 +82,7 @@ const CartPage: React.FC = () => {
         setPageType(`${value}`)
         
     }
-    const handleCartChange = async (type: string, items: CartItemDetail[], id: string) =>{
+    const handleCartChange = async (type: string, common: string, items: CartItemDetail[], id: string) =>{
         if(!cart) return;
         
         let cartProps: CartProps
@@ -98,6 +98,7 @@ const CartPage: React.FC = () => {
                 rentItems: items.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity}))
             }
         }
+
         try{
             const res = await cartService.addToCart(cartProps)
             setCart(res.data)
@@ -108,13 +109,18 @@ const CartPage: React.FC = () => {
             const code_101 = err.response.data.code
 
             if(code_101 === 101){
-                if(type === 'sale'){
+                if(type === 'sale' && common === '+'){
                     const [item] = cart.saleItems.filter(x => x.productItemDetail.id === id)
-                    console.log({item})
                     item.quantity = item.quantity - 1
-                }else{
+                }else if(type === 'rent' && common === '+'){
                     const [item] = cart.rentItems.filter(x => x.productItemDetail.id === id)
                     item.quantity = item.quantity - 1
+                }else if(type === 'sale' && common === '-'){
+                    const [item] = cart.saleItems.filter(x => x.productItemDetail.id === id)
+                    item.quantity = item.quantity + 1
+                }else if(type === 'rent' && common === '-'){
+                    const [item] = cart.rentItems.filter(x => x.productItemDetail.id === id)
+                    item.quantity = item.quantity + 1
                 }
                 setCart({...cart})
                 dispatch(setNoti({type: 'warning', message: 'Số lượng hàng trong kho không đủ'}))

@@ -36,7 +36,7 @@ const schema = yup.object().shape({
 interface CartRentProps{
     items: CartItemDetail[]
     shipping: ShippingFee[]
-    onChange: (type: string, items: CartItemDetail[], id: string) => void
+    onChange: (type: string, common: string, items: CartItemDetail[], id: string) => void
     onSubmit: (type: string, data: OrderUserInfor, orderPreview: OrderPreview) => void
 }
 
@@ -164,7 +164,7 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
             item.quantity = item.quantity - 1
         }
         clearPoint()
-        onChange('rent', items, item.productItemDetail.id)
+        onChange('rent', common,items, item.productItemDetail.id)
     }
     const DataSourceRent = useMemo(() => {
         return items.map((c, index) => ({
@@ -185,7 +185,7 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
     const handleRemoveItem = () =>{
         const itemsRemoved = items.filter(x => x.productItemDetail.id !== idRemove)
         clearPoint()
-        onChange('rent', itemsRemoved, idRemove)
+        onChange('rent', '', itemsRemoved, idRemove)
         handleClose()
     }
 

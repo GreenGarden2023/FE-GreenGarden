@@ -1,11 +1,11 @@
 import { Badge, Col, Pagination, Row, Switch, Tooltip } from 'antd';
-import FilterBox from 'app/components/filter/FilterBox';
 import ModalProductItemDetail from 'app/components/modal/product-item-detail/ModalProductItemDetail';
 import ModalProductItem from 'app/components/modal/product-item/ModalProductItem';
 import useDispatch from 'app/hooks/use-dispatch';
+import { Status } from 'app/models/general-type';
 import { Paging } from 'app/models/paging';
 import { Product } from 'app/models/product';
-import { ProductItem, ProductItemDetail, ProductItemDetailHandle } from 'app/models/product-item';
+import { ProductItem, ProductItemDetailHandle } from 'app/models/product-item';
 import productItemService from 'app/services/product-item.service';
 import { setNoti } from 'app/slices/notification';
 import CONSTANT from 'app/utils/constant';
@@ -18,7 +18,6 @@ import { MdPointOfSale } from 'react-icons/md';
 import { SiConvertio } from 'react-icons/si';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import './style.scss';
-import { Status } from 'app/models/general-type';
 
 const ManageProductItem: React.FC = () => {
     const { productId } = useParams()
@@ -30,9 +29,9 @@ const ManageProductItem: React.FC = () => {
     const [product, setProduct] = useState<Product>()
     const [paging, setPaging] = useState<Paging>();
     const [openModal, setOpenModal] = useState(0);
-    const [productItemSelected, setProductItemSelected] = useState<ProductItem>();
-    const [productItemIdSelected, setProductItemIdSelected] = useState('');
-    const [productItemDetailSelected, setProductItemDetailSelected] = useState<ProductItemDetail>()
+
+    const [productIndex, setProductIndex] = useState(-1)
+    const [productDetailIndex, setProductDetailIndex] = useState(-1)
 
     useEffect(() =>{
         const currentPage = searchParams.get('page');
@@ -59,18 +58,15 @@ const ManageProductItem: React.FC = () => {
 
     const handleCreateProduct = () =>{
         setOpenModal(1)
-        setProductItemSelected(undefined)
+        // setProductItemSelected(undefined)
     }
 
-    const handleCloseModalProductItem = () =>{
+    const handleCloseModal = () =>{
         setOpenModal(0)
-        setProductItemSelected(undefined)
+        setProductIndex(-1)
+        setProductDetailIndex(-1)
     }
-    const handleCloseModalProductItemDetail = () =>{
-        setOpenModal(0)
-        setProductItemIdSelected('')
-        setProductItemDetailSelected(undefined)
-    }
+
     const handleSubmitProductItem = (productItem: ProductItem) =>{
         const index = productItems.findIndex(x => x.id === productItem.id)
         if(index < 0){
@@ -80,7 +76,7 @@ const ManageProductItem: React.FC = () => {
             // update
             setProductItems(productItems.map(x => x.id === productItem.id ? productItem : x))
         }
-        handleCloseModalProductItem()
+        handleCloseModal()
     }
     const handleSubmitProductItemDetail = async (productItemDetail: ProductItemDetailHandle) =>{
         try{
@@ -93,8 +89,8 @@ const ManageProductItem: React.FC = () => {
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
         }
     }
-    const handleCreateProductItemDetail = (productItemId: string) =>{
-        const productItem = productItems.filter(x => x.id === productItemId)[0]
+    const handleCreateProductItemDetail = (parentIndex: number) =>{
+        const productItem = productItems[parentIndex]
         const type = productItem.type
         const numOfChild = productItem.productItemDetail.length
 
@@ -104,7 +100,8 @@ const ManageProductItem: React.FC = () => {
         }
 
         setOpenModal(2)
-        setProductItemIdSelected(productItemId)
+        setProductIndex(parentIndex)
+        // setProductItemIdSelected(productItemId)
     }
 
     const handleChangeStatus = async (pIndex: number, Cindex: number, checked: boolean) =>{
@@ -125,7 +122,7 @@ const ManageProductItem: React.FC = () => {
                 <h1>{product?.name}</h1>
             </section>
             <section className="mpi-search-wrapper default-layout">
-                <FilterBox sizeFilter />
+                {/* <FilterBox sizeFilter /> */}
                 <div className="mpi-btn-wrapper">
                     <button onClick={handleCreateProduct} className='btn-create'>
                         <IoCreateOutline size={20} />
@@ -169,8 +166,10 @@ const ManageProductItem: React.FC = () => {
                                                             <Switch onChange={(e) => handleChangeStatus(index, indexItem, e)} checked={item.status === 'active'} className="status" />
                                                             <button className='btn btn-update' onClick={() => {
                                                                 setOpenModal(2)
-                                                                setProductItemIdSelected(pt.id)
-                                                                setProductItemDetailSelected(item)
+                                                                setProductIndex(index)
+                                                                setProductDetailIndex(indexItem)
+                                                                // setProductItemIdSelected(pt.id)
+                                                                // setProductItemDetailSelected(item)
                                                             }}>
                                                                 Chỉnh sửa
                                                             </button>
@@ -184,11 +183,12 @@ const ManageProductItem: React.FC = () => {
                                                 <Tooltip title="Chỉnh sửa thông tin sản phẩm" color='#108ee9'>
                                                     <AiFillEdit color='#5cb9d8' size={20} cursor='pointer' style={{marginRight: '5px'}} onClick={() => {
                                                         setOpenModal(1)
-                                                        setProductItemSelected(pt)
+                                                        setProductIndex(index)
+                                                        // setProductItemSelected(pt)
                                                     }} />
                                                 </Tooltip>
                                                 <Tooltip title="Tạo mới thông tin chi tiết" color='#108ee9'>
-                                                    <AiOutlinePlusSquare color='#5cb9d8' size={20} cursor='pointer' onClick={() => handleCreateProductItemDetail(pt.id)} />
+                                                    <AiOutlinePlusSquare color='#5cb9d8' size={20} cursor='pointer' onClick={() => handleCreateProductItemDetail(index)} />
                                                 </Tooltip>
                                             </div>
                                         </div>
@@ -211,21 +211,19 @@ const ManageProductItem: React.FC = () => {
                 openModal === 1 && 
                 <ModalProductItem 
                     productId={product?.id || ''}
-                    numberOfChild={productItems.filter(x => x.id === productItemSelected?.id)[0] ? productItems.filter(x => x.id === productItemSelected?.id)[0].productItemDetail.length : 0}
-                    productItem={productItemSelected}
-                    onClose={handleCloseModalProductItem}
+                    productItem={productItems[productIndex]}
+                    onClose={handleCloseModal}
                     onSubmit={handleSubmitProductItem}
                 />
             }
             {
                 openModal === 2 &&
                 <ModalProductItemDetail
-                    productItemId={productItemIdSelected}
-                    productItemType={productItems.filter(x => x.id === productItemIdSelected)[0].type}
-                    productItemDetail={productItemDetailSelected}
+                    productItem={productItems[productIndex]}
+                    productDetailIndex={productDetailIndex}
                     isRent={product?.isForRent || false}
                     isSale={product?.isForSale || false}
-                    onClose={handleCloseModalProductItemDetail}
+                    onClose={handleCloseModal}
                     onSubmit={handleSubmitProductItemDetail}
                 />
             }

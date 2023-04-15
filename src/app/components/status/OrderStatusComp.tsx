@@ -16,6 +16,7 @@ const OrderStatusComp: React.FC<OrderStatusCompProps> = ({ status }) => {
         case 'paid': return <Tag className='center' color='#87d068' icon={<FaCheck />} >Đã thanh toán đủ</Tag>
         case 'completed': return <Tag className='center' color='#2db7f5' icon={<MdDoneAll />} >Đã hoàn thành</Tag>
         case 'cancel': return <Tag className='center' color='#528B8B' icon={<MdOutlineCancel />} >Đã bị hủy</Tag>
+        default: return <></>
     }
 //   return (
 //     <div>OrderStatusComp</div>

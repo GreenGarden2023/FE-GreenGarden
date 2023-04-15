@@ -1,8 +1,8 @@
 import { OrderStatus, OrderType } from "app/models/general-type";
-import { CreateServiceOrder, OrderCalculate, OrderCreate, OrderExtendDetail, RentOrder, RentOrderDetailList, RentOrderResponse, SaleOrderList, SaleOrderResponse } from "app/models/order";
+import { CreateServiceOrder, OrderCalculate, OrderCreate, OrderExtendDetail, RentOrder, RentOrderDetailList, RentOrderResponse, SaleOrderResponse } from "app/models/order";
 import { Paging } from "app/models/paging";
 import { Response } from "app/models/response";
-import { ServiceOrderDetail, ServiceOrderList, ServiceResponse } from "app/models/service";
+import { ServiceOrderDetail, ServiceResponse } from "app/models/service";
 import queryString from "query-string";
 import golbalAxios from "../utils/http-client";
 
@@ -79,7 +79,7 @@ const getServiceOrders = async (paging: Partial<Paging>) =>{
 }
 // get all
 const getAllServiceOrders = async (paging: Partial<Paging>) =>{
-    const res = await golbalAxios.get(`/order/get-all-service-orders?${queryString.stringify(paging)}`)
+    const res = await golbalAxios.get<Response<ServiceResponse>>(`/order/get-all-service-orders?${queryString.stringify(paging)}`)
     return res.data
 }
 const createServiceOrder = async (serviceId: string) =>{
@@ -96,23 +96,50 @@ const getAServiceOrderDetail = async (orderID: string) =>{
     return res.data
 }
 
-const cancelOrder = async (orderID: string, orderType: OrderType) =>{
-    const res = await golbalAxios.post('/order/cancel-order', { orderID, orderType })
+const cancelOrder = async (orderID: string, orderType: OrderType, reason: string) =>{
+    const res = await golbalAxios.post('/order/cancel-order', { orderID, orderType, reason })
     return res.data
 }
 
-const getRentOrderDetailByOrderCode = async (orderCode: string) =>{
-    const res = await golbalAxios.get<Response<RentOrder>>(`/order/get-rent-order-detail-by-order-code?orderCode=${orderCode}`)
+interface SearchOrderParams{
+    orderCode?: string;
+    phone?: string;
+    status?: OrderStatus
+}
+
+const getRentOrderDetailByOrderCode = async (paging: Partial<Paging>, params: SearchOrderParams) =>{
+    const { orderCode, phone, status } = params
+    const newParams: SearchOrderParams = {
+        ...paging,
+        orderCode: orderCode || undefined,
+        phone: phone || undefined,
+        status: status || undefined
+    }
+    const res = await golbalAxios.get<Response<RentOrderResponse>>(`/order/get-rent-order-detail-by-order-code?${queryString.stringify(newParams)}`)
     return res.data
 }
 
-const getSaleOrderDetailByOrderCode = async (orderCode: string) =>{
-    const res = await golbalAxios.get<Response<SaleOrderList>>(`/order/get-sale-order-detail-by-order-code?orderCode=${orderCode}`)
+const getSaleOrderDetailByOrderCode = async (paging: Partial<Paging>, params: SearchOrderParams) =>{
+    const { orderCode, phone, status } = params
+    const newParams: SearchOrderParams = {
+        ...paging,
+        orderCode: orderCode || undefined,
+        phone: phone || undefined,
+        status: status || undefined
+    }
+    const res = await golbalAxios.get<Response<SaleOrderResponse>>(`/order/get-sale-order-detail-by-order-code?${queryString.stringify(newParams)}`)
     return res.data
 }
 
-const getServiceOrderDetailByOrderCode = async (orderCode: string) =>{
-    const res = await golbalAxios.get<Response<ServiceOrderList>>(`/order/get-service-order-detail-by-order-code?orderCode=${orderCode}`)
+const getServiceOrderDetailByOrderCode = async (paging: Partial<Paging>, params: SearchOrderParams) =>{
+    const { orderCode, phone, status } = params
+    const newParams: SearchOrderParams = {
+        ...paging,
+        orderCode: orderCode || undefined,
+        phone: phone || undefined,
+        status: status || undefined
+    }
+    const res = await golbalAxios.get<Response<ServiceResponse>>(`/order/get-service-order-detail-by-order-code?${queryString.stringify(newParams)}`)
     return res.data
 }
 

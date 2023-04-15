@@ -1,6 +1,5 @@
 import { SyncOutlined } from '@ant-design/icons'
-import { Checkbox, Modal, Popover, Tag } from 'antd'
-import { CheckboxChangeEvent } from 'antd/es/checkbox'
+import { Modal, Popover, Tag } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import CancelOrder from 'app/components/modal/cancel-order/CancelOrder'
@@ -55,11 +54,9 @@ const ManageTakeCareOrder: React.FC = () => {
     const [paging, setPaging] = useState<Partial<Paging>>({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_RENT})
 
     const [amount, setAmount] = useState(0);
-    const [checkFullAmount, setCheckFullAmount] = useState(false);
     const [shipping, setShipping] = useState<ShippingFee[]>([])
 
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
-    const [recall, setRecall] = useState(true)
 
     useEffect(() =>{
         const init = async () =>{
@@ -82,11 +79,12 @@ const ManageTakeCareOrder: React.FC = () => {
             return navigate('/panel/take-care-order?page=1')
         }
         
-        if(search.isSearching && search.orderCode){
+        const { isSearching, orderCode, phone, status } = search
+        if(isSearching && (orderCode || phone || status)){
             const initSearch = async () =>{
-                const res = await orderService.getServiceOrderDetailByOrderCode(search.orderCode || '')
-                setServiceOrders(res.data ? [res.data] : [])
-                setPaging({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_RENT})
+                const res = await orderService.getServiceOrderDetailByOrderCode({curPage: Number(currentPage), pageSize: paging.pageSize}, {orderCode, phone, status})
+                setServiceOrders(res.data.serviceOrderList)
+                setPaging(res.data.paging)
             }
             initSearch()
         }else{
@@ -97,7 +95,7 @@ const ManageTakeCareOrder: React.FC = () => {
             }
             init()
         }
-    }, [navigate, searchParams, paging.pageSize, search, recall])
+    }, [navigate, searchParams, paging.pageSize, search])
 
     const handleAction = (data: PaymentControlState) =>{
         const { actionType, orderId } = data
@@ -138,7 +136,7 @@ const ManageTakeCareOrder: React.FC = () => {
                     <span>Xem giao dịch</span>
                 </div>
                 {
-                    (record.status === 'unpaid') && 
+                    (record.status === 'unpaid' && record.remainMoney === record.totalPrice) && 
                     <div className="item" onClick={() => {
                         handleAction({orderId: record.orderId, actionType: 'deposit', orderType: 'service', openIndex: -1})
                     }}>
@@ -326,6 +324,7 @@ const ManageTakeCareOrder: React.FC = () => {
         }))
     }, [serviceOrders])
     const handleClose = () =>{
+        setAmount(0)
         setActionMethod(undefined)
     }
     const handlePaymentDeposit = async () =>{
@@ -343,39 +342,35 @@ const ManageTakeCareOrder: React.FC = () => {
         }
     }
     const handlePaymentCash = async () =>{
-        if(!checkFullAmount && amount < 1000){
-            dispatch(setNoti({type: 'error', message: 'Số tiền nhập vào ít nhất là 1.000 VNĐ'}))
+        const [order] = serviceOrders.filter(x => x.id === actionMethod?.orderId)
+        const total = order.remainAmount - amount
+
+        if(amount < 1000 && (total < 1000 || total === 0)){
+            dispatch(setNoti({type: 'error', message: CONSTANT.PAYMENT_MESSAGE.MIN_AMOUNT_PAYMENT}))
             return;
         }
         
-        const [order] = serviceOrders.filter(x => x.id === actionMethod?.orderId)
-        
         try{
-            let amountOrder = 0;
-            if(checkFullAmount){
-                amountOrder = order.remainAmount
-            }else{
-                amountOrder = amount
+            await paymentService.paymentCash(actionMethod?.orderId || '', amount, 'service', total === 0 ? 'whole' : '')
+            if(total === 0){
+                order.status = 'paid'
             }
-            await paymentService.paymentCash(actionMethod?.orderId || '', amountOrder, 'service', checkFullAmount ? 'whole' : '')
+            order.remainAmount = total
+            setServiceOrders([...serviceOrders])
             // recall 
-            setRecall(!recall)
+            // setRecall(!recall)
             // const currentPage = searchParams.get('page');
             // const res = await orderService.getAllServiceOrders({curPage: Number(currentPage), pageSize: paging.pageSize})
             // setServiceOrders(res.data.serviceOrderList)
             // setPaging(res.data.paging)
             // 
-            handleClose()
             dispatch(setNoti({type: 'success', message: 'Cập nhật đơn hàng thành công'}))
-            setCheckFullAmount(false)
-            setAmount(0)
+            handleClose()
         }catch{
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
     }
-    const handleChangeCheck = (e: CheckboxChangeEvent) =>{
-        setCheckFullAmount(e.target.checked)
-    }
+    
     const handleCancelOrder = () =>{
         const [order] = serviceOrders.filter(x => x.id === actionMethod?.orderId)
 
@@ -424,6 +419,8 @@ const ManageTakeCareOrder: React.FC = () => {
             <HeaderInfor title='Quản lý đơn hàng chăm sóc' />
             <Searching
                 isOrderCode
+                isPhone
+                isStatus
             />
             <section className="mtko-box default-layout">
                 {
@@ -467,7 +464,7 @@ const ManageTakeCareOrder: React.FC = () => {
                     width={1000}
                 >
                     <p>Nhập số tiền cần thanh toán (VND)</p>
-                    <CurrencyFormat disabled={checkFullAmount} isAllowed={(values) => {
+                    <CurrencyFormat isAllowed={(values) => {
                         const value = values.floatValue || 0
                         const remain = serviceOrders.filter(x => x.id === actionMethod.orderId)[0].remainAmount
                         if(value >= remain) {
@@ -480,7 +477,6 @@ const ManageTakeCareOrder: React.FC = () => {
                     className='currency-input'
                     value={amount} 
                     max={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].remainAmount} thousandSeparator/>
-                    <Checkbox checked={checkFullAmount} onChange={handleChangeCheck}>Đã thanh toán đủ</Checkbox>
                     <UserInforOrder {...OrderDetail} />
                 </Modal>
             }

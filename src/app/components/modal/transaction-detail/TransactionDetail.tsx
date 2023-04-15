@@ -26,6 +26,7 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({orderId, orderType
             try{
                 const res = await transactionService.getTransactionByOrder(orderId, orderType)
                 setTransactions(res.data)
+                console.log(res)
             }catch{
                 
             }
@@ -45,7 +46,8 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({orderId, orderType
             title: 'Thời gian giao dịch',
             key: 'paidDate',
             dataIndex: 'paidDate',
-            render: (v) => (utilDateTime.dateToString(v))
+            width: 250,
+            render: (v) => (utilDateTime.dateTimeToString(v))
         },
         {
             title: 'Số tiền',
