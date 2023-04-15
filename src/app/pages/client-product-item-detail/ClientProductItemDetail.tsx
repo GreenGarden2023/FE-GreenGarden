@@ -118,6 +118,7 @@ const ClientProductItemDetail: React.FC = () => {
     const handleAddCart = async (cartType: CartType, productItemDetailID: string) =>{
         const currentItem = proItem?.productItemDetail.filter(x => x.id === productItemDetailID)[0].quantity || 0
         const newData = {...cartState}
+        newData.status = ''
 
         let finalQuantity = 0
         const indexRent = newData.rentItems.findIndex(x => x.productItemDetailID === productItemDetailID)

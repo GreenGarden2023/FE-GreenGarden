@@ -1,5 +1,5 @@
 import { OrderStatus, OrderType } from "app/models/general-type";
-import { CreateServiceOrder, OrderCalculate, OrderCreate, OrderExtendDetail, RentOrder, RentOrderDetailList, RentOrderResponse, SaleOrderResponse } from "app/models/order";
+import { CreateServiceOrder, OrderCalculate, OrderCreate, OrderExtendDetail, RentOrder, RentOrderResponse, SaleOrderDetail, SaleOrderResponse } from "app/models/order";
 import { Paging } from "app/models/paging";
 import { Response } from "app/models/response";
 import { ServiceOrderDetail, ServiceResponse } from "app/models/service";
@@ -38,7 +38,7 @@ const getSaleOrders = async (paging: Partial<Paging>) =>{
 }
 
 const getSaleOrderDetail = async (saleOrderDetailID: string) =>{
-    const res = await golbalAxios.get<Response<RentOrderDetailList>>(`/order/get-sale-order-detail?saleOrderDetailID=${saleOrderDetailID}`)
+    const res = await golbalAxios.get<Response<SaleOrderDetail[]>>(`/order/get-sale-order-detail?saleOrderDetailID=${saleOrderDetailID}`)
     return res.data
 }
 

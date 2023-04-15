@@ -297,6 +297,13 @@ const ClientOrder: React.FC = () =>{
                     </div>
                 }
                 {
+                    record.status === 'completed' &&
+                    <div className="item" onClick={() => navigate(`/order/sale/feedback/${record.orderId}`)} >
+                        <MdOutlinePayments size={25} className='icon'/>
+                        <span>Đánh giá</span>
+                    </div>
+                }
+                {
                     (record.status === 'unpaid' || record.status === 'ready') &&
                     <div className="item" onClick={() => {
                         handlePaymentSale({orderId: record.orderId, actionType: 'remaining', orderType: 'sale', openIndex: -1})

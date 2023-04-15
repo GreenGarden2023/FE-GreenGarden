@@ -78,15 +78,17 @@ const ModalProductItemDetail: React.FC<ModalSizeProductItemProps> = ({ productIt
         const init = async () =>{
             try{
                 const res = await sizeService.getAllSize();
-                if(productDetailIndex < 0){
-                    setSizes(res.data)
-                }else{
+                // if(productDetailIndex < 0){
+                //     setSizes(res.data)
+                // }else{
                     const sizeExsited = productItem.productItemDetail.map(x => x.size.id)
                     const sizeFinal = res.data.filter(x => !sizeExsited.includes(x.id))
-                    sizeFinal.push(productItem.productItemDetail[productDetailIndex].size)
+                    if(productDetailIndex >= 0){
+                        sizeFinal.push(productItem.productItemDetail[productDetailIndex].size)
+                    }
                     setSizes(sizeFinal)
-                }
-            }catch{
+                // }
+            }catch(e){
                 dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
         }

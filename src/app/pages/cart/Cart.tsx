@@ -21,11 +21,13 @@ import CartRent from './rent/CartRent';
 import CartSale from './sale/CartSale';
 import './style.scss';
 import utilCalculate from 'app/utils/order-calculate';
+import { useNavigate } from 'react-router-dom';
 
 
 // const dateFormat = 'DD/MM/YYYY';
 
 const CartPage: React.FC = () => {
+    const navigate = useNavigate()
     const dispatch = useDispatch();
 
     const [cart, setCart] = useState<Cart>()
@@ -90,12 +92,14 @@ const CartPage: React.FC = () => {
         if(type === 'sale'){
             cartProps = {
                 saleItems: items.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})),
-                rentItems: cart.rentItems.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity}))
+                rentItems: cart.rentItems.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})),
+                status: common === 'remove' ? 'remove' : ''
             }
         }else{
             cartProps = {
                 saleItems: cart.saleItems.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})),
-                rentItems: items.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity}))
+                rentItems: items.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity})),
+                status: common === 'remove' ? 'remove' : ''
             }
         }
 
@@ -144,7 +148,7 @@ const CartPage: React.FC = () => {
                     cart.saleItems = []
                     setCart({...cart})
                     dispatch(setEmptySaleCart())
-                    console.log(true)
+                    navigate('/checkout-success')
                 }else{
                     dispatch(setNoti({type: 'info', message: 'Đã có sự thay đổi về giá. Quý khách vui lòng tải lại trang để đặt hàng'}))
                 }
@@ -164,6 +168,7 @@ const CartPage: React.FC = () => {
                     cart.rentItems = []
                     setCart({...cart})
                     dispatch(setEmptyRentCart())
+                    navigate('/checkout-success')
                 }else{
                     dispatch(setNoti({type: 'info', message: 'Đã có sự thay đổi về giá. Quý khách vui lòng tải lại trang để đặt hàng'}))
                 }

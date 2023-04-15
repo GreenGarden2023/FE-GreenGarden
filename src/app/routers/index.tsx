@@ -9,6 +9,7 @@ import ClientProduct from 'app/pages/client-product/ClientProduct';
 import ClientRentOrderGroup from 'app/pages/client-rent-order-group/ClientRentOrderGroup';
 import ClientTakeCareServiceConfirm from 'app/pages/client-take-care-service-confirm/ClientTakeCareServiceConfirm';
 import ClientTakeCareService from 'app/pages/client-take-care-service/ClientTakeCareService';
+import FeedbackSale from 'app/pages/feedback/FeedbackSale';
 import ManageOrder from 'app/pages/manage-order/ManageOrder';
 import ManageProductItem from 'app/pages/manage-product-item/ManageProductItem';
 import ManageRentOrder from 'app/pages/manage-rent-order/ManageRentOrder';
@@ -18,8 +19,8 @@ import ManageShippingFee from 'app/pages/manage-shipping-fee/ManageShippingFee';
 import ManageSize from 'app/pages/manage-size/ManageSize';
 import ManageTakeCareOrder from 'app/pages/manage-take-care-order/ManageTakeCareOrder';
 import ManageTakeCareService from 'app/pages/manage-take-care-service/ManageTakeCareService';
-import TechManageServiceOrderDetail from 'app/pages/tech-manage-service-order/detail/TechManageServiceOrderDetail';
 import TechManageServiceOrder from 'app/pages/tech-manage-service-order/TechManageServiceOrder';
+import TechManageServiceOrderDetail from 'app/pages/tech-manage-service-order/detail/TechManageServiceOrderDetail';
 import React, { useEffect } from 'react';
 import { AiFillCheckCircle, AiFillWarning } from 'react-icons/ai';
 import { MdError } from 'react-icons/md';
@@ -125,6 +126,7 @@ const Routers: React.FC = () =>{
                 <Route path='/product/:productId' element={<ClientProductItem />} />
                 <Route path='/product-item/:productItemId' element={<ClientProductItemDetail />} />
                 <Route path='/orders' element={<ClientOrder />} />
+                <Route path='/order/sale/feedback/:orderId' element={<FeedbackSale />} />
                 <Route path='/order-group/:groupId' element={<ClientRentOrderGroup />} />
                 <Route path='/checkout-success' element={<CheckoutSuccess />} />
                 <Route path='/take-care-service' element={<ClientTakeCareService />} />

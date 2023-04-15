@@ -1,4 +1,5 @@
 import { CartItem } from "./cart"
+import { Feedback } from "./feedback";
 import { OrderStatus } from "./general-type";
 import { Paging } from "./paging";
 import { ProductItemDetail } from "./product-item";
@@ -17,6 +18,18 @@ export interface OrderCreate{
 }
 
 // order get
+export interface SaleOrderDetail {
+    id: string
+    productItemDetailID: string
+    productItemName: string
+    quantity: number
+    salePricePerUnit: number
+    totalPrice: number
+    sizeName: string
+    imgURL: string
+    feedbackList: Feedback[]
+}
+  
 export interface RentOrderDetailList {
     id: string;
     imgURL: string;

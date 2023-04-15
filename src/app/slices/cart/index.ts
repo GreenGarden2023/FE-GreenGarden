@@ -4,6 +4,7 @@ import { CartItem } from 'app/models/cart';
 export interface CartProps{
     rentItems: CartItem[]
     saleItems: CartItem[]
+    status?: 'remove' | ''
 }
 
 const initialState: CartProps = {

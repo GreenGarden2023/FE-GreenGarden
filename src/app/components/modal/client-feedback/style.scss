@@ -1,0 +1,48 @@
+@import 'app/styles/variable.scss';
+
+.preview-feedback-order{
+    .head{
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+        .left{
+            img{
+                width: 150px;
+                height: 150px;
+                border-radius: 5px;
+                object-fit: cover;
+            }
+        }
+        .right{
+            flex: 1;
+            .name{
+                color: $default-green;
+                font-weight: 500;
+                font-size: 26px;
+            }
+        }
+    }
+    .rating{
+        display: flex;
+        gap: 20px;
+        margin-bottom: 10px;
+        span{
+
+        }
+        .stars{
+
+        }
+    }
+    .images{
+        margin-bottom: 10px;
+    }
+    .comment{
+        margin-bottom: 10px;
+    }
+    .uploader{
+        button{
+            padding: 10px;
+            background-color: $orange-text;
+        }
+    }
+}

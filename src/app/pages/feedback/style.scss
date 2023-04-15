@@ -1,0 +1,75 @@
+@import 'app/styles/variable.scss';
+
+.feedback-sale-wrapper{
+    .product{
+        display: flex;
+    }
+    .left{
+        width: 200px;
+        img{
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+    }
+    .right{
+        flex: 1;
+        .name{
+            font-size: 26px;
+            font-weight: 500;
+            color: $default-green;
+        }
+        .right-item{
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            .label{
+                font-size: 18px;
+                font-weight: 500;
+                width: 100px;
+                color: $soft-text;
+            }
+            .content{
+                font-size: 20px;
+                color: $orange-text;
+                font-weight: 500;
+            }
+        }
+        .btn-create-feedback{
+            margin-top: 10px;
+            padding: 10px;
+            background-color: $orange-text;
+        }
+    }
+    .feedback-detail{
+        display: flex;
+        gap: 20px;
+        .left-feedback{
+            width: 10%;
+            display: flex;
+            justify-content: center;
+        }
+        .right-feedback{
+            flex: 1;
+            .user-name{
+                font-weight: 500;
+            }
+            .comment{
+                padding: 20px 0;
+            }
+            .time{
+                color: $soft-text;
+            }
+            .btn-edit-feedback{
+                margin-top: 10px;
+                padding: 10px;
+                background-color: $orange-text;
+            }
+            .disabled{
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+        }
+    }
+}

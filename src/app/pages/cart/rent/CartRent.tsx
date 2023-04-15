@@ -185,7 +185,7 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
     const handleRemoveItem = () =>{
         const itemsRemoved = items.filter(x => x.productItemDetail.id !== idRemove)
         clearPoint()
-        onChange('rent', '', itemsRemoved, idRemove)
+        onChange('rent', 'remove', itemsRemoved, idRemove)
         handleClose()
     }
 

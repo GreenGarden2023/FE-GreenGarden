@@ -166,7 +166,7 @@ const CartSale: React.FC<CartSaleProps> = ({items, shipping, onChange, onSubmit}
 
     const handleRemoveItem = () =>{
         const itemsRemoved = items.filter(x => x.productItemDetail.id !== idRemove)
-        onChange('sale', '', itemsRemoved, idRemove)
+        onChange('sale', 'remove', itemsRemoved, idRemove)
         clearPoint()
         handleClose()
     }
