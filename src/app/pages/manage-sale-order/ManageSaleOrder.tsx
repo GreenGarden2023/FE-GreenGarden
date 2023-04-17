@@ -236,7 +236,7 @@ const ManageSaleOrder: React.FC = () => {
                     </div>
                 }
                 {
-                    (record.status === 'paid' && record.isTransport) && 
+                    ((record.status === 'ready' || record.status === 'paid') && record.isTransport) && 
                     <div className="item" onClick={() => {
                         handleSetAction({orderId: record.orderId, actionType: 'delivery', orderType: 'sale', openIndex: -1})
                     }}>

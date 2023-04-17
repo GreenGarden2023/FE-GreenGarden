@@ -14,7 +14,8 @@ const initialState: UserLogin = {
         mail: '',
         roleName: '',
         currentPoint: 0,
-        districtID: 0
+        districtID: 0,
+        status: 'enable'
     },
     token: '',
     loading: false

@@ -1,3 +1,5 @@
+import { Paging } from "./paging";
+
 export interface User{
     id: string;
     userName: string;
@@ -9,6 +11,7 @@ export interface User{
     mail: string;
     roleName: string;
     currentPoint: number;
+    status: 'disable' | 'enable'
 }
 
 export interface UserUpdate{
@@ -36,4 +39,9 @@ export interface UserGetByRole{
     email: string
     roleName: string
     orderNumber: number
+}
+
+export interface UserReponse{
+    users: User[]
+    paging: Paging
 }

@@ -267,7 +267,7 @@ const ManageRentOrder:React.FC = () => {
                     </div>
                 }
                 {
-                    (record.status === 'paid' && record.isTransport) && 
+                    ((record.status === 'ready' || record.status === 'paid') && record.isTransport) && 
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.orderId, actionType: 'delivery', orderType: 'rent', openIndex: -1})
                     }}>

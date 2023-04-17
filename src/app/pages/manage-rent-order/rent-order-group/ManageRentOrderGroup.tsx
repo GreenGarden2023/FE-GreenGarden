@@ -224,9 +224,9 @@ const ManageRentOrderGroup: React.FC = () => {
           </div>
         }
         {
-          (record.status === 'paid' && record.isTransport) &&
+          ((record.status === 'ready' || record.status === 'paid') && record.isTransport) &&
           <div className="item" onClick={() => {
-            handleSetAction({orderId: record.orderId, actionType: 'cancel', orderType: 'rent', openIndex: -1})
+            handleSetAction({orderId: record.orderId, actionType: 'delivery', orderType: 'rent', openIndex: -1})
           }}>
             <GiReturnArrow size={25} className='icon'/>
             <span>Vận chuyển</span>
@@ -684,13 +684,14 @@ const ViewAllOrderGroup: React.FC<ViewAllOrderGroupProps> = ({orderId, recall}) 
             <span>Xác nhận tất toán</span>
           </div>
         }
+        
         {
-          (record.status === 'paid' && record.isTransport) &&
+          ((record.status === 'ready' || record.status === 'paid') && record.isTransport) &&
           <div className="item" onClick={() => {
-            handleSetAction({orderId: record.orderId, actionType: 'cancel', orderType: 'rent', openIndex: -1})
+            handleSetAction({orderId: record.orderId, actionType: 'delivery', orderType: 'rent', openIndex: -1})
           }}>
             <GiReturnArrow size={25} className='icon'/>
-            <span>Hủy đơn hàng</span>
+            <span>Vận chuyển</span>
           </div>
         }
         {

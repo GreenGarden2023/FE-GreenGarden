@@ -44,7 +44,7 @@ import { setLoading, setUser } from '../slices/user-infor';
 import CONSTANT from '../utils/constant';
 import AdminRoute from './AdminRoute';
 import AuthGuard from './AuthGuard';
-import User from 'app/pages/users/User';
+import UserPage from 'app/pages/users/UserPage';
 
 const Routers: React.FC = () =>{
     const dispatch = useDispatch();
@@ -150,7 +150,7 @@ const Routers: React.FC = () =>{
                     <Route path='manage-shipping-fee' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_SHIPPING_FEE} ><AdminRoute><ManageShippingFee /></AdminRoute></AuthGuard>} />
                     <Route path='take-care-order-assigned' element={<AuthGuard rolesAuth={CONSTANT.TAKE_CARE_ORDER} ><AdminRoute><TechManageServiceOrder /></AdminRoute></AuthGuard>} />
                     <Route path='take-care-order-assigned/:orderId' element={<AuthGuard rolesAuth={CONSTANT.TAKE_CARE_ORDER} ><AdminRoute><TechManageServiceOrderDetail /></AdminRoute></AuthGuard>} />
-                    <Route path='users' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_USERS} ><AdminRoute><User /></AdminRoute></AuthGuard>} />
+                    <Route path='users' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_USERS} ><AdminRoute><UserPage /></AdminRoute></AuthGuard>} />
                 </Route>
                 <Route path='/file-not-found' element={<FileNotFound />} />
             </Routes>
