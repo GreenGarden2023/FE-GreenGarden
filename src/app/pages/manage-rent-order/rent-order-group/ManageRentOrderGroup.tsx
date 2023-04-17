@@ -29,6 +29,9 @@ import { MdOutlinePayments } from "react-icons/md";
 import { RiBillLine } from "react-icons/ri";
 import { useParams } from "react-router-dom";
 import "./style.scss";
+import Transport from "app/components/renderer/transport/Transport";
+import SaleDelivery from "app/components/modal/delivery/sale-delivery/SaleDelivery";
+import { OrderStatus } from "app/models/general-type";
 
 const ManageRentOrderGroup: React.FC = () => {
   const { groupId } = useParams();
@@ -101,6 +104,12 @@ const ManageRentOrderGroup: React.FC = () => {
       dataIndex: "status",
       width: 200,
       render: (v) => (OrderStatusToTag(v))
+    },
+    {
+      title: "Nơi nhận cây",
+      key: "isTransport",
+      dataIndex: "isTransport",
+      render: (v) => (<Transport isTransport={v} />)
     },
     {
       title: "Phí vận chuyển",
@@ -215,6 +224,15 @@ const ManageRentOrderGroup: React.FC = () => {
           </div>
         }
         {
+          (record.status === 'paid' && record.isTransport) &&
+          <div className="item" onClick={() => {
+            handleSetAction({orderId: record.orderId, actionType: 'cancel', orderType: 'rent', openIndex: -1})
+          }}>
+            <GiReturnArrow size={25} className='icon'/>
+            <span>Vận chuyển</span>
+          </div>
+        }
+        {
           (record.status !== 'completed' && record.status !== 'cancel') &&
           <div className="item" onClick={() => {
             handleSetAction({orderId: record.orderId, actionType: 'cancel', orderType: 'rent', openIndex: -1})
@@ -232,6 +250,7 @@ const ManageRentOrderGroup: React.FC = () => {
             <span>Hoàn tiền</span>
           </div>
         }
+        
       </div>
     );
   };
@@ -309,14 +328,7 @@ const ManageRentOrderGroup: React.FC = () => {
       handleClose();
     } catch {}
   };
-  const handleReturnDeposit = (rentOrderListId: string) =>{
-    if(!groupOrder) return;
-
-    const index = groupOrder.rentOrderList.findIndex(x => x.id === rentOrderListId)
-    groupOrder.rentOrderList[index].status = 'completed'
-    setGroupOrder({...groupOrder})
-    handleClose()
-  }
+  
   const handleCancelOrder = () =>{
     if(!groupOrder) return;
 
@@ -326,6 +338,21 @@ const ManageRentOrderGroup: React.FC = () => {
     handleClose()
   }
   const handleRefundOrder = () =>{
+    handleClose()
+  }
+  const handleRecall = async () =>{
+    const res = await orderService.getRentOrderGroup(groupId || '');
+    const newRes = {...res.data}
+    newRes.rentOrderList = newRes.rentOrderList.reverse()
+    setGroupOrder(newRes);
+  }
+
+  const updateOrderStatus = (orderStatus: OrderStatus) =>{
+    if(!groupOrder) return;
+
+    const [order] = groupOrder.rentOrderList.filter(x => x.id === actionMethod?.orderId)
+    order.status = orderStatus
+    setGroupOrder({...groupOrder})
     handleClose()
   }
   return (
@@ -339,7 +366,7 @@ const ManageRentOrderGroup: React.FC = () => {
             dataSource={DataSourceRentOrder}
             columns={ColumnRentOrder}
             pagination={false}
-            scroll={{ x: 2200, y: 680 }}
+            scroll={{ x: 2500, y: 680 }}
           />
         }
       </section>
@@ -389,7 +416,10 @@ const ManageRentOrderGroup: React.FC = () => {
       }
       {
         (groupOrder && groupOrder.rentOrderList.length > 1) &&
-        <ViewAllOrderGroup />
+        <ViewAllOrderGroup
+          orderId={DataSourceRentOrder[0].orderId}
+          recall={handleRecall}
+        />
       }
       {actionMethod?.actionType === "detail" && groupOrder && (
         <ModalClientRentOrderDetai
@@ -416,7 +446,7 @@ const ManageRentOrderGroup: React.FC = () => {
         (<ReturnDepositRentOrder 
             rentOrderList={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0]}
             onClose={handleClose}
-            onSubmit={handleReturnDeposit}
+            onSubmit={() => updateOrderStatus('completed')}
         />)
       }
       {
@@ -432,12 +462,22 @@ const ManageRentOrderGroup: React.FC = () => {
       {
         (actionMethod?.actionType === 'refund' && groupOrder) &&
         <RefundOrder
-          onClose={handleClose}
-          onSubmit={handleRefundOrder}
-          orderCode={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0].orderCode}
           orderId={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0].id}
+          orderCode={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0].orderCode}
           orderType='rent'
           transactionType='rent refund'
+          onClose={handleClose}
+          onSubmit={handleRefundOrder}
+        />
+      }
+      {
+        (actionMethod?.actionType === 'delivery' && groupOrder) &&
+        <SaleDelivery
+          orderId={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0].id}
+          orderCode={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0].orderCode}
+          type='rent'
+          onClose={handleClose}
+          onSubmit={() => updateOrderStatus('delivery')}
         />
       }
     </div>
@@ -445,7 +485,12 @@ const ManageRentOrderGroup: React.FC = () => {
 };
 
 // ---------------------------------------------------------------------------------------------------------------------------
-const ViewAllOrderGroup: React.FC = () =>{
+interface ViewAllOrderGroupProps{
+  orderId: string;
+  recall: () => void;
+}
+const ViewAllOrderGroup: React.FC<ViewAllOrderGroupProps> = ({orderId, recall}) =>{
+  console.log({orderId})
   const dispatch = useDispatch();
   const { groupId } = useParams();
   // data
@@ -465,6 +510,14 @@ const ViewAllOrderGroup: React.FC = () =>{
   }, [groupId])
   
   const ColumnRentOrder: ColumnsType<any> = [
+    {
+      title: "#",
+      key: "#",
+      dataIndex: "#",
+      align: "center",
+      width: 50,
+      render: (_, v, index) => index + 1,
+    },
     {
       title: "Mã đơn hàng",
       key: "orderCode",
@@ -490,18 +543,21 @@ const ViewAllOrderGroup: React.FC = () =>{
       title: "Ngày tạo đơn hàng",
       key: "createDate",
       dataIndex: "createDate",
+      width: 150,
       render: (v) => utilDateTime.dateToString(v),
     },
     {
       title: "Ngày bắt đầu thuê",
       key: "startDateRent",
       dataIndex: "startDateRent",
+      width: 150,
       render: (v) => utilDateTime.dateToString(v),
     },
     {
       title: "Ngày kết thúc thuê",
       key: "endDateRent",
       dataIndex: "endDateRent",
+      width: 150,
       render: (v) => utilDateTime.dateToString(v),
     },
     {
@@ -510,6 +566,12 @@ const ViewAllOrderGroup: React.FC = () =>{
       dataIndex: "status",
       width: 200,
       render: (v) => (OrderStatusToTag(v))
+    },
+    {
+      title: "Nơi nhận cây",
+      key: "isTransport",
+      dataIndex: "isTransport",
+      render: (v) => (<Transport isTransport={v} />)
     },
     {
       title: "Phí vận chuyển",
@@ -623,6 +685,15 @@ const ViewAllOrderGroup: React.FC = () =>{
           </div>
         }
         {
+          (record.status === 'paid' && record.isTransport) &&
+          <div className="item" onClick={() => {
+            handleSetAction({orderId: record.orderId, actionType: 'cancel', orderType: 'rent', openIndex: -1})
+          }}>
+            <GiReturnArrow size={25} className='icon'/>
+            <span>Hủy đơn hàng</span>
+          </div>
+        }
+        {
           (record.status !== 'completed' && record.status !== 'cancel') &&
           <div className="item" onClick={() => {
             handleSetAction({orderId: record.orderId, actionType: 'cancel', orderType: 'rent', openIndex: -1})
@@ -674,13 +745,19 @@ const ViewAllOrderGroup: React.FC = () =>{
       recipientAddress: x.recipientAddress,
       transportFee: x.transportFee,
       discountAmount: x.discountAmount,
-      createDate: x.createDate
+      createDate: x.createDate,
+      isTransport: x.isTransport
     }))
   }, [groupOrder]);
 
   const handleClose = () => {
     setActionMethod(undefined)
   };
+  const checkReCallOrder = (currentOrderId: string) =>{
+    if(currentOrderId === orderId){
+      recall()
+    }
+  }
   const handlePaymentDeposit = async (orderId: string) => {
     if(!groupOrder) return;
 
@@ -694,6 +771,7 @@ const ViewAllOrderGroup: React.FC = () =>{
       setGroupOrder({...groupOrder})
       // setRecall(true)
       handleClose();
+      checkReCallOrder(order.id)
     } catch {}
   };
   const handlePaymentCash = async (orderId: string, amount: number,) => {
@@ -711,27 +789,32 @@ const ViewAllOrderGroup: React.FC = () =>{
       dispatch(setNoti({ type: "success", message: "Thanh toán đơn hàng thành công" }));
       // setRecall(true)
       handleClose();
+      checkReCallOrder(order.id)
     } catch {}
   };
-  const handleReturnDeposit = (rentOrderListId: string) =>{
-    if(!groupOrder) return;
-
-    const index = groupOrder.rentOrderList.findIndex(x => x.id === rentOrderListId)
-    groupOrder.rentOrderList[index].status = 'completed'
-    setGroupOrder({...groupOrder})
-    handleClose()
-  }
-  const handleCancelOrder = () =>{
+  const handleCancelOrder = (reason: string) =>{
     if(!groupOrder) return;
 
     const [order] = groupOrder.rentOrderList.filter(x => x.id === actionMethod?.orderId)
     order.status = 'cancel'
+    order.reason = reason
     setGroupOrder({...groupOrder})
     handleClose()
+    checkReCallOrder(order.id)
   }
 
   const handleRefundOrder = () =>{
     handleClose()
+  }
+
+  const updateOrderStatus = (orderStatus: OrderStatus) =>{
+    if(!groupOrder) return;
+
+    const [order] = groupOrder.rentOrderList.filter(x => x.id === actionMethod?.orderId)
+    order.status = orderStatus
+    setGroupOrder({...groupOrder})
+    handleClose()
+    checkReCallOrder(order.id)
   }
   return (
     <>
@@ -749,7 +832,7 @@ const ViewAllOrderGroup: React.FC = () =>{
                 dataSource={DataSourceRentOrderAll}
                 columns={ColumnRentOrder}
                 pagination={false}
-                scroll={{ x: 2200, y: 680 }}
+                scroll={{ x: 2500, y: 680 }}
               />
             </Collapse.Panel>
           </Collapse>
@@ -780,28 +863,38 @@ const ViewAllOrderGroup: React.FC = () =>{
         (<ReturnDepositRentOrder 
             rentOrderList={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0]}
             onClose={handleClose}
-            onSubmit={handleReturnDeposit}
+            onSubmit={() => updateOrderStatus('completed')}
         />)
       }
       {
         (actionMethod?.actionType === 'cancel' && groupOrder) &&
         <CancelOrder
+          orderId={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0].id}
+          orderCode={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0].orderCode}
+          orderType='rent'
           onClose={handleClose}
           onSubmit={handleCancelOrder}
-          orderCode={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0].orderCode}
-          orderId={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0].id}
-          orderType='rent'
         />
       }
       {
         (actionMethod?.actionType === 'refund' && groupOrder) &&
         <RefundOrder
-          onClose={handleClose}
-          onSubmit={handleRefundOrder}
-          orderCode={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0].orderCode}
           orderId={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0].id}
+          orderCode={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0].orderCode}
           orderType='rent'
           transactionType='rent refund'
+          onClose={handleClose}
+          onSubmit={handleRefundOrder}
+        />
+      }
+      {
+        (actionMethod?.actionType === 'delivery' && groupOrder) &&
+        <SaleDelivery
+            orderId={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0].id}
+            orderCode={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0].orderCode}
+            type='rent'
+            onClose={handleClose}
+            onSubmit={() => updateOrderStatus('delivery')}
         />
       }
     </>

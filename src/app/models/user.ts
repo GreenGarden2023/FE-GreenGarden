@@ -35,4 +35,5 @@ export interface UserGetByRole{
     fullName: string
     email: string
     roleName: string
+    orderNumber: number
 }

@@ -1,0 +1,19 @@
+@import 'app/styles/variable.scss';
+
+.assign-tech-wrapper{
+    p{
+        margin-bottom: 10px;
+    }
+    .radio-wrapper{
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        .tech-name{
+            color: $color-link;
+        }
+        .tech-num-order{
+            color: $deep-pink;
+            font-weight: 500;
+        }
+    }
+}

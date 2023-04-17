@@ -49,7 +49,7 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productId, productIt
     useEffect(() =>{
         if(!productItem) return;
 
-        const { id, productId, content, description, imageURL, name, type, productItemDetail } = productItem
+        const { id, productId, content, description, imageURL, name, type, productItemDetail, rule } = productItem
         setValue('id', id)
         setValue('productId', productId)
         setValue('content', content)
@@ -59,6 +59,7 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productId, productIt
         setValue('name', name)
         setValue('type', type)
         setValue('productItemDetail', productItemDetail)
+        setValue('rule', rule || '')
     }, [productItem, setValue, trigger])
 
     const handleCloseModal = () =>{
@@ -180,11 +181,20 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productId, productIt
                             {errors.type && <ErrorMessage message={errors.type.message} />}
                         </Form.Item>
                     </Col>
-                    <Col span={24}>
+                    <Col span={12}>
                         <Form.Item label='Mô tả'>
                             <Controller 
                                 control={control}
                                 name='description'
+                                render={({ field }) => <Input.TextArea {...field} autoSize={{minRows: 4, maxRows: 6}} />}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item label='Lưu ý khi thuê cây'>
+                            <Controller 
+                                control={control}
+                                name='rule'
                                 render={({ field }) => <Input.TextArea {...field} autoSize={{minRows: 4, maxRows: 6}} />}
                             />
                         </Form.Item>

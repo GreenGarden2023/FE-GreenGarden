@@ -89,6 +89,8 @@ const ClientOrder: React.FC = () =>{
         if(pageType !== 'sale') return;
         const currentPage = searchParams.get('page');
 
+        if(!pagingPath.isValidPaging(currentPage)) return;
+
         const init = async () =>{
             try{
                 const res = await orderService.getSaleOrders({curPage: Number(currentPage), pageSize: paging.pageSize})

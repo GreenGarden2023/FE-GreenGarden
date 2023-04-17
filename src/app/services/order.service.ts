@@ -42,8 +42,8 @@ const getSaleOrderDetail = async (saleOrderDetailID: string) =>{
     return res.data
 }
 
-const updateSaleOrderStatus = async (saleOrderID: string, status: OrderStatus) =>{
-    const res = await golbalAxios.post('/order/update-sale-order-status', { saleOrderID, status })
+const updateSaleOrderStatus = async (orderID: string, status: OrderStatus) =>{
+    const res = await golbalAxios.post('/order/update-sale-order-status', { orderID, status })
     return res.data
 }
 

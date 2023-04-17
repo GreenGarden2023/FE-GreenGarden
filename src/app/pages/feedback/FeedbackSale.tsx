@@ -72,7 +72,7 @@ const FeedbackSale: React.FC = () => {
                                                 <MoneyFormat value={item.totalPrice} color='Blue' isHighlight />
                                             </div>
                                             {
-                                                (!item.feedbackList || item.feedbackList[0].updateDate) &&
+                                                (!item.feedbackList || item.feedbackList.length === 0) &&
                                                 <button className='btn btn-create-feedback' onClick={() => setOrderIndex(index)} >Đánh giá</button>
                                             }
                                         </div>
@@ -101,7 +101,7 @@ const FeedbackSale: React.FC = () => {
                                                                             src={image}
                                                                             width={100}
                                                                             height={100}
-                                                                            style={{objectFit: 'cover'}}
+                                                                            style={{objectFit: 'cover', borderRadius: '5px'}}
                                                                         />
                                                                     ))
                                                                 }
@@ -111,7 +111,10 @@ const FeedbackSale: React.FC = () => {
                                                         <p className="time">
                                                             {utilDateTime.dateTimeToString(fb.updateDate ? fb.updateDate : fb.createDate)}
                                                         </p>
-                                                        <button onClick={() => {setOrderIndex(index); setFbIndex(indexFB)}} className={`btn btn-edit-feedback ${fb.updateDate ? 'disabled' : ''}`}>Chỉnh sửa</button>
+                                                        {
+                                                            !fb.updateDate &&
+                                                            <button onClick={() => {setOrderIndex(index); setFbIndex(indexFB)}} className={`btn btn-edit-feedback`}>Chỉnh sửa</button>
+                                                        }
                                                     </div>
                                                 </div>
                                             ))

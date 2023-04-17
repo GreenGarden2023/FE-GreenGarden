@@ -1,7 +1,7 @@
 import { Button, Form, Image, Input, Modal } from 'antd'
 import ErrorMessage from 'app/components/message.tsx/ErrorMessage'
 import useDispatch from 'app/hooks/use-dispatch'
-import { CreateFeedback } from 'app/models/feedback'
+import { CreateFeedback, UpdateFeedback } from 'app/models/feedback'
 import { SaleOrderDetail } from 'app/models/order'
 import feedbackService from 'app/services/feedback.service'
 import uploadService from 'app/services/upload.service'
@@ -25,7 +25,7 @@ const ClientFeedback: React.FC<ClientFeedbackProps> = ({ orderId, order, fbIndex
     const ref = useRef<HTMLInputElement>(null)
 
     const [comment, setComment] = useState('')
-    const [rating, setRating] = useState(3)
+    const [rating, setRating] = useState(5)
     const [imagesUrls, setImagesUrls] = useState<string[]>([])
 
     const [erorrUpload, setErrorUpload] = useState('')
@@ -91,7 +91,15 @@ const ClientFeedback: React.FC<ClientFeedbackProps> = ({ orderId, order, fbIndex
     
             }
         }else{
-            
+            const body: UpdateFeedback = {
+                feedbackID: order.feedbackList[fbIndex].id,
+                comment,
+                rating,
+                imagesUrls
+            }
+            await feedbackService.updateFeedback(body)
+            onSubmit()
+            dispatch(setNoti({type: 'success', message: 'Cập nhật đánh giá thành công'}))
         }
     }
 

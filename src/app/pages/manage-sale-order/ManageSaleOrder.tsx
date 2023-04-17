@@ -29,8 +29,11 @@ import { GrMore } from 'react-icons/gr'
 import { MdOutlinePayments } from 'react-icons/md'
 import { RiBillLine } from 'react-icons/ri'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { OrderStatusToTag } from '../manage-take-care-order/ManageTakeCareOrder'
 import './style.scss'
+import OrderStatusComp from 'app/components/status/OrderStatusComp'
+import SaleDelivery from 'app/components/modal/delivery/sale-delivery/SaleDelivery'
+import FinishOrder from 'app/components/modal/finish-order/FinishOrder'
+import { OrderStatus } from 'app/models/general-type'
 
 const ManageSaleOrder: React.FC = () => {
     const dispatch = useDispatch();
@@ -125,7 +128,7 @@ const ManageSaleOrder: React.FC = () => {
             key: 'status',
             dataIndex: 'status',
             width: 200,
-            render: (v) => (OrderStatusToTag(v))
+            render: (v) => (<OrderStatusComp status={v} />)
         },
         {
             title: 'Nơi nhận cây',
@@ -230,6 +233,24 @@ const ManageSaleOrder: React.FC = () => {
                     }}>
                         <RiBillLine size={25} className='icon'/>
                         <span>Thanh toán đơn hàng</span>
+                    </div>
+                }
+                {
+                    (record.status === 'paid' && record.isTransport) && 
+                    <div className="item" onClick={() => {
+                        handleSetAction({orderId: record.orderId, actionType: 'delivery', orderType: 'sale', openIndex: -1})
+                    }}>
+                        <RiBillLine size={25} className='icon'/>
+                        <span>Vận chuyển</span>
+                    </div>
+                }
+                {
+                    ((record.status === 'paid' && !record.isTransport) || record.status === 'delivery') && 
+                    <div className="item" onClick={() => {
+                        handleSetAction({orderId: record.orderId, actionType: 'finished', orderType: 'sale', openIndex: -1})
+                    }}>
+                        <RiBillLine size={25} className='icon'/>
+                        <span>Hoàn thành</span>
                     </div>
                 }
                 {
@@ -353,6 +374,13 @@ const ManageSaleOrder: React.FC = () => {
         setAmount(order.remainMoney)
     }, [actionMethod, saleOrders])
 
+    const updateOrderStatus = (orderStatus: OrderStatus) =>{
+        const [order] = saleOrders.filter(x => x.id === actionMethod?.orderId)
+        order.status = orderStatus
+        setSaleOrders([...saleOrders])
+        handleCancel()
+    }
+
     return (
         <div className="mso-wrapper">
             <HeaderInfor title='Quản lý đơn hàng mua' />
@@ -455,6 +483,26 @@ const ManageSaleOrder: React.FC = () => {
                     orderCode={saleOrders.filter(x => x.id === actionMethod.orderId)[0].orderCode}
                     orderType='sale'
                     onClose={handleCancel}
+                />
+            }
+            {
+                actionMethod?.actionType === 'delivery' &&
+                <SaleDelivery
+                    orderId={saleOrders.filter(x => x.id === actionMethod.orderId)[0].id}
+                    orderCode={saleOrders.filter(x => x.id === actionMethod.orderId)[0].orderCode}
+                    type='sale'
+                    onClose={handleCancel}
+                    onSubmit={() => updateOrderStatus('delivery')}
+                />
+            }
+            {
+                actionMethod?.actionType === 'finished' &&
+                <FinishOrder
+                    orderId={saleOrders.filter(x => x.id === actionMethod.orderId)[0].id}
+                    orderCode={saleOrders.filter(x => x.id === actionMethod.orderId)[0].orderCode}
+                    type='sale'
+                    onClose={handleCancel}
+                    onSubmit={() => updateOrderStatus('completed')}
                 />
             }
         </div>

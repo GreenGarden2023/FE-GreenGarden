@@ -50,12 +50,13 @@ const SUPPORT_FORMATS = ['image/png', 'image/jpg', 'image/jpeg']
 
 
 
-const MANAGE_CATEGORY: Role[] = ['Admin', 'Staff', 'Manager']
-const MANAGE_PRODUCT: Role[] = ['Admin', 'Staff', 'Manager']
-const MANAGE_PRODUCT_ITEM: Role[] = ['Admin', 'Staff', 'Manager']
-const MANAGE_SIZE: Role[] = ['Admin', 'Staff', 'Manager']
-const MANAGE_ORDER: Role[] = ['Admin', 'Staff', 'Manager']
+const MANAGE_CATEGORY: Role[] = ['Staff', 'Manager']
+const MANAGE_PRODUCT: Role[] = ['Staff', 'Manager']
+const MANAGE_PRODUCT_ITEM: Role[] = ['Staff', 'Manager']
+const MANAGE_SIZE: Role[] = ['Staff', 'Manager']
+const MANAGE_ORDER: Role[] = ['Staff', 'Manager']
 const MANAGE_SHIPPING_FEE: Role[] = ['Admin']
+const MANAGE_USERS: Role[] = ['Admin']
 const TAKE_CARE_ORDER: Role[] = ['Technician']
 
 const PAYMENT_MESSAGE = {
@@ -111,7 +112,8 @@ const CONSTANT = {
     SALE_DEPOSIT_RATE,
     MIN_ORDER,
     MONEY_RATE,
-    DEPOSIT_MIN_RATE
+    DEPOSIT_MIN_RATE,
+    MANAGE_USERS
 }
 
 export default CONSTANT

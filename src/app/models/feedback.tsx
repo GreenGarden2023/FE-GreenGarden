@@ -15,3 +15,10 @@ export interface CreateFeedback{
     imagesUrls: string[]
     orderID: string
 }
+
+export interface UpdateFeedback{
+    feedbackID: string
+    rating: number
+    comment: string
+    imagesUrls: string[]
+}

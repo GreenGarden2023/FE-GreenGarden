@@ -2,6 +2,7 @@ import { Modal, Tooltip } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import MoneyFormat from 'app/components/money/MoneyFormat'
+import CurrencyInput from 'app/components/renderer/currency-input/CurrencyInput'
 import useDispatch from 'app/hooks/use-dispatch'
 import { ShippingFee } from 'app/models/shipping-fee'
 import shippingFeeService from 'app/services/shipping-fee.service'
@@ -50,7 +51,7 @@ const ManageShippingFee: React.FC = () => {
             key: 'feeAmount',
             dataIndex: 'feeAmount',
             align: 'center',
-            render: (v) => (<MoneyFormat value={v} />)
+            render: (v) => (<MoneyFormat value={v} color='Blue' />)
         },
         {
             title: 'Xử lý',
@@ -93,6 +94,12 @@ const ManageShippingFee: React.FC = () => {
         }
     }
 
+    const handleChangeAmount = (values: CurrencyFormat.Values) =>{
+        const { floatValue } = values
+        const data = Number(floatValue || 0)
+        setAmount(data)
+    }
+
     return (
         <div className='msf-wrapper'>
             <HeaderInfor title='Quản lý phí vận chuyển' />
@@ -103,21 +110,11 @@ const ManageShippingFee: React.FC = () => {
                 itemSelect &&
                 <Modal
                     open
-                    title={`Cập nhật phí vận chuyển cho ${itemSelect.district}`}
+                    title={`Cập nhật phí vận chuyển cho ${itemSelect.district} (VND)`}
                     onCancel={() => setItemSelect(undefined)}
                     onOk={handleSubmit}
                 >
-                    <CurrencyFormat min={0} value={amount} thousandSeparator={true} suffix={' VNĐ'} 
-                    allowNegative={false}
-                    isAllowed={(values) => {
-                        const value = values.floatValue || 0
-                        console.log(value)
-                        if(value >= 0) {
-                            setAmount(value)
-                        }
-                        return value >= 0
-                    }}
-                    />
+                    <CurrencyInput min={0} value={amount} onChange={handleChangeAmount} />
                 </Modal>
             }
         </div>

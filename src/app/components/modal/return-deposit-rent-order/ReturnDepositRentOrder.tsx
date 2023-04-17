@@ -13,7 +13,7 @@ import CurrencyFormat from 'react-currency-format';
 interface ReturnDepositRentOrderProps{
     rentOrderList: RentOrderList
     onClose: () => void;
-    onSubmit: (rentOrderListId: string) => void;
+    onSubmit: () => void;
 }
 
 const ReturnDepositRentOrder: React.FC<ReturnDepositRentOrderProps> = ({rentOrderList, onClose, onSubmit}) => {
@@ -93,7 +93,7 @@ const ReturnDepositRentOrder: React.FC<ReturnDepositRentOrderProps> = ({rentOrde
                     break;
             }
             dispatch(setNoti({type: 'success', message: `Xác nhận tất toán cho đơn hàng "${rentOrderList.orderCode}" thành công`}))
-            onSubmit(rentOrderList.id)
+            onSubmit()
         }catch{
 
         }

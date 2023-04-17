@@ -3,25 +3,26 @@ import Table, { ColumnsType } from 'antd/es/table'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import CancelOrder from 'app/components/modal/cancel-order/CancelOrder'
 import ModalClientRentOrderDetai from 'app/components/modal/client-rent-order-detail/ModalClientRentOrderDetai'
+import SaleDelivery from 'app/components/modal/delivery/sale-delivery/SaleDelivery'
 import RefundOrder from 'app/components/modal/refundOrder.tsx/RefundOrder'
 import RentOrderPaymentCash from 'app/components/modal/rent-oder-payment-cash/RentOrderPaymentCash'
 import RentOrderPaymentDeposit from 'app/components/modal/rent-order-payment-deposit/RentOrderPaymentDeposit'
 import ReturnDepositRentOrder from 'app/components/modal/return-deposit-rent-order/ReturnDepositRentOrder'
 import TransactionDetail from 'app/components/modal/transaction-detail/TransactionDetail'
 import MoneyFormat from 'app/components/money/MoneyFormat'
+import Transport from 'app/components/renderer/transport/Transport'
 import Filtering from 'app/components/search-and-filter/filter/Filtering'
 import NoResult from 'app/components/search-and-filter/no-result/NoResult'
 import Searching from 'app/components/search-and-filter/search/Searching'
+import OrderStatusComp from 'app/components/status/OrderStatusComp'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
 import useDispatch from 'app/hooks/use-dispatch'
 import useSelector from 'app/hooks/use-selector'
 import { RentOrder } from 'app/models/order'
 import { Paging } from 'app/models/paging'
 import { PaymentControlState } from 'app/models/payment'
-import { ShippingFee } from 'app/models/shipping-fee'
 import orderService from 'app/services/order.service'
 import paymentService from 'app/services/payment.service'
-import shippingFeeService from 'app/services/shipping-fee.service'
 import { setNoti } from 'app/slices/notification'
 import CONSTANT from 'app/utils/constant'
 import utilDateTime from 'app/utils/date-time'
@@ -34,9 +35,8 @@ import { GrMore } from 'react-icons/gr'
 import { MdOutlinePayments } from 'react-icons/md'
 import { RiBillLine } from 'react-icons/ri'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { OrderStatusToTag } from '../manage-take-care-order/ManageTakeCareOrder'
-import ExtendRentOrderManager from './extend-rent-order-manager/ExtendRentOrderManager'
 import './style.scss'
+import { OrderStatus } from 'app/models/general-type'
 
 const ManageRentOrder:React.FC = () => {
     const dispatch = useDispatch();
@@ -51,19 +51,6 @@ const ManageRentOrder:React.FC = () => {
 
     const [paging, setPaging] = useState<Partial<Paging>>({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_RENT})
     const [recall, setRecall] = useState(true)
-    const [shipping, setShipping] = useState<ShippingFee[]>([])
-
-    useEffect(() =>{
-        const init = async () =>{
-            try{
-                const res = await shippingFeeService.getList()
-                setShipping(res.data)
-            }catch{
-                
-            }
-        }
-        init()
-    }, [])
 
     useEffect(() =>{
         const currentPage = searchParams.get('page');
@@ -161,7 +148,20 @@ const ManageRentOrder:React.FC = () => {
             key: 'status',
             dataIndex: 'status',
             width: 200,
-            render: (v) => (OrderStatusToTag(v))
+            render: (v) => (<OrderStatusComp status={v} />)
+        },
+        {
+            title: 'Nơi nhận cây',
+            key: 'isTransport',
+            dataIndex: 'isTransport',
+            width: 200,
+            render: (v) => (<Transport isTransport={v} />)
+        },
+        {
+            title: "Số lượng đơn hàng",
+            key: "numberOfOrder",
+            dataIndex: "numberOfOrder",
+            render: (v) => (v)
         },
         {
             title: 'Phí vận chuyển',
@@ -169,7 +169,7 @@ const ManageRentOrder:React.FC = () => {
             dataIndex: 'transportFee',
             align: 'right',
             width: 200,
-            render: (v) => (<MoneyFormat value={v} color='Default' isHighlight />)
+            render: (v) => (<MoneyFormat value={v} color='Default' />)
         },
         {
             title: 'Tiền cọc',
@@ -177,7 +177,7 @@ const ManageRentOrder:React.FC = () => {
             dataIndex: 'deposit',
             align: 'right',
             width: 200,
-            render: (v) => (<MoneyFormat value={v} color='Orange' isHighlight />)
+            render: (v) => (<MoneyFormat value={v} color='Orange' />)
         },
         {
             title: 'Tiền được giảm',
@@ -185,7 +185,7 @@ const ManageRentOrder:React.FC = () => {
             dataIndex: 'discountAmount',
             align: 'right',
             width: 200,
-            render: (v) => <MoneyFormat value={v} color='Yellow' isHighlight />
+            render: (v) => <MoneyFormat value={v} color='Yellow' />
         },
         {
             title: 'Tổng tất cả đơn hàng',
@@ -193,7 +193,7 @@ const ManageRentOrder:React.FC = () => {
             dataIndex: 'totalPrice',
             align: 'right',
             width: 200,
-            render: (v) => (<MoneyFormat value={v} color='Light Blue' isHighlight />)
+            render: (v) => (<MoneyFormat value={v} color='Light Blue' />)
         },
         {
             title: 'Tiền còn thiếu',
@@ -239,7 +239,7 @@ const ManageRentOrder:React.FC = () => {
                     <span>Chi tiết đơn hàng</span>
                 </div>
                 <div className="item" onClick={() => {
-                    handleSetAction({orderId: record.orderId, actionType: 'view transaction', orderType: 'rent', openIndex: -1})
+                    setActionMethod({orderId: record.orderId, actionType: 'view transaction', orderType: 'rent', openIndex: -1})
                 }}>
                     <BiDetail size={25} className='icon'/>
                     <span>Xem giao dịch</span>
@@ -251,7 +251,7 @@ const ManageRentOrder:React.FC = () => {
                 {
                     (record.status === 'unpaid' && record.deposit !== 0 && record.remainMoney === record.totalPrice) &&
                     <div className="item" onClick={() => {
-                        handleSetAction({orderId: record.orderId, actionType: 'deposit', orderType: 'rent', openIndex: -1})
+                        setActionMethod({orderId: record.orderId, actionType: 'deposit', orderType: 'rent', openIndex: -1})
                     }}>
                         <MdOutlinePayments size={25} className='icon'/>
                         <span>Thanh toán tiền cọc</span>
@@ -260,16 +260,25 @@ const ManageRentOrder:React.FC = () => {
                 {
                     (record.status === 'ready' || record.status === 'unpaid') && 
                     <div className="item" onClick={() => {
-                        handleSetAction({orderId: record.orderId, actionType: 'remaining', orderType: 'rent', openIndex: -1})
+                        setActionMethod({orderId: record.orderId, actionType: 'remaining', orderType: 'rent', openIndex: -1})
                     }}>
                         <RiBillLine size={25} className='icon'/>
                         <span>Thanh toán đơn hàng</span>
                     </div>
                 }
                 {
+                    (record.status === 'paid' && record.isTransport) && 
+                    <div className="item" onClick={() => {
+                        setActionMethod({orderId: record.orderId, actionType: 'delivery', orderType: 'rent', openIndex: -1})
+                    }}>
+                        <RiBillLine size={25} className='icon'/>
+                        <span>Vận chuyển</span>
+                    </div>
+                }
+                {
                     record.status === 'paid' && 
                     <div className="item" onClick={() => {
-                        handleSetAction({orderId: record.orderId, actionType: 'return deposit', orderType: 'rent', openIndex: -1})
+                        setActionMethod({orderId: record.orderId, actionType: 'return deposit', orderType: 'rent', openIndex: -1})
                     }}>
                         <GiReturnArrow size={25} className='icon'/>
                         <span>Xác nhận tất toán</span>
@@ -278,7 +287,7 @@ const ManageRentOrder:React.FC = () => {
                 {
                     (record.status !== 'completed' && record.status !== 'cancel') && 
                     <div className="item" onClick={() => {
-                        handleSetAction({orderId: record.orderId, actionType: 'cancel', orderType: 'rent', openIndex: -1})
+                        setActionMethod({orderId: record.orderId, actionType: 'cancel', orderType: 'rent', openIndex: -1})
                     }}>
                         <RiBillLine size={25} className='icon'/>
                         <span>Hủy đơn hàng</span>
@@ -287,34 +296,16 @@ const ManageRentOrder:React.FC = () => {
                 {
                     record.status === 'cancel' &&
                     <div className="item" onClick={() => {
-                        handleSetAction({orderId: record.orderId, actionType: 'refund', orderType: 'rent', openIndex: -1})
+                        setActionMethod({orderId: record.orderId, actionType: 'refund', orderType: 'rent', openIndex: -1})
                     }}>
                         <BiDetail size={25} className='icon'/>
                         <span>Hoàn tiền</span>
                     </div>
                 }
-                {/* <div className="item" onClick={() => {
-                    handleSetAction({orderId: record.orderId, actionType: 'extend', orderType: 'rent', openIndex: -1})
-                }}>
-                    <BiDetail size={25} className='icon'/>
-                    <span>Gia hạn đơn hàng</span>
-                </div> */}
             </div>
         )
     }
-    const handleSetAction = async (data: PaymentControlState) =>{
-        const { orderId, actionType } = data
-        const [order] = rentOrders.filter(x => x.rentOrderList[0].id === orderId)[0].rentOrderList
-        
-        if(actionType === 'deposit' && order.status !== 'unpaid'){
-            return dispatch(setNoti({type: 'info', message: CONSTANT.PAYMENT_MESSAGE.PAID_DEPOSIT}))
-        }
-        if(actionType === 'remaining' && (order.status === 'paid' || order.status === 'completed')){
-            return dispatch(setNoti({type: 'info', message: CONSTANT.PAYMENT_MESSAGE.PAID_REMAINING}))
-        }
-
-        setActionMethod(data)
-    }
+    
     const DataSourceRentOrder = useMemo(() =>{
         return rentOrders.map((x, index) => ({
             key: String(index + 1),
@@ -331,7 +322,9 @@ const ManageRentOrder:React.FC = () => {
             recipientPhone: x.rentOrderList[0].recipientPhone,
             recipientAddress: x.rentOrderList[0].recipientAddress,
             transportFee: x.rentOrderList[0].transportFee,
-            discountAmount: x.rentOrderList[0].discountAmount
+            discountAmount: x.rentOrderList[0].discountAmount,
+            isTransport: x.rentOrderList[0].isTransport,
+            numberOfOrder: x.rentOrderList.length
         }))
     }, [rentOrders])
     const handleClose = () =>{
@@ -370,13 +363,6 @@ const ManageRentOrder:React.FC = () => {
 
         }
     }
-    const handleReturnDeposit = (rentOrderListId: string) =>{
-        const index = rentOrders.findIndex(x => x.rentOrderList[0].id === rentOrderListId)
-        console.log(index)
-        rentOrders[index].rentOrderList[0].status = 'completed'
-        setRentOrders([...rentOrders])
-        setActionMethod(undefined)
-    }
     const handleCancelOrder = (reason: string) =>{
         const [order] = rentOrders.filter(x => x.rentOrderList[0].id === actionMethod?.orderId)[0].rentOrderList
 
@@ -388,10 +374,15 @@ const ManageRentOrder:React.FC = () => {
     const handleRefundOrder = () =>{
         handleClose()
     }
-    const handleExtendOrder = async () =>{
+
+    const updateOrderStatus = (orderStatus: OrderStatus) =>{
+        const [order] = rentOrders.filter(x => x.rentOrderList[0].id === actionMethod?.orderId)[0].rentOrderList
+
+        order.status = orderStatus
+        setRentOrders([...rentOrders])
         handleClose()
-        setRecall(!recall)
     }
+
     return (
         <div className="mro-wrapper">
             <HeaderInfor title='Quản lý đơn hàng thuê' />
@@ -409,7 +400,7 @@ const ManageRentOrder:React.FC = () => {
                     <Table 
                         dataSource={DataSourceRentOrder} 
                         columns={ColumnRentOrder} 
-                        scroll={{ y: 680, x: 2200 }}
+                        scroll={{ y: 680, x: 2500 }}
                         pagination={{
                             current: paging.curPage || 1,
                             pageSize: paging.pageSize || 1,
@@ -450,7 +441,7 @@ const ManageRentOrder:React.FC = () => {
                 <ReturnDepositRentOrder 
                     rentOrderList={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0]}
                     onClose={handleClose}
-                    onSubmit={handleReturnDeposit}
+                    onSubmit={() => updateOrderStatus('completed')}
                 />
             }
             {
@@ -475,21 +466,22 @@ const ManageRentOrder:React.FC = () => {
                 />
             }
             {
-                actionMethod?.actionType === 'extend' &&
-                <ExtendRentOrderManager
-                    rentOrderList={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0]}
-                    shipping={shipping}
-                    onClose={handleClose}
-                    onExtend={handleExtendOrder}
-                />
-            }
-            {
                 actionMethod?.actionType === 'view transaction' &&
                 <TransactionDetail
                     orderId={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0].id}
                     orderCode={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0].orderCode}
                     orderType='rent'
                     onClose={handleClose}
+                />
+            }
+            {
+                actionMethod?.actionType === 'delivery' &&
+                <SaleDelivery
+                    orderId={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0].id}
+                    orderCode={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0].orderCode}
+                    type='rent'
+                    onClose={handleClose}
+                    onSubmit={() => updateOrderStatus('delivery')}
                 />
             }
         </div>

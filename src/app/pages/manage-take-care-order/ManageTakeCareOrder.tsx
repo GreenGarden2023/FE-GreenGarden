@@ -8,6 +8,7 @@ import TransactionDetail from 'app/components/modal/transaction-detail/Transacti
 import UpdateConfirmServiceDetail from 'app/components/modal/update-confirm-service-detail/UpdateConfirmServiceDetail'
 import MoneyFormat from 'app/components/money/MoneyFormat'
 import TechnicianName from 'app/components/renderer/technician/TechnicianName'
+import Transport from 'app/components/renderer/transport/Transport'
 import NoResult from 'app/components/search-and-filter/no-result/NoResult'
 import Searching from 'app/components/search-and-filter/search/Searching'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
@@ -225,6 +226,12 @@ const ManageTakeCareOrder: React.FC = () => {
             dataIndex: 'status',
             width: 200,
             render: (v) => (OrderStatusToTag(v))
+        },
+        {
+            title: 'Nơi chăm sóc',
+            key: 'isTransport',
+            dataIndex: 'isTransport',
+            render: (v) => (<Transport isTransport={v} isRequest />)
         },
         {
             title: 'Phí vận chuyển',

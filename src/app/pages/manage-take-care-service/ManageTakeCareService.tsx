@@ -5,6 +5,7 @@ import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import AssignTechnician from 'app/components/modal/assign-technician/AssignTechnician'
 import UpdateConfirmServiceDetail from 'app/components/modal/update-confirm-service-detail/UpdateConfirmServiceDetail'
 import TechnicianName from 'app/components/renderer/technician/TechnicianName'
+import Transport from 'app/components/renderer/transport/Transport'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
 import useDispatch from 'app/hooks/use-dispatch'
 import { ServiceStatus } from 'app/models/general-type'
@@ -137,6 +138,7 @@ const ManageTakeCareService: React.FC = () => {
             title: 'Mã dịch vụ',
             key: 'serviceCode',
             dataIndex: 'serviceCode',
+            fixed: 'left'
         },
         {
             title: 'Thông tin khách hàng',
@@ -169,6 +171,12 @@ const ManageTakeCareService: React.FC = () => {
             dataIndex: 'status',
             width: 200,
             render: (v) => (ServiceStatusToTag(v))
+        },
+        {
+            title: 'Nơi chăm sóc',
+            key: 'isTransport',
+            dataIndex: 'isTransport',
+            render: (v) => (<Transport isTransport={v} isRequest />)
         },
         {
             title: 'Người chăm sóc',
@@ -272,7 +280,7 @@ const ManageTakeCareService: React.FC = () => {
                     className='table' 
                     columns={ColumnServiceOrder} 
                     dataSource={DataSourceServiceOrder} 
-                    scroll={{ y: 680, x: 1500 }}
+                    scroll={{ y: 680, x: 2000 }}
                 />
             </section>
             {

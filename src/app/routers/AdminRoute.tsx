@@ -91,6 +91,11 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
             return ['10']
         }
 
+        const managerUser = ['users']
+        if(managerUser.includes(affix)){
+            return ['11']
+        }
+
     }, [location])
     const openedKey = useMemo(() =>{
         const affix = location.pathname.split('/')[2]
@@ -113,6 +118,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
        CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/manage-take-care-service'>Yêu cầu chăm sóc</Link>, '8', <MdOutlineInventory2 size={18} />) : null,
        CONSTANT.MANAGE_SHIPPING_FEE.includes(roleName as Role) ? getItem(<Link to='/panel/manage-shipping-fee'>Phí vận chuyển</Link>, '9', <MdOutlineInventory2 size={18} />) : null,
        CONSTANT.TAKE_CARE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/take-care-order-assigned'>Đơn chăm sóc</Link>, '10', <MdOutlineInventory2 size={18} />) : null,
+       CONSTANT.MANAGE_USERS.includes(roleName as Role) ? getItem(<Link to='/panel/users'>Người dùng</Link>, '11', <MdOutlineInventory2 size={18} />) : null,
     ];
   return (
     <>

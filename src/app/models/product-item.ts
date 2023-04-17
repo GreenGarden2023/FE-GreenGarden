@@ -35,6 +35,7 @@ export interface ProductItem{
     type: ProductItemType
     imageURL: string;
     productItemDetail: ProductItemDetail[];
+    rule: string;
 }
 export interface ProductItemResponse{
     paging: Paging;
