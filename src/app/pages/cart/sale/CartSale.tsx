@@ -188,7 +188,7 @@ const CartSale: React.FC<CartSaleProps> = ({items, shipping, onChange, onSubmit}
 
         for (const item of items) {
             totalPriceOrder += item.quantity * item.productItemDetail.salePrice
-            transportFee += ((item.productItemDetail.transportFee * item.quantity))
+            transportFee += (item.productItemDetail.transportFee * item.quantity)
         }
 
         if(!isTransport){
