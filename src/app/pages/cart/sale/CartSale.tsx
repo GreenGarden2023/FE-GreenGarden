@@ -184,11 +184,11 @@ const CartSale: React.FC<CartSaleProps> = ({items, shipping, onChange, onSubmit}
         const [shippingFeeTemp] = shipping.filter(x => x.districtID === shippingID)
 
         let totalPriceOrder = 0
-        let transportFee = 0
+        let transportFee = shippingFeeTemp ? shippingFeeTemp.feeAmount : 0
 
         for (const item of items) {
             totalPriceOrder += item.quantity * item.productItemDetail.salePrice
-            transportFee += ((shippingFeeTemp ? shippingFeeTemp.feeAmount : 0) + (item.productItemDetail.transportFee * item.quantity))
+            transportFee += ((item.productItemDetail.transportFee * item.quantity))
         }
 
         if(!isTransport){
