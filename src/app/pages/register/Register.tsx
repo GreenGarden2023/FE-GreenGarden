@@ -56,7 +56,7 @@ const Register: React.FC = () => {
   const [openModalConfirm, setOpenModalConfirm] = useState(false)
   const [confirmCode, setConfirmCode] = useState('')
 
-  const { handleSubmit, formState: { errors, isSubmitting }, control, setError } = useForm<UserRegister>({
+  const { handleSubmit, formState: { errors, isSubmitting }, control, setError, getValues } = useForm<UserRegister>({
     defaultValues,
     resolver: yupResolver(schema)
   })
@@ -110,6 +110,15 @@ const Register: React.FC = () => {
   const handleCloseModal = () =>{
     setOpenModalConfirm(false)
     setConfirmCode('')
+  }
+
+  const handleVerifyCode = async () =>{
+    const email = getValues('mail')
+    try{
+      await authService.verifyRegisterOtpCode(email, confirmCode)
+    }catch{
+
+    }
   }
 
   return (
@@ -264,15 +273,16 @@ const Register: React.FC = () => {
             open
             title={`Nhập mã xác thực email`}
             onCancel={handleCloseModal}
+            footer={false}
           >
             <Form
-              
+              onFinish={handleVerifyCode}
             >
               <Form.Item label="Mã xác thức" required>
                 <Input value={confirmCode} onChange={(e) => setConfirmCode(e.target.value)} />
               </Form.Item>
               <div className='btn-form-wrapper'>
-                <Button htmlType='button' type='default' className='btn-cancel' size='large' >Hủy bỏ</Button>
+                <Button htmlType='button' type='default' className='btn-cancel' size='large' onClick={handleCloseModal} >Hủy bỏ</Button>
                 <Button htmlType='submit' type='primary' className='btn-update' size='large'>
                     Xác nhận
                 </Button>

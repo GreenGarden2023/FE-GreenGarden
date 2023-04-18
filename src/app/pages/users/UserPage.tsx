@@ -27,6 +27,7 @@ const UserPage: React.FC = () => {
     const [users, setUsers]= useState<User[]>([])
     const [paging, setPaging] = useState<Partial<Paging>>({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_USER})
 
+    const [action, setAction] = useState(0)
     const [userIndex, setUserIndex] = useState(-1)
 
     useEffect(() =>{
@@ -90,9 +91,17 @@ const UserPage: React.FC = () => {
             key: 'actions',
             dataIndex: 'actions',
             render: (_, record, index) => (
-                <Tooltip color='#00a76f' title='Chỉnh sửa'>
-                    <AiOutlineEdit size={25} color='#00a76f' cursor='pointer' onClick={() => setUserIndex(index)} />
-                </Tooltip>
+                <>
+                    {
+                        record.roleName !== 'Customer' && 
+                        <Tooltip color='#00a76f' title='Chỉnh sửa'>
+                            <AiOutlineEdit size={25} color='#00a76f' cursor='pointer' onClick={() => {
+                                setUserIndex(index)
+                                setAction(2)
+                            }} />
+                        </Tooltip>
+                    }
+                </>
             )
         }
     ]
@@ -119,6 +128,7 @@ const UserPage: React.FC = () => {
 
     const handleClose = () =>{
         setUserIndex(-1)
+        setAction(0)
     }
 
     return (
@@ -135,7 +145,7 @@ const UserPage: React.FC = () => {
                 }} />
             </section>
             {
-                userIndex !== -1 &&
+                action !== 0 &&
                 <AdminUpdateUser
                     user={users[userIndex]}
                     shippingFees={shipping}

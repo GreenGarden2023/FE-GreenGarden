@@ -31,13 +31,19 @@ const sendEmailCode = async (email: string) =>{
     return res.data
 }
 
+const verifyRegisterOtpCode = async (email: string, otpCode: string) =>{
+    const res = await golbalAxios.post('/user/verify-register-otp-code', { email, otpCode})
+    return res.data
+}
+
 const authService = {
     register,
     login,
     getUserDetail,
     decodeToken,
     getUserListByRole,
-    sendEmailCode
+    sendEmailCode,
+    verifyRegisterOtpCode
 }
 
 export default authService
