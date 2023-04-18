@@ -51,11 +51,11 @@ const SUPPORT_FORMATS = ['image/png', 'image/jpg', 'image/jpeg']
 
 
 
-const MANAGE_CATEGORY: Role[] = ['Staff', 'Manager']
-const MANAGE_PRODUCT: Role[] = ['Staff', 'Manager']
-const MANAGE_PRODUCT_ITEM: Role[] = ['Staff', 'Manager']
-const MANAGE_SIZE: Role[] = ['Staff', 'Manager']
-const MANAGE_ORDER: Role[] = ['Staff', 'Manager']
+const MANAGE_CATEGORY: Role[] = ['Manager']
+const MANAGE_PRODUCT: Role[] = ['Manager']
+const MANAGE_PRODUCT_ITEM: Role[] = ['Manager']
+const MANAGE_SIZE: Role[] = ['Manager']
+const MANAGE_ORDER: Role[] = ['Manager']
 const MANAGE_SHIPPING_FEE: Role[] = ['Admin']
 const MANAGE_USERS: Role[] = ['Admin']
 const TAKE_CARE_ORDER: Role[] = ['Technician']

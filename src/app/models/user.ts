@@ -1,3 +1,4 @@
+import { Role } from "./general-type";
 import { Paging } from "./paging";
 
 export interface User{
@@ -9,9 +10,9 @@ export interface User{
     phone: string;
     favorite: string;
     mail: string;
-    roleName: string;
+    roleName: Role;
     currentPoint: number;
-    status: 'disable' | 'enable'
+    status: 'disabled' | 'enable'
 }
 
 export interface UserUpdate{
@@ -44,4 +45,16 @@ export interface UserGetByRole{
 export interface UserReponse{
     users: User[]
     paging: Paging
+}
+
+export interface CreateUserByAdmin{
+    userName: string
+    password: string
+    fullName: string
+    address: string
+    districtId: number
+    roleName: Role
+    phone: string
+    favorite: string
+    mail: string
 }

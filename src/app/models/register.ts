@@ -1,3 +1,5 @@
+import { Role } from "./general-type";
+
 export interface UserRegister{
     userName: string;
     password: string;
@@ -9,4 +11,5 @@ export interface UserRegister{
     confirmPassword: string;
     isAgreeTerm: boolean;
     districtID: number;
+    roleName: Role
 }

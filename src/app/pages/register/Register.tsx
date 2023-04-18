@@ -1,4 +1,4 @@
-import { Button, Checkbox, Col, Form, Input, Row, Select } from 'antd';
+import { Button, Checkbox, Col, Form, Input, Modal, Row, Select } from 'antd';
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { MdNavigateNext } from 'react-icons/md';
@@ -30,18 +30,18 @@ const defaultValues: UserRegister = {
   confirmPassword: '',
   isAgreeTerm: false,
   districtID: 1,
+  roleName: 'Customer'
 }
 /* eslint-disable no-useless-escape */
 const schema = yup.object().shape({
-  userName: yup.string().required('username is required').min(5, 'username is greater than 5 characters').max(30, 'username is less than 30 characters'),
-  password: yup.string().required('password is required').min(6, 'password is greater than 6 characters').max(30, 'password is less than 30 characters'),
-  fullName: yup.string().required('Full Name is required').min(5, 'Full Name is greater than 5 characters').max(50, 'Full Name is less than 50 characters'),
-  address: yup.string().required('address is required').min(5, 'Address is greater than 5 characters').max(100, 'Address is less than 100 characters'),
-  phone: yup.string().required('Phone is required').matches(/(84|0[3|5|7|8|9])+([0-9]{8})\b/g, 'Phone is not valid'),
-  favorite: yup.string().required('favorite is required'),
-  mail: yup.string().required('mail is required').matches(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Email is not valid'),
-  confirmPassword: yup.string().required('Confirm password is required').oneOf([yup.ref('password'), null], 'Confirm password must match with password'),
-  isAgreeTerm: yup.boolean().required("The terms and conditions must be accepted.").oneOf([true], "The terms and conditions must be accepted.")
+  userName: yup.string().trim().required('Tài khoản không được để trống').min(5, 'Tài khoản có ít nhất 5 ký tự').max(30, 'Tài khoản có nhiều nhất 30 ký tự'),
+  password: yup.string().trim().required('Mật khẩu không được để trống').min(6, 'Mật khẩu có ít nhất 6 ký tự').max(30, 'Mật khẩu có nhiều nhất 30 ký tự'),
+  fullName: yup.string().trim().required('Họ và tên không được để trống').min(5, 'Họ và tên có ít nhất 5 ký tự').max(50, 'Họ và tên có nhiều nhất 50 ký tự'),
+  address: yup.string().trim().required('Địa chỉ không được để trống').min(5, 'Địa chỉ có ít nhất 5 ký tự').max(100, 'Địa chỉ có nhiều nhất 100 ký tự'),
+  phone: yup.string().trim().required('Số điện thoại không được để trống').matches(/(0[3|5|7|8|9])+([0-9]{8})\b/g, 'Số điện thoại không hợp lệ'),
+  mail: yup.string().trim().required('Email không được để trống').matches(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Email không hợp lệ'),
+  confirmPassword: yup.string().required('Xác thực mật khẩu được để trống').oneOf([yup.ref('password'), null], 'Xác thực mật khẩu không trùng khớp'),
+  isAgreeTerm: yup.boolean().required("Bạn phải đồng ý với các điều khoản trước khi đăng ký tài khoản").oneOf([true], "Bạn phải đồng ý với các điều khoản trước khi đăng ký tài khoản")
 })
 
 const Register: React.FC = () => {
@@ -52,6 +52,9 @@ const Register: React.FC = () => {
   const [viewConPassword, setViewConPassword] = useState(false);
 
   const [shipping, setShipping] = useState<ShippingFee[]>([])
+
+  const [openModalConfirm, setOpenModalConfirm] = useState(false)
+  const [confirmCode, setConfirmCode] = useState('')
 
   const { handleSubmit, formState: { errors, isSubmitting }, control, setError } = useForm<UserRegister>({
     defaultValues,
@@ -90,17 +93,23 @@ const Register: React.FC = () => {
     try{
       const res = await authService.register(data)
       if(res.isSuccess){
-        dispatch(setNoti({type: 'success', message: 'Create account successfully'}))
-        navigate('/login')
+        await authService.sendEmailCode(data.mail)
+        setOpenModalConfirm(true)
+        dispatch(setNoti({type: 'success', message: `Mã xác thực đăng ký đã gửi tới email ${data.mail}. Vui lòng kiểm tra email của bạn.`}))
         return;
       }
       setError('userName', {
         type: 'pattern',
-        message: 'Account existed'
+        message: 'Tài khoản này đã tồn tại'
       })
     }catch(err){
-      dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
+      dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
     }
+  }
+
+  const handleCloseModal = () =>{
+    setOpenModalConfirm(false)
+    setConfirmCode('')
   }
 
   return (
@@ -108,14 +117,14 @@ const Register: React.FC = () => {
         <div className='sign-up-wrapper'>
             <div className="sign-up-box">
                 <div className="left">
-                <h2>Sign up</h2>
+                <h2>Đăng ký</h2>
                   <Form
                     layout='vertical'
                     onFinish={handleSubmit(handleSubmitForm)}
                   >
                     <Row gutter={24}>
                       <Col span={12}>
-                        <Form.Item label='Full name' required validateStatus={errors.fullName ? 'error' : ''} >
+                        <Form.Item label='Họ và tên' required validateStatus={errors.fullName ? 'error' : ''} >
                           <Controller
                             control={control}
                             name='fullName'
@@ -125,7 +134,7 @@ const Register: React.FC = () => {
                         </Form.Item>
                       </Col>
                       <Col span={12}>
-                        <Form.Item label='Address' required validateStatus={errors.address ? 'error' : ''}>
+                        <Form.Item label='Địa chỉ' required validateStatus={errors.address ? 'error' : ''}>
                           <Controller
                             control={control}
                             name='address'
@@ -135,7 +144,7 @@ const Register: React.FC = () => {
                         </Form.Item>
                       </Col>
                       <Col span={24}>
-                        <Form.Item label='Địa chỉ nhận hàng' required validateStatus={errors.address ? 'error' : ''}>
+                        <Form.Item label='Vị trí nhận hàng' required validateStatus={errors.address ? 'error' : ''}>
                           <Controller
                             control={control}
                             name='districtID'
@@ -154,7 +163,7 @@ const Register: React.FC = () => {
                         </Form.Item>
                       </Col>
                       <Col span={12}>
-                        <Form.Item label='Phone' required validateStatus={errors.phone ? 'error' : ''}>
+                        <Form.Item label='Số điện thoại' required validateStatus={errors.phone ? 'error' : ''}>
                           <Controller
                             control={control}
                             name='phone'
@@ -174,7 +183,7 @@ const Register: React.FC = () => {
                         </Form.Item>
                       </Col>
                       <Col span={12}>
-                        <Form.Item label='Username' required validateStatus={errors.userName ? 'error' : ''}>
+                        <Form.Item label='Tài khoản' required validateStatus={errors.userName ? 'error' : ''}>
                           <Controller
                             control={control}
                             name='userName'
@@ -184,7 +193,7 @@ const Register: React.FC = () => {
                         </Form.Item>
                       </Col>
                       <Col span={12}>
-                        <Form.Item label='Favorite' required validateStatus={errors.favorite ? 'error' : ''}>
+                        <Form.Item label='Sở thích' required validateStatus={errors.favorite ? 'error' : ''}>
                           <Controller
                             control={control}
                             name='favorite'
@@ -202,7 +211,7 @@ const Register: React.FC = () => {
                         </Form.Item>
                       </Col>
                       <Col span={12}>
-                          <Form.Item label='Password' required validateStatus={errors.password ? 'error' : ''}>
+                          <Form.Item label='Mật khẩu' required validateStatus={errors.password ? 'error' : ''}>
                             <Controller
                               control={control}
                               name='password'
@@ -212,7 +221,7 @@ const Register: React.FC = () => {
                           </Form.Item>
                       </Col>
                       <Col span={12}>
-                        <Form.Item label='Confirm password' required validateStatus={errors.confirmPassword ? 'error' : ''}>
+                        <Form.Item label='Nhập lại mật khẩu' required validateStatus={errors.confirmPassword ? 'error' : ''}>
                           <Controller
                             control={control}
                             name='confirmPassword'
@@ -226,7 +235,7 @@ const Register: React.FC = () => {
                       <Controller
                         control={control}
                         name='isAgreeTerm'
-                        render={({ field: { value, onChange } }) => <Checkbox checked={value} onChange={onChange} >I agree all statements in <Link to='/term-of-services' target='_blank'>Terms of services</Link></Checkbox>}
+                        render={({ field: { value, onChange } }) => <Checkbox checked={value} onChange={onChange} >Đồng ý với tất cả các điều khoản <Link to='/term-of-services' target='_blank'>Xem điều khoản</Link></Checkbox>}
                       />
                       {errors.isAgreeTerm && (
                         <>
@@ -236,9 +245,9 @@ const Register: React.FC = () => {
                       )}
                     </Form.Item>
                     <div className='btn-box'>
-                      <Button loading={isSubmitting} type='primary' htmlType='submit' className='btn-submit' size='large'>Register</Button>
-                      <Button type='primary' htmlType='button' className='btn-login' size='large' onClick={handleRedirectLogin}>
-                        <span>Login</span>
+                      <Button loading={isSubmitting} type='primary' htmlType='submit' className='btn-submit' size='large'>Đăng ký</Button>
+                      <Button disabled={isSubmitting} type='primary' htmlType='button' className='btn-login' size='large' onClick={handleRedirectLogin}>
+                        <span>Đăng nhập</span>
                         <MdNavigateNext size={20} />
                       </Button>
                     </div>
@@ -248,15 +257,29 @@ const Register: React.FC = () => {
                   <img src='/assets/signup-image.jpg' alt='/' />
                 </div>
             </div>
-            {/* <div className="sign-up-footer">
-                <div className="left">
-
-                </div>
-                <div className="right">
-
-                </div>
-            </div> */}
         </div>
+        {
+          openModalConfirm &&
+          <Modal
+            open
+            title={`Nhập mã xác thực email`}
+            onCancel={handleCloseModal}
+          >
+            <Form
+              
+            >
+              <Form.Item label="Mã xác thức" required>
+                <Input value={confirmCode} onChange={(e) => setConfirmCode(e.target.value)} />
+              </Form.Item>
+              <div className='btn-form-wrapper'>
+                <Button htmlType='button' type='default' className='btn-cancel' size='large' >Hủy bỏ</Button>
+                <Button htmlType='submit' type='primary' className='btn-update' size='large'>
+                    Xác nhận
+                </Button>
+              </div>
+            </Form>
+          </Modal>
+        }
     </div>
   )
 }

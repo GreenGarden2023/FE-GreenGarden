@@ -37,9 +37,9 @@ const Login: React.FC = () => {
         if(location.state && location.state['history']) return navigate(location.state['history'])
         navigate('/')
       }
-      setErrorLogin('Username or Password are not correct')
+      setErrorLogin('Tài khoản hoặc mật khẩu không hợp lệ')
     }catch(err){
-      dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
+      dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
     }
     setSubmitting(false)
   }
@@ -60,7 +60,7 @@ const Login: React.FC = () => {
       {
         isLogged ? <Navigate to='/' /> :
         <div className='sign-in-wrapper'>
-            <h2>Sign up</h2>
+            <h2>Đăng nhập</h2>
             <div className="sign-up-box">
                 <div className="left">
                   <Form
@@ -71,23 +71,23 @@ const Login: React.FC = () => {
                     }}
                     onFinish={handleLogin}
                   >
-                    <Form.Item label='Username' name='username'>
+                    <Form.Item label='Tài khoản' name='username'>
                       <Input />
                     </Form.Item>
-                    <Form.Item label='Password' name='password'>
+                    <Form.Item label='Mật khẩu' name='password'>
                       <Input type='password' />
                     </Form.Item>
                     {errorLogin && <ErrorMessage message={errorLogin} />}
                     <Form.Item>
                         <label className='register-msg'>
-                            You don't have account
-                            <Link to='/register'>Create an account</Link>
+                            Bạn chưa có tài khoản?
+                            <Link to='/register'>Tạo mới tài khoản</Link>
                         </label>
                     </Form.Item>
                     <Form.Item className='btn-box'>
-                      <Button loading={submitting} type='primary' htmlType='submit' className='btn-submit' size='large'>Login</Button>
+                      <Button loading={submitting} type='primary' htmlType='submit' className='btn-submit' size='large'>Đăng nhập</Button>
                       <Button type='primary' htmlType='button' className='btn-back' size='large' onClick={() => navigate('/')}>
-                        Back to store
+                        Quay lại cửa hàng
                       </Button>
                     </Form.Item>
                   </Form>

@@ -9,7 +9,7 @@ const getListAccountByAdmin = async (paging: Partial<PagingProps>) =>{
     return res.data
 }
 
-const updateUserStatus = async (userID: string, status: 'enable' | 'disable') =>{
+const updateUserStatus = async (userID: string, status: 'enable' | 'disabled') =>{
     const res = await golbalAxios.post('/user/update-user-status', { userID, status })
     return res.data
 }

@@ -12,7 +12,7 @@ const initialState: UserLogin = {
         phone: '',
         favorite: '',
         mail: '',
-        roleName: '',
+        roleName: 'Customer',
         currentPoint: 0,
         districtID: 0,
         status: 'enable'

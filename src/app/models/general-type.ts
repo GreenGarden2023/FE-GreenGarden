@@ -1,6 +1,6 @@
 export type Status = 'active' | 'disable' | 'all'
 export type Action = 'Create' | 'Update' | ''
-export type Role = 'Customer' | 'Admin' | 'Staff' | 'Manager' | 'Technician'
+export type Role = 'Customer' | 'Admin' | 'Manager' | 'Technician'
 // 1 rent - 2 sale - 3 all
 export type TypeOfSale = 'rent' | 'sale' | 'all'
 // 1-duy nhất-unique, 2-số lượng lớn-normal

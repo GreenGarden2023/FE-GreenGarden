@@ -13,16 +13,33 @@ import useDispatch from 'app/hooks/use-dispatch'
 import { setNoti } from 'app/slices/notification'
 import { AiOutlineEdit } from 'react-icons/ai'
 import AdminUpdateUser from 'app/components/modal/admin-update-user/AdminUpdateUser'
+import { ShippingFee } from 'app/models/shipping-fee'
+import shippingFeeService from 'app/services/shipping-fee.service'
+
 
 const UserPage: React.FC = () => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 
+    const [shipping, setShipping] = useState<ShippingFee[]>([])
+
     const [users, setUsers]= useState<User[]>([])
     const [paging, setPaging] = useState<Partial<Paging>>({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_USER})
 
     const [userIndex, setUserIndex] = useState(-1)
+
+    useEffect(() =>{
+        const init = async () =>{
+            try{
+                const res = await shippingFeeService.getList();
+                setShipping(res.data)
+            }catch{
+
+            }
+        }
+        init()
+    }, [])
 
     useEffect(() =>{
         const currentPage = searchParams.get('page');
@@ -89,7 +106,7 @@ const UserPage: React.FC = () => {
 
     const handleChangeStatus = async (checked: boolean, index: number) =>{
         const user = users[index]
-        const status = checked ? 'enable' : 'disable'
+        const status = checked ? 'enable' : 'disabled'
         try{
             await userService.updateUserStatus(user.id, status)
             dispatch(setNoti({type: 'success', message: 'Cập nhật trạng thái thành công'}))
@@ -121,6 +138,7 @@ const UserPage: React.FC = () => {
                 userIndex !== -1 &&
                 <AdminUpdateUser
                     user={users[userIndex]}
+                    shippingFees={shipping}
                     onClose={handleClose}
                     onSubmit={() => {}}
                 />

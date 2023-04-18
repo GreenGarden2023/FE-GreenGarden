@@ -25,12 +25,19 @@ const getUserListByRole = async (role: 'admin' | 'technician' | 'customer' | 'ma
     const res = await golbalAxios.get<Response<UserGetByRole[]>>(`/user/get-user-list-by-role?role=${role}`)
     return res.data
 }
+
+const sendEmailCode = async (email: string) =>{
+    const res = await golbalAxios.post(`/user/send-email-code?email=${email}`)
+    return res.data
+}
+
 const authService = {
     register,
     login,
     getUserDetail,
     decodeToken,
-    getUserListByRole
+    getUserListByRole,
+    sendEmailCode
 }
 
 export default authService
