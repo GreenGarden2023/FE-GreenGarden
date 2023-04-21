@@ -6,7 +6,6 @@ import useDispatch from 'app/hooks/use-dispatch';
 import { PaymentControlState } from 'app/models/payment';
 import { ServiceOrderDetail } from 'app/models/service';
 import { CalendarUpdate, ServiceCalendar } from 'app/models/service-calendar';
-import { OrderStatusToTag } from 'app/pages/manage-take-care-order/ManageTakeCareOrder';
 import orderService from 'app/services/order.service';
 import serviceCalendar from 'app/services/service-calendar.service';
 import uploadService from 'app/services/upload.service';
@@ -27,6 +26,7 @@ import Description from 'app/components/renderer/description/Description';
 import TreeName from 'app/components/renderer/tree-name/TreeName';
 import MoneyFormat from 'app/components/money/MoneyFormat';
 import ServiceReportDetail from 'app/components/modal/service-report-detail/ServiceReportDetail';
+import OrderStatusComp from 'app/components/status/OrderStatusComp';
 
 const dateFormatList = ['DD/MM/YYYY', 'DD/MM/YY', 'DD-MM-YYYY', 'DD-MM-YY'];
 
@@ -387,7 +387,9 @@ const TechManageServiceOrderDetail: React.FC = () => {
                                 <Col span={8}>
                                     <div className="item">
                                         <span className="label">Trạng thái đơn hàng</span>
-                                        <span className="content">{OrderStatusToTag(serviceOrder.status)}</span>
+                                        <span className="content">
+                                            <OrderStatusComp status={serviceOrder.status} />
+                                        </span>
                                     </div>
                                 </Col>
                             </Row>

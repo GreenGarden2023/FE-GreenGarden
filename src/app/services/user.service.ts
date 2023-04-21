@@ -1,7 +1,7 @@
 import { PagingProps } from "app/models/paging";
 import golbalAxios from "../utils/http-client";
 import { Response } from "app/models/response";
-import { UserReponse } from "app/models/user";
+import { CreateUserByAdmin, User, UserReponse, UserUpdate } from "app/models/user";
 import queryString from "query-string";
 
 const getListAccountByAdmin = async (paging: Partial<PagingProps>) =>{
@@ -14,15 +14,27 @@ const updateUserStatus = async (userID: string, status: 'enable' | 'disabled') =
     return res.data
 }
 
-const updateUser = async (data: any) =>{
-    const res = await golbalAxios.post('/user/update-user', data)
+const updateUser = async (data: UserUpdate) =>{
+    const res = await golbalAxios.post<Response<User>>('/user/update-user', data)
+    return res.data
+}
+
+const createUserByAdmin = async (data: CreateUserByAdmin) =>{
+    const res = await golbalAxios.post<Response<User>>('/user/create-user-by-admin', data)
+    return res.data
+}
+
+const updateUserByAdmin = async (data: CreateUserByAdmin) =>{
+    const res = await golbalAxios.post<Response<User>>('/user/update-user-by-admin', data)
     return res.data
 }
 
 const userService = {
     getListAccountByAdmin,
     updateUserStatus,
-    updateUser
+    updateUser,
+    createUserByAdmin,
+    updateUserByAdmin
 }
 
 export default userService

@@ -23,8 +23,8 @@ import { GrMore } from 'react-icons/gr'
 import { MdOutlinePayments } from 'react-icons/md'
 import { SiGitextensions } from 'react-icons/si'
 import { useParams } from 'react-router-dom'
-import { OrderStatusToTag } from '../manage-take-care-order/ManageTakeCareOrder'
 import './style.scss'
+import OrderStatusComp from 'app/components/status/OrderStatusComp'
 
 const ClientRentOrderGroup: React.FC = () => {
     const { groupId } = useParams()
@@ -86,7 +86,7 @@ const ClientRentOrderGroup: React.FC = () => {
             dataIndex: 'status',
             align: 'center',
             width: 200,
-            render: (v) => (OrderStatusToTag(v))
+            render: (v) => (<OrderStatusComp status={v} />)
         },
         {
             title: 'Phí vận chuyển',

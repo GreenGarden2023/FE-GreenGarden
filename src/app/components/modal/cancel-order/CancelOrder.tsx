@@ -17,7 +17,10 @@ const CancelOrder: React.FC<CancelOrderProps> = ({ orderId, orderCode, orderType
     const dispatch = useDispatch()
     const [reason, setReason] = useState('')
 
+    const [loading, setLoading] = useState(false)
+
     const handleSubmit = async () =>{
+        setLoading(true)
         try{
             await orderService.cancelOrder(orderId, orderType, reason)
             dispatch(setNoti({type: 'success', message: `Hủy đơn hàng "${orderCode}" thành công`}))
@@ -25,6 +28,7 @@ const CancelOrder: React.FC<CancelOrderProps> = ({ orderId, orderCode, orderType
         }catch{
             
         }
+        setLoading(false)
     }
     return (
         <Modal
@@ -42,8 +46,8 @@ const CancelOrder: React.FC<CancelOrderProps> = ({ orderId, orderCode, orderType
                     <Input.TextArea autoSize={{minRows: 4, maxRows: 6}} value={reason} onChange={(e) => setReason(e.target.value)} ></Input.TextArea>
                 </Form.Item>
                 <div className='btn-form-wrapper'>
-                    <Button htmlType='button' type='default' className='btn-cancel' size='large' onClick={onClose}>Hủy bỏ</Button>
-                    <Button htmlType='submit' type='primary' className='btn-update' size='large'>
+                    <Button htmlType='button' disabled={loading} type='default' className='btn-cancel' size='large' onClick={onClose}>Hủy bỏ</Button>
+                    <Button htmlType='submit' loading={loading} type='primary' className='btn-update' size='large'>
                         Xác nhận
                     </Button>
                 </div>

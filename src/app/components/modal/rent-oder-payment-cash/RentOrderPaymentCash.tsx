@@ -1,4 +1,4 @@
-import { Modal } from 'antd';
+import { Button, Modal } from 'antd';
 import UserInforOrder from 'app/components/user-infor/user-infor-order/UserInforOrder';
 import useDispatch from 'app/hooks/use-dispatch';
 import { RentOrderList } from 'app/models/order';
@@ -62,12 +62,18 @@ const RentOrderPaymentCash: React.FC<RentOrderPaymentCashProps> = ({rentOrderLis
             title={`Thanh toán tiền cho đơn hàng "${rentOrderList.orderCode}"`}
             open
             onCancel={handleClose}
-            onOk={handlePaymentCash}
             width={1000}
+            footer={false}
         >
             <p>Nhập số tiền cần thanh toán (VND)</p>
             <CurrencyFormat min={0} value={amount} isAllowed={handleChangeAmount} className='currency-input' thousandSeparator={true} />
             <UserInforOrder {...InforOrder} />
+            <div className='btn-form-wrapper mt-10'>
+                <Button type='default' className='btn-cancel' size='large' onClick={onClose} >Hủy bỏ</Button>
+                <Button type='primary' className='btn-update' size='large' onClick={handlePaymentCash}>
+                    Thanh toán
+                </Button>
+            </div>
         </Modal>
     )
 }

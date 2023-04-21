@@ -9,6 +9,7 @@ import utilDateTime from 'app/utils/date-time';
 import MoneyFormat from 'app/components/money/MoneyFormat';
 import { BiShoppingBag } from 'react-icons/bi';
 import Description from 'app/components/renderer/description/Description';
+import LoadingView from 'app/components/loading-view/LoadingView';
 
 interface TransactionDetailProps{
     orderId: string;
@@ -20,8 +21,10 @@ interface TransactionDetailProps{
 const TransactionDetail: React.FC<TransactionDetailProps> = ({orderId, orderType, orderCode, onClose}) => {
 
     const [transactions, setTransactions] = useState<Transaction[]>([])
+    const [loading, setLoading] = useState(false)
 
     useEffect(() =>{
+        setLoading(true)
         const init = async () =>{
             try{
                 const res = await transactionService.getTransactionByOrder(orderId, orderType)
@@ -32,6 +35,7 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({orderId, orderType
             }
         }
         init()
+        setLoading(false)
     }, [orderId, orderType])
 
     const Column: ColumnsType<any> = [
@@ -92,17 +96,23 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({orderId, orderType
             width={1000}
         >
             {
-                transactions.length === 0 ? 
-                <div className='no-transaction'>
-                    <BiShoppingBag size={30} color='#0099FF' />
-                    <span>Chưa có giao dịch nào cho đơn hàng "{orderCode}"</span>
-                </div> : 
-                <Table
-                    dataSource={DataSource} 
-                    columns={Column} 
-                    scroll={{ y: 680 }}
-                    pagination={false}
-                />
+                loading ?
+                <LoadingView loading={loading} /> :
+                <>
+                    {
+                        transactions.length === 0 ? 
+                        <div className='no-transaction'>
+                            <BiShoppingBag size={30} color='#0099FF' />
+                            <span>Chưa có giao dịch nào cho đơn hàng "{orderCode}"</span>
+                        </div> : 
+                        <Table
+                            dataSource={DataSource} 
+                            columns={Column} 
+                            scroll={{ y: 680 }}
+                            pagination={false}
+                        />
+                    }
+                </>
             }
         </Modal>
     )

@@ -1,12 +1,15 @@
 import { Button, Col, Form, Input, Modal, Radio, RadioChangeEvent, Row } from 'antd';
 import MoneyFormat from 'app/components/money/MoneyFormat';
 import CurrencyInput from 'app/components/renderer/currency-input/CurrencyInput';
+import UserInforOrder from 'app/components/user-infor/user-infor-order/UserInforOrder';
 import useDispatch from 'app/hooks/use-dispatch';
 import { RentOrderList } from 'app/models/order'
 import { TransactionHandle } from 'app/models/transaction';
 import orderService from 'app/services/order.service';
 import transactionService from 'app/services/transaction.service';
 import { setNoti } from 'app/slices/notification';
+import CONSTANT from 'app/utils/constant';
+import utilDateTime from 'app/utils/date-time';
 import React, { useMemo, useState } from 'react'
 import CurrencyFormat from 'react-currency-format';
 
@@ -22,6 +25,8 @@ const ReturnDepositRentOrder: React.FC<ReturnDepositRentOrderProps> = ({rentOrde
     const [amount, setAmount] = useState(0)
     const [days, setDays] = useState(0)
 
+    const [loading, setLoading] = useState(false)
+
     const TotalPayment = useMemo(() =>{
         let total = 0
 
@@ -33,6 +38,7 @@ const ReturnDepositRentOrder: React.FC<ReturnDepositRentOrderProps> = ({rentOrde
     }, [rentOrderList, days, amount])
 
     const handleConfirmReturnDeposit = async () =>{
+        setLoading(true)
         try{
             switch(value){
                 case 2:
@@ -95,8 +101,9 @@ const ReturnDepositRentOrder: React.FC<ReturnDepositRentOrderProps> = ({rentOrde
             dispatch(setNoti({type: 'success', message: `Xác nhận tất toán cho đơn hàng "${rentOrderList.orderCode}" thành công`}))
             onSubmit()
         }catch{
-
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
+        setLoading(false)
     }
     const handleChangeAmount = (values: CurrencyFormat.Values) =>{
         const { floatValue } = values
@@ -114,6 +121,35 @@ const ReturnDepositRentOrder: React.FC<ReturnDepositRentOrderProps> = ({rentOrde
         setAmount(0)
         setValue(e.target.value)
     }
+
+    const UserInforDetail = useMemo(() =>{
+    //     name?: string;
+    // phone?: string;
+    // address?: string;
+    // createOrderDate?: string;
+    // startDate?: string;
+    // endDate?: string;
+    // status?: OrderStatus;
+    // transportFee?: number;
+    // totalOrder?: number;
+    // remainMoney?: number;
+    // deposit?: number;
+    // reason?: string;
+        const { recipientName, recipientPhone, recipientAddress, createDate, startRentDate, endRentDate, status, transportFee, totalPrice,
+        remainMoney, deposit, reason } = rentOrderList
+
+        return {
+            name: recipientName,
+            phone: recipientPhone,
+            address: recipientAddress,
+            createOrderDate: utilDateTime.dateToString(createDate.toString()),
+            startDate:  utilDateTime.dateToString(startRentDate.toString()),
+            endDate: utilDateTime.dateToString(endRentDate.toString()),
+            status, transportFee,
+            totalOrder: totalPrice,
+            remainMoney, deposit, reason
+        }
+    }, [rentOrderList])
 
     return (
         <Modal
@@ -168,13 +204,17 @@ const ReturnDepositRentOrder: React.FC<ReturnDepositRentOrderProps> = ({rentOrde
                         <MoneyFormat value={TotalPayment} isHighlight color='Blue' />
                     </Form.Item>
                 }
-                <div className='btn-form-wrapper'>
-                    <Button htmlType='button' type='default' className='btn-cancel' size='large' >Hủy bỏ</Button>
-                    <Button htmlType='submit' type='primary' className='btn-update' size='large'>
+                <div>
+                    <UserInforOrder {...UserInforDetail} />
+                </div>
+                <div className='btn-form-wrapper' style={{marginTop: '10px'}}>
+                    <Button htmlType='button' disabled={loading} type='default' className='btn-cancel' size='large' >Hủy bỏ</Button>
+                    <Button htmlType='submit' loading={loading} type='primary' className='btn-update' size='large'>
                         Xác nhận
                     </Button>
                 </div>
             </Form>
+            
         </Modal>
     )
 }

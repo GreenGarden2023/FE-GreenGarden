@@ -1,4 +1,4 @@
-import { Modal } from 'antd';
+import { Button, Modal } from 'antd';
 import useDispatch from 'app/hooks/use-dispatch';
 import orderService from 'app/services/order.service';
 import { setNoti } from 'app/slices/notification';
@@ -16,7 +16,7 @@ const SaleDelivery: React.FC<SaleDeliveryProps> = ({orderId, orderCode, type, on
     const dispatch = useDispatch()
 
     const [loading, setLoading] = useState(false)
-    console.log(loading)
+    
 
     const handleSubmitForm = async () =>{
         setLoading(true)
@@ -44,10 +44,15 @@ const SaleDelivery: React.FC<SaleDeliveryProps> = ({orderId, orderCode, type, on
         <Modal
             open
             title={`Chuyển trạng thái vận chuyển cho đơn hàng "${orderCode}"`}
-            onCancel={onClose}
             onOk={handleSubmitForm}
+            footer={false}
         >
-
+            <div className='btn-form-wrapper mt-10'>
+                <Button htmlType='button' disabled={loading} type='default' className='btn-cancel' size='large' onClick={onClose} >Hủy bỏ</Button>
+                <Button htmlType='submit' loading={loading} type='primary' className='btn-update' size='large' onClick={handleSubmitForm}>
+                    Chuyển trạng thái
+                </Button>
+            </div>
         </Modal>
     )
 }

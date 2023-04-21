@@ -27,6 +27,7 @@ const CheckoutSuccess: React.FC = () => {
                         <AiFillCheckCircle size={50} color='#fff' />
                         <p className="cos-notify">Tạo mới đơn hàng thành công</p>
                         <p className="cos-content">Đơn hàng của bạn đang được xử lý. Cảm ơn đã sử dụng dịch vụ của chúng tôi.</p>
+                        <p className="cos-content">Vui lòng thanh toán cọc để nhận được cây</p>
                         <div className="btn-box">
                             <button className="btn btn-view-order" onClick={() => navigate('/orders')}>
                                 <MdOutlineInventory2 size={20} />

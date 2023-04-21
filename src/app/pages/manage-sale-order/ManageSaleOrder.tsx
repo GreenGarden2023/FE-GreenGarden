@@ -1,18 +1,22 @@
-import { Modal, Popover } from 'antd'
+import { Button, Modal, Popover } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import CancelOrder from 'app/components/modal/cancel-order/CancelOrder'
 import ModalClientSaleOrderDetai from 'app/components/modal/client-sale-order-detail/ModalClientSaleOrderDetai'
+import SaleDelivery from 'app/components/modal/delivery/sale-delivery/SaleDelivery'
+import FinishOrder from 'app/components/modal/finish-order/FinishOrder'
 import RefundOrder from 'app/components/modal/refundOrder.tsx/RefundOrder'
 import TransactionDetail from 'app/components/modal/transaction-detail/TransactionDetail'
 import MoneyFormat from 'app/components/money/MoneyFormat'
 import Transport from 'app/components/renderer/transport/Transport'
 import NoResult from 'app/components/search-and-filter/no-result/NoResult'
 import Searching from 'app/components/search-and-filter/search/Searching'
+import OrderStatusComp from 'app/components/status/OrderStatusComp'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
 import UserInforOrder from 'app/components/user-infor/user-infor-order/UserInforOrder'
 import useDispatch from 'app/hooks/use-dispatch'
 import useSelector from 'app/hooks/use-selector'
+import { OrderStatus } from 'app/models/general-type'
 import { SaleOrderList } from 'app/models/order'
 import { Paging } from 'app/models/paging'
 import { PaymentControlState } from 'app/models/payment'
@@ -24,22 +28,24 @@ import utilDateTime from 'app/utils/date-time'
 import pagingPath from 'app/utils/paging-path'
 import React, { useEffect, useMemo, useState } from 'react'
 import CurrencyFormat from 'react-currency-format'
+import { AiOutlineTransaction } from 'react-icons/ai'
 import { BiDetail } from 'react-icons/bi'
+import { BsCheck2All } from 'react-icons/bs'
+import { CiDeliveryTruck } from 'react-icons/ci'
+import { GiReturnArrow } from 'react-icons/gi'
 import { GrMore } from 'react-icons/gr'
-import { MdOutlinePayments } from 'react-icons/md'
-import { RiBillLine } from 'react-icons/ri'
+import { MdCancelPresentation, MdOutlinePayment, MdOutlinePayments } from 'react-icons/md'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import './style.scss'
-import OrderStatusComp from 'app/components/status/OrderStatusComp'
-import SaleDelivery from 'app/components/modal/delivery/sale-delivery/SaleDelivery'
-import FinishOrder from 'app/components/modal/finish-order/FinishOrder'
-import { OrderStatus } from 'app/models/general-type'
 
 const ManageSaleOrder: React.FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const { search } = useSelector(state => state.SearchFilter)
+
+    const [loading, setLoading] = useState(false)
+    const [loadingAction, setLoadingAction] = useState(false)
 
     // data
     const [saleOrders, setSaleOrders] = useState<SaleOrderList[]>([]);
@@ -52,6 +58,7 @@ const ManageSaleOrder: React.FC = () => {
     const [recall, setRecall] = useState(true)
 
     useEffect(() =>{
+        setLoading(true)
         pagingPath.scrollTop()
         const currentPage = searchParams.get('page');
         if(!pagingPath.isValidPaging(currentPage)){
@@ -75,19 +82,7 @@ const ManageSaleOrder: React.FC = () => {
             }
             init()
         }
-        // if(!recall) return;
-
-        // const init = async () =>{
-        //     try{
-        //         const res = await orderService.getAllSaleOrders({curPage: Number(currentPage), pageSize: paging.pageSize})
-        //         setSaleOrders(res.data.saleOrderList)
-        //         setPaging(res.data.paging)
-        //     }catch{
-                
-        //     }
-        //     // setRecall(false)
-        // }
-        // init()
+        setLoading(false)
     }, [navigate, searchParams, paging.pageSize, recall, search])
     const handleSetAction = (data: PaymentControlState) =>{
         const { orderId, actionType } = data
@@ -214,7 +209,7 @@ const ManageSaleOrder: React.FC = () => {
                 <div className="item" onClick={() => {
                     handleSetAction({orderId: record.orderId, actionType: 'view transaction', orderType: 'sale', openIndex: -1})
                 }}>
-                    <BiDetail size={25} className='icon'/>
+                    <AiOutlineTransaction size={25} className='icon'/>
                     <span>Xem giao dịch</span>
                 </div>
                 {
@@ -231,7 +226,7 @@ const ManageSaleOrder: React.FC = () => {
                     <div className="item" onClick={() => {
                         handleSetAction({orderId: record.orderId, actionType: 'remaining', orderType: 'sale', openIndex: -1})
                     }}>
-                        <RiBillLine size={25} className='icon'/>
+                        <MdOutlinePayment size={25} className='icon'/>
                         <span>Thanh toán đơn hàng</span>
                     </div>
                 }
@@ -240,7 +235,7 @@ const ManageSaleOrder: React.FC = () => {
                     <div className="item" onClick={() => {
                         handleSetAction({orderId: record.orderId, actionType: 'delivery', orderType: 'sale', openIndex: -1})
                     }}>
-                        <RiBillLine size={25} className='icon'/>
+                        <CiDeliveryTruck size={25} className='icon'/>
                         <span>Vận chuyển</span>
                     </div>
                 }
@@ -249,7 +244,7 @@ const ManageSaleOrder: React.FC = () => {
                     <div className="item" onClick={() => {
                         handleSetAction({orderId: record.orderId, actionType: 'finished', orderType: 'sale', openIndex: -1})
                     }}>
-                        <RiBillLine size={25} className='icon'/>
+                        <BsCheck2All size={25} className='icon'/>
                         <span>Hoàn thành</span>
                     </div>
                 }
@@ -258,7 +253,7 @@ const ManageSaleOrder: React.FC = () => {
                     <div className="item" onClick={() => {
                         handleSetAction({orderId: record.orderId, actionType: 'cancel', orderType: 'sale', openIndex: -1})
                     }}>
-                        <RiBillLine size={25} className='icon'/>
+                        <MdCancelPresentation size={25} className='icon'/>
                         <span>Hủy đơn hàng</span>
                     </div>
                 }
@@ -267,7 +262,7 @@ const ManageSaleOrder: React.FC = () => {
                     <div className="item" onClick={() => {
                         handleSetAction({orderId: record.orderId, actionType: 'refund', orderType: 'sale', openIndex: -1})
                     }}>
-                        <BiDetail size={25} className='icon'/>
+                        <GiReturnArrow size={25} className='icon'/>
                         <span>Hoàn tiền</span>
                     </div>
                 }
@@ -299,6 +294,7 @@ const ManageSaleOrder: React.FC = () => {
     }
 
     const handlePaymentDeposit = async () =>{
+        setLoadingAction(true)
         try{
             await paymentService.depositPaymentCash(actionMethod?.orderId || '', 'sale')
             setSaleOrders(saleOrders.map(x => x.id === actionMethod?.orderId ? ({
@@ -312,10 +308,12 @@ const ManageSaleOrder: React.FC = () => {
         }catch{
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
+        setLoadingAction(false)
     }
     
 
     const handlePaymentCash = async () =>{
+        setLoadingAction(true)
         if(amount < 1000){
             dispatch(setNoti({type: 'error', message: 'Số tiền nhập vào ít nhất là 1.000 VNĐ'}))
             return;
@@ -337,6 +335,7 @@ const ManageSaleOrder: React.FC = () => {
         }catch{
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
+        setLoadingAction(false)
     }
     const handleCancelOrder = async (reason: string) =>{
         const [order] = saleOrders.filter(x => x.id === actionMethod?.orderId)
@@ -406,6 +405,7 @@ const ManageSaleOrder: React.FC = () => {
                             navigate(`/panel/sale-order?page=${page}`)
                         }
                     }}
+                    loading={loading}
                 />
             }
             </section>
@@ -421,12 +421,18 @@ const ManageSaleOrder: React.FC = () => {
                 <Modal
                     title='Thanh toán tiền đặt cọc'
                     open
-                    onOk={handlePaymentDeposit}
                     onCancel={handleCancel}
                     width={1000}
+                    footer={false}
                 >
                     <h3>Xác nhận thanh toán đặt cọc cho đơn hàng {saleOrders.filter(x => x.id === actionMethod?.orderId)[0].orderCode}</h3>
                     <UserInforOrder {...OrderDetail} />
+                    <div className='btn-form-wrapper mt-10'>
+                        <Button htmlType='button' disabled={loadingAction} type='default' className='btn-cancel' size='large' onClick={handleCancel} >Hủy bỏ</Button>
+                        <Button htmlType='submit' loading={loadingAction} type='primary' className='btn-update' size='large' onClick={handlePaymentDeposit}>
+                            Thanh toán
+                        </Button>
+                    </div>
                 </Modal>
             }
             {
@@ -435,8 +441,8 @@ const ManageSaleOrder: React.FC = () => {
                     title={`Thanh toán tiền cho đơn hàng "${saleOrders.filter(x => x.id === actionMethod?.orderId)[0].orderCode}"`}
                     open
                     onCancel={handleCancel}
-                    onOk={handlePaymentCash}
                     width={1000}
+                    footer={false}
                 >
                     <p>Nhập số tiền cần thanh toán (VND)</p>
                     <CurrencyFormat isAllowed={(values) => {
@@ -453,6 +459,12 @@ const ManageSaleOrder: React.FC = () => {
                     value={amount} 
                     max={saleOrders.filter(x => x.id === actionMethod?.orderId)[0].remainMoney} thousandSeparator={true}/>
                     <UserInforOrder {...OrderDetail} />
+                    <div className='btn-form-wrapper mt-10'>
+                        <Button htmlType='button' disabled={loadingAction} type='default' className='btn-cancel' size='large' onClick={handleCancel} >Hủy bỏ</Button>
+                        <Button htmlType='submit' loading={loadingAction} type='primary' className='btn-update' size='large' onClick={handlePaymentCash}>
+                            Thanh toán
+                        </Button>
+                    </div>
                 </Modal>
             }
             {

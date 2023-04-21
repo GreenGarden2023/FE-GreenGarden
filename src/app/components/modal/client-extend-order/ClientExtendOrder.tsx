@@ -541,7 +541,7 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
                                 </Col>
                                 <Col span={24} >
                                     <div className='btn-form-wrapper'>
-                                        <Button htmlType='button' loading={isSubmitting} type='default' size='large' className='btn-cancel'>Hủy</Button>
+                                        <Button htmlType='button' disabled={isSubmitting} type='default' size='large' className='btn-cancel'>Hủy</Button>
                                         <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large'>
                                             Gia hạn
                                         </Button>

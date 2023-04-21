@@ -38,8 +38,8 @@ const schema = yup.object().shape({
   password: yup.string().trim().required('Mật khẩu không được để trống').min(6, 'Mật khẩu có ít nhất 6 ký tự').max(30, 'Mật khẩu có nhiều nhất 30 ký tự'),
   fullName: yup.string().trim().required('Họ và tên không được để trống').min(5, 'Họ và tên có ít nhất 5 ký tự').max(50, 'Họ và tên có nhiều nhất 50 ký tự'),
   address: yup.string().trim().required('Địa chỉ không được để trống').min(5, 'Địa chỉ có ít nhất 5 ký tự').max(100, 'Địa chỉ có nhiều nhất 100 ký tự'),
-  phone: yup.string().trim().required('Số điện thoại không được để trống').matches(/(0[3|5|7|8|9])+([0-9]{8})\b/g, 'Số điện thoại không hợp lệ'),
-  mail: yup.string().trim().required('Email không được để trống').matches(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Email không hợp lệ'),
+  phone: yup.string().trim().required('Số điện thoại không được để trống').matches(CONSTANT.PHONE_REGEX, 'Số điện thoại không hợp lệ'),
+  mail: yup.string().trim().required('Email không được để trống').matches(CONSTANT.EMAIL_REGEX, 'Email không hợp lệ'),
   confirmPassword: yup.string().required('Xác thực mật khẩu được để trống').oneOf([yup.ref('password'), null], 'Xác thực mật khẩu không trùng khớp'),
   isAgreeTerm: yup.boolean().required("Bạn phải đồng ý với các điều khoản trước khi đăng ký tài khoản").oneOf([true], "Bạn phải đồng ý với các điều khoản trước khi đăng ký tài khoản")
 })
@@ -56,7 +56,7 @@ const Register: React.FC = () => {
   const [openModalConfirm, setOpenModalConfirm] = useState(false)
   const [confirmCode, setConfirmCode] = useState('')
 
-  const { handleSubmit, formState: { errors, isSubmitting }, control, setError, getValues } = useForm<UserRegister>({
+  const { handleSubmit, formState: { errors, isSubmitting }, control, getValues } = useForm<UserRegister>({
     defaultValues,
     resolver: yupResolver(schema)
   })
@@ -98,10 +98,7 @@ const Register: React.FC = () => {
         dispatch(setNoti({type: 'success', message: `Mã xác thực đăng ký đã gửi tới email ${data.mail}. Vui lòng kiểm tra email của bạn.`}))
         return;
       }
-      setError('userName', {
-        type: 'pattern',
-        message: 'Tài khoản này đã tồn tại'
-      })
+      dispatch(setNoti({type: 'success', message: res.message}))
     }catch(err){
       dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
     }
@@ -115,7 +112,13 @@ const Register: React.FC = () => {
   const handleVerifyCode = async () =>{
     const email = getValues('mail')
     try{
-      await authService.verifyRegisterOtpCode(email, confirmCode)
+      const res = await authService.verifyRegisterOtpCode(email, confirmCode)
+      if(res.isSuccess){
+        dispatch(setNoti({type: 'success', message: 'Tạo mới tài khoản thành công'}))
+        navigate('/login')
+        return;
+      }
+      dispatch(setNoti({type: 'error', message: res.message}))
     }catch{
 
     }

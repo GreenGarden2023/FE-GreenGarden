@@ -20,7 +20,7 @@ import { useParams } from 'react-router-dom'
 import './style.scss'
 import pagingPath from 'app/utils/paging-path'
 import ServiceReportDetail from 'app/components/modal/service-report-detail/ServiceReportDetail'
-import { OrderStatusToTag } from 'app/pages/manage-take-care-order/ManageTakeCareOrder'
+import OrderStatusComp from 'app/components/status/OrderStatusComp'
 
 const ClientManageTakeCareServiceDetail: React.FC = () => {
     const { orderId } = useParams()
@@ -220,7 +220,9 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
                                 </Col>
                                 <Col span={8} style={{display: 'flex'}}>
                                     <span className="label">Trạng thái đơn hàng</span>
-                                    <span className="content">{OrderStatusToTag(serviceOrder.status)}</span>
+                                    <span className="content">
+                                        <OrderStatusComp status={serviceOrder.status} />
+                                    </span>
                                 </Col>
                             </Row>
                         </div>

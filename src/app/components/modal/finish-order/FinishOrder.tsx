@@ -1,8 +1,8 @@
-import { Modal } from 'antd';
+import { Button, Modal } from 'antd';
 import useDispatch from 'app/hooks/use-dispatch';
 import orderService from 'app/services/order.service';
 import { setNoti } from 'app/slices/notification';
-import React from 'react'
+import React, { useState } from 'react'
 
 interface FinishOrderProps{
     orderId: string;
@@ -14,8 +14,11 @@ interface FinishOrderProps{
 
 const FinishOrder: React.FC<FinishOrderProps> = ({ orderId, orderCode, type, onClose, onSubmit }) => {
     const dispatch = useDispatch();
+    
+    const [loading, setLoading] = useState(false)
 
     const handleSubmitForm = async () =>{
+        setLoading(true)
         if(type === 'sale'){
             try{
                 await orderService.updateSaleOrderStatus(orderId, 'completed')
@@ -33,15 +36,21 @@ const FinishOrder: React.FC<FinishOrderProps> = ({ orderId, orderCode, type, onC
 
             }
         }
+        setLoading(false)
     }
     return (
         <Modal
             open
             title={`Xác nhận đã hoàn thành đơn hàng "${orderCode}"`}
             onCancel={onClose}
-            onOk={handleSubmitForm}
+            footer={false}
         >
-
+            <div className='btn-form-wrapper mt-10'>
+                <Button htmlType='button' disabled={loading} type='default' className='btn-cancel' size='large' onClick={onClose} >Hủy bỏ</Button>
+                <Button htmlType='submit' loading={loading} type='primary' className='btn-update' size='large' onClick={handleSubmitForm}>
+                    Xác nhận
+                </Button>
+            </div>
         </Modal>
     )
 }

@@ -26,12 +26,13 @@ import pagingPath from 'app/utils/paging-path';
 import React, { useEffect, useMemo, useState } from 'react';
 import { BiCommentDetail, BiDetail } from 'react-icons/bi';
 import { GrMore } from 'react-icons/gr';
-import { MdOutlinePayments } from 'react-icons/md';
+import { MdCancelPresentation, MdFeedback, MdOutlinePayment, MdOutlinePayments } from 'react-icons/md';
 import { SiGitextensions } from 'react-icons/si';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { OrderStatusToTag } from '../manage-take-care-order/ManageTakeCareOrder';
 import './style.scss';
 import { setTitle } from 'app/slices/window-title';
+import OrderStatusComp from 'app/components/status/OrderStatusComp';
+import { FaLayerGroup } from 'react-icons/fa';
 
 type OrderPage = 'rent' | 'sale' | 'service'
 
@@ -216,7 +217,7 @@ const ClientOrder: React.FC = () =>{
             dataIndex: 'status',
             align: 'center',
             width: 200,
-            render: (v) => (OrderStatusToTag(v))
+            render: (v) => (<OrderStatusComp status={v} />)
         },
         {
             title: 'Phí vận chuyển',
@@ -286,7 +287,7 @@ const ClientOrder: React.FC = () =>{
                 <div className="item" onClick={() => {
                     setActionMethod({orderId: record.orderId, actionType: 'detail', orderType: 'sale', openIndex: -1})
                 }}>
-                    <BiCommentDetail size={25} className='icon'/>
+                    <BiDetail size={25} className='icon'/>
                     <span>Chi tiết đơn hàng</span>
                 </div>
                 {
@@ -299,19 +300,19 @@ const ClientOrder: React.FC = () =>{
                     </div>
                 }
                 {
-                    record.status === 'completed' &&
-                    <div className="item" onClick={() => navigate(`/order/sale/feedback/${record.orderId}`)} >
-                        <MdOutlinePayments size={25} className='icon'/>
-                        <span>Đánh giá</span>
-                    </div>
-                }
-                {
                     (record.status === 'unpaid' || record.status === 'ready') &&
                     <div className="item" onClick={() => {
                         handlePaymentSale({orderId: record.orderId, actionType: 'remaining', orderType: 'sale', openIndex: -1})
                     }} >
-                        <MdOutlinePayments size={25} className='icon'/>
+                        <MdOutlinePayment size={25} className='icon'/>
                         <span>Thanh toán đơn hàng bằng Momo</span>
+                    </div>
+                }
+                {
+                    record.status === 'completed' &&
+                    <div className="item" onClick={() => navigate(`/order/sale/feedback/${record.orderId}`)} >
+                        <MdFeedback size={25} className='icon'/>
+                        <span>Đánh giá</span>
                     </div>
                 }
                 {
@@ -319,7 +320,7 @@ const ClientOrder: React.FC = () =>{
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.orderId, actionType: 'cancel', orderType: 'sale', openIndex: -1})
                     }} >
-                        <MdOutlinePayments size={25} className='icon'/>
+                        <MdCancelPresentation size={25} className='icon'/>
                         <span>Hủy đơn hàng</span>
                     </div>
                 }
@@ -367,7 +368,7 @@ const ClientOrder: React.FC = () =>{
             key: 'status',
             dataIndex: 'status',
             width: 200,
-            render: (v) => (OrderStatusToTag(v))
+            render: (v) => (<OrderStatusComp status={v} />)
         },
         {
             title: 'Phí vận chuyển',
@@ -381,6 +382,7 @@ const ClientOrder: React.FC = () =>{
             key: 'deposit',
             dataIndex: 'deposit',
             align: 'right',
+            width: 150,
             render: (v) => (<MoneyFormat value={v} color='Orange' />)
         },
         {
@@ -388,6 +390,7 @@ const ClientOrder: React.FC = () =>{
             key: 'discountAmount',
             dataIndex: 'discountAmount',
             align: 'right',
+            width: 150,
             render: (v) => (<MoneyFormat value={v} color='Yellow' />)
         },
         {
@@ -395,6 +398,7 @@ const ClientOrder: React.FC = () =>{
             key: 'totalPrice',
             dataIndex: 'totalPrice',
             align: 'right',
+            width: 150,
             render: (v) => (<MoneyFormat value={v} color='Light Blue' />)
         },
         {
@@ -402,6 +406,7 @@ const ClientOrder: React.FC = () =>{
             key: 'remainMoney',
             dataIndex: 'remainMoney',
             align: 'right',
+            width: 150,
             render: (v) => (<MoneyFormat value={v} color='Blue' />)
         },
         {
@@ -440,11 +445,11 @@ const ClientOrder: React.FC = () =>{
                     <span>Chi tiết đơn hàng</span>
                 </div>
                 <div className="item" onClick={() => navigate(`/order-group/${record.groupID}`)}>
-                    <BiDetail size={25} className='icon'/>
+                    <FaLayerGroup size={25} className='icon'/>
                     <span>Xem nhóm đơn hàng</span>
                 </div>
                 {
-                    (record.status === 'paid' && utilDateTime.isDisplayExtendRentOrder(new Date())) && 
+                    ((record.status === 'paid' || record.status === 'renting') && utilDateTime.isDisplayExtendRentOrder(record.endDateRent)) && 
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.orderId, actionType: 'extend', orderType: 'rent', openIndex: -1})
                     }}>
@@ -453,7 +458,7 @@ const ClientOrder: React.FC = () =>{
                     </div>
                 }
                 {
-                    record.status === 'unpaid' &&
+                    (record.status === 'unpaid') &&
                     <div className="item" onClick={() => {
                         handlePaymentRent({orderId: record.orderId, actionType: 'deposit', orderType: 'rent', openIndex: -1})
                     }} >
@@ -466,7 +471,7 @@ const ClientOrder: React.FC = () =>{
                     <div className="item" onClick={() => {
                         handlePaymentRent({orderId: record.orderId, actionType: 'remaining', orderType: 'rent', openIndex: -1})
                     }} >
-                        <MdOutlinePayments size={25} className='icon'/>
+                        <MdOutlinePayment size={25} className='icon'/>
                         <span>Thanh toán đơn hàng bằng Momo</span>
                     </div>
                 }
@@ -475,7 +480,7 @@ const ClientOrder: React.FC = () =>{
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.orderId, actionType: 'cancel', orderType: 'rent', openIndex: -1})
                     }} >
-                        <MdOutlinePayments size={25} className='icon'/>
+                        <MdCancelPresentation size={25} className='icon'/>
                         <span>Hủy đơn hàng</span>
                     </div>
                 }
@@ -610,7 +615,7 @@ const ClientOrder: React.FC = () =>{
             key: 'status',
             dataIndex: 'status',
             width: 200,
-            render: (v) => (OrderStatusToTag(v))
+            render: (v) => (<OrderStatusComp status={v} />)
         },
         {
             title: 'Người chăm sóc',
@@ -719,9 +724,10 @@ const ClientOrder: React.FC = () =>{
     const handleCancel = () =>{
         setActionMethod(undefined)
     }
-    const handleCancelRentOrder = () =>{
+    const handleCancelRentOrder = (reason: string) =>{
         const [order] = rentOrders.filter(x => x.rentOrderList[0].id === actionMethod?.orderId)[0].rentOrderList
         order.status = 'cancel'
+        order.reason = reason
         setRentOrders([...rentOrders])
         handleCancel()
     }

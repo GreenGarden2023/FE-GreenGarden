@@ -1,6 +1,10 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Badge, Button, Col, Form, Input, Modal, Row, Select } from 'antd';
+import { Role } from 'app/models/general-type';
+import { ShippingFee } from 'app/models/shipping-fee';
 import cartService from 'app/services/cart.service';
+import shippingFeeService from 'app/services/shipping-fee.service';
+import userService from 'app/services/user.service';
 import { CartProps, setCartSlice } from 'app/slices/cart';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -15,19 +19,16 @@ import useDispatch from '../../hooks/use-dispatch';
 import useSelector from '../../hooks/use-selector';
 import { UserUpdate } from '../../models/user';
 import { setNoti } from '../../slices/notification';
-import { setEmptyUser } from '../../slices/user-infor';
+import { setApartUser, setEmptyUser } from '../../slices/user-infor';
 import CONSTANT from '../../utils/constant';
 import ErrorMessage from '../message.tsx/ErrorMessage';
 import './style.scss';
-import { Role } from 'app/models/general-type'
 
 /* eslint-disable no-useless-escape */
 const schema = yup.object().shape({
-    fullName: yup.string().required('Full Name is required').min(5, 'Full Name is greater than 5 characters').max(50, 'Full Name is less than 50 characters'),
-    address: yup.string().required('Address is required').min(5, 'Address is greater than 5 characters').max(100, 'Address is less than 100 characters'),
-    phone: yup.string().required('Phone is required').matches(/(84|0[3|5|7|8|9])+([0-9]{8})\b/g, 'Phone is not valid'),
-    favorite: yup.string().required('Favorite is required'),
-    mail: yup.string().required('Email is required').matches(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Email is not valid'),
+    fullName: yup.string().trim().required('Họ và tên không được để trống').min(5, 'Họ và tên có ít nhất 5 ký tự').max(50, 'Họ và tên có nhiều nhất 50 ký tự'),
+    address: yup.string().trim().required('Địa chỉ không được để trống').min(5, 'Địa chỉ có ít nhất 5 ký tự').max(100, 'Địa chỉ có nhiều nhất 100 ký tự'),
+    phone: yup.string().trim().required('Số điện thoại không được để trống').matches(CONSTANT.PHONE_REGEX, 'Số điện thoại không hợp lệ'),
 })
 
 const LandingHeader: React.FC = () =>{
@@ -37,10 +38,24 @@ const LandingHeader: React.FC = () =>{
     const userState = useSelector(state => state.userInfor);
 
     const [openModalUserInfor, setOpenModalInfor] = useState(false);
+    const [shipping, setShipping] = useState<ShippingFee[]>([])
 
     const { setValue, formState: { errors, isSubmitting }, control, handleSubmit, reset } = useForm<UserUpdate>({
         resolver: yupResolver(schema)
     })
+
+    useEffect(() =>{
+      if(!openModalUserInfor) return;
+      const init = async () =>{
+        try{
+          const res = await shippingFeeService.getList()
+          setShipping(res.data)
+        }catch{
+
+        }
+      }
+      init()
+    }, [openModalUserInfor])
 
     useEffect(() =>{
         if(!openModalUserInfor) {
@@ -48,13 +63,15 @@ const LandingHeader: React.FC = () =>{
             return;
         }
 
-        const { id, fullName, address, phone, mail, favorite } = userState.user
+        const { id, fullName, address, phone, mail, favorite, districtID } = userState.user
         setValue('id', id);
         setValue('fullName', fullName);
         setValue('address', address);
         setValue('phone', phone);
         setValue('mail', mail);
         setValue('favorite', favorite);
+        setValue('districtID', districtID);
+
     }, [openModalUserInfor, userState, setValue, reset])
 
     useEffect(() =>{
@@ -88,8 +105,13 @@ const LandingHeader: React.FC = () =>{
 
     const handleSubmitForm = async(data: UserUpdate) =>{
         try{
-            // console.log(data)
-            dispatch(setNoti({type: 'success', message: 'Update infor success'}))
+            const res = await userService.updateUser(data)
+            if(res.isSuccess){
+              dispatch(setApartUser(data))
+              dispatch(setNoti({type: 'success', message: 'Cập nhật thông tin thành công'}))
+              return;
+            }
+            dispatch(setNoti({type: 'error', message: res.message}))
         }catch(err){
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
         }
@@ -184,7 +206,7 @@ const LandingHeader: React.FC = () =>{
                     </div>
                 </div>
             </header>
-            <Modal width={800} title='User information' open={openModalUserInfor} footer={null} onCancel={() => setOpenModalInfor(false)}>
+            <Modal width={800} title='Thông tin của bạn' open={openModalUserInfor} footer={null} onCancel={() => setOpenModalInfor(false)}>
                 <Form
                     layout='vertical'
                     onFinish={handleSubmit(handleSubmitForm)}
@@ -192,7 +214,7 @@ const LandingHeader: React.FC = () =>{
                 >
                     <Row gutter={24}>
                       <Col span={12}>
-                        <Form.Item label='Full name' required validateStatus={errors.fullName ? 'error' : ''} >
+                        <Form.Item label='Họ và tên' required validateStatus={errors.fullName ? 'error' : ''} >
                           <Controller
                             control={control}
                             name='fullName'
@@ -202,19 +224,7 @@ const LandingHeader: React.FC = () =>{
                         </Form.Item>
                       </Col>
                       <Col span={12}>
-                        <Form.Item label='Address' required validateStatus={errors.address ? 'error' : ''}>
-                          <Controller
-                            control={control}
-                            name='address'
-                            render={({ field }) => <Input {...field} />}
-                          />
-                          {errors.address && <ErrorMessage message={errors.address.message} />}
-                        </Form.Item>
-                      </Col>
-                    </Row>
-                    <Row gutter={24}>
-                      <Col span={12}>
-                        <Form.Item label='Phone' required validateStatus={errors.phone ? 'error' : ''}>
+                        <Form.Item label='Số điện thoại' required validateStatus={errors.phone ? 'error' : ''}>
                           <Controller
                             control={control}
                             name='phone'
@@ -224,19 +234,43 @@ const LandingHeader: React.FC = () =>{
                         </Form.Item>
                       </Col>
                       <Col span={12}>
-                        <Form.Item label='Email' required validateStatus={errors.mail ? 'error' : ''}>
+                        <Form.Item label='Địa chỉ nhận hàng'>
+                          <Controller 
+                            control={control}
+                            name='districtID'
+                            render={({field}) => (
+                              <Select {...field}>
+                                {
+                                  shipping.map((item, index) => (
+                                    <Select.Option value={item.districtID} key={index} >{item.district}</Select.Option>
+                                  ))
+                                }
+                              </Select>
+                            )}
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col span={12}>
+                        <Form.Item label='Địa chỉ cụ thể' required validateStatus={errors.address ? 'error' : ''}>
+                          <Controller
+                            control={control}
+                            name='address'
+                            render={({ field }) => <Input {...field} />}
+                          />
+                          {errors.address && <ErrorMessage message={errors.address.message} />}
+                        </Form.Item>
+                      </Col>
+                      <Col span={12}>
+                        <Form.Item label='Email'>
                           <Controller
                             control={control}
                             name='mail'
-                            render={({ field }) => <Input {...field} />}
+                            render={({ field }) => <Input disabled {...field} />}
                           />
-                          {errors.mail && <ErrorMessage message={errors.mail.message} />}
                         </Form.Item>
                       </Col>
-                    </Row>
-                    <Row gutter={24}>
-                      <Col span={24}>
-                        <Form.Item label='Favorite' required validateStatus={errors.favorite ? 'error' : ''}>
+                      <Col span={12}>
+                        <Form.Item label='Sở thích' required validateStatus={errors.favorite ? 'error' : ''}>
                           <Controller
                             control={control}
                             name='favorite'
@@ -256,9 +290,9 @@ const LandingHeader: React.FC = () =>{
                     </Row>
                     <Form.Item className='btn-box'>
                       <Button type='default' htmlType='button' className='btn-cancel' size='large' onClick={() => setOpenModalInfor(false)}>
-                        Cancel
+                        Hủy bỏ
                       </Button>
-                      <Button loading={isSubmitting} type='primary' htmlType='submit' className='btn-update' size='large'>Update</Button>
+                      <Button loading={isSubmitting} type='primary' htmlType='submit' className='btn-update' size='large'>Cập nhật</Button>
                     </Form.Item>
                 </Form>
             </Modal>

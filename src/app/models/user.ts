@@ -6,7 +6,7 @@ export interface User{
     userName: string;
     fullName: string;
     address: string;
-    districtID:number;
+    districtID: number;
     phone: string;
     favorite: string;
     mail: string;
@@ -22,6 +22,7 @@ export interface UserUpdate{
     phone: string;
     mail: string;
     favorite: string;
+    districtID: number;
 }
 
 export interface LoginResponse{
@@ -48,6 +49,7 @@ export interface UserReponse{
 }
 
 export interface CreateUserByAdmin{
+    userID?: string
     userName: string
     password: string
     fullName: string

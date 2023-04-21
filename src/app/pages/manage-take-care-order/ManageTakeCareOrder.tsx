@@ -1,5 +1,4 @@
-import { SyncOutlined } from '@ant-design/icons'
-import { Modal, Popover, Tag } from 'antd'
+import { Modal, Popover } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import CancelOrder from 'app/components/modal/cancel-order/CancelOrder'
@@ -11,11 +10,11 @@ import TechnicianName from 'app/components/renderer/technician/TechnicianName'
 import Transport from 'app/components/renderer/transport/Transport'
 import NoResult from 'app/components/search-and-filter/no-result/NoResult'
 import Searching from 'app/components/search-and-filter/search/Searching'
+import OrderStatusComp from 'app/components/status/OrderStatusComp'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
 import UserInforOrder from 'app/components/user-infor/user-infor-order/UserInforOrder'
 import useDispatch from 'app/hooks/use-dispatch'
 import useSelector from 'app/hooks/use-selector'
-import { OrderStatus } from 'app/models/general-type'
 import { Paging } from 'app/models/paging'
 import { PaymentControlState } from 'app/models/payment'
 import { ServiceDetailList, ServiceOrderList } from 'app/models/service'
@@ -30,20 +29,8 @@ import pagingPath from 'app/utils/paging-path'
 import React, { useEffect, useMemo, useState } from 'react'
 import CurrencyFormat from 'react-currency-format'
 import { BiCommentDetail, BiDetail } from 'react-icons/bi'
-import { FaCheck } from 'react-icons/fa'
 import { GrMore } from 'react-icons/gr'
-import { MdAttachMoney, MdDoneAll, MdOutlineCancel } from 'react-icons/md'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-
-export const OrderStatusToTag = (status: OrderStatus) =>{
-    switch(status){
-        case 'unpaid': return <Tag className='center' color='#AAAAAA' icon={<SyncOutlined />} >Đang xử lý</Tag>
-        case 'ready': return <Tag className='center' color='#108ee9' icon={<MdAttachMoney />} >Đã thanh toán cọc</Tag>
-        case 'paid': return <Tag className='center' color='#87d068' icon={<FaCheck />} >Đã thanh toán đủ</Tag>
-        case 'completed': return <Tag className='center' color='#2db7f5' icon={<MdDoneAll />} >Đã hoàn thành</Tag>
-        case 'cancel': return <Tag className='center' color='#528B8B' icon={<MdOutlineCancel />} >Đã bị hủy</Tag>
-    }
-}
 
 const ManageTakeCareOrder: React.FC = () => {
     const dispatch = useDispatch()
@@ -225,7 +212,7 @@ const ManageTakeCareOrder: React.FC = () => {
             key: 'status',
             dataIndex: 'status',
             width: 200,
-            render: (v) => (OrderStatusToTag(v))
+            render: (v) => (<OrderStatusComp status={v} />)
         },
         {
             title: 'Nơi chăm sóc',

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction, CaseReducer } from '@reduxjs/toolkit';
-import { UserLogin } from '../../models/user';
+import { User, UserLogin } from '../../models/user';
 
 type CR<T> = CaseReducer<UserLogin, PayloadAction<T>>;
 
@@ -37,6 +37,14 @@ const setLoadingCR: CR<{loading: boolean}> = (state: UserLogin, action) => ({
     loading: action.payload.loading
 })
 
+const setApartUserCR: CR<Partial<User>> = (state, action) => ({
+    ...state,
+    user: {
+        ...state.user,
+        ...action.payload
+    }
+})
+
 const slice = createSlice({
     name: 'user-infor/slice',
     initialState,
@@ -44,9 +52,10 @@ const slice = createSlice({
         setUser: setUserCR,
         setEmptyUser: setEmptyUserCR,
         setTokenAndRole: setTokenAndRoleCR,
-        setLoading: setLoadingCR
+        setLoading: setLoadingCR,
+        setApartUser: setApartUserCR
     },
 });
 
-export const { setUser, setEmptyUser, setTokenAndRole, setLoading } = slice.actions
+export const { setUser, setEmptyUser, setTokenAndRole, setLoading, setApartUser } = slice.actions
 export default slice.reducer

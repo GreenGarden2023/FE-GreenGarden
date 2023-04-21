@@ -22,11 +22,15 @@ const RefundOrder: React.FC<RefundOrderProps> = ({orderId, orderCode, orderType,
     const [amount, setAmount] = useState(0)
     const [desc, setDesc] = useState('')
 
+    const [loading, setLoading] = useState(false)
+
     const handleRefundOrder = async () =>{
         if(amount < 1000){
             dispatch(setNoti({type: 'warning', message: 'Số tiền nhập vào ít nhất là 1000VNĐ'}))
             return
         }
+
+        setLoading(true)
         try{
             const body: TransactionHandle = {
                 orderID: orderId,
@@ -45,6 +49,7 @@ const RefundOrder: React.FC<RefundOrderProps> = ({orderId, orderCode, orderType,
         }catch{
 
         }
+        setLoading(false)
     }
     const handleChangeAmount = (values: CurrencyFormat.Values) =>{
         const { floatValue } = values
@@ -71,8 +76,8 @@ const RefundOrder: React.FC<RefundOrderProps> = ({orderId, orderCode, orderType,
                     <Input.TextArea autoSize={{minRows: 4, maxRows: 6}} value={desc} onChange={(e) => setDesc(e.target.value)} ></Input.TextArea>
                 </Form.Item>
                 <div className='btn-form-wrapper'>
-                    <Button htmlType='button' type='default' className='btn-cancel' size='large' >Hủy bỏ</Button>
-                    <Button htmlType='submit' type='primary' className='btn-update' size='large'>
+                    <Button htmlType='button' disabled={loading} type='default' className='btn-cancel' size='large' >Hủy bỏ</Button>
+                    <Button htmlType='submit' loading={loading} type='primary' className='btn-update' size='large'>
                         Xác nhận
                     </Button>
                 </div>

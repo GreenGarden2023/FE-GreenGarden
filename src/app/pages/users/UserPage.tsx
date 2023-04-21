@@ -93,7 +93,7 @@ const UserPage: React.FC = () => {
             render: (_, record, index) => (
                 <>
                     {
-                        record.roleName !== 'Customer' && 
+                        (record.roleName === 'Technician' || record.roleName === 'Manager') && 
                         <Tooltip color='#00a76f' title='Chỉnh sửa'>
                             <AiOutlineEdit size={25} color='#00a76f' cursor='pointer' onClick={() => {
                                 setUserIndex(index)
@@ -131,9 +131,28 @@ const UserPage: React.FC = () => {
         setAction(0)
     }
 
+    const handleSubmitUser = async (user: User) =>{
+        if(action === 1){
+            // create
+            if(users.length !== (paging.pageSize || 0)){
+                users.push(user)
+                setUsers([...users])
+            }
+        }else if(action === 2){
+            // update
+            users[userIndex] = user
+            setUsers([...users])
+        }
+        handleClose()
+    }
+
     return (
         <div className='manage-user-wrapper'>
             <HeaderInfor title='Quản lý người dùng' />
+            <section className="default-layout">
+                <button style={{marginLeft: 'auto'}} className='btn btn-create' onClick={() => setAction(1)}>Create account</button>
+            </section>
+            {/* <Filtering isRole /> */}
             <section className="default-layout manage-user-table">
                 <Table dataSource={DataSource} columns={Column} pagination={{
                     current: paging.curPage || 1,
@@ -150,7 +169,7 @@ const UserPage: React.FC = () => {
                     user={users[userIndex]}
                     shippingFees={shipping}
                     onClose={handleClose}
-                    onSubmit={() => {}}
+                    onSubmit={handleSubmitUser}
                 />
             }
         </div>

@@ -3,10 +3,10 @@ import Table, { ColumnsType } from 'antd/es/table'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import CancelOrder from 'app/components/modal/cancel-order/CancelOrder'
 import ModalClientRentOrderDetai from 'app/components/modal/client-rent-order-detail/ModalClientRentOrderDetai'
-import SaleDelivery from 'app/components/modal/delivery/sale-delivery/SaleDelivery'
 import RefundOrder from 'app/components/modal/refundOrder.tsx/RefundOrder'
 import RentOrderPaymentCash from 'app/components/modal/rent-oder-payment-cash/RentOrderPaymentCash'
 import RentOrderPaymentDeposit from 'app/components/modal/rent-order-payment-deposit/RentOrderPaymentDeposit'
+import Renting from 'app/components/modal/renting/Renting'
 import ReturnDepositRentOrder from 'app/components/modal/return-deposit-rent-order/ReturnDepositRentOrder'
 import TransactionDetail from 'app/components/modal/transaction-detail/TransactionDetail'
 import MoneyFormat from 'app/components/money/MoneyFormat'
@@ -18,6 +18,7 @@ import OrderStatusComp from 'app/components/status/OrderStatusComp'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
 import useDispatch from 'app/hooks/use-dispatch'
 import useSelector from 'app/hooks/use-selector'
+import { OrderStatus } from 'app/models/general-type'
 import { RentOrder } from 'app/models/order'
 import { Paging } from 'app/models/paging'
 import { PaymentControlState } from 'app/models/payment'
@@ -28,15 +29,15 @@ import CONSTANT from 'app/utils/constant'
 import utilDateTime from 'app/utils/date-time'
 import pagingPath from 'app/utils/paging-path'
 import React, { useEffect, useMemo, useState } from 'react'
+import { AiOutlineTransaction } from 'react-icons/ai'
 import { BiDetail } from 'react-icons/bi'
 import { FaLayerGroup } from 'react-icons/fa'
 import { GiReturnArrow } from 'react-icons/gi'
 import { GrMore } from 'react-icons/gr'
-import { MdOutlinePayments } from 'react-icons/md'
-import { RiBillLine } from 'react-icons/ri'
+import { MdCancelPresentation, MdOutlineKeyboardReturn, MdOutlinePayment, MdOutlinePayments } from 'react-icons/md'
+import { VscServerProcess } from 'react-icons/vsc'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import './style.scss'
-import { OrderStatus } from 'app/models/general-type'
 
 const ManageRentOrder:React.FC = () => {
     const dispatch = useDispatch();
@@ -89,29 +90,6 @@ const ManageRentOrder:React.FC = () => {
         // setRecall(false)
 
     }, [filter, search, recall, navigate, paging.pageSize, searchParams])
-
-    // useEffect(() =>{
-    //     pagingPath.scrollTop()
-    //     const currentPage = searchParams.get('page');
-
-    //     if(!pagingPath.isValidPaging(currentPage)){
-    //         setPaging({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_RENT})
-    //         return navigate('/panel/rent-order?page=1')
-    //     }
-    //     if(!recall) return;
-
-    //     const init = async () =>{
-    //         try{
-    //             const res = await orderService.getAllRentOrders({curPage: Number(currentPage), pageSize: paging.pageSize});
-    //             setRentOrders(res.data.rentOrderGroups)
-    //             setPaging(res.data.paging)
-    //         }catch{
-
-    //         }
-    //         setRecall(false)
-    //     }
-    //     init()
-    // }, [searchParams, navigate, paging.pageSize, recall])
 
     const ColumnRentOrder: ColumnsType<any> = [
         {
@@ -189,8 +167,8 @@ const ManageRentOrder:React.FC = () => {
         },
         {
             title: 'Tổng tất cả đơn hàng',
-            key: 'totalPrice',
-            dataIndex: 'totalPrice',
+            key: 'totalGroupAmount',
+            dataIndex: 'totalGroupAmount',
             align: 'right',
             width: 200,
             render: (v) => (<MoneyFormat value={v} color='Light Blue' />)
@@ -241,7 +219,7 @@ const ManageRentOrder:React.FC = () => {
                 <div className="item" onClick={() => {
                     setActionMethod({orderId: record.orderId, actionType: 'view transaction', orderType: 'rent', openIndex: -1})
                 }}>
-                    <BiDetail size={25} className='icon'/>
+                    <AiOutlineTransaction size={25} className='icon'/>
                     <span>Xem giao dịch</span>
                 </div>
                 <div className="item" onClick={() => navigate(`/panel/rent-order/${record.groupID}`)}>
@@ -262,25 +240,25 @@ const ManageRentOrder:React.FC = () => {
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.orderId, actionType: 'remaining', orderType: 'rent', openIndex: -1})
                     }}>
-                        <RiBillLine size={25} className='icon'/>
+                        <MdOutlinePayment size={25} className='icon'/>
                         <span>Thanh toán đơn hàng</span>
                     </div>
                 }
                 {
-                    ((record.status === 'ready' || record.status === 'paid') && record.isTransport) && 
+                    (record.status === 'paid') && 
                     <div className="item" onClick={() => {
-                        setActionMethod({orderId: record.orderId, actionType: 'delivery', orderType: 'rent', openIndex: -1})
+                        setActionMethod({orderId: record.orderId, actionType: 'renting', orderType: 'rent', openIndex: -1})
                     }}>
-                        <RiBillLine size={25} className='icon'/>
-                        <span>Vận chuyển</span>
+                        <VscServerProcess size={25} className='icon'/>
+                        <span>Đang thuê</span>
                     </div>
                 }
                 {
-                    record.status === 'paid' && 
+                    record.status === 'renting' && 
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.orderId, actionType: 'return deposit', orderType: 'rent', openIndex: -1})
                     }}>
-                        <GiReturnArrow size={25} className='icon'/>
+                        <MdOutlineKeyboardReturn size={25} className='icon'/>
                         <span>Xác nhận tất toán</span>
                     </div>
                 }
@@ -289,7 +267,7 @@ const ManageRentOrder:React.FC = () => {
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.orderId, actionType: 'cancel', orderType: 'rent', openIndex: -1})
                     }}>
-                        <RiBillLine size={25} className='icon'/>
+                        <MdCancelPresentation size={25} className='icon'/>
                         <span>Hủy đơn hàng</span>
                     </div>
                 }
@@ -298,7 +276,7 @@ const ManageRentOrder:React.FC = () => {
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.orderId, actionType: 'refund', orderType: 'rent', openIndex: -1})
                     }}>
-                        <BiDetail size={25} className='icon'/>
+                        <GiReturnArrow size={25} className='icon'/>
                         <span>Hoàn tiền</span>
                     </div>
                 }
@@ -312,7 +290,7 @@ const ManageRentOrder:React.FC = () => {
             orderId: x.rentOrderList[0].id,
             orderCode: x.rentOrderList[0].orderCode,
             groupID: x.id,
-            totalPrice: x.totalGroupAmount,
+            totalPrice: x.rentOrderList[0].totalPrice,
             startDateRent: x.rentOrderList[0].startRentDate,
             endDateRent: x.rentOrderList[0].endRentDate,
             status: x.rentOrderList[0].status,
@@ -324,7 +302,8 @@ const ManageRentOrder:React.FC = () => {
             transportFee: x.rentOrderList[0].transportFee,
             discountAmount: x.rentOrderList[0].discountAmount,
             isTransport: x.rentOrderList[0].isTransport,
-            numberOfOrder: x.rentOrderList.length
+            numberOfOrder: x.rentOrderList.length,
+            totalGroupAmount: x.totalGroupAmount
         }))
     }, [rentOrders])
     const handleClose = () =>{
@@ -475,13 +454,12 @@ const ManageRentOrder:React.FC = () => {
                 />
             }
             {
-                actionMethod?.actionType === 'delivery' &&
-                <SaleDelivery
+                actionMethod?.actionType === 'renting' &&
+                <Renting
                     orderId={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0].id}
                     orderCode={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0].orderCode}
-                    type='rent'
                     onClose={handleClose}
-                    onSubmit={() => updateOrderStatus('delivery')}
+                    onSubmit={() => updateOrderStatus('renting')}
                 />
             }
         </div>

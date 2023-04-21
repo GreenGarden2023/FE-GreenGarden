@@ -49,6 +49,7 @@ const SIZES = {
 }
 const SUPPORT_FORMATS = ['image/png', 'image/jpg', 'image/jpeg']
 
+const ROLES_DECLARE: Role[] = ['Admin', 'Customer', 'Manager', 'Technician']
 
 
 const MANAGE_CATEGORY: Role[] = ['Manager']
@@ -114,7 +115,8 @@ const CONSTANT = {
     MIN_ORDER,
     MONEY_RATE,
     DEPOSIT_MIN_RATE,
-    MANAGE_USERS
+    MANAGE_USERS,
+    ROLES_DECLARE
 }
 
 export default CONSTANT

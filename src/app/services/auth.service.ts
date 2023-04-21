@@ -32,7 +32,7 @@ const sendEmailCode = async (email: string) =>{
 }
 
 const verifyRegisterOtpCode = async (email: string, otpCode: string) =>{
-    const res = await golbalAxios.post('/user/verify-register-otp-code', { email, otpCode})
+    const res = await golbalAxios.post<Response<User>>('/user/verify-register-otp-code', { email, otpCode})
     return res.data
 }
 

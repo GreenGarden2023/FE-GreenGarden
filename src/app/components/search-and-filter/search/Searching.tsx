@@ -82,6 +82,7 @@ const Searching: React.FC<SearchingProps> = ({ isOrderCode, isPhone, isStatus })
                                     <Select.Option value='ready' >Đã thanh toán cọc</Select.Option>
                                     <Select.Option value='paid' >Đã thanh toán đủ</Select.Option>
                                     <Select.Option value='delivery' >Vận chuyển</Select.Option>
+                                    <Select.Option value='renting' >Đang thuê</Select.Option>
                                     <Select.Option value='completed' >Đã hoàn thành</Select.Option>
                                     <Select.Option value='cancel' >Đã hủy</Select.Option>
                                 </Select>

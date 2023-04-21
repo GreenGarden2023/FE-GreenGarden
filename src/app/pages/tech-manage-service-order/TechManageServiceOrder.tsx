@@ -2,6 +2,7 @@ import { Popover } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import MoneyFormat from 'app/components/money/MoneyFormat'
+import OrderStatusComp from 'app/components/status/OrderStatusComp'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
 import useSelector from 'app/hooks/use-selector'
 import { PaymentControlState } from 'app/models/payment'
@@ -12,7 +13,6 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { BiCommentDetail } from 'react-icons/bi'
 import { GrMore } from 'react-icons/gr'
 import { useNavigate } from 'react-router-dom'
-import { OrderStatusToTag } from '../manage-take-care-order/ManageTakeCareOrder'
 
 const TechManageServiceOrder: React.FC = () => {
     // const dispatch = useDispatch()
@@ -81,7 +81,7 @@ const TechManageServiceOrder: React.FC = () => {
             key: 'status',
             dataIndex: 'status',
             width: 200,
-            render: (v) => OrderStatusToTag(v)
+            render: (v) => (<OrderStatusComp status={v} />)
         },
         {
             title: 'Tổng tiền',

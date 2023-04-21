@@ -17,7 +17,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import CONSTANT from 'app/utils/constant'
 import ErrorMessage from 'app/components/message.tsx/ErrorMessage'
 import locale from 'antd/es/date-picker/locale/vi_VN';
-import Dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import { MdNavigateNext } from 'react-icons/md'
 import useDispatch from 'app/hooks/use-dispatch'
 import { setNoti } from 'app/slices/notification'
@@ -190,11 +190,20 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
     }
 
     const handleChangeDateRange = (dates, dateStrings)=>{
-        if(!dates){
+        const newDate = dates as [Dayjs, Dayjs]
+        console.log(newDate)
+        if(!newDate){
             setValue('startDateRent', undefined)
             setValue('endDateRent', undefined)
         }else{
-            const [start, end] = dates
+            const [start, end] = newDate
+            const newStart = new Date(start.toDate())
+            console.log(newStart.toLocaleDateString())
+            const startRevert = dayjs(newStart.toLocaleDateString()).toDate()
+            console.log(startRevert)
+            // newStart.setDate(newStart.getDate() + 1)
+            // const endStart = new Date(end.toDate())
+            // endDate.setDate(endStart.getDate() + 1)
             setValue('startDateRent', start.toDate())
             setValue('endDateRent', end.toDate())
             clearErrors('startDateRent')
@@ -211,8 +220,8 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
             })
             return;
         }
-        const start = Dayjs(startDateRent)
-        const end = Dayjs(endDateRent)
+        const start = dayjs(startDateRent)
+        const end = dayjs(endDateRent)
         if(start.diff(end, 'days') === 0){
             setError('startDateRent', {
                 type: 'pattern',
@@ -237,8 +246,8 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
     const getDiffDays = (startDate?: Date, endDate?: Date) => {
         if(!startDate || !endDate) return 0
 
-        const start = Dayjs(startDate)
-        const end = Dayjs(endDate)
+        const start = dayjs(startDate)
+        const end = dayjs(endDate)
 
         return end.diff(start, 'days')
     }
@@ -446,7 +455,7 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
                                                     placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
                                                     format={CONSTANT.DATE_FORMAT_LIST}
                                                     disabledDate={(current) => current && current.valueOf()  < Date.now()}
-                                                    defaultValue={[Dayjs(Dayjs(getValues('startDateRent')).format('DD/MM/YYYY'), 'DD/MM/YYYY'), Dayjs(Dayjs(getValues('endDateRent')).format('DD/MM/YYYY'), 'DD/MM/YYYY')]}
+                                                    defaultValue={[dayjs(dayjs(getValues('startDateRent')).format('DD/MM/YYYY'), 'DD/MM/YYYY'), dayjs(dayjs(getValues('endDateRent')).format('DD/MM/YYYY'), 'DD/MM/YYYY')]}
                                                     onChange={handleChangeDateRange}
                                                 />
                                                 {errors.startDateRent && <ErrorMessage message={errors.startDateRent.message} />}
