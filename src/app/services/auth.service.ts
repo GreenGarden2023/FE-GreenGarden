@@ -4,6 +4,7 @@ import { UserRegister } from "../models/register";
 import { Response } from "../models/response";
 import { LoginResponse, User, UserGetByRole } from "../models/user";
 import golbalAxios from "../utils/http-client";
+import { ResetPassword } from 'app/components/modal/forgot-password/ForgotPassword';
 
 const register = async (user: Partial<UserRegister>): Promise<Response<null>> =>{
     const result = await golbalAxios.post<Response<null>>('/user/register', { ...user });
@@ -27,12 +28,17 @@ const getUserListByRole = async (role: 'admin' | 'technician' | 'customer' | 'ma
 }
 
 const sendEmailCode = async (email: string) =>{
-    const res = await golbalAxios.post(`/user/send-email-code?email=${email}`)
+    const res = await golbalAxios.post<Response<null>>(`/user/send-email-code?email=${email}`)
     return res.data
 }
 
 const verifyRegisterOtpCode = async (email: string, otpCode: string) =>{
     const res = await golbalAxios.post<Response<User>>('/user/verify-register-otp-code', { email, otpCode})
+    return res.data
+}
+
+const resetPassword = async (data: ResetPassword) =>{
+    const res = await golbalAxios.post<Response<null>>('/user/reset-password', data)
     return res.data
 }
 
@@ -43,7 +49,8 @@ const authService = {
     decodeToken,
     getUserListByRole,
     sendEmailCode,
-    verifyRegisterOtpCode
+    verifyRegisterOtpCode,
+    resetPassword
 }
 
 export default authService

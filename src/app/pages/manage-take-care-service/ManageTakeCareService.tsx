@@ -254,6 +254,7 @@ const ManageTakeCareService: React.FC = () => {
         handleClose()
     }
     const handleUpdateService = (service: Service) =>{
+        console.log({service})
         const index = serviceOrders.findIndex(x => x.id === service.id)
         serviceOrders[index] = service
         setServiceOrders([...serviceOrders])

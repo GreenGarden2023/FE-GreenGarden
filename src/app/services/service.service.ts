@@ -1,6 +1,8 @@
 import { ServiceStatus } from "app/models/general-type";
+import { Paging } from "app/models/paging";
 import { Response } from "app/models/response";
-import { Service, ServiceCreate, UpdateServiceDetail } from "app/models/service";
+import { Service, ServiceCreate, ServiceRequestResponse, UpdateServiceDetail } from "app/models/service";
+import queryString from "query-string";
 import golbalAxios from "../utils/http-client";
 
 const createServcieRequest = async (data: ServiceCreate) =>{
@@ -31,6 +33,12 @@ const getAServiceRequestDetail = async (serviceRequestID: string) =>{
     const res = await golbalAxios.get<Response<Service>>(`/service/get-a-service-request-detail?serviceRequestID=${serviceRequestID}`)
     return res.data
 }
+
+const getRequestOrderByTechnician = async (paging: Partial<Paging>, technicianID: string) =>{
+    const param = {...paging, technicianID}
+    const res = await golbalAxios.get<Response<ServiceRequestResponse>>(`/service/get-request-order-by-technician?${queryString.stringify(param)}`)
+    return res.data
+}
 // const updateService 
 
 const serviceService = {
@@ -40,7 +48,8 @@ const serviceService = {
     createServcieRequest,
     assignServiceTechnician,
     updateServiceDetail,
-    getAServiceRequestDetail
+    getAServiceRequestDetail,
+    getRequestOrderByTechnician
 }
 
 export default serviceService

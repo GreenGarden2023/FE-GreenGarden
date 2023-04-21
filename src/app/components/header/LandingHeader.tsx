@@ -270,7 +270,7 @@ const LandingHeader: React.FC = () =>{
                         </Form.Item>
                       </Col>
                       <Col span={12}>
-                        <Form.Item label='Sở thích' required validateStatus={errors.favorite ? 'error' : ''}>
+                        <Form.Item label='Sở thích' >
                           <Controller
                             control={control}
                             name='favorite'
@@ -284,7 +284,6 @@ const LandingHeader: React.FC = () =>{
                               </Select>
                             )}
                           />
-                          {errors.favorite && <ErrorMessage message={errors.favorite.message} />}
                         </Form.Item>
                       </Col>
                     </Row>

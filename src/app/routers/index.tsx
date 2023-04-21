@@ -45,6 +45,7 @@ import CONSTANT from '../utils/constant';
 import AdminRoute from './AdminRoute';
 import AuthGuard from './AuthGuard';
 import UserPage from 'app/pages/users/UserPage';
+import ManageRequest from 'app/pages/manage-request/ManageRequest';
 
 const Routers: React.FC = () =>{
     const dispatch = useDispatch();
@@ -148,6 +149,7 @@ const Routers: React.FC = () =>{
                     <Route path='manage-take-care-service' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageTakeCareService /></AdminRoute></AuthGuard>} />
                     <Route path='rent-order/:groupId' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageRentOrderGroup /></AdminRoute></AuthGuard>} />
                     <Route path='manage-shipping-fee' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_SHIPPING_FEE} ><AdminRoute><ManageShippingFee /></AdminRoute></AuthGuard>} />
+                    <Route path='manage-request' element={<AuthGuard rolesAuth={CONSTANT.TAKE_CARE_ORDER} ><AdminRoute><ManageRequest /></AdminRoute></AuthGuard>} />
                     <Route path='take-care-order-assigned' element={<AuthGuard rolesAuth={CONSTANT.TAKE_CARE_ORDER} ><AdminRoute><TechManageServiceOrder /></AdminRoute></AuthGuard>} />
                     <Route path='take-care-order-assigned/:orderId' element={<AuthGuard rolesAuth={CONSTANT.TAKE_CARE_ORDER} ><AdminRoute><TechManageServiceOrderDetail /></AdminRoute></AuthGuard>} />
                     <Route path='users' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_USERS} ><AdminRoute><UserPage /></AdminRoute></AuthGuard>} />

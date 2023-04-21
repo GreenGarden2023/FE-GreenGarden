@@ -1,5 +1,6 @@
 import { OrderStatus, ServiceStatus } from "./general-type"
 import { Paging } from "./paging"
+import { User } from "./user"
 
 export interface ServiceCreate {
     startDate?: Date
@@ -70,6 +71,7 @@ export interface Service {
     technicianName: string
     serviceDetailList: ServiceDetailList[]
     rules: string
+    districtID: number;
 }
   
 export interface ServiceDetailList {
@@ -132,4 +134,32 @@ export interface ServiceOrderDetail{
     transportFee: number
     status: OrderStatus
     service: Service
+}
+
+export interface ServiceRequest{
+    id: string
+    serviceCode: string
+    startDate: string
+    endDate: string
+    name: string
+    userCurrentPoint: number
+    phone: string
+    email: string
+    address: string
+    status: string
+    districtID: number
+    user: User
+    createDate: string
+    technicianName: string
+    isTransport: boolean
+    transportFee: number
+    rules: string
+    rewardPointUsed: number
+    technician: Technician
+    serviceDetailList: ServiceDetailList[]
+}
+
+export interface ServiceRequestResponse{
+    paging: Paging
+    requestList: ServiceRequest[]
 }

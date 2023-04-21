@@ -22,6 +22,7 @@ import { MdNavigateNext } from 'react-icons/md'
 import useDispatch from 'app/hooks/use-dispatch'
 import { setNoti } from 'app/slices/notification'
 import RentPolicy from 'app/components/modal/rent-policy/RentPolicy'
+import utilDateTime from 'app/utils/date-time'
 
 const schema = yup.object().shape({
     recipientAddress: yup.string().when("isTransport", {
@@ -197,15 +198,8 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
             setValue('endDateRent', undefined)
         }else{
             const [start, end] = newDate
-            const newStart = new Date(start.toDate())
-            console.log(newStart.toLocaleDateString())
-            const startRevert = dayjs(newStart.toLocaleDateString()).toDate()
-            console.log(startRevert)
-            // newStart.setDate(newStart.getDate() + 1)
-            // const endStart = new Date(end.toDate())
-            // endDate.setDate(endStart.getDate() + 1)
-            setValue('startDateRent', start.toDate())
-            setValue('endDateRent', end.toDate())
+            setValue('startDateRent', utilDateTime.dayjsToLocalString(start))
+            setValue('endDateRent', utilDateTime.dayjsToLocalString(end))
             clearErrors('startDateRent')
         }
     }

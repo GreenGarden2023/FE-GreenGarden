@@ -5,40 +5,56 @@ import MoneyFormat from 'app/components/money/MoneyFormat'
 import OrderStatusComp from 'app/components/status/OrderStatusComp'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
 import useSelector from 'app/hooks/use-selector'
+import { Paging } from 'app/models/paging'
 import { PaymentControlState } from 'app/models/payment'
 import { ServiceDetailList, ServiceOrderList } from 'app/models/service'
 import orderService from 'app/services/order.service'
+import CONSTANT from 'app/utils/constant'
 import utilDateTime from 'app/utils/date-time'
+import pagingPath from 'app/utils/paging-path'
 import React, { useEffect, useMemo, useState } from 'react'
 import { BiCommentDetail } from 'react-icons/bi'
 import { GrMore } from 'react-icons/gr'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
 const TechManageServiceOrder: React.FC = () => {
     // const dispatch = useDispatch()
     const navigate = useNavigate()
-    const userState = useSelector(state => state.userInfor)
+    const [searchParams] = useSearchParams();
+    const {user} = useSelector(state => state.userInfor)
 
     // data
     const [serviceOrders, setServiceOrders] = useState<ServiceOrderList[]>([])
+    const [paging, setPaging] = useState<Partial<Paging>>({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.REQUEST})
 
     // action
+    const [loading, setLoading] = useState(false)
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
 
     useEffect(() =>{
-        const {id} = userState.user
-        if(!id) return;
+        setLoading(true)
+        pagingPath.scrollTop()
+        const currentPage = searchParams.get('page');
+        if(!pagingPath.isValidPaging(currentPage)){
+            setPaging({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.REQUEST})
+            return navigate('/panel/take-care-order-assigned?page=1')
+        }
+
+        
 
         const init = async () =>{
             try{
-                const res = await orderService.getServiceOrdersByTechnician(id, {curPage: 1, pageCount: 10})
+                if(!user.id) return;
+                const res = await orderService.getServiceOrdersByTechnician(user.id, {curPage: Number(currentPage), pageSize: paging.pageSize})
                 setServiceOrders(res.data.serviceOrderList)
+                setPaging(res.data.paging)
             }catch{
 
             }
         }
         init()
-    }, [userState])
+        setLoading(false)
+    }, [user.id, paging.pageSize, navigate, searchParams])
 
     const ColumnServiceOrder: ColumnsType<any> = [
         {
@@ -72,16 +88,16 @@ const TechManageServiceOrder: React.FC = () => {
             render: (v) => (utilDateTime.dateToString(v))
         },
         {
-            title: 'Số lượng cây',
-            key: 'totalQuantity',
-            dataIndex: 'totalQuantity',
-        },
-        {
             title: 'Trạng thái',
             key: 'status',
             dataIndex: 'status',
             width: 200,
             render: (v) => (<OrderStatusComp status={v} />)
+        },
+        {
+            title: 'Số lượng cây',
+            key: 'totalQuantity',
+            dataIndex: 'totalQuantity',
         },
         {
             title: 'Tổng tiền',
@@ -189,15 +205,15 @@ const TechManageServiceOrder: React.FC = () => {
                     columns={ColumnServiceOrder} 
                     dataSource={DataSourceServiceOrder} 
                     scroll={{ y: 680, x: 2200 }}
-                    // pagination={{
-                    //     current: paging.curPage,
-                    //     pageSize: paging.pageSize,
-                    //     total: paging.recordCount,
-                    //     onChange: (page: number) =>{
-                    //         setRecall(true)
-                    //         navigate(`/panel/sale-order?page=${page}`)
-                    //     }
-                    // }}
+                    loading={loading}
+                    pagination={{
+                        current: paging.curPage,
+                        pageSize: paging.pageSize,
+                        total: paging.recordCount,
+                        onChange: (page: number) =>{
+                            navigate(`/panel/take-care-order-assigned?page=${page}`)
+                        }
+                    }}
                 />
             </section>
         </div>

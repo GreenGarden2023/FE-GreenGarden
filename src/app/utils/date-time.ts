@@ -1,13 +1,13 @@
-import Dayjs from 'dayjs'
+import dayjs from 'dayjs'
 
 const dateToString = (date: string) =>{
     const d = new Date(date)
-    const result = Dayjs(d).format('DD/MM/YYYY')
+    const result = dayjs(d).format('DD/MM/YYYY')
     return result
 }
 const isDisplayExtendRentOrder = (date: Date) =>{
-    const d1 = Dayjs(new Date())
-    const d2 = Dayjs(date)
+    const d1 = dayjs(new Date())
+    const d2 = dayjs(date)
 
     if(d2.diff(d1, 'days') >= 0){
         return true
@@ -16,8 +16,8 @@ const isDisplayExtendRentOrder = (date: Date) =>{
 }
 
 const getDiff2Days = (date1: Date, date2: Date) =>{
-    const d1 = Dayjs(date1)
-    const d2 = Dayjs(date2)
+    const d1 = dayjs(date1)
+    const d2 = dayjs(date2)
 
     return d2.diff(d1, 'days')
 }
@@ -28,11 +28,16 @@ const dateTimeToString = (time: string | Date) =>{
     return dateString
 }
 
+const dayjsToLocalString = (date: dayjs.Dayjs) => {
+    return date.toDate().toLocaleDateString() as any
+}
+
 const utilDateTime = {
     dateToString,
     isDisplayExtendRentOrder,
     getDiff2Days,
-    dateTimeToString
+    dateTimeToString,
+    dayjsToLocalString
 }
 
 export default utilDateTime;

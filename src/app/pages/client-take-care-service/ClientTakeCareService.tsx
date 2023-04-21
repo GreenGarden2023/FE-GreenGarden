@@ -194,8 +194,8 @@ const ClientTakeCareService: React.FC = () => {
             return;
         }
         const [start, end] = dates
-        setValue('startDate', start.toDate())
-        setValue('endDate', end.toDate())
+        setValue('startDate', utilDateTime.dayjsToLocalString(start))
+        setValue('endDate', utilDateTime.dayjsToLocalString(end))
         clearErrors('startDate')
     }
     return (

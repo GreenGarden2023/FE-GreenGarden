@@ -72,7 +72,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
     const [listPrice, setListPrice] = useState<string[]>([])
 
     useEffect(() =>{
-        const { id, name, phone, email, address, rewardPointUsed, startDate, endDate, isTransport, rules } = service
+        const { id, name, phone, email, address, rewardPointUsed, startDate, endDate, isTransport, rules, districtID } = service
         console.log({startDate, endDate})
         setValue('serviceID', id)
         setValue('name', name)
@@ -85,7 +85,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
         setValue('rules', rules || '')
         setValue('isTranSport', isTransport || false)
 
-        setValue('districtID', 1)
+        setValue('districtID', districtID)
 
         // setTransport(isTransport)
 
@@ -197,22 +197,22 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
             return;
         }
 
-        const { startDate, endDate, rewardPointUsed } = data
-        if(!startDate || !endDate){
+        const { rewardPointUsed } = data
+        if(!data.startDate || !data.endDate){
             setError('startDate', {
                 type: 'pattern',
                 message: 'Thời gian chăm sóc không được để trống'
             })
             return;
         }
-        if(utilDateTime.getDiff2Days(startDate, endDate) < 7){
+        if(utilDateTime.getDiff2Days(data.startDate, data.endDate) < 7){
             setError('startDate', {
                 type: 'pattern',
                 message: 'Thời gian chăm sóc không được ít hơn 7 ngày'
             })
             return;
         }
-        if(utilDateTime.getDiff2Days(new Date(), startDate) > 14){
+        if(utilDateTime.getDiff2Days(new Date(), data.startDate) > 14){
             setError('startDate', {
                 message: 'Thời gian đặt trước lịch chăm sóc tối đa 14 ngày',
                 type: 'pattern'
@@ -245,12 +245,13 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
         try{
             await serviceService.updateServiceDetail(body)
             dispatch(setNoti({type: 'success', message: `Cập nhật thông tin dịch vụ chăm sóc cho đơn hàng "${service.serviceCode}" thành công`}))
-            const { name, phone, email, address } = data
-            const newService = {
-                ...serviceDetail,
-                name, phone, email, address
+            const { name, phone, email, address, isTranSport, transportFee, districtID, startDate, endDate, rewardPointUsed,  } = data
+            
+            const serviceSubmit: Service = {
+                ...service,
+                name, phone, email, address, isTransport: isTranSport, transportFee, districtID, startDate, endDate, rewardPointUsed,
             }
-            onSubmit(newService)
+            onSubmit(serviceSubmit)
         }catch{
 
         }
@@ -263,8 +264,8 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
             return
         }
         const [start, end] = dates
-        setValue('startDate', start.toDate())
-        setValue('endDate', end.toDate())
+        setValue('startDate', utilDateTime.dayjsToLocalString(start))
+        setValue('endDate', utilDateTime.dayjsToLocalString(end))
         clearErrors('startDate')
     }
     const setPolicy = (item: string) =>{

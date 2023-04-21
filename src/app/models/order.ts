@@ -96,6 +96,7 @@ export interface SaleOrderList {
     orderCode: string;
     isTransport: boolean;
     reason: string;
+    cancelBy: string;
     rentOrderDetailList: RentOrderDetailList[];
 }
 export interface SaleOrderResponse{

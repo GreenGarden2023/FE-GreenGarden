@@ -39,14 +39,13 @@ const AdminUpdateUser: React.FC<AdminUpdateUserProps> = ({user, shippingFees, on
         defaultValues: {
             roleName: 'Customer',
             districtId: 1,
-            favorite: 'Hoa Hồng'
         },
         resolver: yupResolver(schema)
     })
 
     useEffect(() =>{
         if(!user) return;
-        const { address, districtID, fullName, mail, phone, roleName, userName, id } = user
+        const { address, districtID, fullName, mail, phone, roleName, userName, id, favorite } = user
 
         setValue('userID', id)
         setValue('fullName', fullName)
@@ -57,6 +56,7 @@ const AdminUpdateUser: React.FC<AdminUpdateUserProps> = ({user, shippingFees, on
         setValue('userName', userName)
         setValue('roleName', roleName)
         setValue('password', '')
+        setValue('favorite', favorite)
 
     }, [user, setValue])
 
@@ -171,23 +171,26 @@ const AdminUpdateUser: React.FC<AdminUpdateUserProps> = ({user, shippingFees, on
                             />
                         </Form.Item>
                     </Col>
-                    <Col span={24}>
-                        <Form.Item label='Sở thích'>
-                            <Controller 
-                                control={control}
-                                name='favorite'
-                                render={({field}) => (
-                                    <Select {...field}>
-                                        {
-                                            CONSTANT.FAVORITES.map((item, index) => (
-                                                <Select.Option key={index} value={item} >{item}</Select.Option>
-                                            ))
-                                        }
-                                    </Select>
-                                )}
-                            />
-                        </Form.Item>
-                    </Col>
+                    {
+                        user?.roleName === 'Customer' &&
+                        <Col span={24}>
+                            <Form.Item label='Sở thích'>
+                                <Controller 
+                                    control={control}
+                                    name='favorite'
+                                    render={({field}) => (
+                                        <Select {...field}>
+                                            {
+                                                CONSTANT.FAVORITES.map((item, index) => (
+                                                    <Select.Option key={index} value={item} >{item}</Select.Option>
+                                                ))
+                                            }
+                                        </Select>
+                                    )}
+                                />
+                            </Form.Item>
+                        </Col>
+                    }
                     {
                         !user &&
                         <>

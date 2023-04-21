@@ -23,9 +23,10 @@ interface UserInforOrderProps{
     remainMoney?: number;
     deposit?: number;
     reason?: string;
+    cancelBy?: string;
 }
 
-const UserInforOrder: React.FC<UserInforOrderProps> = ({name, phone, address, createOrderDate, startDate, endDate, status, transportFee, totalOrder, remainMoney, deposit, reason}) => {
+const UserInforOrder: React.FC<UserInforOrderProps> = ({name, phone, address, createOrderDate, startDate, endDate, status, transportFee, totalOrder, remainMoney, deposit, reason, cancelBy}) => {
   return (
     <div className='uio-wrapper'>
         <div className="uio-content">
@@ -182,6 +183,20 @@ const UserInforOrder: React.FC<UserInforOrderProps> = ({name, phone, address, cr
                                 </div>
                                 <div className="content">
                                     <MoneyFormat value={deposit} color='Orange' />
+                                </div>
+                            </div>
+                        </Col>
+                    }
+                    {
+                        cancelBy &&
+                        <Col span={8}>
+                            <div className="item">
+                                <div className="label">
+                                    <FaMoneyBillWave color='#5cb9d8' size={20} />
+                                    <span>Người hủy đơn</span>
+                                </div>
+                                <div className="content">
+                                    <p>{cancelBy}</p>
                                 </div>
                             </div>
                         </Col>

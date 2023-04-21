@@ -31,7 +31,8 @@ const PAGING_ITEMS = {
     MANAGE_ORDER_SALE: 20,
     MANAGE_ORDER_RENT: 20,
     MANAGE_ORDER_RENT_GROUP: 20,
-    MANAGE_USER: 5
+    MANAGE_USER: 5,
+    REQUEST: 20,
 }
 const STATUS = {
     ACTIVE: 'Active',

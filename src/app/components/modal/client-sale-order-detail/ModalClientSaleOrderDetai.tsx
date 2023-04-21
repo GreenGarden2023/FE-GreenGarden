@@ -86,7 +86,7 @@ const ModalClientSaleOrderDetai: React.FC<ModalClientSaleOrderDetaiProps> = ({ s
     }, [saleOrderList])
 
     const OrderDetail = useMemo(() =>{
-        const { recipientName, recipientPhone, recipientAddress, createDate, status, transportFee, totalPrice, remainMoney, deposit, reason } = saleOrderList
+        const { recipientName, recipientPhone, recipientAddress, createDate, status, transportFee, totalPrice, remainMoney, deposit, reason, cancelBy } = saleOrderList
 
         return {
             name: recipientName,
@@ -98,7 +98,8 @@ const ModalClientSaleOrderDetai: React.FC<ModalClientSaleOrderDetaiProps> = ({ s
             totalOrder: totalPrice,
             remainMoney,
             deposit,
-            reason: status === 'cancel' ? reason : undefined
+            reason: status === 'cancel' ? reason : undefined,
+            cancelBy
         }
     }, [saleOrderList])
     return (

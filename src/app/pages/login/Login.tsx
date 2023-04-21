@@ -9,6 +9,7 @@ import { setUser } from '../../slices/user-infor';
 import { setTitle } from '../../slices/window-title';
 import CONSTANT from '../../utils/constant';
 import './style.scss';
+import ForgotPassword from 'app/components/modal/forgot-password/ForgotPassword';
 
 const Login: React.FC = () => {
   const dispatch = useDispatch();
@@ -17,6 +18,7 @@ const Login: React.FC = () => {
   
   const [errorLogin, setErrorLogin] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [forgot, setForgot] = useState(false)
  
   useEffect(() =>{
     dispatch(setTitle(`${CONSTANT.APP_NAME} | Login`))
@@ -55,6 +57,10 @@ const Login: React.FC = () => {
     return true
   }, [])
 
+  const closeModal = () =>{
+    setForgot(false)
+  }
+
   return (
     <div>
       {
@@ -82,8 +88,10 @@ const Login: React.FC = () => {
                         <label className='register-msg'>
                             Bạn chưa có tài khoản?
                             <Link to='/register'>Tạo mới tài khoản</Link>
+                            <span className='forgot-label' onClick={() => setForgot(true)}>Quên mật khẩu</span>
                         </label>
                     </Form.Item>
+                    
                     <Form.Item className='btn-box'>
                       <Button loading={submitting} type='primary' htmlType='submit' className='btn-submit' size='large'>Đăng nhập</Button>
                       <Button type='primary' htmlType='button' className='btn-back' size='large' onClick={() => navigate('/')}>
@@ -96,15 +104,10 @@ const Login: React.FC = () => {
                   <img src='/assets/signin-image.jpg' alt='/' />
                 </div>
             </div>
-            {/* <div className="sign-up-footer">
-                <div className="left">
-
-                </div>
-                <div className="right">
-
-                </div>
-            </div> */}
         </div>
+      }
+      {
+        forgot && <ForgotPassword onClose={closeModal} />
       }
     </div>
   )

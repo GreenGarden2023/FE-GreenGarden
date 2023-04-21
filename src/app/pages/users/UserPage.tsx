@@ -150,7 +150,7 @@ const UserPage: React.FC = () => {
         <div className='manage-user-wrapper'>
             <HeaderInfor title='Quản lý người dùng' />
             <section className="default-layout">
-                <button style={{marginLeft: 'auto'}} className='btn btn-create' onClick={() => setAction(1)}>Create account</button>
+                <button style={{marginLeft: 'auto'}} className='btn btn-create' onClick={() => setAction(1)}>Thêm tài khoản</button>
             </section>
             {/* <Filtering isRole /> */}
             <section className="default-layout manage-user-table">

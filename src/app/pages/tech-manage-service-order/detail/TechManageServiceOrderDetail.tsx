@@ -11,7 +11,7 @@ import serviceCalendar from 'app/services/service-calendar.service';
 import uploadService from 'app/services/upload.service';
 import { setNoti } from 'app/slices/notification';
 import utilDateTime from 'app/utils/date-time';
-import { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { AiOutlineCloudUpload } from 'react-icons/ai';
 import { BiCommentDetail } from 'react-icons/bi';
@@ -37,6 +37,7 @@ const TechManageServiceOrderDetail: React.FC = () => {
     // data
     const [serviceOrder, setServiceOrder] = useState<ServiceOrderDetail>();
     const [calendars, setCalendars] = useState<ServiceCalendar[]>([])
+
     const [errorImgs, setErrorImgs] = useState('')
     const [errorCalendar, setErrorCalendar] = useState('')
 
@@ -223,7 +224,7 @@ const TechManageServiceOrderDetail: React.FC = () => {
         if(!serviceOrder) return;
         try{
             const res = await serviceCalendar.createServiceCalendar({calendarInitial: {
-                serviceDate: date.toDate(),
+                serviceDate: utilDateTime.dayjsToLocalString(date),
                 serviceOrderId: serviceOrder.id
             }})
             dispatch(setNoti({type: 'success', message: 'Tạo mới ngày chăm sóc đầu tiên thành công'}))
@@ -238,7 +239,18 @@ const TechManageServiceOrderDetail: React.FC = () => {
         setDate(date)
         console.log(date, dateString);
     };
+
+    const isDisabledDate = (d1: Date, d2: Date) => {
+        const start = dayjs(d1)
+        const end = dayjs(d2)
+
+        if(end.diff(start, 'days') >= 0) return true
+
+        return false
+    }
+
     const handleUpdateCalendar = async () =>{
+        console.log({serviceOrder})
         if(!serviceOrder) return;
 
         let [calendar] = calendars.filter(x => x.id === actionMethod?.orderId)
@@ -253,18 +265,23 @@ const TechManageServiceOrderDetail: React.FC = () => {
             setErrorImgs('Hình ảnh không được để trống')
             return;
         }
-        if(utilDateTime.getDiff2Days(serviceOrder.service.endDate, new Date()) !== 0){
+        // if(utilDateTime.getDiff2Days(serviceOrder.service.endDate, new Date()) !== 0){
+            // }
+        const currentCal = calendars.filter(x => x.id === actionMethod?.orderId)[0].serviceDate
+        const endDate = serviceOrder.service.endDate
+        if(!isDisabledDate(currentCal, endDate)){
             if(!update.nextServiceDate){
                 setErrorCalendar('Lịch chăm sóc không được để trống')
                 return;
             }
         }
-
+            
 
         try{
             const body: CalendarUpdate = {
                 ...update,
-                serviceCalendarId: calendar.id
+                serviceCalendarId: calendar.id,
+                nextServiceDate: utilDateTime.dayjsToLocalString(dayjs(update.nextServiceDate))
             }
             // console.log({body})
             await serviceCalendar.createServiceCalendar({calendarUpdate: body})
@@ -279,8 +296,8 @@ const TechManageServiceOrderDetail: React.FC = () => {
                 setServiceOrder(res.data)
             }
             // append data
-        }catch{
-
+        }catch(e){
+            console.log(e)
         }
     }
     const handleChangeDateUpdateCalendar: DatePickerProps['onChange'] = (date, dateString) =>{
@@ -431,8 +448,9 @@ const TechManageServiceOrderDetail: React.FC = () => {
                                 <DatePicker
                                     locale={locale} 
                                     format={dateFormatList}
-                                    disabledDate={(current) => current && current.valueOf()  < (Date.now()) && current.valueOf() > serviceOrder?.service.endDate.valueOf()}
+                                    // disabledDate={(current) => current && current.valueOf()  < (Date.now()) && current.valueOf() > serviceOrder?.service.endDate.valueOf()}
                                     onChange={handleChangeDateRange}
+                                    disabledDate={(current) => current && current.valueOf()  < Date.now()}
                                 />
                             }
                         </Form.Item>
@@ -446,7 +464,7 @@ const TechManageServiceOrderDetail: React.FC = () => {
                 </Modal>
             }
             {
-                actionMethod?.actionType === 'update calendar' &&
+                (actionMethod?.actionType === 'update calendar' && serviceOrder) &&
                 <Modal
                     open
                     title={`Cập nhật báo cáo cho ngày chăm sóc "${utilDateTime.dateToString(calendars.filter(x => x.id === actionMethod.orderId)[0].serviceDate.toString())}"`}
@@ -493,6 +511,7 @@ const TechManageServiceOrderDetail: React.FC = () => {
                                 disabledDate={(current) => current && current.valueOf()  < Date.now()}
                                 onChange={handleChangeDateUpdateCalendar}
                                 style={{width: '200px'}}
+                                disabled={isDisabledDate(calendars.filter(x => x.id === actionMethod?.orderId)[0].serviceDate, serviceOrder.service.endDate)}
                             />
                             {errorCalendar && <ErrorMessage message={errorCalendar} />}
                         </Form.Item>
