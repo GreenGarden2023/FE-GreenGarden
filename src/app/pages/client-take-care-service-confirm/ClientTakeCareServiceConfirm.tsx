@@ -15,9 +15,9 @@ import utilDateTime from 'app/utils/date-time'
 import React, { useEffect, useMemo, useState } from 'react'
 import { AiOutlineCheck } from 'react-icons/ai'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ServiceStatusToTag } from '../manage-take-care-service/ManageTakeCareService'
 import './style.scss'
 import pagingPath from 'app/utils/paging-path'
+import ServiceStatusComp from 'app/components/status/ServiceStatusComp'
 
 const ClientTakeCareServiceConfirm: React.FC = () => {
     const { serviceId } = useParams()
@@ -153,14 +153,17 @@ const ClientTakeCareServiceConfirm: React.FC = () => {
                                     <span className="title">Nơi chăm sóc: </span>
                                     <span className="content">{service.isTransport ? 'Tại nhà' : 'Tại cửa hàng'}</span>
                                 </Col>
-                                <Col span={8}>
-                                    <span className="title">Phí vận chuyển: </span>
-                                    <span className="content">{service.transportFee}</span>
-                                </Col>
+                                {
+                                    (service.transportFee && service.transportFee !== 0) ?
+                                    <Col span={8}>
+                                        <span className="title">Phí vận chuyển: </span>
+                                        <span className="content">{service.transportFee}</span>
+                                    </Col> : undefined
+                                }
                                 <Col span={8} style={{display: 'flex'}}>
                                     <span className="title">Trạng thái yêu cầu: </span>
                                     <span className="content">
-                                        {ServiceStatusToTag(service.status)}
+                                        <ServiceStatusComp status={service.status} />
                                         {/* {service.status} */}
                                     </span>
                                 </Col>
@@ -168,9 +171,13 @@ const ClientTakeCareServiceConfirm: React.FC = () => {
                                     <span className="title" style={{marginBottom: '10px', display: 'block'}}>Thông tin hợp đồng chăm sóc cây</span>
                                     <div className='rule-wrapper'>
                                         {
-                                            service.rules.split('\n').map((x, index) => (
-                                                <p key={index}>{x}</p>
-                                            ))
+                                            service.rules ?
+                                                
+                                                    service.rules.split('\n').map((x, index) => (
+                                                        <p key={index}>{x}</p>
+                                                    ))
+                                                
+                                            : <p>Chưa có thông tin hợp đồng</p>
                                         }
                                     </div>
                                     {/* <Input.TextArea autoSize={{minRows: 4, maxRows: 10}} value={service.rules} disabled></Input.TextArea> */}

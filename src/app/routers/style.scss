@@ -4,6 +4,8 @@
     .admin-header{
         position: sticky;
         top: 0;
+        display: flex;
+        justify-content: space-between;
         z-index: 10;
         width: 100%;
         padding: 0;
@@ -25,6 +27,31 @@
                 align-items: center;
                 border-radius: 5px;
                 cursor: pointer;
+            }
+        }
+        .right{
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding-right: 50px;
+            .info-name{
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                span{
+                    font-weight: 500;
+                }
+            }
+            .info-detail{
+                span{
+                    font-weight: 500;
+                    color: $orange-text;
+                }
+            }
+            .btn-tools{
+                display: flex;
+                align-items: center;
+                gap: 10px;
             }
         }
     }

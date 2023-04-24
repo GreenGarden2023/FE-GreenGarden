@@ -64,6 +64,8 @@ export interface RentOrderList {
     orderCode: string
     recipientDistrict: number;
     reason: string;
+    cancelBy: string;
+    nameCancelBy: string;
     rentOrderDetailList: RentOrderDetailList[]
 }
 export interface RentOrder{
@@ -97,6 +99,7 @@ export interface SaleOrderList {
     isTransport: boolean;
     reason: string;
     cancelBy: string;
+    nameCancelBy: string;
     rentOrderDetailList: RentOrderDetailList[];
 }
 export interface SaleOrderResponse{

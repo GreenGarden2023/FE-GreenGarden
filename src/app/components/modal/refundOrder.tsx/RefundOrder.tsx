@@ -1,5 +1,6 @@
 import { Button, Form, Input, Modal } from 'antd';
 import CurrencyInput from 'app/components/renderer/currency-input/CurrencyInput';
+import UserInforOrder from 'app/components/user-infor/user-infor-order/UserInforOrder';
 import useDispatch from 'app/hooks/use-dispatch';
 import { OrderType, TransactionType } from 'app/models/general-type';
 import { TransactionHandle } from 'app/models/transaction';
@@ -13,11 +14,12 @@ interface RefundOrderProps{
     orderCode: string;
     orderType: OrderType;
     transactionType: TransactionType
+    userInforOrder: any;
     onClose: () => void;
     onSubmit: () => void;
 }
 
-const RefundOrder: React.FC<RefundOrderProps> = ({orderId, orderCode, orderType, transactionType, onClose, onSubmit}) => {
+const RefundOrder: React.FC<RefundOrderProps> = ({orderId, orderCode, orderType, transactionType, userInforOrder, onClose, onSubmit}) => {
     const dispatch = useDispatch()
     const [amount, setAmount] = useState(0)
     const [desc, setDesc] = useState('')
@@ -75,7 +77,8 @@ const RefundOrder: React.FC<RefundOrderProps> = ({orderId, orderCode, orderType,
                 <Form.Item label='Ghi chú'>
                     <Input.TextArea autoSize={{minRows: 4, maxRows: 6}} value={desc} onChange={(e) => setDesc(e.target.value)} ></Input.TextArea>
                 </Form.Item>
-                <div className='btn-form-wrapper'>
+                <UserInforOrder {...userInforOrder} columnNumber={2} />
+                <div className='btn-form-wrapper mt-10'>
                     <Button htmlType='button' disabled={loading} type='default' className='btn-cancel' size='large' >Hủy bỏ</Button>
                     <Button htmlType='submit' loading={loading} type='primary' className='btn-update' size='large'>
                         Xác nhận

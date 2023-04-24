@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import './style.scss'
 import { Col, Row } from 'antd'
 import { MdDateRange, MdOutlineDriveFileRenameOutline } from 'react-icons/md'
@@ -23,203 +23,211 @@ interface UserInforOrderProps{
     remainMoney?: number;
     deposit?: number;
     reason?: string;
-    cancelBy?: string;
+    nameCancelBy?: string;
+    columnNumber?: number
 }
 
-const UserInforOrder: React.FC<UserInforOrderProps> = ({name, phone, address, createOrderDate, startDate, endDate, status, transportFee, totalOrder, remainMoney, deposit, reason, cancelBy}) => {
-  return (
-    <div className='uio-wrapper'>
-        <div className="uio-content">
-            <p className="title">Thông tin đơn hàng</p>
-            <div className="uio-infor">
-                <Row gutter={[24, 24]}>
-                    {
-                        name && 
-                        <Col span={8}>
-                            <div className="item">
-                                <div className="label">
-                                    <MdOutlineDriveFileRenameOutline color='#5cb9d8' size={20} />
-                                    <span>Tên</span>
+const UserInforOrder: React.FC<UserInforOrderProps> = ({name, phone, address, createOrderDate, startDate, 
+    endDate, status, transportFee, totalOrder, remainMoney, deposit, reason, nameCancelBy, columnNumber}) => {
+
+    const ColumnNumber = useMemo(() =>{
+        if(!columnNumber) return 8;
+        return 24 / columnNumber
+    }, [columnNumber])
+
+    return (
+        <div className='uio-wrapper'>
+            <div className="uio-content">
+                <p className="title">Thông tin đơn hàng</p>
+                <div className="uio-infor">
+                    <Row gutter={[24, 24]}>
+                        {
+                            name && 
+                            <Col span={ColumnNumber}>
+                                <div className="item">
+                                    <div className="label">
+                                        <MdOutlineDriveFileRenameOutline color='#5cb9d8' size={20} />
+                                        <span>Tên</span>
+                                    </div>
+                                    <div className="content">
+                                        {name}
+                                    </div>
                                 </div>
-                                <div className="content">
-                                    {name}
+                            </Col>
+                        }
+                        {
+                            phone && 
+                            <Col span={ColumnNumber}>
+                                <div className="item">
+                                    <div className="label">
+                                        <AiOutlinePhone color='#5cb9d8' size={20} />
+                                        <span>Số điện thoại</span>
+                                    </div>
+                                    <div className="content">
+                                        {phone}
+                                    </div>
                                 </div>
-                            </div>
-                        </Col>
-                    }
-                    {
-                        phone && 
-                        <Col span={8}>
-                            <div className="item">
-                                <div className="label">
-                                    <AiOutlinePhone color='#5cb9d8' size={20} />
-                                    <span>Số điện thoại</span>
+                            </Col>
+                        }
+                        {
+                            address && 
+                            <Col span={ColumnNumber}>
+                                <div className="item">
+                                    <div className="label">
+                                        <CiLocationOn color='#5cb9d8' size={20} />
+                                        <span>Địa chỉ</span>
+                                    </div>
+                                    <div className="content">
+                                        {address}
+                                    </div>
                                 </div>
-                                <div className="content">
-                                    {phone}
+                            </Col>
+                        }
+                        {
+                            createOrderDate && 
+                            <Col span={ColumnNumber}>
+                                <div className="item">
+                                    <div className="label">
+                                        <MdDateRange color='#5cb9d8' size={20} />
+                                        <span>Ngày tạo đơn</span>
+                                    </div>
+                                    <div className="content">
+                                        {createOrderDate}
+                                    </div>
                                 </div>
-                            </div>
-                        </Col>
-                    }
-                    {
-                        address && 
-                        <Col span={8}>
-                            <div className="item">
-                                <div className="label">
-                                    <CiLocationOn color='#5cb9d8' size={20} />
-                                    <span>Địa chỉ</span>
+                            </Col>
+                        }
+                        {
+                            startDate && 
+                            <Col span={ColumnNumber}>
+                                <div className="item">
+                                    <div className="label">
+                                        <MdDateRange color='#5cb9d8' size={20} />
+                                        <span>Ngày thuê</span>
+                                    </div>
+                                    <div className="content">
+                                        {startDate}
+                                    </div>
                                 </div>
-                                <div className="content">
-                                    {address}
+                            </Col>
+                        }
+                        {
+                            endDate && 
+                            <Col span={ColumnNumber}>
+                                <div className="item">
+                                    <div className="label">
+                                        <MdDateRange color='#5cb9d8' size={20} />
+                                        <span>Ngày kết thúc</span>
+                                    </div>
+                                    <div className="content">
+                                        {endDate}
+                                    </div>
                                 </div>
-                            </div>
-                        </Col>
-                    }
-                    {
-                        createOrderDate && 
-                        <Col span={8}>
-                            <div className="item">
-                                <div className="label">
-                                    <MdDateRange color='#5cb9d8' size={20} />
-                                    <span>Ngày tạo đơn</span>
+                            </Col>
+                        }
+                        {
+                            status && 
+                            <Col span={ColumnNumber}>
+                                <div className="item">
+                                    <div className="label">
+                                        <HiOutlineStatusOnline color='#5cb9d8' size={20} />
+                                        <span>Trạng thái</span>
+                                    </div>
+                                    <div className="content">
+                                        <OrderStatusComp status={status} />
+                                    </div>
                                 </div>
-                                <div className="content">
-                                    {createOrderDate}
+                            </Col>
+                        }
+                        {
+                            (transportFee !== undefined) && 
+                            <Col span={ColumnNumber}>
+                                <div className="item">
+                                    <div className="label">
+                                        <FaMoneyBillWave color='#5cb9d8' size={20} />
+                                        <span>Phí vận chuyển</span>
+                                    </div>
+                                    <div className="content">
+                                        <MoneyFormat value={transportFee} color='Default' />
+                                    </div>
                                 </div>
-                            </div>
-                        </Col>
-                    }
-                    {
-                        startDate && 
-                        <Col span={8}>
-                            <div className="item">
-                                <div className="label">
-                                    <MdDateRange color='#5cb9d8' size={20} />
-                                    <span>Ngày thuê</span>
+                            </Col>
+                        }
+                        {
+                            (totalOrder !== undefined) && 
+                            <Col span={ColumnNumber}>
+                                <div className="item">
+                                    <div className="label">
+                                        <FaMoneyBillWave color='#5cb9d8' size={20} />
+                                        <span>Tổng đơn hàng</span>
+                                    </div>
+                                    <div className="content">
+                                        <MoneyFormat value={totalOrder} color='Light Blue' />
+                                    </div>
                                 </div>
-                                <div className="content">
-                                    {startDate}
+                            </Col>
+                        }
+                        {
+                            (remainMoney !== undefined) && 
+                            <Col span={ColumnNumber}>
+                                <div className="item">
+                                    <div className="label">
+                                        <FaMoneyBillWave color='#5cb9d8' size={20} />
+                                        <span>Tiền còn thiếu</span>
+                                    </div>
+                                    <div className="content">
+                                        <MoneyFormat value={remainMoney} color='Blue' />
+                                    </div>
                                 </div>
-                            </div>
-                        </Col>
-                    }
-                    {
-                        endDate && 
-                        <Col span={8}>
-                            <div className="item">
-                                <div className="label">
-                                    <MdDateRange color='#5cb9d8' size={20} />
-                                    <span>Ngày kết thúc</span>
+                            </Col>
+                        }
+                        {
+                            (deposit !== undefined) && 
+                            <Col span={ColumnNumber}>
+                                <div className="item">
+                                    <div className="label">
+                                        <FaMoneyBillWave color='#5cb9d8' size={20} />
+                                        <span>Tiền cọc</span>
+                                    </div>
+                                    <div className="content">
+                                        <MoneyFormat value={deposit} color='Orange' />
+                                    </div>
                                 </div>
-                                <div className="content">
-                                    {endDate}
+                            </Col>
+                        }
+                        {
+                            nameCancelBy &&
+                            <Col span={ColumnNumber}>
+                                <div className="item">
+                                    <div className="label">
+                                        <FaMoneyBillWave color='#5cb9d8' size={20} />
+                                        <span>Người hủy đơn</span>
+                                    </div>
+                                    <div className="content">
+                                        <p>{nameCancelBy}</p>
+                                    </div>
                                 </div>
-                            </div>
-                        </Col>
-                    }
-                    {
-                        status && 
-                        <Col span={8}>
-                            <div className="item">
-                                <div className="label">
-                                    <HiOutlineStatusOnline color='#5cb9d8' size={20} />
-                                    <span>Trạng thái</span>
+                            </Col>
+                        }
+                        {
+                            reason && 
+                            <Col span={ColumnNumber}>
+                                <div className="item">
+                                    <div className="label">
+                                        <FaMoneyBillWave color='#5cb9d8' size={20} />
+                                        <span>Lý do hủy đơn</span>
+                                    </div>
+                                    <div className="content">
+                                        <p>{reason}</p>
+                                    </div>
                                 </div>
-                                <div className="content">
-                                    <OrderStatusComp status={status} />
-                                </div>
-                            </div>
-                        </Col>
-                    }
-                    {
-                        (transportFee !== undefined) && 
-                        <Col span={8}>
-                            <div className="item">
-                                <div className="label">
-                                    <FaMoneyBillWave color='#5cb9d8' size={20} />
-                                    <span>Phí vận chuyển</span>
-                                </div>
-                                <div className="content">
-                                    <MoneyFormat value={transportFee} color='Default' />
-                                </div>
-                            </div>
-                        </Col>
-                    }
-                    {
-                        (totalOrder !== undefined) && 
-                        <Col span={8}>
-                            <div className="item">
-                                <div className="label">
-                                    <FaMoneyBillWave color='#5cb9d8' size={20} />
-                                    <span>Tổng đơn hàng</span>
-                                </div>
-                                <div className="content">
-                                    <MoneyFormat value={totalOrder} color='Light Blue' />
-                                </div>
-                            </div>
-                        </Col>
-                    }
-                    {
-                        (remainMoney !== undefined) && 
-                        <Col span={8}>
-                            <div className="item">
-                                <div className="label">
-                                    <FaMoneyBillWave color='#5cb9d8' size={20} />
-                                    <span>Tiền còn thiếu</span>
-                                </div>
-                                <div className="content">
-                                    <MoneyFormat value={remainMoney} color='Blue' />
-                                </div>
-                            </div>
-                        </Col>
-                    }
-                    {
-                        (deposit !== undefined) && 
-                        <Col span={8}>
-                            <div className="item">
-                                <div className="label">
-                                    <FaMoneyBillWave color='#5cb9d8' size={20} />
-                                    <span>Tiền cọc</span>
-                                </div>
-                                <div className="content">
-                                    <MoneyFormat value={deposit} color='Orange' />
-                                </div>
-                            </div>
-                        </Col>
-                    }
-                    {
-                        cancelBy &&
-                        <Col span={8}>
-                            <div className="item">
-                                <div className="label">
-                                    <FaMoneyBillWave color='#5cb9d8' size={20} />
-                                    <span>Người hủy đơn</span>
-                                </div>
-                                <div className="content">
-                                    <p>{cancelBy}</p>
-                                </div>
-                            </div>
-                        </Col>
-                    }
-                    {
-                        reason && 
-                        <Col span={8}>
-                            <div className="item">
-                                <div className="label">
-                                    <FaMoneyBillWave color='#5cb9d8' size={20} />
-                                    <span>Lý do hủy đơn</span>
-                                </div>
-                                <div className="content">
-                                    <p>{reason}</p>
-                                </div>
-                            </div>
-                        </Col>
-                    }
-                </Row>
+                            </Col>
+                        }
+                    </Row>
+                </div>
             </div>
         </div>
-    </div>
-  )
+    )
 }
 
 export default UserInforOrder

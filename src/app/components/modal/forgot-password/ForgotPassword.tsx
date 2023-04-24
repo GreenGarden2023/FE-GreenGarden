@@ -7,6 +7,7 @@ import CONSTANT from 'app/utils/constant';
 import useDispatch from 'app/hooks/use-dispatch';
 import authService from 'app/services/auth.service';
 import { setNoti } from 'app/slices/notification';
+import ErrorMessage from 'app/components/message.tsx/ErrorMessage';
 
 interface ForgotPasswordProps{
     onClose: () => void;
@@ -20,7 +21,7 @@ const schema = yup.object().shape({
 const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onClose }) => {
     const dispatch = useDispatch();
 
-    const { control, formState: { isSubmitting, errors }, handleSubmit, getValues } = useForm<ResetPassword>({
+    const { control, formState: { isSubmitting, errors }, handleSubmit, getValues, setError } = useForm<ResetPassword>({
         resolver: yupResolver(schema)
     })
 
@@ -29,6 +30,15 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onClose }) => {
     const [sentCode, setSentCode] = useState(false)
 
     const handleSubmitForm = async (data: ResetPassword) =>{
+        const { newPassword, confirmPassword } = data
+        if(newPassword !== confirmPassword){
+            setError('confirmPassword', {
+                type: 'pattern',
+                message: 'Xác nhận mật khẩu không trùng khớp'
+            })
+            return;
+        }
+
         if(sentCode){
             // call api send email code
             try{
@@ -40,7 +50,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onClose }) => {
                     dispatch(setNoti({type: 'error', message: 'Mã OTP không hợp lệ'}))
                 }
             }catch{
-                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+                dispatch(setNoti({type: 'error', message: 'Mã OTP không hợp lệ'}))
             }
         }else{
             // call api reset password
@@ -78,19 +88,21 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onClose }) => {
             title='Lấy lại mật khẩu'
             onCancel={onClose}
             footer={false}
+            width={600}
         >
             <Form
                 layout='vertical'
                 onFinish={handleSubmit(handleSubmitForm)}
             >
                 <Row gutter={[24, 0]}>
-                    <Col span={12}>
+                    <Col span={24}>
                         <Form.Item label='Email' required>
                             <Controller 
                                 control={control}
                                 name='email'
                                 render={({field}) => <Input {...field} />}
                             />
+                            {errors.email && <ErrorMessage message={errors.email.message} />}
                         </Form.Item>
                     </Col>
                     <Col span={12}>
@@ -100,6 +112,17 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onClose }) => {
                                 name='newPassword'
                                 render={({field}) => <Input type='password' {...field} />}
                             />
+                            {errors.newPassword && <ErrorMessage message={errors.newPassword.message} />}
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item label='Nhập lại mật khẩu' required>
+                            <Controller 
+                                control={control}
+                                name='confirmPassword'
+                                render={({field}) => <Input type='password' {...field} />}
+                            />
+                            {errors.confirmPassword && <ErrorMessage message={errors.confirmPassword.message} />}
                         </Form.Item>
                     </Col>
                     {
@@ -137,6 +160,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onClose }) => {
 export interface ResetPassword{
     email: string;
     newPassword: string;
+    confirmPassword: string;
     otpCode: string;
 }
 

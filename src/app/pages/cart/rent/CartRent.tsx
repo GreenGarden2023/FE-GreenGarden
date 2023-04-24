@@ -552,6 +552,7 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
                 isViewPolicy &&
                 <RentPolicy
                     checked={isConfirm}
+                    items={items}
                     onConfirm={onClosePolicy}
                 />
             }

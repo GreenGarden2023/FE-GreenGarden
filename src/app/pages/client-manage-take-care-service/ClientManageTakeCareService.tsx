@@ -11,8 +11,10 @@ import utilDateTime from 'app/utils/date-time'
 import React, { useEffect, useMemo, useState } from 'react'
 import { BiCommentDetail } from 'react-icons/bi'
 import { GrMore } from 'react-icons/gr'
+import { MdCancelPresentation } from 'react-icons/md'
 import { useNavigate } from 'react-router-dom'
-import { ServiceStatusToTag } from '../manage-take-care-service/ManageTakeCareService'
+import CancelOrder from 'app/components/modal/cancel-order/CancelOrder'
+import ServiceStatusComp from 'app/components/status/ServiceStatusComp'
 
 const ClientManageTakeCareService: React.FC = () => {
     const navigate = useNavigate();
@@ -60,7 +62,7 @@ const ClientManageTakeCareService: React.FC = () => {
             key: 'status',
             dataIndex: 'status',
             width: 200,
-            render: (v) => (ServiceStatusToTag(v))
+            render: (v) => (<ServiceStatusComp status={v} />)
         },
         {
             title: 'Người chăm sóc',
@@ -106,8 +108,17 @@ const ClientManageTakeCareService: React.FC = () => {
                     navigate(`/take-care-service/me/${record.id}`)
                 }}>
                     <BiCommentDetail size={25} className='icon'/>
-                    <span>Chi tiết dịch vụ</span>
+                    <span>Chi tiết yêu cầu</span>
                 </div>
+                {
+                    record.status === 'processing' &&
+                    <div className="item" onClick={() => {
+                        setActionMethod({orderId: record.id, actionType: 'cancel', orderType: 'service', openIndex: -1})
+                    }}>
+                        <MdCancelPresentation size={25} className='icon'/>
+                        <span>Hủy yêu cầu</span>
+                    </div>
+                }
                 {
                     record.serviceOrderID !== '00000000-0000-0000-0000-000000000000' &&
                     <div className="item" onClick={() => {
@@ -118,42 +129,6 @@ const ClientManageTakeCareService: React.FC = () => {
                         <span>Xem đơn hàng</span>
                     </div>
                 }
-                {/* <div className="item" onClick={() => {
-                    handleAction({orderId: record.id, actionType: 'accept service', orderType: 'service', openIndex: -1})
-                }}>
-                    <BiCommentDetail size={25} className='icon'/>
-                    <span>Xác nhận yêu cầu</span>
-                </div>
-                <div className="item" onClick={() => {
-                    handleAction({orderId: record.id, actionType: 'reject service', orderType: 'service', openIndex: -1})
-                }}>
-                    <BiCommentDetail size={25} className='icon'/>
-                    <span>Từ chối yêu cầu</span>
-                </div>
-                <div className="item" 
-                    onClick={() => {
-                        handleAction({orderId: record.id, actionType: 'assign', orderType: 'service', openIndex: -1})
-                    }}
-                 >
-                    <BiDetail size={25} className='icon'/>
-                    <span>Chọn người chăm sóc</span>
-                </div>
-                <div className="item" 
-                    onClick={() => {
-                        handleAction({orderId: record.id, actionType: 'update infor', orderType: 'service', openIndex: -1})
-                    }}
-                 >
-                    <BiDetail size={25} className='icon'/>
-                    <span>Cập nhật thông tin dịch vụ</span>
-                </div>
-                <div className="item" 
-                    onClick={() => {
-                        handleAction({orderId: record.id, actionType: 'create order', orderType: 'service', openIndex: -1})
-                    }}
-                 >
-                    <BiDetail size={25} className='icon'/>
-                    <span>Tạo đơn hàng</span>
-                </div> */}
             </div>
         )
     }
@@ -172,7 +147,18 @@ const ClientManageTakeCareService: React.FC = () => {
         }))
     }, [services])
 
-    
+    const onCloseModal = () =>{
+        setActionMethod(undefined)
+    }
+
+    const handleCancelRequest = (reason: string, canceledBy: string) =>{
+        const [servcice] = services.filter(x => x.id === actionMethod?.orderId)
+
+        servcice.status = 'cancel'
+        servcice.reason = reason
+        servcice.nameCancelBy = canceledBy
+        setServices([...services])
+    }
 
     return (
         <div>
@@ -186,6 +172,16 @@ const ClientManageTakeCareService: React.FC = () => {
                     </div>
                 </div>
             <LandingFooter />
+            {
+                actionMethod?.actionType === 'cancel' &&
+                <CancelOrder
+                    orderId={services.filter(x => x.id === actionMethod?.orderId)[0].id}
+                    orderCode={services.filter(x => x.id === actionMethod?.orderId)[0].serviceCode}
+                    orderType='request'
+                    onClose={onCloseModal}
+                    onSubmit={handleCancelRequest}
+                />
+            }
         </div>
     )
 }

@@ -218,12 +218,38 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
                                     <span className="label">Email:</span>
                                     <span className="content">{serviceOrder.technician.technicianMail}</span>
                                 </Col>
+                            </Row>
+                        </div>
+                        <div className="default-layout">
+                            <h3>Thông tin đơn hàng chăm sóc cây</h3>
+                            <Row gutter={[24, 24]} style={{marginTop: '20px'}}>
+                                <Col span={8}>
+                                    <span className="label">Ngày bắt đầu</span>
+                                    <span className="content">{utilDateTime.dateToString(serviceOrder.service.startDate.toString())}</span>
+                                </Col>
+                                <Col span={8}>
+                                    <span className="label">Ngày kết thúc</span>
+                                    <span className="content">{utilDateTime.dateToString(serviceOrder.service.endDate.toString())}</span>
+                                </Col>
                                 <Col span={8} style={{display: 'flex'}}>
                                     <span className="label">Trạng thái đơn hàng</span>
                                     <span className="content">
                                         <OrderStatusComp status={serviceOrder.status} />
                                     </span>
                                 </Col>
+                                {
+                                    serviceOrder.nameCancelBy &&
+                                    <>
+                                        <Col span={8}>
+                                            <span className="label">Người hủy đơn</span>
+                                            <span className="content">{serviceOrder.nameCancelBy}</span>
+                                        </Col>
+                                        <Col span={8}>
+                                            <span className="label">Lý do</span>
+                                            <span className="content">{serviceOrder.reason}</span>
+                                        </Col>
+                                    </>
+                                }
                             </Row>
                         </div>
                         <div className="default-layout">

@@ -165,7 +165,7 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productId, productIt
                                 control={control}
                                 name='type'
                                 render={({ field: { value } }) => (
-                                    <Select disabled={(NumberOfChild === 1 && productItem?.type === 'unique') || (NumberOfChild > 1 && productItem?.type === 'normal')} suffixIcon={<AiFillCaretDown />} onChange={(value: string) => {
+                                    <Select disabled={(NumberOfChild > 1 && productItem?.type === 'normal') || (NumberOfChild > 1 && productItem?.type === 'normal')} suffixIcon={<AiFillCaretDown />} onChange={(value: string) => {
                                         setValue('type', value as ProductItemType)
                                         trigger('type')
                                     }} value={value} >
@@ -191,7 +191,7 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productId, productIt
                         </Form.Item>
                     </Col>
                     <Col span={12}>
-                        <Form.Item label='Lưu ý khi thuê cây'>
+                        <Form.Item label='Điều khoản khi thuê cây'>
                             <Controller 
                                 control={control}
                                 name='rule'

@@ -7,6 +7,7 @@ interface CartProductItem {
     description: string;
     type: ProductItemType;
     content: string;
+    rule: string;
 }
 interface CartSizeProductItem{
     id: string;

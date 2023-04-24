@@ -14,9 +14,14 @@ const MESSAGES = {
 
 }
 const FAVORITES = ['Hoa giấy', 'Hoa Hồng', 'Cây cảnh', 'Cây để bàn']
+
+const SUPPORT_FORMATS = ['image/png', 'image/jpg', 'image/jpeg']
+const FILE_SIZE_ACCEPTED = 4000000
+
 const ERROS_MESSAGE = {
     RESPONSE: 'Error occurred while handling. Please try again',
     RESPONSE_VI: 'Đã xảy ra lỗi trong khi xử lý. Vui lòng thử lại',
+    INVALID_FILE: `Định dạng ảnh chỉ chấp nhận ${SUPPORT_FORMATS.join(' - ')} và kích thước nhỏ hơn 4mb.`
 }
 const PAGING_ITEMS = {
     CATEGORY: 10,
@@ -48,7 +53,7 @@ const SIZES = {
     LARGE: 'Large',
     UNIQUE: 'Unique'
 }
-const SUPPORT_FORMATS = ['image/png', 'image/jpg', 'image/jpeg']
+
 
 const ROLES_DECLARE: Role[] = ['Admin', 'Customer', 'Manager', 'Technician']
 
@@ -117,7 +122,8 @@ const CONSTANT = {
     MONEY_RATE,
     DEPOSIT_MIN_RATE,
     MANAGE_USERS,
-    ROLES_DECLARE
+    ROLES_DECLARE,
+    FILE_SIZE_ACCEPTED
 }
 
 export default CONSTANT

@@ -32,12 +32,20 @@ const dayjsToLocalString = (date: dayjs.Dayjs) => {
     return date.toDate().toLocaleDateString() as any
 }
 
+const plusDate = (date: Date | string, plusNumber: number) =>{
+    const current = new Date(date)
+    current.setDate(current.getDate() + plusNumber)
+
+    return current
+}
+
 const utilDateTime = {
     dateToString,
     isDisplayExtendRentOrder,
     getDiff2Days,
     dateTimeToString,
-    dayjsToLocalString
+    dayjsToLocalString,
+    plusDate
 }
 
 export default utilDateTime;

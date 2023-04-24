@@ -1,16 +1,18 @@
 import React, { useMemo } from 'react'
-import { Layout, Menu } from 'antd'
+import { Button, Layout, Menu } from 'antd'
 import type { MenuProps } from 'antd';
 import './style.scss';
 import { FaLongArrowAltRight, FaLongArrowAltLeft } from 'react-icons/fa';
 import useSelector from '../hooks/use-selector';
 import useDispatch from '../hooks/use-dispatch';
 import { setCollapsedHeader } from '../slices/admin-layout';
-import { Link, useLocation } from 'react-router-dom';
-import { BiCategoryAlt } from 'react-icons/bi';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { BiCategoryAlt, BiUserCircle } from 'react-icons/bi';
 import { MdOutlineInventory2 } from 'react-icons/md'
 import CONSTANT from 'app/utils/constant';
 import { Role } from 'app/models/general-type';
+import { setEmptyUser } from 'app/slices/user-infor';
+import { setCartSlice } from 'app/slices/cart';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -37,10 +39,10 @@ interface AdminRouteProps{
 const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
     const dispatch = useDispatch();
     const location = useLocation();
+    const navigate = useNavigate();
     
     const { collapsedHeader } = useSelector(state => state.adminLayout);
-    const userState = useSelector(state => state.userInfor)
-    const { roleName } = userState.user
+    const {roleName, fullName} = useSelector(state => state.userInfor.user)
 
     const handleCollapsedHeader = () =>{
         dispatch(setCollapsedHeader({active: !collapsedHeader}))
@@ -126,46 +128,67 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
        CONSTANT.MANAGE_USERS.includes(roleName as Role) ? getItem(<Link to='/panel/users'>Người dùng</Link>, '11', <MdOutlineInventory2 size={18} />) : null,
        CONSTANT.TAKE_CARE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/manage-request'>Yêu cầu chăm sóc</Link>, '12', <MdOutlineInventory2 size={18} />) : null,
     ];
-  return (
-    <>
-        <Layout className='admin-layout'>
-            <Header className='admin-header'>
-                <div className='left'>
-                    <div className="box-collapsed" onClick={handleCollapsedHeader}>
-                        {
-                            collapsedHeader ? <FaLongArrowAltRight /> : <FaLongArrowAltLeft />
-                        }
+
+    const handleLogout = () =>{
+        localStorage.removeItem(CONSTANT.STORAGE.ACCESS_TOKEN)
+        dispatch(setEmptyUser())
+        dispatch(setCartSlice({rentItems: [], saleItems: []}))
+        navigate('/login')
+    }
+    return (
+        <>
+            <Layout className='admin-layout'>
+                <Header className='admin-header'>
+                    <div className='left'>
+                        <div className="box-collapsed" onClick={handleCollapsedHeader}>
+                            {
+                                collapsedHeader ? <FaLongArrowAltRight /> : <FaLongArrowAltLeft />
+                            }
+                        </div>
                     </div>
-                </div>
-            </Header>
-            <Layout className='admin-layout-inside'>
-                <Sider
-                    className='admin-sider'
-                    style={{
-                    overflow: 'auto',
-                    height: '100vh',
-                    position: 'fixed',
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    }}
-                    collapsed={collapsedHeader}
-                >
-                    <div style={{ height: 32, margin: 16, background: 'rgba(255, 255, 255, 0.2)' }} />
-                    <Menu className='admin-menu' theme="light" mode="inline"  items={items} selectedKeys={defaultSelectedKey} openKeys={openedKey} />
-                </Sider>
-                <Layout className="site-layout" style={{ marginLeft: collapsedHeader ? 80 : 200 }}>
-                    <Content>
-                    <div style={{ padding: 24}}>
-                        {children}
+                    <div className="right">
+                        {/* <div className="manage-info"> */}
+                            <div className="info-name">
+                                <BiUserCircle size={30} /> <span className="name">{fullName}</span>
+                            </div>
+                            <div className="info-detail">
+                                <span className="role">{roleName}</span>
+                            </div>
+                            <div className="btn-tools">
+                                <Link to='/'>Trang chủ</Link>
+                                <Button type='primary' htmlType='button' className='btn-update' size='large' onClick={handleLogout} >Đăng xuất</Button>
+                            </div>
+                        {/* </div> */}
                     </div>
-                    </Content>
-                    <Footer style={{ textAlign: 'center' }}>Designed by Us</Footer>
+                </Header>
+                <Layout className='admin-layout-inside'>
+                    <Sider
+                        className='admin-sider'
+                        style={{
+                        overflow: 'auto',
+                        height: '100vh',
+                        position: 'fixed',
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        }}
+                        collapsed={collapsedHeader}
+                    >
+                        <div style={{ height: 32, margin: 16, background: 'rgba(255, 255, 255, 0.2)' }} />
+                        <Menu className='admin-menu' theme="light" mode="inline"  items={items} selectedKeys={defaultSelectedKey} openKeys={openedKey} />
+                    </Sider>
+                    <Layout className="site-layout" style={{ marginLeft: collapsedHeader ? 80 : 200 }}>
+                        <Content>
+                        <div style={{ padding: 24}}>
+                            {children}
+                        </div>
+                        </Content>
+                        <Footer style={{ textAlign: 'center' }}>Designed by Us</Footer>
+                    </Layout>
                 </Layout>
             </Layout>
-        </Layout>
-    </>
-  )
+        </>
+    )
 }
 
 export default AdminRoute

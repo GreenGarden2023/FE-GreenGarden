@@ -342,11 +342,12 @@ const ManageRentOrder:React.FC = () => {
 
         }
     }
-    const handleCancelOrder = (reason: string) =>{
+    const handleCancelOrder = (reason: string, canceledBy: string) =>{
         const [order] = rentOrders.filter(x => x.rentOrderList[0].id === actionMethod?.orderId)[0].rentOrderList
 
         order.status = 'cancel'
         order.reason = reason
+        order.nameCancelBy = canceledBy
         setRentOrders([...rentOrders])
         handleClose()
     }
@@ -361,6 +362,31 @@ const ManageRentOrder:React.FC = () => {
         setRentOrders([...rentOrders])
         handleClose()
     }
+
+    const OrderDetail = useMemo(() =>{
+        const [data] = rentOrders.filter(x => x.rentOrderList[0].id === actionMethod?.orderId)
+    
+        if(!data) return {}
+
+        const [newData] = data.rentOrderList
+
+        const { recipientName, recipientPhone, recipientAddress, createDate, startRentDate, endRentDate, 
+            status, deposit, transportFee, totalPrice, remainMoney, reason, nameCancelBy } = newData
+
+        return {
+            name: recipientName,
+            phone: recipientPhone,
+            address: recipientAddress,
+            createOrderDate: utilDateTime.dateToString(createDate.toString()),
+            startDate: utilDateTime.dateToString(startRentDate.toString()),
+            endDate: utilDateTime.dateToString(endRentDate.toString()),
+            status: status,
+            transportFee,
+            totalOrder: totalPrice,
+            remainMoney,
+            deposit, reason, nameCancelBy
+        }
+    }, [actionMethod, rentOrders])
 
     return (
         <div className="mro-wrapper">
@@ -431,6 +457,7 @@ const ManageRentOrder:React.FC = () => {
                     orderCode={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0].orderCode}
                     orderId={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0].id}
                     orderType='rent'
+                    userInforOrder={OrderDetail}
                 />
             }
             {
@@ -440,6 +467,7 @@ const ManageRentOrder:React.FC = () => {
                     onSubmit={handleRefundOrder}
                     orderCode={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0].orderCode}
                     orderId={rentOrders.filter(x => x.rentOrderList[0].id === actionMethod.orderId)[0].rentOrderList[0].id}
+                    userInforOrder={OrderDetail}
                     orderType='rent'
                     transactionType='rent refund'
                 />

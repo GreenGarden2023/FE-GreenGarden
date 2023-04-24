@@ -336,11 +336,13 @@ const ManageRentOrderGroup: React.FC = () => {
     } catch {}
   };
   
-  const handleCancelOrder = () =>{
+  const handleCancelOrder = (reason: string, canceledBy: string) =>{
     if(!groupOrder) return;
 
     const [order] = groupOrder.rentOrderList.filter(x => x.id === actionMethod?.orderId)
     order.status = 'cancel'
+    order.reason = reason
+    order.nameCancelBy = canceledBy
     setGroupOrder({...groupOrder})
     handleClose()
   }
@@ -362,6 +364,27 @@ const ManageRentOrderGroup: React.FC = () => {
     setGroupOrder({...groupOrder})
     handleClose()
   }
+  const OrderDetail = useMemo(() =>{
+    if(!groupOrder) return;
+    const [data] = groupOrder.rentOrderList.filter(x => x.id === actionMethod?.orderId)
+
+    const { recipientName, recipientPhone, recipientAddress, createDate, startRentDate, endRentDate, 
+      status, deposit, transportFee, totalPrice, remainMoney, reason, nameCancelBy } = data
+
+    return {
+        name: recipientName,
+        phone: recipientPhone,
+        address: recipientAddress,
+        createOrderDate: utilDateTime.dateToString(createDate.toString()),
+        startDate: utilDateTime.dateToString(startRentDate.toString()),
+        endDate: utilDateTime.dateToString(endRentDate.toString()),
+        status: status,
+        transportFee,
+        totalOrder: totalPrice,
+        remainMoney,
+        deposit, reason, nameCancelBy
+    }
+}, [actionMethod, groupOrder])
   return (
     <div className="mrog-wrapper">
       <HeaderInfor title="Xem nhóm đơn hàng cho thuê" />
@@ -464,6 +487,7 @@ const ManageRentOrderGroup: React.FC = () => {
           orderCode={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0].orderCode}
           orderId={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0].id}
           orderType='rent'
+          userInforOrder={OrderDetail}
         />
       }
       {
@@ -473,6 +497,7 @@ const ManageRentOrderGroup: React.FC = () => {
           orderCode={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0].orderCode}
           orderType='rent'
           transactionType='rent refund'
+          userInforOrder={OrderDetail}
           onClose={handleClose}
           onSubmit={handleRefundOrder}
         />
@@ -482,7 +507,7 @@ const ManageRentOrderGroup: React.FC = () => {
         <TransactionDetail
             orderId={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0].id}
             orderCode={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0].orderCode}
-            orderType='sale'
+            orderType='rent'
             onClose={handleClose}
         />
       }
@@ -837,6 +862,27 @@ const ViewAllOrderGroup: React.FC<ViewAllOrderGroupProps> = ({orderId, recall}) 
     handleClose()
     checkReCallOrder(order.id)
   }
+  const OrderDetail = useMemo(() =>{
+    if(!groupOrder) return {}
+    const [data] = groupOrder.rentOrderList.filter(x => x.id === actionMethod?.orderId)
+
+    const { recipientName, recipientPhone, recipientAddress, createDate, startRentDate, endRentDate, 
+      status, deposit, transportFee, totalPrice, remainMoney, reason, nameCancelBy } = data
+
+    return {
+        name: recipientName,
+        phone: recipientPhone,
+        address: recipientAddress,
+        createOrderDate: utilDateTime.dateToString(createDate.toString()),
+        startDate: utilDateTime.dateToString(startRentDate.toString()),
+        endDate: utilDateTime.dateToString(endRentDate.toString()),
+        status: status,
+        transportFee,
+        totalOrder: totalPrice,
+        remainMoney,
+        deposit, reason, nameCancelBy
+    }
+}, [actionMethod, groupOrder])
   return (
     <>
       {
@@ -895,6 +941,7 @@ const ViewAllOrderGroup: React.FC<ViewAllOrderGroupProps> = ({orderId, recall}) 
           orderType='rent'
           onClose={handleClose}
           onSubmit={handleCancelOrder}
+          userInforOrder={OrderDetail}
         />
       }
       {
@@ -904,6 +951,7 @@ const ViewAllOrderGroup: React.FC<ViewAllOrderGroupProps> = ({orderId, recall}) 
           orderCode={groupOrder.rentOrderList.filter(x => x.id === actionMethod.orderId)[0].orderCode}
           orderType='rent'
           transactionType='rent refund'
+          userInforOrder={OrderDetail}
           onClose={handleClose}
           onSubmit={handleRefundOrder}
         />

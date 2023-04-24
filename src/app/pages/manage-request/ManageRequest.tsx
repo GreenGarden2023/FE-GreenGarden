@@ -15,8 +15,8 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { BiCommentDetail } from 'react-icons/bi'
 import { GrMore } from 'react-icons/gr'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { ServiceStatusToTag } from '../manage-take-care-service/ManageTakeCareService'
 import './style.scss'
+import ServiceStatusComp from 'app/components/status/ServiceStatusComp'
 
 const ManageRequest: React.FC = () => {
     // const dispatch = useDispatch();
@@ -86,7 +86,7 @@ const ManageRequest: React.FC = () => {
             key: 'status',
             dataIndex: 'status',
             width: 200,
-            render: (v) => (ServiceStatusToTag(v))
+            render: (v) => (<ServiceStatusComp status={v} />)
         },
         {
             title: 'Nơi chăm sóc',

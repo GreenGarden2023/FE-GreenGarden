@@ -21,6 +21,7 @@ import { ServiceDetailList, ServiceOrderList } from 'app/models/service'
 import { ShippingFee } from 'app/models/shipping-fee'
 import orderService from 'app/services/order.service'
 import paymentService from 'app/services/payment.service'
+import serviceService from 'app/services/service.service'
 import shippingFeeService from 'app/services/shipping-fee.service'
 import { setNoti } from 'app/slices/notification'
 import CONSTANT from 'app/utils/constant'
@@ -348,16 +349,12 @@ const ManageTakeCareOrder: React.FC = () => {
             await paymentService.paymentCash(actionMethod?.orderId || '', amount, 'service', total === 0 ? 'whole' : '')
             if(total === 0){
                 order.status = 'paid'
+
+                // update status for request is 'taking care'
+                await serviceService.updateServiceRequestStatus(order.service.id, 'taking care')
             }
             order.remainAmount = total
             setServiceOrders([...serviceOrders])
-            // recall 
-            // setRecall(!recall)
-            // const currentPage = searchParams.get('page');
-            // const res = await orderService.getAllServiceOrders({curPage: Number(currentPage), pageSize: paging.pageSize})
-            // setServiceOrders(res.data.serviceOrderList)
-            // setPaging(res.data.paging)
-            // 
             dispatch(setNoti({type: 'success', message: 'Cập nhật đơn hàng thành công'}))
             handleClose()
         }catch{
@@ -375,13 +372,13 @@ const ManageTakeCareOrder: React.FC = () => {
     const handleRefund = () =>{
         handleClose()
     }
-    const OrderDetail = useMemo(() =>{
+    const OrderTakeCareDetail = useMemo(() =>{
         if(!actionMethod) return {}
 
         const [order] = serviceOrders.filter(x => x.id === actionMethod.orderId)
         if(!order) return {};
 
-        const { service, createDate, status, deposit, transportFee, totalPrice, remainAmount } = order
+        const { service, createDate, status, deposit, transportFee, totalPrice, remainAmount, reason, nameCancelBy } = order
         const { name, phone, address } = service
 
         return {
@@ -393,7 +390,7 @@ const ManageTakeCareOrder: React.FC = () => {
             transportFee,
             totalOrder: totalPrice,
             remainMoney: remainAmount,
-            deposit
+            deposit, reason, nameCancelBy
         }
 
     }, [actionMethod, serviceOrders])
@@ -406,6 +403,26 @@ const ManageTakeCareOrder: React.FC = () => {
         if(!order) return;
 
         setAmount(order.remainAmount)
+    }, [actionMethod, serviceOrders])
+
+    const OrderDetail = useMemo(() =>{
+        const data = serviceOrders.filter(x => x.id === actionMethod?.orderId)[0]
+        if(!data) return {}
+    
+        const { createDate, status, deposit, transportFee, totalPrice, remainAmount, reason, cancelBy } = data
+        const { name, phone, address } = data.service
+
+        return {
+            name,
+            phone,
+            address,
+            createOrderDate: utilDateTime.dateToString(createDate.toString()),
+            status: status,
+            transportFee,
+            totalOrder: totalPrice,
+            remainMoney: remainAmount,
+            deposit, reason, cancelBy
+        }
     }, [actionMethod, serviceOrders])
 
     return (
@@ -491,6 +508,7 @@ const ManageTakeCareOrder: React.FC = () => {
                     onSubmit={handleRefund}
                     orderCode={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].orderCode}
                     orderId={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].id}
+                    userInforOrder={OrderTakeCareDetail}
                     orderType='service'
                     transactionType='service refund'
                 />

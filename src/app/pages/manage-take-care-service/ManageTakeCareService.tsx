@@ -1,14 +1,13 @@
-import {SyncOutlined} from '@ant-design/icons'
-import { Modal, Popover, Tag } from 'antd'
+import { Modal, Popover } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import AssignTechnician from 'app/components/modal/assign-technician/AssignTechnician'
 import UpdateConfirmServiceDetail from 'app/components/modal/update-confirm-service-detail/UpdateConfirmServiceDetail'
 import TechnicianName from 'app/components/renderer/technician/TechnicianName'
 import Transport from 'app/components/renderer/transport/Transport'
+import ServiceStatusComp from 'app/components/status/ServiceStatusComp'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
 import useDispatch from 'app/hooks/use-dispatch'
-import { ServiceStatus } from 'app/models/general-type'
 import { PaymentControlState } from 'app/models/payment'
 import { Service, ServiceDetailList } from 'app/models/service'
 import { ShippingFee } from 'app/models/shipping-fee'
@@ -20,20 +19,7 @@ import { setNoti } from 'app/slices/notification'
 import utilDateTime from 'app/utils/date-time'
 import React, { useEffect, useMemo, useState } from 'react'
 import { BiCommentDetail, BiDetail } from 'react-icons/bi'
-import { FaCheck } from 'react-icons/fa'
 import { GrMore } from 'react-icons/gr'
-import { MdOutlineCancel, MdOutlineFileDownloadDone, MdOutlineKeyboardReturn } from 'react-icons/md'
-
-export const ServiceStatusToTag = (status: ServiceStatus) =>{
-    switch(status){
-        case 'processing': return <Tag className='center' icon={<SyncOutlined  />} color='default' >Đang xử lý</Tag>
-        case 'accepted': return <Tag className='center' icon={<FaCheck  />} color='#2db7f5' >Đã xác nhận</Tag>
-        case 'rejected': return <Tag className='center' icon={<MdOutlineCancel  />} color='#f50'>Từ chối</Tag>
-        case 'confirmed': return <Tag className='center' icon={<MdOutlineFileDownloadDone  />} color='#FF0066'>Đang chăm sóc</Tag>
-        case 'user approved': return <Tag className='center' icon={<MdOutlineFileDownloadDone  />} color='#87d068'>Đã chấp nhận</Tag>
-        default: return <Tag className='center' icon={<MdOutlineKeyboardReturn />} color='#108ee9'>Đang xử lý lại</Tag>
-    }
-}
 
 const ManageTakeCareService: React.FC = () => {
     const dispatch = useDispatch();
@@ -170,7 +156,7 @@ const ManageTakeCareService: React.FC = () => {
             key: 'status',
             dataIndex: 'status',
             width: 200,
-            render: (v) => (ServiceStatusToTag(v))
+            render: (v) => (<ServiceStatusComp status={v} />)
         },
         {
             title: 'Nơi chăm sóc',
@@ -244,15 +230,25 @@ const ManageTakeCareService: React.FC = () => {
     }
     const handleConfirmService = async() =>{
         const serviceId = actionMethod?.orderId || ''
-        const status = actionMethod?.actionType === 'accept service' ? 'accepted' : 'rejected'
 
-        serviceService.updateServiceRequestStatus(serviceId, status)
+        serviceService.updateServiceRequestStatus(serviceId, 'accepted')
         const serviceIndex = serviceOrders.findIndex(x => x.id === serviceId)
-        serviceOrders[serviceIndex].status = status
+        serviceOrders[serviceIndex].status = 'accepted'
         setServiceOrders([...serviceOrders])
-        dispatch(setNoti({type: 'success', message: 'Cập nhật trạng thái dịch vụ thành công'}))
+        dispatch(setNoti({type: 'success', message: 'Cập nhật trạng thái yêu cầu chăm sóc thành công'}))
         handleClose()
     }
+
+    const handleRejectService = async () =>{
+        const serviceId = actionMethod?.orderId || ''
+        serviceService.updateServiceRequestStatus(serviceId, 'rejected')
+        const [service] = serviceOrders.filter(x => x.id === serviceId)
+        service.status = 'rejected'
+        setServiceOrders([...serviceOrders])
+        dispatch(setNoti({type: 'success', message: 'Cập nhật trạng thái yêu cầu chăm sóc thành công'}))
+        handleClose()
+    }
+
     const handleUpdateService = (service: Service) =>{
         console.log({service})
         const index = serviceOrders.findIndex(x => x.id === service.id)
@@ -261,18 +257,18 @@ const ManageTakeCareService: React.FC = () => {
         handleClose()
     }
     const handleCreateServiceOrder = async() =>{
-        const serviceIndex = serviceOrders.findIndex(x => x.id === actionMethod?.orderId)
-        const service = serviceOrders[serviceIndex]
+        const [service] = serviceOrders.filter(x => x.id === actionMethod?.orderId)
         try{
             await orderService.createServiceOrder(service.id)
             dispatch(setNoti({type: 'success', message: `Tạo mới đơn hàng thành công cho dịch vụ ${service.serviceCode}`}))
-            serviceOrders[serviceIndex].status = 'confirmed'
+            service.status = 'confirmed'
             setServiceOrders([...serviceOrders])
             handleClose()
         }catch{
 
         }
     }
+
     return (
         <div className="mtko-wrapper">
             <HeaderInfor title='Quản lý yêu cầu chăm sóc' />
@@ -293,12 +289,23 @@ const ManageTakeCareService: React.FC = () => {
                 />
             }
             {
-                (actionMethod?.actionType === 'accept service' || actionMethod?.actionType === 'reject service') &&
+                (actionMethod?.actionType === 'accept service') &&
                 <Modal
-                    title={`${actionMethod?.actionType === 'accept service' ? 'Xác nhận' : 'Từ chối'} dịch vụ ${serviceOrders.filter(x => x.id === actionMethod.orderId)[0].serviceCode}`}
+                    title={`Chấp nhận yêu cầu "${serviceOrders.filter(x => x.id === actionMethod.orderId)[0].serviceCode}"`}
                     open
                     onCancel={handleClose}
                     onOk={handleConfirmService}
+                >
+
+                </Modal>
+            }
+            {
+                (actionMethod?.actionType === 'reject service') &&
+                <Modal
+                    title={`Từ chối yêu cầu "${serviceOrders.filter(x => x.id === actionMethod.orderId)[0].serviceCode}"`}
+                    open
+                    onCancel={handleClose}
+                    onOk={handleRejectService}
                 >
 
                 </Modal>

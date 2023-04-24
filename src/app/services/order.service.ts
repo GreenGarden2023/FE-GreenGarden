@@ -149,6 +149,11 @@ const getRentOrderDetailByRangeDate = async (paging: Partial<Paging>, fromDate: 
     return res.data
 }
 
+const updateServiceOrderStatus = async (orderID: string, status: OrderStatus) =>{
+    const res = await golbalAxios.post(`/order/update-service-order-status`, {orderID, status})
+    return res.data
+}
+
 const orderService = {
     createOrder,
     getRentOrders,
@@ -172,7 +177,8 @@ const orderService = {
     getRentOrderDetailByOrderCode,
     getSaleOrderDetailByOrderCode,
     getServiceOrderDetailByOrderCode,
-    getRentOrderDetailByRangeDate
+    getRentOrderDetailByRangeDate,
+    updateServiceOrderStatus
 }
 
 export default orderService

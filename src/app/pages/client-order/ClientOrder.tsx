@@ -724,22 +724,27 @@ const ClientOrder: React.FC = () =>{
     const handleCancel = () =>{
         setActionMethod(undefined)
     }
-    const handleCancelRentOrder = (reason: string) =>{
+    const handleCancelRentOrder = (reason: string, canceledBy: string) =>{
         const [order] = rentOrders.filter(x => x.rentOrderList[0].id === actionMethod?.orderId)[0].rentOrderList
         order.status = 'cancel'
         order.reason = reason
+        order.nameCancelBy = canceledBy
         setRentOrders([...rentOrders])
         handleCancel()
     }
-    const handleCancelSaleOrder = () =>{
+    const handleCancelSaleOrder = (reason: string, canceledBy: string) =>{
         const [order] = saleOrders.filter(x => x.id === actionMethod?.orderId)
         order.status = 'cancel'
+        order.reason = reason
+        order.nameCancelBy = canceledBy
         setSaleOrders([...saleOrders])
         handleCancel()
     }
-    const handleCancelServiceOrder = () =>{
+    const handleCancelServiceOrder = (reason: string, canceledBy: string) =>{
         const [order] = serviceOrders.filter(x => x.id === actionMethod?.orderId)
         order.status = 'cancel'
+        order.reason = reason
+        order.nameCancelBy = canceledBy
         setServiceOrders([...serviceOrders])
         handleCancel()
     }

@@ -72,6 +72,9 @@ export interface Service {
     serviceDetailList: ServiceDetailList[]
     rules: string
     districtID: number;
+    reason: string;
+    cancelBy: string;
+    nameCancelBy: string;
 }
   
 export interface ServiceDetailList {
@@ -107,6 +110,9 @@ export interface ServiceOrderList {
     transportFee: number
     status: OrderStatus
     service: Service
+    reason: string;
+    cancelBy: string;
+    nameCancelBy: string;
 }
 export interface Technician {
     technicianID: string
@@ -123,8 +129,8 @@ export interface ServiceOrderDetail{
     userID: string
     technician: Technician
     createDate: string
-    serviceStartDate: string
-    serviceEndDate: string
+    serviceStartDate: Date
+    serviceEndDate: Date
     deposit: number
     totalPrice: number
     discountAmount: number
@@ -134,6 +140,9 @@ export interface ServiceOrderDetail{
     transportFee: number
     status: OrderStatus
     service: Service
+    reason: string;
+    cancelBy: string;
+    nameCancelBy: string;
 }
 
 export interface ServiceRequest{

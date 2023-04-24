@@ -2,6 +2,14 @@ export interface CreateServiceCalendar{
     calendarInitial?: CalendarInitial
     calendarUpdate?: CalendarUpdate
 }
+export interface CreateFirstCalendarResponse{
+    id: string
+    serviceOrderId: string
+    serviceDate: Date
+    sumary: string
+    status: string
+    images: string[]
+}
 export interface CreateServiceResponse{
     nextCalendar: ServiceCalendar
     previousCalendar: ServiceCalendar

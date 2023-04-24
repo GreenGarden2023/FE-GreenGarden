@@ -337,10 +337,11 @@ const ManageSaleOrder: React.FC = () => {
         }
         setLoadingAction(false)
     }
-    const handleCancelOrder = async (reason: string) =>{
+    const handleCancelOrder = async (reason: string, canceledBy: string) =>{
         const [order] = saleOrders.filter(x => x.id === actionMethod?.orderId)
         order.status = 'cancel'
         order.reason = reason
+        order.nameCancelBy = canceledBy
         setSaleOrders([...saleOrders])
         handleCancel()
     }
@@ -352,7 +353,7 @@ const ManageSaleOrder: React.FC = () => {
         const data = saleOrders.filter(x => x.id === actionMethod?.orderId)[0]
         if(!data) return {}
     
-        const { recipientName, recipientPhone, recipientAddress, createDate, status, deposit, transportFee, totalPrice, remainMoney } = data
+        const { recipientName, recipientPhone, recipientAddress, createDate, status, deposit, transportFee, totalPrice, remainMoney, reason, nameCancelBy } = data
 
         return {
             name: recipientName,
@@ -363,7 +364,7 @@ const ManageSaleOrder: React.FC = () => {
             transportFee,
             totalOrder: totalPrice,
             remainMoney,
-            deposit
+            deposit, reason, nameCancelBy
         }
     }, [actionMethod, saleOrders])
 
@@ -379,6 +380,35 @@ const ManageSaleOrder: React.FC = () => {
         setSaleOrders([...saleOrders])
         handleCancel()
     }
+
+    // const UserInforOrder = useMemo(() =>{
+    //     const [order] = saleOrders.filter(x => x.id === actionMethod?.orderId)
+
+    //     // name?: string;
+    //     // phone?: string;
+    //     // address?: string;
+    //     // createOrderDate?: string;
+    //     // startDate?: string;
+    //     // endDate?: string;
+    //     // status?: OrderStatus;
+    //     // transportFee?: number;
+    //     // totalOrder?: number;
+    //     // remainMoney?: number;
+    //     // deposit?: number;
+    //     // reason?: string;
+    //     // nameCancelBy?: string;
+    //     const { recipientName, recipientPhone, recipientAddress, createDate, status, transportFee,
+    //     totalPrice, remainMoney, deposit, reason, cancelBy } = order
+
+    //     return {
+    //         name: recipientName,
+    //         phone: recipientPhone,
+    //         address: recipientAddress,
+    //         createDate: utilDateTime.dateToString(createDate.toString()),
+    //         status, transportFee, totalOrder: totalPrice,
+    //         remainMoney, deposit, reason, cancelBy
+    //     }
+    // }, [saleOrders, actionMethod?.orderId])
 
     return (
         <div className="mso-wrapper">
@@ -475,6 +505,7 @@ const ManageSaleOrder: React.FC = () => {
                     orderCode={saleOrders.filter(x => x.id === actionMethod?.orderId)[0].orderCode}
                     orderId={saleOrders.filter(x => x.id === actionMethod?.orderId)[0].id}
                     orderType='sale'
+                    userInforOrder={OrderDetail}
                 />
             }
             {
@@ -484,6 +515,7 @@ const ManageSaleOrder: React.FC = () => {
                     onSubmit={handleRefundOrder}
                     orderCode={saleOrders.filter(x => x.id === actionMethod.orderId)[0].orderCode}
                     orderId={saleOrders.filter(x => x.id === actionMethod.orderId)[0].id}
+                    userInforOrder={OrderDetail}
                     orderType='sale'
                     transactionType='sale refund'
                 />

@@ -97,6 +97,7 @@ const LandingHeader: React.FC = () =>{
         localStorage.removeItem(CONSTANT.STORAGE.ACCESS_TOKEN)
         dispatch(setEmptyUser())
         dispatch(setCartSlice({rentItems: [], saleItems: []}))
+        navigate('/login')
     }
 
     const handleViewInfor = () =>{
