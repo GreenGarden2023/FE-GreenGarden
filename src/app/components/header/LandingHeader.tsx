@@ -152,6 +152,8 @@ const LandingHeader: React.FC = () =>{
                         </Link>
                     </div>
                     <div className="right">
+                      {
+                        userState.token &&
                         <div className="cart-box">
                             <Link to='/cart' >
                                 <Badge count={cartQuantity} >
@@ -159,6 +161,7 @@ const LandingHeader: React.FC = () =>{
                                 </Badge>
                             </Link>
                         </div>
+                      }
                         <div className="register-login-infor-box">
                           {
                             !userState.loading && 

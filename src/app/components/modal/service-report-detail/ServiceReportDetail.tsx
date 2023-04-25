@@ -1,4 +1,4 @@
-import { Image, Modal } from 'antd';
+import { Button, Image, Modal } from 'antd';
 import { ServiceCalendar } from 'app/models/service-calendar';
 import utilDateTime from 'app/utils/date-time';
 import React from 'react';
@@ -6,6 +6,7 @@ import { BiTimeFive } from 'react-icons/bi';
 import './style.scss';
 import { GrFormNext, GrFormPrevious } from 'react-icons/gr';
 import Slider from "react-slick";
+import TakeCareStatusComp from 'app/components/status/TakeCareStatusComp';
 
 interface ServiceReportDetailProps{
     orderCode: string;
@@ -36,45 +37,64 @@ const ServiceReportDetail: React.FC<ServiceReportDetailProps> = ({orderCode, ser
                 <div className="report-time">
                     <div className="title">
                         <BiTimeFive size={20} color='#0099FF' />
-                        <span>Thời gian chăm sóc</span>
+                        <p>Thời gian chăm sóc</p>
                     </div>
                     <div className="content">
-                        <span>{utilDateTime.dateToString(serviceCalendar.serviceDate.toString())}</span>
+                        <p>{utilDateTime.dateToString(serviceCalendar.serviceDate.toString())}</p>
+                    </div>
+                    <div className="status">
+                        <TakeCareStatusComp status={serviceCalendar.status} />
                     </div>
                 </div>
-                <h3>Hình ảnh</h3>
-                <div className="report-images">
-                    {
-                        (serviceCalendar && serviceCalendar.images.length > 4) &&
-                        <Slider {...settings}>
+                {
+                    (serviceCalendar.images && serviceCalendar.images.length !== 0) && 
+                    <>
+                        <h3>Hình ảnh</h3>
+                        <div className="report-images">
                             {
-                                serviceCalendar.images.map((item, index) => (
-                                    <div key={index} className='image-item-wrapper'>
-                                        <img src={item} alt="/" className='image-item-detail' />
-                                    </div>
-                                ))
+                                (serviceCalendar && serviceCalendar.images.length > 4) &&
+                                <Slider {...settings}>
+                                    {
+                                        serviceCalendar.images.map((item, index) => (
+                                            <div key={index} className='image-item-wrapper'>
+                                                <img src={item} alt="/" className='image-item-detail' />
+                                            </div>
+                                        ))
+                                    }
+                                </Slider>
                             }
-                        </Slider>
-                    }
-                    {
-                        (serviceCalendar && serviceCalendar.images.length <= 4) &&
-                        <Image.PreviewGroup>
                             {
-                                serviceCalendar.images.map((x, index) => (
-                                    <Image 
-                                        src={x}
-                                        key={index}
-                                        className='image-item'
-                                    />
-                                ))
+                                (serviceCalendar && serviceCalendar.images.length <= 4) &&
+                                <Image.PreviewGroup>
+                                    {
+                                        serviceCalendar.images.map((x, index) => (
+                                            <Image 
+                                                src={x}
+                                                key={index}
+                                                className='image-item'
+                                            />
+                                        ))
+                                    }
+                                </Image.PreviewGroup>
                             }
-                        </Image.PreviewGroup>
-                    }
-                </div>
-                <h3>Ghi chú</h3>
-                <div className="report-description">
-                    <p>{serviceCalendar.sumary}</p>
-                </div>
+                        </div>
+                    </>
+                }
+                {
+                    (serviceCalendar.sumary && serviceCalendar.sumary.trim()) &&
+                    <>
+                        <h3>Ghi chú</h3>
+                        <div className="report-description">
+                            <p>{serviceCalendar.sumary}</p>
+                        </div>
+                    </>
+                }
+            </div>
+            <div className='btn-form-wrapper mt-10'>
+                <Button type='default' className='btn-cancel' size='large' onClick={onClose} >Hủy bỏ</Button>
+                <Button type='primary' className='btn-update' size='large' onClick={onClose}>
+                    Xác nhận
+                </Button>
             </div>
         </Modal>
     )

@@ -1,11 +1,11 @@
-import { Breadcrumb, Col, Collapse, Divider, Row, Tag } from 'antd';
+import { Breadcrumb, Col, Collapse, Divider, Image, Row, Tag } from 'antd';
 import LandingFooter from 'app/components/footer/LandingFooter';
 import LandingHeader from 'app/components/header/LandingHeader';
 import React, { useEffect, useMemo, useState } from 'react';
-import { AiOutlineShoppingCart } from 'react-icons/ai';
+import { AiFillStar, AiOutlineShoppingCart } from 'react-icons/ai';
 import { BiPlus } from 'react-icons/bi';
 import { GrFormNext, GrFormPrevious, GrFormSubtract } from 'react-icons/gr';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Carousel } from 'react-responsive-carousel'
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import './style.scss';
@@ -23,12 +23,19 @@ import { Product } from 'app/models/product';
 import { Category } from 'app/models/category';
 import pagingPath from 'app/utils/paging-path';
 import { IoFlowerOutline } from 'react-icons/io5';
+import { FaRegSmileBeam, FaVoteYea } from 'react-icons/fa';
+import { RxAvatar } from 'react-icons/rx';
+import { FeedbackGet } from 'app/models/feedback';
+import feedbackService from 'app/services/feedback.service';
+import utilDateTime from 'app/utils/date-time';
 
 const text = `Đối với các sản phẩm cây/ bao gồm cây:\n- Chỉ giao hàng tại TP HCM`
 const ClientProductItemDetail: React.FC = () => {
     const { productItemId } = useParams()
+    const navigate = useNavigate()
     const dispatch = useDispatch()
     const cartState = useSelector(state => state.CartStore)
+    const { id } = useSelector(state => state.userInfor.user)
 
     const [proItem, setProItem] = useState<ProductItem>();
     const [product, setproduct] = useState<Product>();
@@ -36,7 +43,21 @@ const ClientProductItemDetail: React.FC = () => {
     const [sizeSelect, setSizeSelect] = useState('');
     const [quanRent, setQuanRent] = useState(1)
     const [quanSale, setQuanSale] = useState(1)
+    const [feedback, setFeedback] = useState<FeedbackGet[]>([])
 
+    useEffect(() =>{
+        if(!productItemId) return;
+
+        const init = async () =>{
+            try{
+                const res = await feedbackService.getListFeedbackByProductItemDetail(productItemId)
+                setFeedback(res.data)
+            }catch{
+
+            }
+        }
+        init()
+    }, [productItemId])
 
     useEffect(() =>{
         pagingPath.scrollTop()
@@ -116,6 +137,14 @@ const ClientProductItemDetail: React.FC = () => {
 
 
     const handleAddCart = async (cartType: CartType, productItemDetailID: string) =>{
+        // no user before
+        if(!id){
+            return navigate('/login', {
+                state: {
+                    history: `/product-item/${productItemId}`
+                }
+            })
+        }
         const currentItem = proItem?.productItemDetail.filter(x => x.id === productItemDetailID)[0].quantity || 0
         const newData = {...cartState}
         newData.status = ''
@@ -366,6 +395,57 @@ const ClientProductItemDetail: React.FC = () => {
                             }
                         </section>
                     }
+                     <section className="feedback-wrapper default-layout">
+                            <Divider orientation='left' >
+                                <div className='feedback-divider'>
+                                    <FaVoteYea color='#00a76f' size={25} />
+                                    <span>Đánh giá của khách hàng</span>
+                                </div>
+                            </Divider>
+                            {
+                                feedback.length === 0 ?
+                                <div className="no-feedback">
+                                    <FaRegSmileBeam color='#00a76f' size={25} />
+                                    <span>Chưa có đánh giá nào cho sản phẩm này</span>
+                                </div> : 
+                                feedback.map((fb, index) => (
+                                    <div className="feedback-item" key={index}>
+                                        <div className="feedback-detail" >
+                                            <div className="left-feedback">
+                                                <RxAvatar size={50} color='#707070' />
+                                            </div>
+                                            <div className="right-feedback">
+                                                <p className="user-name">{fb.user.fullName}</p>
+                                                <p className="rating">
+                                                    {
+                                                        [...Array(fb.rating)].map((_, i) => (<AiFillStar key={i} color='#f95441' />))
+                                                    }
+                                                </p>
+                                                <div className="images">
+                                                    <Image.PreviewGroup>
+                                                        {
+                                                            fb.imageURL.map((image, j) => (
+                                                                <Image 
+                                                                    key={j}
+                                                                    src={image}
+                                                                    width={100}
+                                                                    height={100}
+                                                                    style={{objectFit: 'cover', borderRadius: '5px'}}
+                                                                />
+                                                            ))
+                                                        }
+                                                    </Image.PreviewGroup>
+                                                </div>
+                                                <p className="comment">{fb.comment}</p>
+                                                <p className="time">
+                                                    {utilDateTime.dateTimeToString(fb.updateDate ? fb.updateDate : fb.createDate)}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            }
+                    </section>
                 </div>
             </div>
             <LandingFooter />

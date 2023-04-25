@@ -1,4 +1,4 @@
-import { Breadcrumb, Col, Divider, Row } from 'antd';
+import { Breadcrumb, Col, Divider, Pagination, Row } from 'antd';
 import LandingFooter from 'app/components/footer/LandingFooter';
 import LandingHeader from 'app/components/header/LandingHeader';
 import useDispatch from 'app/hooks/use-dispatch';
@@ -26,8 +26,8 @@ const ClientProductItem: React.FC = () => {
     const [productItems, setProductItems] = useState<ProductItem[]>([])
     const [product, setProduct] = useState<Product>()
     const [category, setCategory] = useState<Category>()
-    const [paging, setPaging] = useState<Paging>();
-    console.log(paging)
+    const [paging, setPaging] = useState<Partial<Paging>>({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.CLIENT_PRODUCT_ITEM});
+    
     useEffect(() =>{
         pagingPath.scrollTop()
         const currentPage = searchParams.get('page');
@@ -40,7 +40,7 @@ const ClientProductItem: React.FC = () => {
 
         const init = async () =>{
             try{
-                const res = await productItemService.getAllProductItem({curPage: Number(currentPage), pageSize: CONSTANT.PAGING_ITEMS.CLIENT_PRODUCT_ITEM}, {
+                const res = await productItemService.getAllProductItem({curPage: Number(currentPage), pageSize: paging.pageSize}, {
                     productID: productId,
                     status: 'active',
                 })
@@ -54,7 +54,7 @@ const ClientProductItem: React.FC = () => {
         }
         init();
 
-    }, [productId, dispatch, navigate, searchParams])
+    }, [productId, dispatch, navigate, searchParams, paging.pageSize])
 
     return (
         <div>
@@ -106,6 +106,9 @@ const ClientProductItem: React.FC = () => {
                                 ))
                             }
                         </Row>
+                        <div style={{width: 'fit-content', margin: '20px auto'}}>
+                            <Pagination total={paging.recordCount} current={paging.curPage} pageSize={paging.pageSize} onChange={(page) => navigate(`/product/${productId}?page=${page}`)} />
+                        </div> 
                     </section>
                 </div>
             </div>

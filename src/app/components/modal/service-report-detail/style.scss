@@ -26,6 +26,7 @@
             width: 230px;
             height: 230px;
             object-fit: cover;
+            border-radius: 15px;
         }
     }
     .report-description{
@@ -34,6 +35,7 @@
         border-radius: 5px;
         color: $soft-text;
         font-weight: 500;
+        min-height: 200px;
     }
 }
 .image-item-wrapper{

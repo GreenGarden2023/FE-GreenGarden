@@ -1,3 +1,5 @@
+import { TakeCareStatus } from "./general-type"
+
 export interface CreateServiceCalendar{
     calendarInitial?: CalendarInitial
     calendarUpdate?: CalendarUpdate
@@ -7,7 +9,7 @@ export interface CreateFirstCalendarResponse{
     serviceOrderId: string
     serviceDate: Date
     sumary: string
-    status: string
+    status: TakeCareStatus
     images: string[]
 }
 export interface CreateServiceResponse{
@@ -33,5 +35,5 @@ export interface ServiceCalendar {
     nextServiceDate: Date
     images: string[]
     sumary: string
-    status: string
+    status: TakeCareStatus
 }

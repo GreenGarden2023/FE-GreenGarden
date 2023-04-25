@@ -21,8 +21,6 @@
                             padding: 0;
                             margin: 0;
                             background-color: #fff;
-                            li{
-                            }
                         }
                     }
                 }
@@ -228,5 +226,65 @@
     img{
         height: 60px;
         object-fit: cover;
+    }
+}
+
+.feedback-wrapper{
+    .feedback-divider{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        span{
+            color: $default-green;
+            font-size: 20px;
+            font-weight: 500;
+        }
+    }
+    .no-feedback{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        span{
+            color: $default-green;
+            font-size: 17px;
+            font-weight: 500;
+        }
+    }
+    .feedback-item{
+        .feedback-detail{
+            display: flex;
+            gap: 20px;
+            .left-feedback{
+                width: 10%;
+                display: flex;
+                justify-content: center;
+            }
+            .right-feedback{
+                flex: 1;
+                .user-name{
+                    font-weight: 500;
+                }
+                .comment{
+                    padding: 20px 0;
+                }
+                .time{
+                    color: $soft-text;
+                }
+                .btn-edit-feedback{
+                    margin-top: 10px;
+                    padding: 10px;
+                    background-color: $orange-text;
+                }
+                .disabled{
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+            }
+        }
+        .images{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
     }
 }

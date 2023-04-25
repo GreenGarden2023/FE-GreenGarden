@@ -22,6 +22,7 @@ import { GrMore } from 'react-icons/gr';
 import { useParams } from 'react-router-dom';
 import './style.scss';
 import dayjs from 'dayjs'
+import TakeCareStatusComp from 'app/components/status/TakeCareStatusComp';
 
 const TechManageServiceOrderDetail: React.FC = () => {
     const { orderId } = useParams()
@@ -94,6 +95,7 @@ const TechManageServiceOrderDetail: React.FC = () => {
             title: 'Trạng thái',
             key: 'status',
             dataIndex: 'status',
+            render:(v) => <TakeCareStatusComp status={v} />
         },
         {
             title: 'Xử lý',

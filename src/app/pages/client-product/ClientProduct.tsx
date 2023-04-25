@@ -22,7 +22,7 @@ const ClientProduct: React.FC = () => {
     const dispatch = useDispatch()
 
     const [products, setProducts] = useState<Product[]>([])
-    const [paging, setPaging] = useState<Paging>();
+    const [paging, setPaging] = useState<Partial<Paging>>({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.CLIENT_PRODUCT});
     const [category, setCategory] = useState<Category>();
     const [isRent, setIsRent] = useState<TypeOfSale>('rent')
 
@@ -36,7 +36,7 @@ const ClientProduct: React.FC = () => {
 
       const init = async () =>{
         try{
-          const res = await productServcie.getAllProduct({curPage: Number(currentPage), pageSize: CONSTANT.PAGING_ITEMS.CLIENT_PRODUCT}, categoryId, 'active', isRent)
+          const res = await productServcie.getAllProduct({curPage: Number(currentPage), pageSize: paging.pageSize}, categoryId, 'active', isRent)
           setProducts(res.data.result)
           setPaging(res.data.paging)
           setCategory(res.data.category)
@@ -45,7 +45,7 @@ const ClientProduct: React.FC = () => {
         }
       }
       init();
-    }, [searchParams, navigate, categoryId, dispatch, isRent])
+    }, [searchParams, navigate, categoryId, dispatch, isRent, paging.pageSize])
     
     return (
       <div>
