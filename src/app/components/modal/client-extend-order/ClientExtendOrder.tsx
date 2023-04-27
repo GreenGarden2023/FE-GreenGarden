@@ -22,6 +22,7 @@ import { GrFormSubtract } from 'react-icons/gr'
 import * as yup from 'yup'
 import './style.scss'
 import orderService from 'app/services/order.service'
+import utilCalculate from 'app/utils/order-calculate'
 
 const schema = yup.object().shape({
     recipientAddress: yup.string().when("isTransport", {
@@ -234,13 +235,18 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
             itemList: rentOrderListData.rentOrderDetailList.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity}))
         }
         try{
-            await orderService.createOrder(body)
-            dispatch(setNoti({type: 'success', message: 'Gia hạn đơn hàng thành công'}))
-            onExtend()
+            const calculatorRent = await orderService.calculateOrder(body)
+            if(utilCalculate.compare2Orders(calculatorRent.data, OrderPreview())){
+                await orderService.createOrder(body)
+                dispatch(setNoti({type: 'success', message: 'Gia hạn đơn hàng thành công'}))
+                onExtend()
+                onClose()
+            }else{
+                dispatch(setNoti({type: 'info', message: 'Đã có sự thay đổi về giá. Quý khách vui lòng tải lại trang để đặt hàng'}))
+            }
         }catch{
-
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
-
     }
 
     const handleChangeDateRange = (dates, dateStrings)=>{
