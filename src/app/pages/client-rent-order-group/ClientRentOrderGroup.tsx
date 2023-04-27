@@ -25,6 +25,8 @@ import { SiGitextensions } from 'react-icons/si'
 import { useParams } from 'react-router-dom'
 import './style.scss'
 import OrderStatusComp from 'app/components/status/OrderStatusComp'
+import LoadingView from 'app/components/loading-view/LoadingView'
+import NoProduct from 'app/components/no-product/NoProduct'
 
 const ClientRentOrderGroup: React.FC = () => {
     const { groupId } = useParams()
@@ -33,6 +35,7 @@ const ClientRentOrderGroup: React.FC = () => {
     const [rentOrderGroup, setRentOrderGroup] = useState<RentOrder>()
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
     const [shipping, setShipping] = useState<ShippingFee[]>([])
+    const [loading, setLoading] = useState(true)
 
     useEffect(() =>{
         const init = async () =>{
@@ -40,25 +43,27 @@ const ClientRentOrderGroup: React.FC = () => {
                 const res = await shippingFeeService.getList()
                 setShipping(res.data)
             }catch{
-                
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
         }
         init()
-    }, [])
+    }, [dispatch])
     useEffect(() =>{
         pagingPath.scrollTop()
         if(!groupId) return;
 
         const init = async () =>{
+            setLoading(true)
             try{
                 const res = await orderService.getRentOrderGroup(groupId)
                 setRentOrderGroup(res.data)
             }catch{
-
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
+            setLoading(false)
         }
         init()
-    }, [groupId])
+    }, [groupId, dispatch])
     const ColumnRentOrder: ColumnsType<any> = [
         {
             title: 'Mã đơn hàng',
@@ -240,10 +245,19 @@ const ClientRentOrderGroup: React.FC = () => {
             <LandingHeader />
             <div className="main-content-not-home">
                 <div className="container-wrapper crog-wrapper">
-                    <HeaderInfor title={`Nhóm đơn hàng thuê ${rentOrderGroup?.id}`} />
-                    <section className="crog-box default-layout">
-                        <Table className='cart-table' dataSource={DataSourceRentOrder} columns={ColumnRentOrder} pagination={false} scroll={{x: 1500}} />
-                    </section>
+                    {
+                        loading && <LoadingView loading />
+                    }
+                    {
+                        (!loading && !rentOrderGroup) ? <NoProduct /> :
+                        rentOrderGroup && 
+                        <>
+                            <HeaderInfor title={`Nhóm đơn hàng thuê ${rentOrderGroup?.id}`} />
+                            <section className="crog-box default-layout">
+                                <Table className='cart-table' dataSource={DataSourceRentOrder} columns={ColumnRentOrder} pagination={false} scroll={{x: 1500}} />
+                            </section>
+                        </>
+                    }
                 </div>
             </div>
             <LandingFooter />

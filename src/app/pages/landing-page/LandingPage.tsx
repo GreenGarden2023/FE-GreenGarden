@@ -15,10 +15,13 @@ import { Link } from 'react-router-dom';
 import { Divider } from 'antd';
 import { AiFillStar } from 'react-icons/ai';
 import { GrFormNext, GrFormPrevious } from 'react-icons/gr';
+import LoadingView from 'app/components/loading-view/LoadingView';
 
 const LandingPage: React.FC = () =>{
     const dispatch = useDispatch();
+    
     const [categories, setCategories] = useState<Category[]>([]);
+    const [loading, setLoading] = useState(false)
 
     useEffect(() =>{
         dispatch(setTitle(CONSTANT.APP_NAME))
@@ -26,17 +29,19 @@ const LandingPage: React.FC = () =>{
     
     useEffect(() =>{
         const init = async () =>{
+            setLoading(true)
             try{
                 const res = await categoryService.getAllCategoryByStatus({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.CLIENT_CATEGORY}, 'active')
                 setCategories(res.data.result)
             }catch(err){
-                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
+            setLoading(false)
         }
         init()
     }, [dispatch])
 
-    var settings = {
+    const settings = {
         dots: false,
         infinite: true,
         speed: 500,
@@ -44,7 +49,7 @@ const LandingPage: React.FC = () =>{
         slidesToScroll: 1,
         nextArrow: <GrFormNext />,
         prevArrow: <GrFormPrevious />
-      };
+    };
     return (
         <div>
             <LandingHeader />
@@ -59,26 +64,31 @@ const LandingPage: React.FC = () =>{
                 </section>
                 <section className="category-wrapper">
                     <div className="container-wrapper">
-                        <Divider >
-                            <div className='divider-item'>
-                                <AiFillStar color='#b06c67' size={30} />
-                                <span>Các loại cây ở cửa hàng</span>
-                            </div>
-                        </Divider>
-                        <Slider {...settings}>
-                            {
-                                categories.map((item, index) => (
-                                    <div key={index} className='category-item'>
-                                        <Link to={`/category/${item.id}?page=1`}>
-                                            <img src={item.imgUrl} alt="/" className='category-image' />
-                                            <div className="category-infor">
-                                                <p>{item.name}</p>
-                                            </div>
-                                        </Link>
+                        {
+                            loading ? <LoadingView loading /> : 
+                            <>
+                                <Divider >
+                                    <div className='divider-item'>
+                                        <AiFillStar color='#b06c67' size={30} />
+                                        <span>Các loại cây ở cửa hàng</span>
                                     </div>
-                                ))
-                            }
-                        </Slider>
+                                </Divider>
+                                <Slider {...settings}>
+                                    {
+                                        categories.map((item, index) => (
+                                            <div key={index} className='category-item'>
+                                                <Link to={`/category/${item.id}?page=1`}>
+                                                    <img src={item.imgUrl} alt="/" className='category-image' />
+                                                    <div className="category-infor">
+                                                        <p>{item.name}</p>
+                                                    </div>
+                                                </Link>
+                                            </div>
+                                        ))
+                                    }
+                                </Slider>
+                            </>
+                        }
                     </div>
                 </section>
                 <LandingWidget index={1} url='take-care-service' backgroundUrl='/assets/widget-1.jpg' />

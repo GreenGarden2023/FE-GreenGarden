@@ -66,6 +66,7 @@ export interface RentOrderList {
     reason: string;
     cancelBy: string;
     nameCancelBy: string;
+    contractURL: string;
     rentOrderDetailList: RentOrderDetailList[]
 }
 export interface RentOrder{

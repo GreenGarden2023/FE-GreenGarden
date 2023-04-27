@@ -9,20 +9,19 @@ import Description from 'app/components/renderer/description/Description';
 import ListImage from 'app/components/renderer/list-image/ListImage';
 import TreeName from 'app/components/renderer/tree-name/TreeName';
 import OrderStatusComp from 'app/components/status/OrderStatusComp';
-import { OrderStatus } from 'app/models/general-type';
+import TakeCareStatusComp from 'app/components/status/TakeCareStatusComp';
 import { PaymentControlState } from 'app/models/payment';
 import { ServiceOrderDetail } from 'app/models/service';
 import { ServiceCalendar } from 'app/models/service-calendar';
 import orderService from 'app/services/order.service';
 import serviceCalendar from 'app/services/service-calendar.service';
 import utilDateTime from 'app/utils/date-time';
+import dayjs from 'dayjs';
 import React, { useEffect, useMemo, useState } from 'react';
 import { BiCommentDetail } from 'react-icons/bi';
 import { GrMore } from 'react-icons/gr';
 import { useParams } from 'react-router-dom';
 import './style.scss';
-import dayjs from 'dayjs'
-import TakeCareStatusComp from 'app/components/status/TakeCareStatusComp';
 
 const TechManageServiceOrderDetail: React.FC = () => {
     const { orderId } = useParams()
@@ -206,24 +205,17 @@ const TechManageServiceOrderDetail: React.FC = () => {
         setCalendars([...calendars, serviceCalendar])
     }
     
-    const handleUploadCalendar = (orderStatus: OrderStatus, prev: ServiceCalendar, next: ServiceCalendar) =>{
+    const handleUploadCalendar = (prev: ServiceCalendar, next?: ServiceCalendar) =>{
         if(!serviceOrder) return;
+        
+        const index = calendars.findIndex(x => x.id === prev.id)
+        calendars[index] = prev
 
-        if(orderStatus === 'completed'){
-            serviceOrder.status = orderStatus
-            setServiceOrder({...serviceOrder})
-    
-            const [carlendar] = calendars.filter(x => x.id === next.id)
-            const { images, status, sumary } = next
-            carlendar.images = images
-            carlendar.status = status
-            carlendar.sumary = sumary
-            setCalendars([...calendars])
-        }else{
-            const index = calendars.findIndex(x => x.id === prev.id)
-            calendars[index] = prev
+        if(next){
             setCalendars([next, ...calendars])
+            return;
         }
+        setCalendars([...calendars])
     }
     return (
         <div className='tmsod-wrapper'>
@@ -287,7 +279,7 @@ const TechManageServiceOrderDetail: React.FC = () => {
                         <Table style={{marginTop: '20px'}} columns={ColumnServiceOrder} dataSource={DataSourceServiceOrder} pagination={false} />
                     </div>
                     {
-                        (calendars.length === 0 && serviceOrder.status === 'paid') &&
+                        (calendars.length === 0 && (serviceOrder.status === 'paid' || serviceOrder.status === 'ready')) &&
                         <div className="default-layout no-calendar">
                             <h3>Bạn chưa có lịch chăm sóc nào. Hãy tạo mới 1 lịch chăm sóc</h3>
                             <button className='btn btn-create' onClick={() => setActionMethod({orderId: '', actionType: 'create calendar', openIndex: -1, orderType: 'service'})}>Tạo mới 1 lịch chăm sóc</button>

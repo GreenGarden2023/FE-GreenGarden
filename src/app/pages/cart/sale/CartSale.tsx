@@ -31,7 +31,7 @@ interface CartSaleProps{
     items: CartItemDetail[]
     shipping: ShippingFee[]
     onChange: (type: string, common: string, items: CartItemDetail[], id: string) => void
-    onSubmit: (type: string, data: OrderUserInfor, orderPreview: OrderPreview) => void
+    onSubmit: (type: string, data: OrderUserInfor, orderPreview: OrderPreview) => Promise<void>
 }
 
 const CartSale: React.FC<CartSaleProps> = ({items, shipping, onChange, onSubmit}) => {
@@ -171,11 +171,11 @@ const CartSale: React.FC<CartSaleProps> = ({items, shipping, onChange, onSubmit}
         handleClose()
     }
 
-    const onSubmitForm = (data: OrderUserInfor) =>{
+    const onSubmitForm = async (data: OrderUserInfor) =>{
         // validate right here
         data.itemList = items.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity}))
         // console.log({data})
-        onSubmit('sale', data, OrderPreview())
+        await onSubmit('sale', data, OrderPreview())
     }
 
     const OrderPreview = () =>{

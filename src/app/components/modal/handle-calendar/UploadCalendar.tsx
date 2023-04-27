@@ -1,25 +1,24 @@
 import { Button, Col, DatePicker, DatePickerProps, Form, Image, Input, Modal, Row } from 'antd'
+import locale from 'antd/es/date-picker/locale/vi_VN'
 import useDispatch from 'app/hooks/use-dispatch'
+import { ServiceOrderDetail } from 'app/models/service'
 import { CalendarUpdate, ServiceCalendar } from 'app/models/service-calendar'
 import fileService from 'app/services/file.service'
+import serviceCalendar from 'app/services/service-calendar.service'
 import uploadService from 'app/services/upload.service'
 import { setNoti } from 'app/slices/notification'
 import CONSTANT from 'app/utils/constant'
 import utilDateTime from 'app/utils/date-time'
+import dayjs, { Dayjs } from 'dayjs'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { AiOutlineCloudUpload } from 'react-icons/ai'
 import { CiSquareRemove } from 'react-icons/ci'
-import locale from 'antd/es/date-picker/locale/vi_VN';
-import dayjs, { Dayjs } from 'dayjs'
-import { ServiceOrderDetail } from 'app/models/service'
-import serviceCalendar from 'app/services/service-calendar.service'
-import { OrderStatus } from 'app/models/general-type'
 
 interface UploadCalendarProps{
     serviceCalendarDetail: ServiceCalendar
     serviceOrderDetail: ServiceOrderDetail
     onClose: () => void
-    onSubmit: (status: OrderStatus, prev: ServiceCalendar, next: ServiceCalendar) => void
+    onSubmit: (prev: ServiceCalendar, next?: ServiceCalendar) => void
 }
 
 const UploadCalendar: React.FC<UploadCalendarProps> = ({ serviceCalendarDetail, serviceOrderDetail, onClose, onSubmit }) => {
@@ -108,17 +107,17 @@ const UploadCalendar: React.FC<UploadCalendarProps> = ({ serviceCalendarDetail, 
 
             console.log(utilDateTime.getDiff2Days(serviceOrderDetail.serviceEndDate, new Date()))
             
-            if(IsEndDate){
-                // await orderService.updateServiceOrderStatus(serviceOrderDetail.id, 'completed')
-                // await serviceService.updateServiceRequestStatus(serviceOrderDetail.service.id, 'completed')
-                onSubmit('completed', res.data.previousCalendar, res.data.nextCalendar)
-                dispatch(setNoti({type: 'success', message: 'Cập nhật thông tin chăm sóc và trạng thái đơn hàng thành công'}))
-                onClose()
-                setLoading(false)
-                return;
-            }
+            // if(IsEndDate){
+            //     // await orderService.updateServiceOrderStatus(serviceOrderDetail.id, 'completed')
+            //     // await serviceService.updateServiceRequestStatus(serviceOrderDetail.service.id, 'completed')
+            //     onSubmit(res.data.previousCalendar, res.data.nextCalendar)
+            //     dispatch(setNoti({type: 'success', message: 'Cập nhật thông tin chăm sóc và trạng thái đơn hàng thành công'}))
+            //     onClose()
+            //     setLoading(false)
+            //     return;
+            // }
 
-            onSubmit(serviceOrderDetail.status, res.data.previousCalendar, res.data.nextCalendar)
+            onSubmit(res.data.previousCalendar, res.data.nextCalendar)
             dispatch(setNoti({type: 'success', message: 'Cập nhật lịch chăm sóc thành công'}))
             onClose()
         }catch(e){

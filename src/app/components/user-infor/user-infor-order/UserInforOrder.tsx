@@ -9,6 +9,7 @@ import { CiLocationOn } from 'react-icons/ci';
 import { HiOutlineStatusOnline } from 'react-icons/hi';
 import { FaMoneyBillWave } from 'react-icons/fa';
 import OrderStatusComp from 'app/components/status/OrderStatusComp';
+import { Link } from 'react-router-dom';
 
 interface UserInforOrderProps{
     name?: string;
@@ -24,11 +25,12 @@ interface UserInforOrderProps{
     deposit?: number;
     reason?: string;
     nameCancelBy?: string;
-    columnNumber?: number
+    columnNumber?: number;
+    contract?: string
 }
 
 const UserInforOrder: React.FC<UserInforOrderProps> = ({name, phone, address, createOrderDate, startDate, 
-    endDate, status, transportFee, totalOrder, remainMoney, deposit, reason, nameCancelBy, columnNumber}) => {
+    endDate, status, transportFee, totalOrder, remainMoney, deposit, reason, nameCancelBy, columnNumber, contract}) => {
 
     const ColumnNumber = useMemo(() =>{
         if(!columnNumber) return 8;
@@ -219,6 +221,20 @@ const UserInforOrder: React.FC<UserInforOrderProps> = ({name, phone, address, cr
                                     </div>
                                     <div className="content">
                                         <p>{reason}</p>
+                                    </div>
+                                </div>
+                            </Col>
+                        }
+                        {
+                            contract && 
+                            <Col span={ColumnNumber}>
+                                <div className="item">
+                                    <div className="label">
+                                        <FaMoneyBillWave color='#5cb9d8' size={20} />
+                                        <span>Hợp đồng thuê</span>
+                                    </div>
+                                    <div className="content">
+                                        <Link to={contract} target='_blank' className='download-link' >Tải xuống</Link>
                                     </div>
                                 </div>
                             </Col>

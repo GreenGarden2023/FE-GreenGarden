@@ -24,6 +24,9 @@ import { setNoti } from 'app/slices/notification'
 import RentPolicy from 'app/components/modal/rent-policy/RentPolicy'
 import utilDateTime from 'app/utils/date-time'
 
+const disbaledDate = new Date();
+disbaledDate.setDate(disbaledDate.getDate() + 3)
+
 const schema = yup.object().shape({
     recipientAddress: yup.string().when("isTransport", {
         is: true,
@@ -38,7 +41,7 @@ interface CartRentProps{
     items: CartItemDetail[]
     shipping: ShippingFee[]
     onChange: (type: string, common: string, items: CartItemDetail[], id: string) => void
-    onSubmit: (type: string, data: OrderUserInfor, orderPreview: OrderPreview) => void
+    onSubmit: (type: string, data: OrderUserInfor, orderPreview: OrderPreview) => Promise<void>
 }
 
 const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}) => {
@@ -48,10 +51,10 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
     const [idRemove, setIdRemove] = useState('')
 
     const startDate = new Date()
-    startDate.setDate(startDate.getDate() + 1);
+    startDate.setDate(startDate.getDate() + 4);
 
     const endDate = new Date()
-    endDate.setDate(endDate.getDate() + 7);
+    endDate.setDate(endDate.getDate() + 11);
 
     const { setValue, getValues, trigger, formState: { errors, isSubmitting }, handleSubmit, control, setError, clearErrors } = useForm<OrderUserInfor>({
         defaultValues: {
@@ -204,7 +207,7 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
         }
     }
 
-    const onSubmitForm = (data: OrderUserInfor) =>{
+    const onSubmitForm = async (data: OrderUserInfor) =>{
         const { startDateRent, endDateRent} = data
         // validate right here
         if(!startDateRent || !endDateRent){
@@ -223,6 +226,13 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
             })
             return;
         }
+        if(utilDateTime.getDiff2Days(new Date(), startDateRent) >= 14){
+            setError('startDateRent', {
+                type: 'pattern',
+                message: 'Ngày bắt đầu thuê không được quá 2 tuần kể từ hôm nay'
+            })
+            return;
+        }
 
         if(!isConfirm){
             dispatch(setNoti({type: 'info', message: 'Bạn hãy đồng ý với các điều khoản của chúng tôi trước khi thuê cây'}))
@@ -230,7 +240,7 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
         }
         
         data.itemList = items.map(x => ({productItemDetailID: x.productItemDetail.id, quantity: x.quantity}))
-        onSubmit('rent', data, OrderPreview())
+        await onSubmit('rent', data, OrderPreview())
     }
 
     const clearPoint = () =>{
@@ -448,7 +458,7 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
                                                     locale={locale}
                                                     placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
                                                     format={CONSTANT.DATE_FORMAT_LIST}
-                                                    disabledDate={(current) => current && current.valueOf()  < Date.now()}
+                                                    disabledDate={(current) => current && current.valueOf()  < disbaledDate.valueOf()}
                                                     defaultValue={[dayjs(dayjs(getValues('startDateRent')).format('DD/MM/YYYY'), 'DD/MM/YYYY'), dayjs(dayjs(getValues('endDateRent')).format('DD/MM/YYYY'), 'DD/MM/YYYY')]}
                                                     onChange={handleChangeDateRange}
                                                 />

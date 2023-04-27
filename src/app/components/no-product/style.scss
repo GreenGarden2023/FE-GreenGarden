@@ -1,0 +1,16 @@
+@import 'app/styles/variable.scss';
+
+.no-product-wrapper{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    border-radius: 10px;
+    padding-bottom: 20px;
+    h1{
+        font-size: 48px;
+        color: $soft-text;
+    }
+    background-color: #edf3ee;
+}

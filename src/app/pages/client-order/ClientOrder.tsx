@@ -33,6 +33,7 @@ import './style.scss';
 import { setTitle } from 'app/slices/window-title';
 import OrderStatusComp from 'app/components/status/OrderStatusComp';
 import { FaLayerGroup } from 'react-icons/fa';
+import LoadingView from 'app/components/loading-view/LoadingView';
 
 type OrderPage = 'rent' | 'sale' | 'service'
 
@@ -58,6 +59,8 @@ const ClientOrder: React.FC = () =>{
 
     const [shipping, setShipping] = useState<ShippingFee[]>([])
 
+    const [loading, setLoading] = useState(true)
+
     useEffect(() =>{
         dispatch(setTitle(`${CONSTANT.APP_NAME} | Đơn hàng`))
     }, [dispatch])
@@ -68,11 +71,11 @@ const ClientOrder: React.FC = () =>{
                 const res = await shippingFeeService.getList()
                 setShipping(res.data)
             }catch{
-                
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
         }
         init()
-    }, [])
+    }, [dispatch])
 
     useEffect(() =>{
         pagingPath.scrollTop()
@@ -93,6 +96,7 @@ const ClientOrder: React.FC = () =>{
         if(!pagingPath.isValidPaging(currentPage)) return;
 
         const init = async () =>{
+            setLoading(true)
             try{
                 const res = await orderService.getSaleOrders({curPage: Number(currentPage), pageSize: paging.pageSize})
                 setSaleOrders(res.data.saleOrderList)
@@ -100,6 +104,7 @@ const ClientOrder: React.FC = () =>{
             }catch{
                 dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
+            setLoading(false)
         }
         init()
     }, [id, dispatch, pageType, searchParams, paging.pageSize])
@@ -109,16 +114,18 @@ const ClientOrder: React.FC = () =>{
         const currentPage = searchParams.get('page');
 
         const init = async () =>{
+            setLoading(true)
             try{
                 const res = await orderService.getServiceOrders({curPage: Number(currentPage), pageSize: CONSTANT.PAGING_ITEMS.CLIENT_ORDER_RENT})
                 setServiceOrders(res.data.serviceOrderList)
                 setPaging(res.data.paging)
             }catch{
-
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
+            setLoading(false)
         }
         init()
-    }, [pageType, searchParams])
+    }, [pageType, searchParams, dispatch])
 
     useEffect(() =>{
         if(!id) return;
@@ -127,6 +134,7 @@ const ClientOrder: React.FC = () =>{
         if(!Number(currentPage)) return;
 
         const init = async () =>{
+            setLoading(true)
             try{
                 const res = await orderService.getRentOrders({curPage: Number(currentPage), pageSize: paging.pageSize})
                 setRentOrders(res.data.rentOrderGroups)
@@ -134,6 +142,7 @@ const ClientOrder: React.FC = () =>{
             }catch{
                 dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
+            setLoading(false)
         }
         init()
     }, [id, dispatch, pageType, searchParams, paging.pageSize])
@@ -772,61 +781,66 @@ const ClientOrder: React.FC = () =>{
                         <Segmented size="large" onChange={handleChangeSegment} options={['Thuê', 'Mua', 'Dịch vụ']} />
                     </section>
                     {
-                        pageType === 'rent' &&
-                        <section className="co-box default-layout">
-                            <Table 
-                                className='cart-table' 
-                                columns={ColumnRentOrder} 
-                                dataSource={DataSourceRentOrder} 
-                                scroll={{x: 1500}}
-                                pagination={{
-                                    current: paging.curPage,
-                                    pageSize: paging.pageSize,
-                                    total: paging.recordCount,
-                                    onChange: (page: number) =>{
-                                        navigate(`/orders?page=${page}`)
-                                    }
-                                }}
-                            />
-                        </section>
-                    }
-                    {
-                        pageType === 'sale' &&
-                        <section className="co-box default-layout">
-                            <Table 
-                                className='cart-table' 
-                                columns={ColumnSaleOrder} 
-                                dataSource={DataSourceSaleOrder} 
-                                scroll={{x: 1500}}
-                                pagination={{
-                                    current: paging.curPage,
-                                    pageSize: paging.pageSize,
-                                    total: paging.recordCount,
-                                    onChange: (page: number) =>{
-                                        navigate(`/orders?page=${page}`)
-                                    }
-                                }}
-                            />
-                        </section>
-                    }
-                    {
-                        pageType === 'service' &&
-                        <section className="co-box default-layout">
-                            <Table 
-                                className='cart-table' 
-                                columns={ColumnServiceOrder} 
-                                dataSource={DataSourceServiceOrder} 
-                                scroll={{x: 2500}}
-                                pagination={{
-                                    current: paging.curPage,
-                                    pageSize: paging.pageSize,
-                                    total: paging.recordCount,
-                                    onChange: (page: number) =>{
-                                        navigate(`/orders?page=${page}`)
-                                    }
-                                }}
-                            />
-                        </section>
+                        loading ?  <LoadingView loading /> : 
+                        <>
+                            {
+                                pageType === 'rent' &&
+                                <section className="co-box default-layout">
+                                    <Table 
+                                        className='cart-table' 
+                                        columns={ColumnRentOrder} 
+                                        dataSource={DataSourceRentOrder} 
+                                        scroll={{x: 1500}}
+                                        pagination={{
+                                            current: paging.curPage,
+                                            pageSize: paging.pageSize,
+                                            total: paging.recordCount,
+                                            onChange: (page: number) =>{
+                                                navigate(`/orders?page=${page}`)
+                                            }
+                                        }}
+                                    />
+                                </section>
+                            }
+                            {
+                                pageType === 'sale' &&
+                                <section className="co-box default-layout">
+                                    <Table 
+                                        className='cart-table' 
+                                        columns={ColumnSaleOrder} 
+                                        dataSource={DataSourceSaleOrder} 
+                                        scroll={{x: 1500}}
+                                        pagination={{
+                                            current: paging.curPage,
+                                            pageSize: paging.pageSize,
+                                            total: paging.recordCount,
+                                            onChange: (page: number) =>{
+                                                navigate(`/orders?page=${page}`)
+                                            }
+                                        }}
+                                    />
+                                </section>
+                            }
+                            {
+                                pageType === 'service' &&
+                                <section className="co-box default-layout">
+                                    <Table 
+                                        className='cart-table' 
+                                        columns={ColumnServiceOrder} 
+                                        dataSource={DataSourceServiceOrder} 
+                                        scroll={{x: 2500}}
+                                        pagination={{
+                                            current: paging.curPage,
+                                            pageSize: paging.pageSize,
+                                            total: paging.recordCount,
+                                            onChange: (page: number) =>{
+                                                navigate(`/orders?page=${page}`)
+                                            }
+                                        }}
+                                    />
+                                </section>
+                            }
+                        </>
                     }
                 </div>
             </div>

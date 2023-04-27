@@ -367,7 +367,7 @@ const ManageRentOrderGroup: React.FC = () => {
   const OrderDetail = useMemo(() =>{
     if(!groupOrder) return;
     const [data] = groupOrder.rentOrderList.filter(x => x.id === actionMethod?.orderId)
-
+    if(!data) return;
     const { recipientName, recipientPhone, recipientAddress, createDate, startRentDate, endRentDate, 
       status, deposit, transportFee, totalPrice, remainMoney, reason, nameCancelBy } = data
 
@@ -865,7 +865,7 @@ const ViewAllOrderGroup: React.FC<ViewAllOrderGroupProps> = ({orderId, recall}) 
   const OrderDetail = useMemo(() =>{
     if(!groupOrder) return {}
     const [data] = groupOrder.rentOrderList.filter(x => x.id === actionMethod?.orderId)
-
+    if(!data) return {}
     const { recipientName, recipientPhone, recipientAddress, createDate, startRentDate, endRentDate, 
       status, deposit, transportFee, totalPrice, remainMoney, reason, nameCancelBy } = data
 

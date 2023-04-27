@@ -21,31 +21,40 @@ import './style.scss'
 import pagingPath from 'app/utils/paging-path'
 import ServiceReportDetail from 'app/components/modal/service-report-detail/ServiceReportDetail'
 import OrderStatusComp from 'app/components/status/OrderStatusComp'
+import useDispatch from 'app/hooks/use-dispatch'
+import { setNoti } from 'app/slices/notification'
+import CONSTANT from 'app/utils/constant'
+import LoadingView from 'app/components/loading-view/LoadingView'
+import NoProduct from 'app/components/no-product/NoProduct'
 
 const ClientManageTakeCareServiceDetail: React.FC = () => {
     const { orderId } = useParams()
+    const dispatch = useDispatch()
 
     const [serviceOrder, setServiceOrder] = useState<ServiceOrderDetail>();
     const [calendars, setCalendars] = useState<ServiceCalendar[]>([])
 
     // action
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
+    const [loading, setLoading] = useState(true)
 
     useEffect(() =>{
         pagingPath.scrollTop()
         if(!orderId) return;
 
         const init = async () =>{
+            setLoading(true)
             try{
                 const res = await orderService.getAServiceOrderDetail(orderId)
                 setServiceOrder(res.data)
             }catch{
-
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
+            setLoading(false)
         }
         init()
 
-    }, [orderId])
+    }, [orderId, dispatch])
 
     useEffect(() =>{
         if(!orderId) return;
@@ -55,11 +64,11 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
                 const res = await serviceCalendar.getServiceCalendarByServiceOrder(orderId)
                 setCalendars(res.data)
             }catch{
-
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
         }
         init()
-    }, [orderId])
+    }, [orderId, dispatch])
     
     const ColumnServiceOrder: ColumnsType<any> = [
         {
@@ -202,62 +211,70 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
                 serviceOrder &&
                 <div className="main-content-not-home">
                     <div className="container-wrapper cmtcs-wrapper">
-                        <HeaderInfor title={`Chi tiết đơn hàng chăm sóc cây "${serviceOrder.orderCode}"`} />
-                        <div className="default-layout">
-                            <h3>Thông tin của người chăm sóc</h3>
-                            <Row gutter={[24, 24]} style={{marginTop: '20px'}}>
-                                <Col span={8}>
-                                    <span className="label">Tên:</span>
-                                    <span className="content">{serviceOrder.technician.technicianFullName}</span>
-                                </Col>
-                                <Col span={8}>
-                                    <span className="label">Số điện thoại:</span>
-                                    <span className="content">{serviceOrder.technician.technicianPhone}</span>
-                                </Col>
-                                <Col span={8}>
-                                    <span className="label">Email:</span>
-                                    <span className="content">{serviceOrder.technician.technicianMail}</span>
-                                </Col>
-                            </Row>
-                        </div>
-                        <div className="default-layout">
-                            <h3>Thông tin đơn hàng chăm sóc cây</h3>
-                            <Row gutter={[24, 24]} style={{marginTop: '20px'}}>
-                                <Col span={8}>
-                                    <span className="label">Ngày bắt đầu</span>
-                                    <span className="content">{utilDateTime.dateToString(serviceOrder.service.startDate.toString())}</span>
-                                </Col>
-                                <Col span={8}>
-                                    <span className="label">Ngày kết thúc</span>
-                                    <span className="content">{utilDateTime.dateToString(serviceOrder.service.endDate.toString())}</span>
-                                </Col>
-                                <Col span={8} style={{display: 'flex'}}>
-                                    <span className="label">Trạng thái đơn hàng</span>
-                                    <span className="content">
-                                        <OrderStatusComp status={serviceOrder.status} />
-                                    </span>
-                                </Col>
-                                {
-                                    serviceOrder.nameCancelBy &&
-                                    <>
+                        {
+                            loading && <LoadingView loading />
+                        }
+                        {
+                            (!loading && !serviceOrder) ? <NoProduct /> :
+                            <>
+                                <HeaderInfor title={`Chi tiết đơn hàng chăm sóc cây "${serviceOrder.orderCode}"`} />
+                                <div className="default-layout">
+                                    <h3>Thông tin của người chăm sóc</h3>
+                                    <Row gutter={[24, 24]} style={{marginTop: '20px'}}>
                                         <Col span={8}>
-                                            <span className="label">Người hủy đơn</span>
-                                            <span className="content">{serviceOrder.nameCancelBy}</span>
+                                            <span className="label">Tên:</span>
+                                            <span className="content">{serviceOrder.technician.technicianFullName}</span>
                                         </Col>
                                         <Col span={8}>
-                                            <span className="label">Lý do</span>
-                                            <span className="content">{serviceOrder.reason}</span>
+                                            <span className="label">Số điện thoại:</span>
+                                            <span className="content">{serviceOrder.technician.technicianPhone}</span>
                                         </Col>
-                                    </>
-                                }
-                            </Row>
-                        </div>
-                        <div className="default-layout">
-                            <Table columns={ColumnServiceOrder} dataSource={DataSourceServiceOrder} pagination={false} />
-                        </div>
-                        <div className="default-layout">
-                            <Table columns={ColumnCalendar} dataSource={DataSourceCalendar} pagination={false} />
-                        </div>
+                                        <Col span={8}>
+                                            <span className="label">Email:</span>
+                                            <span className="content">{serviceOrder.technician.technicianMail}</span>
+                                        </Col>
+                                    </Row>
+                                </div>
+                                <div className="default-layout">
+                                    <h3>Thông tin đơn hàng chăm sóc cây</h3>
+                                    <Row gutter={[24, 24]} style={{marginTop: '20px'}}>
+                                        <Col span={8}>
+                                            <span className="label">Ngày bắt đầu</span>
+                                            <span className="content">{utilDateTime.dateToString(serviceOrder.service.startDate.toString())}</span>
+                                        </Col>
+                                        <Col span={8}>
+                                            <span className="label">Ngày kết thúc</span>
+                                            <span className="content">{utilDateTime.dateToString(serviceOrder.service.endDate.toString())}</span>
+                                        </Col>
+                                        <Col span={8} style={{display: 'flex'}}>
+                                            <span className="label">Trạng thái đơn hàng</span>
+                                            <span className="content">
+                                                <OrderStatusComp status={serviceOrder.status} />
+                                            </span>
+                                        </Col>
+                                        {
+                                            serviceOrder.nameCancelBy &&
+                                            <>
+                                                <Col span={8}>
+                                                    <span className="label">Người hủy đơn</span>
+                                                    <span className="content">{serviceOrder.nameCancelBy}</span>
+                                                </Col>
+                                                <Col span={8}>
+                                                    <span className="label">Lý do</span>
+                                                    <span className="content">{serviceOrder.reason}</span>
+                                                </Col>
+                                            </>
+                                        }
+                                    </Row>
+                                </div>
+                                <div className="default-layout">
+                                    <Table columns={ColumnServiceOrder} dataSource={DataSourceServiceOrder} pagination={false} />
+                                </div>
+                                <div className="default-layout">
+                                    <Table columns={ColumnCalendar} dataSource={DataSourceCalendar} pagination={false} />
+                                </div>
+                            </>
+                        }
                     </div>
                 </div>
             }

@@ -22,6 +22,8 @@ import CartSale from './sale/CartSale';
 import './style.scss';
 import utilCalculate from 'app/utils/order-calculate';
 import { useNavigate } from 'react-router-dom';
+import LoadingView from 'app/components/loading-view/LoadingView';
+import NoProduct from 'app/components/no-product/NoProduct';
 
 
 // const dateFormat = 'DD/MM/YYYY';
@@ -35,6 +37,8 @@ const CartPage: React.FC = () => {
     const [shipping, setShipping] = useState<ShippingFee[]>([])
 
     const [pageType, setPageType] = useState('sale')
+
+    const [loading, setLoading] = useState(true)
 
     useEffect(() =>{
         const init = async () =>{
@@ -56,6 +60,7 @@ const CartPage: React.FC = () => {
 
     useEffect(() =>{
         const init = async () =>{
+            setLoading(true)
             try{
                 const result = await cartService.getCart()
                 setCart(result.data)
@@ -68,13 +73,13 @@ const CartPage: React.FC = () => {
                 if(saleItems && saleItems.length !== 0 && rentItems && rentItems.length !== 0) return;
 
                 if(rentItems && rentItems.length !== 0) {
-                    console.log('asds')
                     setPageType('rent')
                 }
             }catch{
                 setCart({rentItems: [], saleItems: [], totalPrice: 0, totalRentPrice: 0, totalSalePrice: 0})
                 dispatch(setCartSlice({rentItems: [], saleItems: []}))
             }
+            setLoading(false)
         }
         init()
     }, [dispatch])
@@ -224,27 +229,35 @@ const CartPage: React.FC = () => {
                 <div className="main-content-not-home">
                     <div className="container-wrapper cart-wrapper">
                         <HeaderInfor title='Giỏ hàng' />
-                        <section className="default-layout">
-                            <h3>Loại cây</h3>
-                            <Segmented size="large" value={pageType} onChange={handleChangeSegment} options={SegmentedOptions} />
-                        </section>
                         {
-                            (pageType === 'sale' && cart) &&
-                            <CartSale
-                                items={cart.saleItems}
-                                shipping={shipping}
-                                onChange={handleCartChange}
-                                onSubmit={handleSubmitCart}
-                            />
+                            loading && <LoadingView loading />
                         }
                         {
-                            (pageType === 'rent' && cart) &&
-                            <CartRent
-                                items={cart.rentItems}
-                                shipping={shipping}
-                                onChange={handleCartChange}
-                                onSubmit={handleSubmitCart}
-                            />
+                            (!loading && !cart) ? <NoProduct /> : 
+                            <>
+                                <section className="default-layout">
+                                    <h3>Loại cây</h3>
+                                    <Segmented size="large" value={pageType} onChange={handleChangeSegment} options={SegmentedOptions} />
+                                </section>
+                                {
+                                    (pageType === 'sale' && cart) &&
+                                    <CartSale
+                                        items={cart.saleItems}
+                                        shipping={shipping}
+                                        onChange={handleCartChange}
+                                        onSubmit={handleSubmitCart}
+                                    />
+                                }
+                                {
+                                    (pageType === 'rent' && cart) &&
+                                    <CartRent
+                                        items={cart.rentItems}
+                                        shipping={shipping}
+                                        onChange={handleCartChange}
+                                        onSubmit={handleSubmitCart}
+                                    />
+                                }
+                            </>
                         }
                     </div>
                 </div>

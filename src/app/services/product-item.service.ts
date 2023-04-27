@@ -20,6 +20,11 @@ const getAllProductItem = async (pagingProps: Partial<Paging>, props: GetAllProp
     const result = await golbalAxios.get<Response<ProductItemResponse>>(`/product-item/get-product-item?${queryString.stringify(getAllProps)}`);
     return result.data
 }
+const getProductItemByManager = async (pagingProps: Partial<Paging>, productID: string) =>{
+    const params = { ...pagingProps, productID }
+    const result = await golbalAxios.get<Response<ProductItemResponse>>(`/product-item/get-product-item-by-manager?${queryString.stringify(params)}`);
+    return result.data
+}
 const createProductItem = async (productItem: Partial<ProductItem>) =>{
     const result = await golbalAxios.post<Response<ProductItem>>(`/product-item/create-product-item`, productItem);
     return result.data
@@ -56,7 +61,8 @@ const productItemService = {
     getProductItemDetail,
     createProductItemDetail,
     updateProductItemDetail,
-    changeStatusProductDetail
+    changeStatusProductDetail,
+    getProductItemByManager
 }
 
 export default productItemService

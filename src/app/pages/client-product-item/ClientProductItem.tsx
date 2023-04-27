@@ -16,6 +16,8 @@ import { BsFlower1 } from 'react-icons/bs';
 import { GiFlowerPot } from 'react-icons/gi';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import './style.scss';
+import LoadingView from 'app/components/loading-view/LoadingView';
+import NoProduct from 'app/components/no-product/NoProduct';
 
 const ClientProductItem: React.FC = () => {
     const { productId } = useParams()
@@ -27,7 +29,8 @@ const ClientProductItem: React.FC = () => {
     const [product, setProduct] = useState<Product>()
     const [category, setCategory] = useState<Category>()
     const [paging, setPaging] = useState<Partial<Paging>>({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.CLIENT_PRODUCT_ITEM});
-    
+    const [loading, setLoading] = useState(true)
+
     useEffect(() =>{
         pagingPath.scrollTop()
         const currentPage = searchParams.get('page');
@@ -39,6 +42,7 @@ const ClientProductItem: React.FC = () => {
         }
 
         const init = async () =>{
+            setLoading(true)
             try{
                 const res = await productItemService.getAllProductItem({curPage: Number(currentPage), pageSize: paging.pageSize}, {
                     productID: productId,
@@ -51,9 +55,9 @@ const ClientProductItem: React.FC = () => {
             }catch{
                 dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
             }
+            setLoading(false)
         }
         init();
-
     }, [productId, dispatch, navigate, searchParams, paging.pageSize])
 
     return (
@@ -61,55 +65,63 @@ const ClientProductItem: React.FC = () => {
             <LandingHeader />
             <div className="main-content-not-home">
                 <div className="container-wrapper cpi-wrapper">
-                    <section className="cpo-bread">
-                        <Breadcrumb>
-                            <Breadcrumb.Item>
-                                <Link to='/' >{CONSTANT.APP_NAME}</Link>
-                            </Breadcrumb.Item>
-                            <Breadcrumb.Item>
-                                <Link to={`/category/${category?.id}?page=1`} >{category?.name}</Link>
-                            </Breadcrumb.Item>
-                            <Breadcrumb.Item>
-                                {product?.name}
-                            </Breadcrumb.Item>
-                        </Breadcrumb>
-                    </section>
-                    <section className="cpo-product-infor default-layout">
-                        <BsFlower1 size={25} />
-                        <p>{product?.name}</p>
-                    </section>
-                    <section className="cpi-box default-layout">
-                        <Row gutter={[10, 10]}>
-                            {
-                                productItems.map((proItem, index) => (
-                                    <Col xs={24} xl={6} key={index} className='col-item'>
-                                        <Link to={`/product-item/${proItem.id}`} className='cp-item'>
-                                            <img src={proItem.imageURL} alt="/" onError={utilGeneral.setDefaultImage} />
-                                            <p className='pro-name'>{proItem.name}</p>
-                                            <div className="size-box">
-                                                <Divider style={{margin: 0}} >
-                                                    <div className="title">
-                                                        <GiFlowerPot color='#e91e63' />
-                                                        <span>Thể loại</span>
+                    {
+                        loading && <LoadingView loading />
+                    }
+                    {
+                        (!loading && productItems.length === 0) ? <NoProduct /> : 
+                        <>
+                            <section className="cpo-bread">
+                                <Breadcrumb>
+                                    <Breadcrumb.Item>
+                                        <Link to='/' >{CONSTANT.APP_NAME}</Link>
+                                    </Breadcrumb.Item>
+                                    <Breadcrumb.Item>
+                                        <Link to={`/category/${category?.id}?page=1`} >{category?.name}</Link>
+                                    </Breadcrumb.Item>
+                                    <Breadcrumb.Item>
+                                        {product?.name}
+                                    </Breadcrumb.Item>
+                                </Breadcrumb>
+                            </section>
+                            <section className="cpo-product-infor default-layout">
+                                <BsFlower1 size={25} />
+                                <p>{product?.name}</p>
+                            </section>
+                            <section className="cpi-box default-layout">
+                                <Row gutter={[10, 10]}>
+                                    {
+                                        productItems.map((proItem, index) => (
+                                            <Col xs={24} xl={6} key={index} className='col-item'>
+                                                <Link to={`/product-item/${proItem.id}`} className='cp-item'>
+                                                    <img src={proItem.imageURL} alt="/" onError={utilGeneral.setDefaultImage} />
+                                                    <p className='pro-name'>{proItem.name}</p>
+                                                    <div className="size-box">
+                                                        <Divider style={{margin: 0}} >
+                                                            <div className="title">
+                                                                <GiFlowerPot color='#e91e63' />
+                                                                <span>Thể loại</span>
+                                                            </div>
+                                                        </Divider>
+                                                        <div className="size-item-wrapper">
+                                                            {
+                                                                proItem.productItemDetail.map((pItem, i) => (
+                                                                    <div key={i} className='item-detail'>{pItem.size.sizeName}</div>
+                                                                ))
+                                                            }
+                                                        </div>
                                                     </div>
-                                                </Divider>
-                                                <div className="size-item-wrapper">
-                                                    {
-                                                        proItem.productItemDetail.map((pItem, i) => (
-                                                            <div key={i} className='item-detail'>{pItem.size.sizeName}</div>
-                                                        ))
-                                                    }
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    </Col>
-                                ))
-                            }
-                        </Row>
-                        <div style={{width: 'fit-content', margin: '20px auto'}}>
-                            <Pagination total={paging.recordCount} current={paging.curPage} pageSize={paging.pageSize} onChange={(page) => navigate(`/product/${productId}?page=${page}`)} />
-                        </div> 
-                    </section>
+                                                </Link>
+                                            </Col>
+                                        ))
+                                    }
+                                </Row>
+                                <div style={{width: 'fit-content', margin: '20px auto'}}>
+                                    <Pagination total={paging.recordCount} current={paging.curPage} pageSize={paging.pageSize} onChange={(page) => navigate(`/product/${productId}?page=${page}`)} />
+                                </div> 
+                            </section>
+                        </>
+                    }
                 </div>
             </div>
             <LandingFooter />

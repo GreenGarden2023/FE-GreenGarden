@@ -15,23 +15,33 @@ import { MdCancelPresentation } from 'react-icons/md'
 import { useNavigate } from 'react-router-dom'
 import CancelOrder from 'app/components/modal/cancel-order/CancelOrder'
 import ServiceStatusComp from 'app/components/status/ServiceStatusComp'
+import useDispatch from 'app/hooks/use-dispatch'
+import { setNoti } from 'app/slices/notification'
+import CONSTANT from 'app/utils/constant'
+import LoadingView from 'app/components/loading-view/LoadingView'
+import NoProduct from 'app/components/no-product/NoProduct'
 
 const ClientManageTakeCareService: React.FC = () => {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const [services, setServices] = useState<Service[]>([])
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
+    const [loading, setLoading] = useState(true)
+
     useEffect(() =>{
         const init = async () =>{
+            setLoading(true)
             try{
                 const res = await serviceService.getUserServiceRequest()
                 setServices(res.data)
             }catch{
-
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
+            setLoading(false)
         }
         init()
-    }, [])
+    }, [dispatch])
 
     const Column: ColumnsType<any> = [
         {
@@ -166,9 +176,15 @@ const ClientManageTakeCareService: React.FC = () => {
                 <div className="main-content-not-home">
                     <div className="container-wrapper cmtcs-wrapper">
                         <HeaderInfor title='Yêu cầu chăm sóc cây của bạn' />
-                        <div className="default-layout">
-                            <Table columns={Column} dataSource={DataSource} scroll={{x: 1500}} />
-                        </div>
+                        {
+                            loading && <LoadingView loading />
+                        }
+                        {
+                            (!loading && services.length === 0) ? <NoProduct /> :
+                            <div className="default-layout">
+                                <Table columns={Column} dataSource={DataSource} scroll={{x: 1500}} />
+                            </div>
+                        }
                     </div>
                 </div>
             <LandingFooter />

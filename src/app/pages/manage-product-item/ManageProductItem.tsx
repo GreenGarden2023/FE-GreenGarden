@@ -45,7 +45,7 @@ const ManageProductItem: React.FC = () => {
 
         const init = async () =>{
             try{
-                const res = await productItemService.getAllProductItem({curPage: Number(currentPage), pageSize: CONSTANT.PAGING_ITEMS.PRODUCT_ITEM}, {productID: productId})
+                const res = await productItemService.getProductItemByManager({curPage: Number(currentPage), pageSize: CONSTANT.PAGING_ITEMS.PRODUCT_ITEM}, productId)
                 setProductItems(res.data.productItems)
                 setPaging(res.data.paging)
                 setProduct(res.data.product)

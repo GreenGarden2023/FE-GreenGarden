@@ -40,9 +40,10 @@
             align-items: center;
             gap: 10px;
             svg{
-                color: $orange-text;
+                color: #fff;
                 cursor: pointer;
-                border: 1px solid $orange-text;
+                // border: 1px solid $orange-text;
+                background-color: $orange-text;
                 border-radius: 3px;
             }
         }
@@ -50,6 +51,7 @@
             width: 100%;
             height: 220px;
             object-fit: cover;
+            border-radius: 5px;
         }
         .item-infor{
             h1{

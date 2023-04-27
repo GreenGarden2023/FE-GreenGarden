@@ -11,8 +11,8 @@ const RENT_POLICY = [
     '- Khách hàng phải kiểm tra kĩ cây trước khi nhận. Nếu có vấn đề thì phải báo cho cửa hàng, cây sẽ được đổi cây mới không phụ thu bất kì chi phí nào.',
     '- Nếu khách hàng không kiểm tra kĩ cây trước khi nhận thì khi cây có vấn đề thì khách hàng phải chịu trách nhiệm.',
     '- Nếu cây không được trả đúng hạn thì sẽ phụ thu thêm tiền cho các ngày tiếp theo đến khi nào cây được trả.',
-    '- Khách hàng có thể tự mình gia hạn thêm thời gian thuê hoặc gọi điện đến cửa hàng để gia hạn thêm.',
-    '- Khi gia hạn thuê thì chỉ được chọn những cây đang thuê, không được thêm bất cứ cây nào khác nếu thêm thì sẽ tạo đơn hành mới.',
+    '- Khách hàng có thể tự mình gia hạn thêm thời gian thuê trên hệ thống.',
+    '- Khi gia hạn thuê thì chỉ được chọn những cây đang thuê, không được thêm bất cứ cây nào khác nếu thêm thì sẽ tạo đơn hàng mới.',
     '- Khi thuê khách hàng phải cọc 20% giá trị đơn hàng. Khi trả cây thì cửa hàng sẽ trả lại cọc cho khách hàng.',
     '- Khách hàng đặt đơn xong vui lòng thanh toán cọc. Đơn hàng chỉ được giao khi khách hàng thanh toán cọc đầy đủ.',
     '- Nếu trong quá trình thuê cây có vấn đề thì phải báo gấp cho cửa hàng biết để kịp thời cứu chữa.'

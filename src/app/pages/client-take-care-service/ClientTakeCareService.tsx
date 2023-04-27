@@ -26,6 +26,7 @@ import utilDateTime from 'app/utils/date-time'
 import CONSTANT from 'app/utils/constant'
 import { ShippingFee } from 'app/models/shipping-fee'
 import shippingFeeService from 'app/services/shipping-fee.service'
+import LoadingView from 'app/components/loading-view/LoadingView'
 
 
 const schema = yup.object().shape({
@@ -56,6 +57,7 @@ const ClientTakeCareService: React.FC = () => {
     const [treesSelect, setTreesSelect] = useState<UserTree[]>([])
 
     const [viewAll, setViewAll] = useState(false)
+    const [loading, setLoading] = useState(true)
 
     const { formState: { errors, isSubmitting }, handleSubmit, setValue, control, setError, clearErrors } = useForm<ServiceCreate>({
         defaultValues: {
@@ -72,26 +74,28 @@ const ClientTakeCareService: React.FC = () => {
                 const res = await shippingFeeService.getList()
                 setShipping(res.data)
             }catch{
-
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
         }
         init()
-    }, [])
+    }, [dispatch])
 
     useEffect(() =>{
         pagingPath.scrollTop()
 
         const init = async () =>{
+            setLoading(true)
             try{
                 const res = await userTreeService.getUserTree()
                 console.log(res)
                 setListTrees(res.data)
             }catch{
-
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
+            setLoading(false)
         }
         init()
-    }, [])
+    }, [dispatch])
 
     useEffect(() =>{
         const { fullName, phone, address, mail, districtID } = userState.user
@@ -204,83 +208,88 @@ const ClientTakeCareService: React.FC = () => {
             <div className="main-content-not-home">
                 <div className="container-wrapper ts-wrapper">
                     <HeaderInfor title='Dịch vụ chăm sóc cây cảnh' />
-                    <section className="default-layout ts-create-service">
-                        <div>
-                            <button className="ts-btn-create btn btn-create" onClick={handleCreateNewTree}>
-                                <AiOutlinePlusSquare size={25} />
-                                Tạo mới cây của bạn
-                            </button>
-                        </div>
-                    </section>
-                    <section className="ts-box default-layout">
-                        <button className="ts-btn-create btn btn-create" onClick={() => navigate('/take-care-service/me')}>
-                            <MdMiscellaneousServices size={25} />
-                            Quản lý yêu cầu của bạn
-                        </button>
-                        <button className='btn btn-create' onClick={handleCreateTakeCareService}>
-                            <IoCreateOutline size={25} />
-                            Tạo yêu cầu chăm sóc cây
-                        </button>
-                    </section>
-                    <section className="ts-infor default-layout">
-                        {
-                            listTrees.length === 0 ?
-                            <div className="empty-tree">
-                                <h1>Hiện tại bạn chưa có cây nào. Hãy tạo mới 1 cây</h1>
-                                <button className='btn btn-create' onClick={handleCreateNewTree}>Tạo mới</button>
-                            </div> :
-                            <>
+                    {
+                        loading ? <LoadingView loading /> : 
+                        <>
+                            <section className="default-layout ts-create-service">
+                                <div>
+                                    <button className="ts-btn-create btn btn-create" onClick={handleCreateNewTree}>
+                                        <AiOutlinePlusSquare size={25} />
+                                        Tạo mới cây của bạn
+                                    </button>
+                                </div>
+                            </section>
+                            <section className="ts-box default-layout">
+                                <button className="ts-btn-create btn btn-create" onClick={() => navigate('/take-care-service/me')}>
+                                    <MdMiscellaneousServices size={25} />
+                                    Quản lý yêu cầu của bạn
+                                </button>
+                                <button className='btn btn-create' onClick={handleCreateTakeCareService}>
+                                    <IoCreateOutline size={25} />
+                                    Tạo yêu cầu chăm sóc cây
+                                </button>
+                            </section>
+                            <section className="ts-infor default-layout">
                                 {
-                                    <div className="filtering">
-                                        <Checkbox checked={viewAll} onChange={(e) => setViewAll(e.target.checked)} >Hiển thị các cây đã chọn</Checkbox>
-                                    </div>
+                                    listTrees.length === 0 ?
+                                    <div className="empty-tree">
+                                        <h1>Hiện tại bạn chưa có cây nào. Hãy tạo mới 1 cây</h1>
+                                        <button className='btn btn-create' onClick={handleCreateNewTree}>Tạo mới</button>
+                                    </div> :
+                                    <>
+                                        {
+                                            <div className="filtering">
+                                                <Checkbox checked={viewAll} onChange={(e) => setViewAll(e.target.checked)} >Hiển thị các cây đã chọn</Checkbox>
+                                            </div>
+                                        }
+                                        <Row gutter={[12, 12]}>
+                                            {
+                                                (viewAll ? treesSelect : listTrees).map((item, index) => (
+                                                    <>
+                                                        {
+                                                            item.status === 'active' &&
+                                                            <Col key={index} span={6}>
+                                                                <div className="item-detail">
+                                                                    <div className="actions-wrapper">
+                                                                        <Tooltip color='#f95441' title='Chỉnh sửa'>
+                                                                            <AiOutlineEdit size={20} onClick={() => setModalState({openModal: 2, tree: item})} />
+                                                                        </Tooltip>
+                                                                        <Tooltip color='#f95441' title='Xóa'>
+                                                                            <IoCloseSharp size={20} onClick={() => {
+                                                                                if(treesSelect.find(x => x.id === item.id)){
+                                                                                    dispatch(setNoti({type: 'warning', message: 'Vui lòng bỏ chọn cây trước khi xóa khỏi kho'}))
+                                                                                    return
+                                                                                }
+                                                                                setModalState({openModal: 4, tree: item})
+                                                                            }} />
+                                                                        </Tooltip>
+                                                                    </div>
+                                                                    <img src={item.imgUrls[0]} alt="/" />
+                                                                    <div className="item-infor">
+                                                                        <h1>
+                                                                            {item.treeName}
+                                                                            <span>({item.quantity})</span>
+                                                                        </h1>
+                                                                        <p className='description'>
+                                                                            Mô tả 
+                                                                            <span>{item.description}</span>
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="select-tree">
+                                                                        <Checkbox onChange={() => handleSelectTree(item)} checked={treesSelect.findIndex(x => x.id === item.id) > -1} >Chọn cây để chăm sóc</Checkbox>
+                                                                    </div>
+                                                                </div>
+                                                            </Col>
+                                                        }
+                                                    </>
+                                                ))
+                                            }
+                                        </Row>
+                                    </>
                                 }
-                                <Row gutter={[12, 12]}>
-                                    {
-                                        (viewAll ? treesSelect : listTrees).map((item, index) => (
-                                            <>
-                                                {
-                                                    item.status === 'active' &&
-                                                    <Col key={index} span={6}>
-                                                        <div className="item-detail">
-                                                            <div className="actions-wrapper">
-                                                                <Tooltip color='#f95441' title='Chỉnh sửa'>
-                                                                    <AiOutlineEdit size={20} onClick={() => setModalState({openModal: 2, tree: item})} />
-                                                                </Tooltip>
-                                                                <Tooltip color='#f95441' title='Xóa'>
-                                                                    <IoCloseSharp size={20} onClick={() => {
-                                                                        if(treesSelect.find(x => x.id === item.id)){
-                                                                            dispatch(setNoti({type: 'warning', message: 'Vui lòng bỏ chọn cây trước khi xóa khỏi kho'}))
-                                                                            return
-                                                                        }
-                                                                        setModalState({openModal: 4, tree: item})
-                                                                    }} />
-                                                                </Tooltip>
-                                                            </div>
-                                                            <img src={item.imgUrls[0]} alt="/" />
-                                                            <div className="item-infor">
-                                                                <h1>
-                                                                    {item.treeName}
-                                                                    <span>({item.quantity})</span>
-                                                                </h1>
-                                                                <p className='description'>
-                                                                    Mô tả 
-                                                                    <span>{item.description}</span>
-                                                                </p>
-                                                            </div>
-                                                            <div className="select-tree">
-                                                                <Checkbox onChange={() => handleSelectTree(item)} checked={treesSelect.findIndex(x => x.id === item.id) > -1} >Chọn cây để chăm sóc</Checkbox>
-                                                            </div>
-                                                        </div>
-                                                    </Col>
-                                                }
-                                            </>
-                                        ))
-                                    }
-                                </Row>
-                            </>
-                        }
-                    </section>
+                            </section>
+                        </>
+                    }
                 </div>
             </div>
             <LandingFooter />
