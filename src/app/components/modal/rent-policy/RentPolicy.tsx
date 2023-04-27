@@ -48,7 +48,7 @@ const RentPolicy: React.FC<RentPolicyProps> = ({checked, items, onConfirm}) => {
             </div>
             {
                 items.map((item, index) => (
-                    item.productItem.rule.trim() ?
+                    (item.productItem.rule && item.productItem.rule.trim()) ?
                     <Fragment key={index}>
                         <Divider orientation='left' >Điều khoản của cây "{item.productItem.name}"</Divider>
                         <div className="rules">
