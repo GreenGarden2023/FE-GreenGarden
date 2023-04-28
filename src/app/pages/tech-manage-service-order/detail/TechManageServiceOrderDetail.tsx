@@ -18,7 +18,8 @@ import serviceCalendar from 'app/services/service-calendar.service';
 import utilDateTime from 'app/utils/date-time';
 // import dayjs from 'dayjs';
 import React, { useEffect, useMemo, useState } from 'react';
-import { BiCommentDetail } from 'react-icons/bi';
+import { AiOutlineCloudUpload } from 'react-icons/ai';
+import { BiDetail } from 'react-icons/bi';
 import { GrMore } from 'react-icons/gr';
 import { useParams } from 'react-router-dom';
 import './style.scss';
@@ -128,7 +129,7 @@ const TechManageServiceOrderDetail: React.FC = () => {
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.id, actionType: 'detail', orderType: 'service', openIndex: -1})
                     }}>
-                        <BiCommentDetail size={25} className='icon'/>
+                        <BiDetail size={25} className='icon'/>
                         <span>Chi tiết báo cáo</span>
                     </div>
                 }
@@ -138,7 +139,7 @@ const TechManageServiceOrderDetail: React.FC = () => {
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.id, actionType: 'update calendar', orderType: 'service', openIndex: -1})
                     }}>
-                        <BiCommentDetail size={25} className='icon'/>
+                        <AiOutlineCloudUpload size={25} className='icon'/>
                         <span>Đăng tải báo cáo</span>
                     </div>
                 }

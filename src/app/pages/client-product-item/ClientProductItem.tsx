@@ -117,7 +117,7 @@ const ClientProductItem: React.FC = () => {
                                             }
                                         </Row>
                                         <div style={{width: 'fit-content', margin: '20px auto'}}>
-                                            <Pagination total={paging.recordCount} current={paging.curPage} pageSize={paging.pageSize} onChange={(page) => navigate(`/product/${productId}?page=${page}`)} />
+                                            <Pagination total={paging.recordCount} current={paging.curPage} pageSize={paging.pageSize} onChange={(page) => navigate(`/product/${productId}?page=${page}`)} hideOnSinglePage />
                                         </div> 
                                     </section>
                                 </>

@@ -282,11 +282,11 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
         const totalRentDays = getDiffDays(startDateRent, endDateRent)
 
         let totalPriceOrder = 0
-        let transportFee = 0
+        let transportFee = shippingFeeTemp ? shippingFeeTemp.feeAmount : 0
 
         for (const item of rentOrderListData.rentOrderDetailList) {
             totalPriceOrder += item.quantity * item.rentPricePerUnit * totalRentDays
-            transportFee += ((shippingFeeTemp ? shippingFeeTemp.feeAmount : 0) + (rentOrderListData.transportFee * item.quantity))
+            transportFee += (item.productItemDetail.transportFee * item.quantity)
         }
 
         if(!isTransport){
@@ -297,7 +297,7 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
 
         const rewardPoint = Math.ceil(totalPricePayment / CONSTANT.REWARD_POINT_RATE)
 
-        const deposit = totalPricePayment <= CONSTANT.RENT_DEPOSIT_RATE ? 0 : Math.ceil(totalPricePayment * CONSTANT.DEPOSIT_MIN_RATE)
+        const deposit = totalPricePayment < CONSTANT.RENT_DEPOSIT_RATE ? 0 : Math.ceil(totalPricePayment * CONSTANT.DEPOSIT_MIN_RATE)
 
         const data: OrderPreview = {
             rewardPoint,

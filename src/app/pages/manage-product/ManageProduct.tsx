@@ -63,12 +63,14 @@ const ManageProduct: React.FC = () => {
   useEffect(() =>{
     const currentPage = searchParams.get('page')
     const currentCategory = searchParams.get('category')
+
+    if(!currentPage || !currentCategory) return;
     
-    if(!currentPage || !currentCategory || categories.length === 0 || categories.findIndex(x => x.id === categoryIdSelected) < 0) return;
+    // if(!currentPage || !currentCategory || categories.length === 0 || categories.findIndex(x => x.id === categoryIdSelected) < 0) return;
     const init = async () =>{
       setLoading(true)
       try{
-        const res = await productServcie.getAllProduct({curPage: Number(currentPage), pageSize: CONSTANT.PAGING_ITEMS.PRODUCT}, categoryIdSelected)
+        const res = await productServcie.getAllProduct({curPage: Number(currentPage), pageSize: CONSTANT.PAGING_ITEMS.PRODUCT}, currentCategory)
         setProducts(res.data.result)
         setPaging(res.data.paging)
         // setCategories(res.data.result)
@@ -79,7 +81,7 @@ const ManageProduct: React.FC = () => {
       setLoading(false)
     }
     init()
-  }, [categories, categoryIdSelected, searchParams, dispatch])
+  }, [categories, searchParams, dispatch])
   
   const Column: ColumnsType<Product> = [
     {

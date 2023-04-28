@@ -32,9 +32,11 @@ import utilDateTime from 'app/utils/date-time'
 import pagingPath from 'app/utils/paging-path'
 import React, { useEffect, useMemo, useState } from 'react'
 import CurrencyFormat from 'react-currency-format'
-import { BiCommentDetail, BiDetail } from 'react-icons/bi'
+import { AiOutlineTransaction } from 'react-icons/ai'
+import { BiDetail } from 'react-icons/bi'
 import { BsCheck2All } from 'react-icons/bs'
 import { GrMore } from 'react-icons/gr'
+import { MdCancelPresentation, MdOutlinePayment, MdOutlinePayments } from 'react-icons/md'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
 const ManageTakeCareOrder: React.FC = () => {
@@ -59,11 +61,11 @@ const ManageTakeCareOrder: React.FC = () => {
                 const res = await shippingFeeService.getList()
                 setShipping(res.data)
             }catch{
-
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
         }
         init()
-    }, [])
+    }, [dispatch])
 
     useEffect(() =>{
         pagingPath.scrollTop()
@@ -123,13 +125,13 @@ const ManageTakeCareOrder: React.FC = () => {
                 <div className="item" onClick={() => {
                     setActionMethod({orderId: record.orderId, actionType: 'detail', orderType: 'service', openIndex: -1})
                 }}>
-                    <BiCommentDetail size={25} className='icon'/>
+                    <BiDetail size={25} className='icon'/>
                     <span>Chi tiết đơn hàng</span>
                 </div>
                 <div className="item" onClick={() => {
                     setActionMethod({orderId: record.orderId, actionType: 'view transaction', orderType: 'service', openIndex: -1})
                 }}>
-                    <BiCommentDetail size={25} className='icon'/>
+                    <AiOutlineTransaction size={25} className='icon'/>
                     <span>Xem giao dịch</span>
                 </div>
                 {
@@ -137,7 +139,7 @@ const ManageTakeCareOrder: React.FC = () => {
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.orderId, actionType: 'deposit', orderType: 'service', openIndex: -1})
                     }}>
-                        <BiDetail size={25} className='icon'/>
+                        <MdOutlinePayments size={25} className='icon'/>
                         <span>Thanh toán tiền cọc</span>
                     </div>
                 }
@@ -146,7 +148,7 @@ const ManageTakeCareOrder: React.FC = () => {
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.orderId, actionType: 'remaining', orderType: 'service', openIndex: -1})
                     }}>
-                        <BiDetail size={25} className='icon'/>
+                        <MdOutlinePayment size={25} className='icon'/>
                         <span>Thanh toán đơn hàng</span>
                     </div>
                 }
@@ -164,7 +166,7 @@ const ManageTakeCareOrder: React.FC = () => {
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.orderId, actionType: 'refund', orderType: 'service', openIndex: -1})
                     }}>
-                        <BiDetail size={25} className='icon'/>
+                        <BsCheck2All size={25} className='icon'/>
                         <span>Hoàn tiền</span>
                     </div>
                 }
@@ -173,7 +175,7 @@ const ManageTakeCareOrder: React.FC = () => {
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.orderId, actionType: 'cancel', orderType: 'service', openIndex: -1})
                     }}>
-                        <BiDetail size={25} className='icon'/>
+                        <MdCancelPresentation size={25} className='icon'/>
                         <span>Hủy đơn hàng</span>
                     </div>
                 }

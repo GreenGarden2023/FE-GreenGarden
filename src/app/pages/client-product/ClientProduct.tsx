@@ -117,6 +117,7 @@ const ClientProduct: React.FC = () => {
                           onChange={(page: number) =>{
                             navigate(`/category/${categoryId}?page=${page}`)
                           }}
+                          hideOnSinglePage
                         />
                       </div>
                     </>

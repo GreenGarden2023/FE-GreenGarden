@@ -2,6 +2,7 @@ import { Popover } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import Transport from 'app/components/renderer/transport/Transport'
+import ServiceStatusComp from 'app/components/status/ServiceStatusComp'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
 import useSelector from 'app/hooks/use-selector'
 import { Paging } from 'app/models/paging'
@@ -12,11 +13,10 @@ import CONSTANT from 'app/utils/constant'
 import utilDateTime from 'app/utils/date-time'
 import pagingPath from 'app/utils/paging-path'
 import React, { useEffect, useMemo, useState } from 'react'
-import { BiCommentDetail } from 'react-icons/bi'
+import { BiDetail } from 'react-icons/bi'
 import { GrMore } from 'react-icons/gr'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import './style.scss'
-import ServiceStatusComp from 'app/components/status/ServiceStatusComp'
 
 const ManageRequest: React.FC = () => {
     // const dispatch = useDispatch();
@@ -94,12 +94,6 @@ const ManageRequest: React.FC = () => {
             dataIndex: 'isTransport',
             render: (v) => (<Transport isTransport={v} isRequest />)
         },
-        // {
-        //     title: 'Người chăm sóc',
-        //     key: 'technicianName',
-        //     dataIndex: 'technicianName',
-        //     render: (v) => <TechnicianName name={v} />
-        // },
         {
             title: 'Tổng số cây',
             key: 'totalQuantity',
@@ -137,60 +131,9 @@ const ManageRequest: React.FC = () => {
                 <div className="item" onClick={() => {
                     setActionMethod({orderId: record.id, actionType: 'detail', orderType: 'service', openIndex: -1})
                 }}>
-                    <BiCommentDetail size={25} className='icon'/>
+                    <BiDetail size={25} className='icon'/>
                     <span>Chi tiết dịch vụ</span>
                 </div>
-                {/* {
-                    (record.status === 'processing' || record.status === 'reprocess') && 
-                    <div className="item" onClick={() => {
-                        setActionMethod({orderId: record.id, actionType: 'accept service', orderType: 'service', openIndex: -1})
-                    }}>
-                        <BiCommentDetail size={25} className='icon'/>
-                        <span>Xác nhận yêu cầu</span>
-                    </div>
-                }
-                {
-                    (record.status === 'processing' || record.status === 'reprocess' || record.status === 'accepted') &&
-                    <div className="item" onClick={() => {
-                        setActionMethod({orderId: record.id, actionType: 'reject service', orderType: 'service', openIndex: -1})
-                    }}>
-                        <BiCommentDetail size={25} className='icon'/>
-                        <span>Từ chối yêu cầu</span>
-                    </div>
-                }
-                {
-                    (record.status === 'accepted') &&
-                    <div className="item" 
-                        onClick={() => {
-                            setActionMethod({orderId: record.id, actionType: 'assign', orderType: 'service', openIndex: -1})
-                        }}
-                    >
-                        <BiDetail size={25} className='icon'/>
-                        <span>Chọn người chăm sóc</span>
-                    </div>
-                }
-                {
-                    (record.status === 'accepted' && record.technicianID) &&
-                    <div className="item" 
-                        onClick={() => {
-                            setActionMethod({orderId: record.id, actionType: 'update infor', orderType: 'service', openIndex: -1})
-                        }}
-                    >
-                        <BiDetail size={25} className='icon'/>
-                        <span>Cập nhật thông tin dịch vụ</span>
-                    </div>
-                }
-                {
-                    record.status === 'user approved' &&
-                    <div className="item" 
-                        onClick={() => {
-                            setActionMethod({orderId: record.id, actionType: 'create order', orderType: 'service', openIndex: -1})
-                        }}
-                    >
-                        <BiDetail size={25} className='icon'/>
-                        <span>Tạo đơn hàng</span>
-                    </div>
-                } */}
             </div>
         )
     }

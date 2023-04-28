@@ -91,9 +91,8 @@ const ServiceReportDetail: React.FC<ServiceReportDetailProps> = ({orderCode, ser
                 }
             </div>
             <div className='btn-form-wrapper mt-10'>
-                <Button type='default' className='btn-cancel' size='large' onClick={onClose} >Hủy bỏ</Button>
                 <Button type='primary' className='btn-update' size='large' onClick={onClose}>
-                    Xác nhận
+                    Đóng
                 </Button>
             </div>
         </Modal>

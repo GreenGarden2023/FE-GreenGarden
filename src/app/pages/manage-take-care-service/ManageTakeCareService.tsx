@@ -19,8 +19,11 @@ import { setNoti } from 'app/slices/notification'
 import CONSTANT from 'app/utils/constant'
 import utilDateTime from 'app/utils/date-time'
 import React, { useEffect, useMemo, useState } from 'react'
-import { BiCommentDetail, BiDetail } from 'react-icons/bi'
+import { AiOutlineEdit } from 'react-icons/ai'
+import { BiDetail, BiUserPlus } from 'react-icons/bi'
+import { BsCheck2All } from 'react-icons/bs'
 import { GrMore } from 'react-icons/gr'
+import { MdCancelPresentation } from 'react-icons/md'
 
 const ManageTakeCareService: React.FC = () => {
     const dispatch = useDispatch();
@@ -66,7 +69,7 @@ const ManageTakeCareService: React.FC = () => {
                 <div className="item" onClick={() => {
                     setActionMethod({orderId: record.id, actionType: 'detail', orderType: 'service', openIndex: -1})
                 }}>
-                    <BiCommentDetail size={25} className='icon'/>
+                    <BiDetail size={25} className='icon'/>
                     <span>Chi tiết dịch vụ</span>
                 </div>
                 {
@@ -74,7 +77,7 @@ const ManageTakeCareService: React.FC = () => {
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.id, actionType: 'accept service', orderType: 'service', openIndex: -1})
                     }}>
-                        <BiCommentDetail size={25} className='icon'/>
+                        <BsCheck2All size={25} className='icon'/>
                         <span>Xác nhận yêu cầu</span>
                     </div>
                 }
@@ -83,7 +86,7 @@ const ManageTakeCareService: React.FC = () => {
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.id, actionType: 'reject service', orderType: 'service', openIndex: -1})
                     }}>
-                        <BiCommentDetail size={25} className='icon'/>
+                        <MdCancelPresentation size={25} className='icon'/>
                         <span>Từ chối yêu cầu</span>
                     </div>
                 }
@@ -94,7 +97,7 @@ const ManageTakeCareService: React.FC = () => {
                             setActionMethod({orderId: record.id, actionType: 'assign', orderType: 'service', openIndex: -1})
                         }}
                     >
-                        <BiDetail size={25} className='icon'/>
+                        <BiUserPlus size={25} className='icon'/>
                         <span>Chọn người chăm sóc</span>
                     </div>
                 }
@@ -105,7 +108,7 @@ const ManageTakeCareService: React.FC = () => {
                             setActionMethod({orderId: record.id, actionType: 'update infor', orderType: 'service', openIndex: -1})
                         }}
                     >
-                        <BiDetail size={25} className='icon'/>
+                        <AiOutlineEdit size={25} className='icon'/>
                         <span>Cập nhật thông tin dịch vụ</span>
                     </div>
                 }
