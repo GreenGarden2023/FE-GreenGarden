@@ -16,7 +16,7 @@ import { ServiceCalendar } from 'app/models/service-calendar';
 import orderService from 'app/services/order.service';
 import serviceCalendar from 'app/services/service-calendar.service';
 import utilDateTime from 'app/utils/date-time';
-import dayjs from 'dayjs';
+// import dayjs from 'dayjs';
 import React, { useEffect, useMemo, useState } from 'react';
 import { BiCommentDetail } from 'react-icons/bi';
 import { GrMore } from 'react-icons/gr';
