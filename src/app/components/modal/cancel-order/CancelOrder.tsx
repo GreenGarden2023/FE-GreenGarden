@@ -6,6 +6,7 @@ import { OrderType } from 'app/models/general-type';
 import orderService from 'app/services/order.service';
 import serviceService from 'app/services/service.service';
 import { setNoti } from 'app/slices/notification';
+import CONSTANT from 'app/utils/constant';
 import React, { useMemo, useState } from 'react'
 
 interface CancelOrderProps{
@@ -33,6 +34,7 @@ const CancelOrder: React.FC<CancelOrderProps> = ({ orderId, orderCode, orderType
                 dispatch(setNoti({type: 'success', message: `Hủy yêu cầu chăm sóc "${orderCode}" thành công`}))
                 onSubmit(reason, fullName)
                 onClose()
+                setLoading(false)
                 return;
             }
 
@@ -41,7 +43,7 @@ const CancelOrder: React.FC<CancelOrderProps> = ({ orderId, orderCode, orderType
             onSubmit(reason, fullName)
             onClose()
         }catch{
-            
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
         setLoading(false)
     }

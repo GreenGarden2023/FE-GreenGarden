@@ -147,7 +147,7 @@ const Routers: React.FC = () =>{
                     <Route path='sale-order' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageSaleOrder /></AdminRoute></AuthGuard>} />
                     <Route path='take-care-order' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageTakeCareOrder /></AdminRoute></AuthGuard>} />
                     <Route path='manage-take-care-service' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageTakeCareService /></AdminRoute></AuthGuard>} />
-                    <Route path='rent-order/:groupId' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageRentOrderGroup /></AdminRoute></AuthGuard>} />
+                    <Route path='rent-order/:groupId/:orderId' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageRentOrderGroup /></AdminRoute></AuthGuard>} />
                     <Route path='manage-shipping-fee' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_SHIPPING_FEE} ><AdminRoute><ManageShippingFee /></AdminRoute></AuthGuard>} />
                     <Route path='manage-request' element={<AuthGuard rolesAuth={CONSTANT.TAKE_CARE_ORDER} ><AdminRoute><ManageRequest /></AdminRoute></AuthGuard>} />
                     <Route path='take-care-order-assigned' element={<AuthGuard rolesAuth={CONSTANT.TAKE_CARE_ORDER} ><AdminRoute><TechManageServiceOrder /></AdminRoute></AuthGuard>} />

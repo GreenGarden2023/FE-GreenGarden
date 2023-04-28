@@ -2,6 +2,7 @@ import { Button, Modal } from 'antd';
 import useDispatch from 'app/hooks/use-dispatch';
 import orderService from 'app/services/order.service';
 import { setNoti } from 'app/slices/notification';
+import CONSTANT from 'app/utils/constant';
 import React, { useState } from 'react'
 
 interface SaleDeliveryProps{
@@ -16,7 +17,6 @@ const SaleDelivery: React.FC<SaleDeliveryProps> = ({orderId, orderCode, type, on
     const dispatch = useDispatch()
 
     const [loading, setLoading] = useState(false)
-    
 
     const handleSubmitForm = async () =>{
         setLoading(true)
@@ -26,7 +26,7 @@ const SaleDelivery: React.FC<SaleDeliveryProps> = ({orderId, orderCode, type, on
                 dispatch(setNoti({type: 'success', message: `Cập nhật trạng thái vận chuyển cho đơn hàng "${orderCode}" thành công`}))
                 onSubmit()
             }catch{
-
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
         }else{
             try{
@@ -34,7 +34,7 @@ const SaleDelivery: React.FC<SaleDeliveryProps> = ({orderId, orderCode, type, on
                 dispatch(setNoti({type: 'success', message: `Cập nhật trạng thái vận chuyển cho đơn hàng "${orderCode}" thành công`}))
                 onSubmit()
             }catch{
-
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
         }
         setLoading(false)

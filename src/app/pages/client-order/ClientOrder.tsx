@@ -391,7 +391,7 @@ const ClientOrder: React.FC = () =>{
             key: 'deposit',
             dataIndex: 'deposit',
             align: 'right',
-            width: 150,
+            width: 200,
             render: (v) => (<MoneyFormat value={v} color='Orange' />)
         },
         {
@@ -399,15 +399,15 @@ const ClientOrder: React.FC = () =>{
             key: 'discountAmount',
             dataIndex: 'discountAmount',
             align: 'right',
-            width: 150,
+            width: 200,
             render: (v) => (<MoneyFormat value={v} color='Yellow' />)
         },
         {
-            title: 'Tổng đơn hàng',
+            title: 'Giá trị đơn hàng',
             key: 'totalPrice',
             dataIndex: 'totalPrice',
             align: 'right',
-            width: 150,
+            width: 200,
             render: (v) => (<MoneyFormat value={v} color='Light Blue' />)
         },
         {
@@ -415,7 +415,7 @@ const ClientOrder: React.FC = () =>{
             key: 'remainMoney',
             dataIndex: 'remainMoney',
             align: 'right',
-            width: 150,
+            width: 200,
             render: (v) => (<MoneyFormat value={v} color='Blue' />)
         },
         {
@@ -476,7 +476,7 @@ const ClientOrder: React.FC = () =>{
                     </div>
                 }
                 {
-                    (record.status === 'unpaid' || record.status === 'ready') &&
+                    (record.status === 'ready' || record.deposit === 0) &&
                     <div className="item" onClick={() => {
                         handlePaymentRent({orderId: record.orderId, actionType: 'remaining', orderType: 'rent', openIndex: -1})
                     }} >
@@ -501,11 +501,11 @@ const ClientOrder: React.FC = () =>{
             key: String(index + 1),
             orderId: x.rentOrderList[0].id,
             groupID: x.id,
-            totalPrice: x.totalGroupAmount,
+            totalPrice: x.rentOrderList[0].remainMoney,
             startDateRent: x.rentOrderList[0].startRentDate,
             endDateRent: x.rentOrderList[0].endRentDate,
             status: x.rentOrderList[0].status,
-            remainMoney: x.rentOrderList[0].remainMoney,
+            remainMoney: x.rentOrderList[0].status === 'unpaid' ? x.rentOrderList[0].remainMoney + x.rentOrderList[0].deposit : x.rentOrderList[0].remainMoney,
             deposit: x.rentOrderList[0].deposit,
             orderCode: x.rentOrderList[0].orderCode,
             transportFee: x.rentOrderList[0].transportFee,
@@ -790,7 +790,7 @@ const ClientOrder: React.FC = () =>{
                                         className='cart-table' 
                                         columns={ColumnRentOrder} 
                                         dataSource={DataSourceRentOrder} 
-                                        scroll={{x: 1500}}
+                                        scroll={{x: 2000}}
                                         pagination={{
                                             current: paging.curPage,
                                             pageSize: paging.pageSize,

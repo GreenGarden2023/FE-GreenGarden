@@ -7,15 +7,15 @@ import React, { useMemo, useState } from 'react'
 interface RentOrderPaymentDepositProps{
     rentOrderList: RentOrderList
     onClose: () => void;
-    onSubmit: (orderId: string) => void
+    onSubmit: (orderId: string) => Promise<void>
 }
 
 const RentOrderPaymentDeposit: React.FC<RentOrderPaymentDepositProps> = ({rentOrderList, onClose, onSubmit}) => {
     const [loading, setLoading] = useState(false)
 
-    const handleSubmit = () =>{
+    const handleSubmit = async() =>{
         setLoading(true)
-        onSubmit(rentOrderList.id)
+        await onSubmit(rentOrderList.id)
         setLoading(false)
     }
     

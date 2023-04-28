@@ -2,6 +2,7 @@ import { Button, Modal } from 'antd';
 import useDispatch from 'app/hooks/use-dispatch';
 import orderService from 'app/services/order.service';
 import { setNoti } from 'app/slices/notification';
+import CONSTANT from 'app/utils/constant';
 import React, { useState } from 'react'
 
 interface FinishOrderProps{
@@ -25,7 +26,7 @@ const FinishOrder: React.FC<FinishOrderProps> = ({ orderId, orderCode, type, onC
                 dispatch(setNoti({type: 'success', message: `Cập nhật trạng thái hoàn thành cho đơn hàng ${orderCode}`}))
                 onSubmit()
             }catch{
-
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
         }else{
             try{
@@ -33,7 +34,7 @@ const FinishOrder: React.FC<FinishOrderProps> = ({ orderId, orderCode, type, onC
                 dispatch(setNoti({type: 'success', message: `Cập nhật trạng thái hoàn thành cho đơn hàng ${orderCode}`}))
                 onSubmit()
             }catch{
-
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
         }
         setLoading(false)

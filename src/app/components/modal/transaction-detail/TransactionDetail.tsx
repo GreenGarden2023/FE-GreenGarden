@@ -3,13 +3,16 @@ import './style.scss'
 import { Transaction } from 'app/models/transaction'
 import transactionService from 'app/services/transaction.service'
 import { OrderType } from 'app/models/general-type';
-import { Modal } from 'antd';
+import { Button, Modal } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 import utilDateTime from 'app/utils/date-time';
 import MoneyFormat from 'app/components/money/MoneyFormat';
 import { BiShoppingBag } from 'react-icons/bi';
 import Description from 'app/components/renderer/description/Description';
 import LoadingView from 'app/components/loading-view/LoadingView';
+import useDispatch from 'app/hooks/use-dispatch';
+import { setNoti } from 'app/slices/notification';
+import CONSTANT from 'app/utils/constant';
 
 interface TransactionDetailProps{
     orderId: string;
@@ -19,24 +22,25 @@ interface TransactionDetailProps{
 }
 
 const TransactionDetail: React.FC<TransactionDetailProps> = ({orderId, orderType, orderCode, onClose}) => {
+    const dispatch = useDispatch()
 
     const [transactions, setTransactions] = useState<Transaction[]>([])
     const [loading, setLoading] = useState(false)
 
     useEffect(() =>{
-        setLoading(true)
         const init = async () =>{
+            setLoading(true)
             try{
                 const res = await transactionService.getTransactionByOrder(orderId, orderType)
                 setTransactions(res.data)
                 console.log(res)
             }catch{
-                
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
+            setLoading(false)
         }
         init()
-        setLoading(false)
-    }, [orderId, orderType])
+    }, [orderId, orderType, dispatch])
 
     const Column: ColumnsType<any> = [
         {
@@ -94,6 +98,7 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({orderId, orderType
             onCancel={onClose}
             onOk={onClose}
             width={1000}
+            footer={false}
         >
             {
                 loading ?
@@ -112,6 +117,11 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({orderId, orderType
                             pagination={false}
                         />
                     }
+                    <div className='btn-form-wrapper mt-10'>
+                        <Button type='primary' className='btn-update' size='large' onClick={onClose}>
+                            Đóng
+                        </Button>
+                    </div>
                 </>
             }
         </Modal>

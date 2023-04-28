@@ -37,7 +37,7 @@ const Renting: React.FC<RentingProps> = ({orderId, orderCode, onClose, onSubmit}
             footer={false}
         >
             <div className='btn-form-wrapper' style={{marginTop: '10px'}}>
-                <Button htmlType='button' disabled={loading} type='default' className='btn-cancel' size='large' >Hủy bỏ</Button>
+                <Button htmlType='button' disabled={loading} type='default' className='btn-cancel' size='large' onClick={onClose} >Hủy bỏ</Button>
                 <Button htmlType='submit' loading={loading} type='primary' className='btn-update' size='large' onClick={handleSubmitForm}>
                     Chuyển trạng thái
                 </Button>

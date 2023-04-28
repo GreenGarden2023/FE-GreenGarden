@@ -1,4 +1,4 @@
-import { Image, Modal } from 'antd';
+import { Button, Image, Modal } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 import MoneyFormat from 'app/components/money/MoneyFormat';
 import TreeName from 'app/components/renderer/tree-name/TreeName';
@@ -110,9 +110,15 @@ const ModalClientSaleOrderDetai: React.FC<ModalClientSaleOrderDetaiProps> = ({ s
             onOk={onClose}
             width={1200}
             className='mcsod-wrapper'
+            footer={false}
         >
             <Table className='table' dataSource={DataSource} columns={Column} pagination={false} />
             <UserInforOrder {...OrderDetail} />
+            <div className='btn-form-wrapper mt-10'>
+                <Button type='primary' className='btn-update' size='large' onClick={onClose}>
+                    Đóng
+                </Button>
+            </div>
         </Modal>
     )
 }

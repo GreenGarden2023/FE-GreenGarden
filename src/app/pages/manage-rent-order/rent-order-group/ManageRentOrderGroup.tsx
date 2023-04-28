@@ -36,7 +36,7 @@ import { useParams } from "react-router-dom";
 import "./style.scss";
 
 const ManageRentOrderGroup: React.FC = () => {
-  const { groupId } = useParams();
+  const { groupId, orderId } = useParams();
   const dispatch = useDispatch();
 
   const [groupOrder, setGroupOrder] = useState<RentOrder>();
@@ -54,9 +54,9 @@ const ManageRentOrderGroup: React.FC = () => {
     const init = async () => {
       try {
         const res = await orderService.getRentOrderGroup(groupId);
-        const newRes = {...res.data}
-        newRes.rentOrderList = newRes.rentOrderList.reverse()
-        setGroupOrder(newRes);
+        // const newRes = {...res.data}
+        // newRes.rentOrderList = newRes.rentOrderList.reverse()
+        setGroupOrder(res.data);
       } catch {
 
       }
@@ -279,7 +279,12 @@ const ManageRentOrderGroup: React.FC = () => {
   };
   const DataSourceRentOrder = useMemo(() => {
     if(!groupOrder) return ({} as any);
-    const x = groupOrder.rentOrderList[groupOrder.rentOrderList.length - 1]
+
+    const [x] = groupOrder.rentOrderList.filter(x => x.id === orderId)
+
+    if(!x) return ({} as any);
+
+    // const x = groupOrder.rentOrderList[groupOrder.rentOrderList.length - 1]
     return [{
       key: String(1),
       orderId: x.id,
@@ -296,7 +301,7 @@ const ManageRentOrderGroup: React.FC = () => {
       transportFee: x.transportFee,
       discountAmount: x.discountAmount
     }]
-  }, [groupOrder]);
+  }, [groupOrder, orderId]);
 
   const handleClose = () => {
     setActionMethod(undefined)
@@ -392,7 +397,11 @@ const ManageRentOrderGroup: React.FC = () => {
         {
           groupOrder &&
           <Table
-            rowClassName={() => 'current-order-group'}
+          // parent-order-group 'current-order-group'
+            rowClassName={(record, index) => {
+              if(record.orderId === groupOrder.rentOrderList[groupOrder.rentOrderList.length - 1].id) return 'parent-order-group'
+              return 'current-order-group'
+            }}
             dataSource={DataSourceRentOrder}
             columns={ColumnRentOrder}
             pagination={false}
@@ -893,7 +902,7 @@ const ViewAllOrderGroup: React.FC<ViewAllOrderGroupProps> = ({orderId, recall}) 
               <Table
                 rowClassName={(record, index) => {
                   if(index === 0) return 'parent-order-group'
-                  if(index === (groupOrder.rentOrderList.length - 1)) return 'current-order-group'
+                  if(record.orderId === orderId) return 'current-order-group'
                   return ''
                 }}
                 dataSource={DataSourceRentOrderAll}

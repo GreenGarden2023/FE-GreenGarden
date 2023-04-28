@@ -38,7 +38,6 @@ const ReturnDepositRentOrder: React.FC<ReturnDepositRentOrderProps> = ({rentOrde
     }, [rentOrderList, days, amount])
 
     const handleConfirmReturnDeposit = async () =>{
-        setLoading(true)
         try{
             switch(value){
                 case 2:
@@ -58,6 +57,7 @@ const ReturnDepositRentOrder: React.FC<ReturnDepositRentOrderProps> = ({rentOrde
                     break;
             }
 
+            setLoading(true)
             await orderService.updateRentOrderStatus(rentOrderList.id, 'completed')
 
             switch(value){

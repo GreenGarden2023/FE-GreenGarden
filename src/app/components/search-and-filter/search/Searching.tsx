@@ -11,11 +11,12 @@ interface SearchingProps{
     isOrderCode?: boolean;
     isPhone?: boolean;
     isStatus?: boolean;
+    statusType?: 'rent' | 'sale'
     // onSearch: (data: SearchResult) => void;
     // onDefault: () => void;
 }
 
-const Searching: React.FC<SearchingProps> = ({ isOrderCode, isPhone, isStatus }) => {
+const Searching: React.FC<SearchingProps> = ({ isOrderCode, isPhone, isStatus, statusType }) => {
     const dispatch = useDispatch()
 
     const [orderCodeSearch, setOrderCodeSearch] = useState('')
@@ -77,14 +78,27 @@ const Searching: React.FC<SearchingProps> = ({ isOrderCode, isPhone, isStatus })
                             <div className='order-code'>
                                 <p className='mb-5'>Trạng thái đơn hàng</p>
                                 <Select value={statusSearch} onChange={(e) => setStatusSearch(e)} style={{width: '100%'}} >
-                                    <Select.Option value='' >None</Select.Option>
-                                    <Select.Option value='unpaid' >Đang xử lý</Select.Option>
-                                    <Select.Option value='ready' >Đã thanh toán cọc</Select.Option>
-                                    <Select.Option value='paid' >Đã thanh toán đủ</Select.Option>
-                                    <Select.Option value='delivery' >Vận chuyển</Select.Option>
-                                    <Select.Option value='renting' >Đang thuê</Select.Option>
-                                    <Select.Option value='completed' >Đã hoàn thành</Select.Option>
-                                    <Select.Option value='cancel' >Đã hủy</Select.Option>
+                                    {
+                                        statusType === 'rent' ? 
+                                        <>
+                                            <Select.Option value='' >None</Select.Option>
+                                            <Select.Option value='unpaid' >Đang xử lý</Select.Option>
+                                            <Select.Option value='ready' >Đã thanh toán cọc</Select.Option>
+                                            <Select.Option value='paid' >Đã thanh toán đủ</Select.Option>
+                                            <Select.Option value='renting' >Đang thuê</Select.Option>
+                                            <Select.Option value='completed' >Đã hoàn thành</Select.Option>
+                                            <Select.Option value='cancel' >Đã hủy</Select.Option>
+                                        </> :
+                                        <>
+                                            <Select.Option value='' >None</Select.Option>
+                                            <Select.Option value='unpaid' >Đang xử lý</Select.Option>
+                                            <Select.Option value='ready' >Đã thanh toán cọc</Select.Option>
+                                            <Select.Option value='paid' >Đã thanh toán đủ</Select.Option>
+                                            <Select.Option value='delivery' >Vận chuyển</Select.Option>
+                                            <Select.Option value='completed' >Đã hoàn thành</Select.Option>
+                                            <Select.Option value='cancel' >Đã hủy</Select.Option>
+                                        </>
+                                    }
                                 </Select>
                             </div>
                         </Col>

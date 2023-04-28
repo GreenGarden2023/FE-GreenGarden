@@ -166,14 +166,6 @@ const ManageRentOrder:React.FC = () => {
             render: (v) => <MoneyFormat value={v} color='Yellow' />
         },
         {
-            title: 'Tổng tất cả đơn hàng',
-            key: 'totalGroupAmount',
-            dataIndex: 'totalGroupAmount',
-            align: 'right',
-            width: 200,
-            render: (v) => (<MoneyFormat value={v} color='Light Blue' />)
-        },
-        {
             title: 'Tiền còn thiếu',
             key: 'remainMoney',
             dataIndex: 'remainMoney',
@@ -222,7 +214,7 @@ const ManageRentOrder:React.FC = () => {
                     <AiOutlineTransaction size={25} className='icon'/>
                     <span>Xem giao dịch</span>
                 </div>
-                <div className="item" onClick={() => navigate(`/panel/rent-order/${record.groupID}`)}>
+                <div className="item" onClick={() => navigate(`/panel/rent-order/${record.groupID}/${record.orderId}`)}>
                     <FaLayerGroup size={25} className='icon'/>
                     <span>Xem nhóm đơn hàng</span>
                 </div>
@@ -395,6 +387,7 @@ const ManageRentOrder:React.FC = () => {
                 isOrderCode
                 isPhone
                 isStatus
+                statusType='rent'
             />
             <Filtering
                 isRangeDate

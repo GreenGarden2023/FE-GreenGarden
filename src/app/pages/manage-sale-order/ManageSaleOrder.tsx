@@ -44,7 +44,7 @@ const ManageSaleOrder: React.FC = () => {
     const [searchParams] = useSearchParams();
     const { search } = useSelector(state => state.SearchFilter)
 
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
     const [loadingAction, setLoadingAction] = useState(false)
 
     // data
@@ -58,32 +58,42 @@ const ManageSaleOrder: React.FC = () => {
     const [recall, setRecall] = useState(true)
 
     useEffect(() =>{
-        setLoading(true)
         pagingPath.scrollTop()
         const currentPage = searchParams.get('page');
         if(!pagingPath.isValidPaging(currentPage)){
             setPaging({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_SALE})
             return navigate('/panel/sale-order?page=1')
         }
-
+        
         const { isSearching, orderCode, phone, status } = search
         if(isSearching && (orderCode || phone || status)){
             const initSearch = async () =>{
-                const res = await orderService.getSaleOrderDetailByOrderCode({curPage: Number(currentPage), pageSize: paging.pageSize}, {orderCode, phone, status})
-                setSaleOrders(res.data.saleOrderList)
-                setPaging(res.data.paging)
+                setLoading(true)
+                try{
+                    const res = await orderService.getSaleOrderDetailByOrderCode({curPage: Number(currentPage), pageSize: paging.pageSize}, {orderCode, phone, status})
+                    setSaleOrders(res.data.saleOrderList)
+                    setPaging(res.data.paging)
+                }catch{
+                    dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+                }
+                setLoading(false)
             }
             initSearch()
         }else{
             const init = async () =>{
-                const res = await orderService.getAllSaleOrders({curPage: Number(currentPage), pageSize: paging.pageSize})
-                setSaleOrders(res.data.saleOrderList)
-                setPaging(res.data.paging)
+                setLoading(true)
+                try{
+                    const res = await orderService.getAllSaleOrders({curPage: Number(currentPage), pageSize: paging.pageSize})
+                    setSaleOrders(res.data.saleOrderList)
+                    setPaging(res.data.paging)
+                }catch{
+                    dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+                }
+                setLoading(false)
             }
             init()
         }
-        setLoading(false)
-    }, [navigate, searchParams, paging.pageSize, recall, search])
+    }, [navigate, searchParams, paging.pageSize, recall, search, dispatch])
     const handleSetAction = (data: PaymentControlState) =>{
         const { orderId, actionType } = data
         const [order] = saleOrders.filter(x => x.id === orderId)
@@ -380,35 +390,6 @@ const ManageSaleOrder: React.FC = () => {
         setSaleOrders([...saleOrders])
         handleCancel()
     }
-
-    // const UserInforOrder = useMemo(() =>{
-    //     const [order] = saleOrders.filter(x => x.id === actionMethod?.orderId)
-
-    //     // name?: string;
-    //     // phone?: string;
-    //     // address?: string;
-    //     // createOrderDate?: string;
-    //     // startDate?: string;
-    //     // endDate?: string;
-    //     // status?: OrderStatus;
-    //     // transportFee?: number;
-    //     // totalOrder?: number;
-    //     // remainMoney?: number;
-    //     // deposit?: number;
-    //     // reason?: string;
-    //     // nameCancelBy?: string;
-    //     const { recipientName, recipientPhone, recipientAddress, createDate, status, transportFee,
-    //     totalPrice, remainMoney, deposit, reason, cancelBy } = order
-
-    //     return {
-    //         name: recipientName,
-    //         phone: recipientPhone,
-    //         address: recipientAddress,
-    //         createDate: utilDateTime.dateToString(createDate.toString()),
-    //         status, transportFee, totalOrder: totalPrice,
-    //         remainMoney, deposit, reason, cancelBy
-    //     }
-    // }, [saleOrders, actionMethod?.orderId])
 
     return (
         <div className="mso-wrapper">

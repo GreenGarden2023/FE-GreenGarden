@@ -4,26 +4,37 @@ import useDispatch from 'app/hooks/use-dispatch';
 import { RentOrderList } from 'app/models/order';
 import { setNoti } from 'app/slices/notification';
 import utilDateTime from 'app/utils/date-time';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import CurrencyFormat from 'react-currency-format';
 
 interface RentOrderPaymentCashProps{
     rentOrderList: RentOrderList
     onClose: () => void;
-    onSubmit: (orderId: string, amount: number) => void
+    onSubmit: (orderId: string, amount: number) => Promise<void>
 }
 
 const RentOrderPaymentCash: React.FC<RentOrderPaymentCashProps> = ({rentOrderList, onClose, onSubmit}) => {
     const dispatch = useDispatch()
 
-    const [amount, setAmount] = useState(rentOrderList.remainMoney);
+    const [amount, setAmount] = useState(0);
+    const [loading, setLoading] = useState(false)
 
-    const handlePaymentCash = () =>{
+    useEffect(() =>{
+        if(rentOrderList.status === 'unpaid' && rentOrderList.deposit !== 0){
+            setAmount(rentOrderList.remainMoney + rentOrderList.deposit)
+        }else{
+            setAmount(rentOrderList.remainMoney)
+        }
+    }, [rentOrderList])
+
+    const handlePaymentCash = async () =>{
         if(amount < 1000){
             dispatch(setNoti({type: 'error', message: 'Số tiền nhập vào ít nhất là 1.000 VNĐ'}))
             return;
         }
-        onSubmit(rentOrderList.id, amount)
+        setLoading(true)
+        await onSubmit(rentOrderList.id, amount)
+        setLoading(false)
     }
     const handleClose = () =>{
         setAmount(0)
@@ -31,7 +42,7 @@ const RentOrderPaymentCash: React.FC<RentOrderPaymentCashProps> = ({rentOrderLis
     }
 
     const handleChangeAmount = (values: CurrencyFormat.Values) =>{
-        const max = rentOrderList.remainMoney
+        const max = rentOrderList.remainMoney + rentOrderList.deposit
         const { floatValue } = values
         const data = Number(floatValue || 0)
 
@@ -67,10 +78,14 @@ const RentOrderPaymentCash: React.FC<RentOrderPaymentCashProps> = ({rentOrderLis
         >
             <p>Nhập số tiền cần thanh toán (VND)</p>
             <CurrencyFormat min={0} value={amount} isAllowed={handleChangeAmount} className='currency-input' thousandSeparator={true} />
+            {
+                (rentOrderList.status === 'unpaid' && rentOrderList.deposit !== 0) &&
+                <p style={{color: '#ff002f', marginTop: '10px'}}>Đơn hàng chưa thanh toán cọc. Số tiền cần thanh toán = Tiền còn thiếu + tiền cọc</p>
+            }
             <UserInforOrder {...InforOrder} />
             <div className='btn-form-wrapper mt-10'>
-                <Button type='default' className='btn-cancel' size='large' onClick={onClose} >Hủy bỏ</Button>
-                <Button type='primary' className='btn-update' size='large' onClick={handlePaymentCash}>
+                <Button type='default' disabled={loading} className='btn-cancel' size='large' onClick={onClose} >Hủy bỏ</Button>
+                <Button type='primary' loading={loading} className='btn-update' size='large' onClick={handlePaymentCash}>
                     Thanh toán
                 </Button>
             </div>

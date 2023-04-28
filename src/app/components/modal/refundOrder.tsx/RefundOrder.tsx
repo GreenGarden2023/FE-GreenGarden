@@ -6,6 +6,7 @@ import { OrderType, TransactionType } from 'app/models/general-type';
 import { TransactionHandle } from 'app/models/transaction';
 import transactionService from 'app/services/transaction.service';
 import { setNoti } from 'app/slices/notification';
+import CONSTANT from 'app/utils/constant';
 import React, { useState } from 'react'
 import CurrencyFormat from 'react-currency-format';
 
@@ -49,7 +50,7 @@ const RefundOrder: React.FC<RefundOrderProps> = ({orderId, orderCode, orderType,
             setDesc('')
             onSubmit()
         }catch{
-
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
         setLoading(false)
     }

@@ -1,4 +1,4 @@
-import { Image, Modal, Table } from 'antd';
+import { Button, Image, Modal, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import MoneyFormat from 'app/components/money/MoneyFormat';
 import TreeName from 'app/components/renderer/tree-name/TreeName';
@@ -116,9 +116,15 @@ const ModalClientRentOrderDetai: React.FC<ModalClientRentOrderDetaiProps> = ({re
             onOk={onClose}
             width={1200}
             className='mcrod-wrapper'
+            footer={false}
         >
             <Table dataSource={DataSource} columns={Column} pagination={false} />
             <UserInforOrder {...OrderDetail} />
+            <div className='btn-form-wrapper mt-10'>
+                <Button type='primary' className='btn-update' size='large' onClick={onClose}>
+                    Đóng
+                </Button>
+            </div>
         </Modal>
     )
 }
