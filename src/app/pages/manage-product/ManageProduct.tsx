@@ -249,7 +249,8 @@ const ManageProduct: React.FC = () => {
             total: paging?.recordCount || 1,
             onChange: (page: number) =>{
               navigate(`/panel/manage-product?category=${categoryIdSelected}&page=${page}`)
-            }
+            },
+            hideOnSinglePage: true
           }} />
         }
       </section>

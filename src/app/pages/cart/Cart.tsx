@@ -46,11 +46,11 @@ const CartPage: React.FC = () => {
                 const res = await shippingFeeService.getList()
                 setShipping(res.data)
             }catch{
-
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
         }
         init()
-    }, [])
+    }, [dispatch])
     
 
     useEffect(() =>{
@@ -70,7 +70,10 @@ const CartPage: React.FC = () => {
                 }
                 dispatch(setCartSlice(cartProps))
                 const { saleItems, rentItems } = cartProps
-                if(saleItems && saleItems.length !== 0 && rentItems && rentItems.length !== 0) return;
+                if(saleItems && saleItems.length !== 0 && rentItems && rentItems.length !== 0) {
+                    setLoading(false)
+                    return;
+                }
 
                 if(rentItems && rentItems.length !== 0) {
                     setPageType('rent')
@@ -78,12 +81,12 @@ const CartPage: React.FC = () => {
             }catch{
                 setCart({rentItems: [], saleItems: [], totalPrice: 0, totalRentPrice: 0, totalSalePrice: 0})
                 dispatch(setCartSlice({rentItems: [], saleItems: []}))
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
             setLoading(false)
         }
         init()
     }, [dispatch])
-    
     
     const handleChangeSegment = (value: string | number) =>{
         setPageType(`${value}`)

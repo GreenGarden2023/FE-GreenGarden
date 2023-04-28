@@ -23,15 +23,15 @@ import './style.scss';
 import utilsFile from 'app/utils/file';
 
 const schema = yup.object().shape({
-  Name: yup.string().required('Category name is required').min(5, 'Category name is greater than 5 characters').max(30, 'Category name is less than 30 characters'),
-  imgUrl: yup.string().required('Thumbnail is required'),
-  Description: yup.string().max(500, 'Description is less than 500 characters'),
+  Name: yup.string().required('Tên danh mục không được để trống').min(5, 'Tên danh mục có ít nhất 5 ký tự').max(30, 'Tên danh mục có nhiều nhất 30 ký tự'),
+  imgUrl: yup.string().required('Ảnh đại diện không được để trống'),
+  Description: yup.string().max(500, 'Mô tả có nhiều nhất 500 ký tự'),
   imgFile: yup.mixed()
-  .test('FILE_FORMAT', 'We only support png/jpg/jpeg', (value) => {
+  .test('FILE_FORMAT', 'Ảnh đại diện chỉ hỗ trợ các định dạng png/jpg/jpeg', (value) => {
     return !value || (value && CONSTANT.SUPPORT_FORMATS.includes(value.type))
   })
-  .test('FILE_SIZE', 'The file is too large', (value ) => {
-    return !value || (value && value.size <= 1000000)
+  .test('FILE_SIZE', 'Kích thước ảnh đại diện quá lớn', (value ) => {
+    return !value || (value && value.size <= CONSTANT.FILE_SIZE_ACCEPTED)
   })
 })
 

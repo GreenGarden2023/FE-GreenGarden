@@ -16,14 +16,14 @@ import useDispatch from 'app/hooks/use-dispatch';
 import { setNoti } from 'app/slices/notification';
 
 const schema = yup.object().shape({
-    name: yup.string().required('Product name is required').min(5, 'Product name is greater than 5 characters').max(30, 'Product name is less than 30 characters'),
-    description: yup.string().max(500, 'Description is less than 500 characters'),
-    imgUrl: yup.string().required('Thumbnail is required'),
+    name: yup.string().required('Tên sản phẩm không được để trống').min(5, 'Tên sản phẩm có tối thiểu 5 ký').max(30, 'Tên sản phẩm có tối đa 30 ký tự'),
+    description: yup.string().max(500, 'Mô tả có tối đa 500 ký tự'),
+    imgUrl: yup.string().required('Ảnh bìa không được để trống'),
     imgFile: yup.mixed()
-    .test('FILE_FORMAT', 'We only support png/jpg/jpeg', (value) => {
+    .test('FILE_FORMAT', 'Ảnh bìa chỉ hỗ trợ các định dạng png/jpg/jpeg', (value) => {
         return !value || (value && CONSTANT.SUPPORT_FORMATS.includes(value.type))
     })
-    .test('FILE_SIZE', 'The file is too large', (value ) => {
+    .test('FILE_SIZE', 'Kích thước ảnh bìa quá lớn', (value ) => {
         return !value || (value && value.size <= 1000000)
     })
 })
@@ -40,7 +40,9 @@ const ModalProduct: React.FC<ModalProductProps> = ({ categoryId, product, action
     const dispatch = useDispatch();
     const { setValue, control, handleSubmit, formState: { errors, isSubmitting }, reset, trigger,  } = useForm<ProductHandle>({
         defaultValues: {
-            categoryId
+            categoryId,
+            isForRent: true,
+            isForSale: true
         },
         resolver: yupResolver(schema)
     })

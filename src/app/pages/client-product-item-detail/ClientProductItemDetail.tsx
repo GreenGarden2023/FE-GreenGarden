@@ -56,11 +56,11 @@ const ClientProductItemDetail: React.FC = () => {
                 const res = await feedbackService.getListFeedbackByProductItemDetail(productItemId)
                 setFeedback(res.data)
             }catch{
-
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
         }
         init()
-    }, [productItemId])
+    }, [productItemId, dispatch])
 
     useEffect(() =>{
         pagingPath.scrollTop()
@@ -328,8 +328,8 @@ const ClientProductItemDetail: React.FC = () => {
                                                             proItemSelectBySize && 
                                                             <div className="price-box">
                                                                 {
-                                                                    proItemSelectBySize.rentPrice &&
-                                                                    <div className="rent-price">
+                                                                    proItemSelectBySize.rentPrice ?
+                                                                    <div className="rent-price" style={{flex: !proItemSelectBySize.salePrice ? '1' : 'initial'}}>
                                                                         <p className='title-price'>Giá thuê / ngày</p>
                                                                         <p className="price">
                                                                             <CurrencyFormat value={proItemSelectBySize.rentPrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
@@ -340,7 +340,7 @@ const ClientProductItemDetail: React.FC = () => {
                                                                                 <button className="decrease" onClick={() => controlRent('-')}>
                                                                                     <GrFormSubtract />
                                                                                 </button>
-                                                                                <input type="number" value={quanRent} onChange={handleChangeRent} />
+                                                                                <input type="number" value={quanRent} onChange={handleChangeRent} disabled={proItem.type === 'unique'} />
                                                                                 <button className="increase" onClick={() => controlRent('+')}>
                                                                                     <BiPlus />
                                                                                 </button>
@@ -352,10 +352,10 @@ const ClientProductItemDetail: React.FC = () => {
                                                                                 <span>Thêm vào giỏ hàng</span>
                                                                             </button>
                                                                         </div>
-                                                                    </div>
+                                                                    </div> : undefined
                                                                 }
                                                                 {
-                                                                    proItemSelectBySize.salePrice && 
+                                                                    proItemSelectBySize.salePrice ? 
                                                                     <div className="sale-price">
                                                                         <p className='title-price'>Giá bán</p>
                                                                         <p className="price">
@@ -379,7 +379,7 @@ const ClientProductItemDetail: React.FC = () => {
                                                                                 <span>Thêm vào giỏ hàng</span>
                                                                             </button>
                                                                         </div>
-                                                                    </div>
+                                                                    </div> : undefined
                                                                 }
                                                             </div>
                                                         }

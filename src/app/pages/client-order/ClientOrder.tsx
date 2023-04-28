@@ -300,7 +300,7 @@ const ClientOrder: React.FC = () =>{
                     <span>Chi tiết đơn hàng</span>
                 </div>
                 {
-                    record.status === 'unpaid' &&
+                    (record.status === 'unpaid' && record.deposit !== 0) &&
                     <div className="item" onClick={() => {
                         handlePaymentSale({orderId: record.orderId, actionType: 'deposit', orderType: 'sale', openIndex: -1})
                     }} >

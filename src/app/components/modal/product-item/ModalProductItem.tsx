@@ -19,9 +19,8 @@ import 'react-quill/dist/quill.snow.css';
 const schema = yup.object().shape({
     name: yup.string().required('Tên sản phẩm không được để trống').min(5, 'Tên sản phẩm phải lớn hơn 5 ký tự').max(100, 'Tên sản phẩm phải nhỏ hơn 100 ký tự'),
     description: yup.string().max(500, 'Mô tả phải ít hơn 500 ký tự'),
-    content: yup.string().required('Nội dung không được để trống'),
     type: yup.string().required('Loại sản phẩm không được để trống'),
-    imageURL: yup.string().required('Hình đại diện sản phẩm không được để trống')
+    imageURL: yup.string().required('Hình đại diện sản phẩm không được để trống'),
 })
 
 interface ModalProductItemProps{
@@ -216,14 +215,15 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productId, productIt
                             />
                         </Col>
                     }
-                    <Col span={24}>
-                        <Form.Item label='Nội dung sản phẩm' required>
+                    <Col span={24} style={{marginTop: '20px'}}>
+                        <Form.Item label='Thông tin sản phẩm'>
                             <Controller
                                 control={control}
                                 name={`content`}
                                 render={({field: { value }}) => (
                                     <ReactQuill theme="snow" value={value} onChange={(val) => {
                                         setValue('content', val)
+                                        trigger('content')
                                     }}
                                     style={{
                                         height: '400px'
@@ -244,7 +244,6 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productId, productIt
                                     />
                                 )}
                             />
-                            {errors.content && <ErrorMessage message={errors.content.message} />}
                         </Form.Item>
                     </Col>
                     <Col span={24} style={{'marginTop': '30px'}}>

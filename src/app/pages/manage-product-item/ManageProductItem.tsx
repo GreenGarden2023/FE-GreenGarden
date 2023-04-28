@@ -18,6 +18,8 @@ import { MdPointOfSale } from 'react-icons/md';
 import { SiConvertio } from 'react-icons/si';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import './style.scss';
+import LoadingView from 'app/components/loading-view/LoadingView';
+import NoProduct from 'app/components/no-product/NoProduct';
 
 const ManageProductItem: React.FC = () => {
     const { productId } = useParams()
@@ -33,6 +35,8 @@ const ManageProductItem: React.FC = () => {
     const [productIndex, setProductIndex] = useState(-1)
     const [productDetailIndex, setProductDetailIndex] = useState(-1)
 
+    const [loading, setLoading] = useState(false);
+
     useEffect(() =>{
         const currentPage = searchParams.get('page');
         if(!productId){
@@ -44,6 +48,7 @@ const ManageProductItem: React.FC = () => {
         }
 
         const init = async () =>{
+            setLoading(true)
             try{
                 const res = await productItemService.getProductItemByManager({curPage: Number(currentPage), pageSize: CONSTANT.PAGING_ITEMS.PRODUCT_ITEM}, productId)
                 setProductItems(res.data.productItems)
@@ -52,6 +57,7 @@ const ManageProductItem: React.FC = () => {
             }catch(err){
                 dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE}))
             }
+            setLoading(false)
         }
         init();
     }, [dispatch, navigate, searchParams, productId])
@@ -131,81 +137,92 @@ const ManageProductItem: React.FC = () => {
                 </div>
             </section>
             <section className="mpi-box default-layout">
-                <Row gutter={[12, 12]}>
-                    {
-                        productItems.map((pt, index) => (
-                            <Col xs={24} xl={4} key={index}>
-                                <Badge.Ribbon color={pt.type === 'normal' ? 'blue' : 'green'} placement='start' text={pt.type === 'normal' ? 'Số lượng lớn' : 'Duy nhất'} >
-                                    <div className="mpi-item">
-                                        <img src={pt.imageURL} alt='/' />
-                                        <div className="mpi-item-infor">
-                                            <p className="name">{pt.name}</p>
-                                            {
-                                                pt.productItemDetail.map((item, indexItem) => (
-                                                    <div className="item-detail" key={indexItem}>
-                                                        <p className="size-name">{item.size.sizeName} ({item.quantity})</p>
-                                                        {
-                                                            (item.salePrice && item.salePrice !== 0) ?
-                                                            <>
-                                                                <p className="sale-price">
-                                                                    <SiConvertio color='#00a76f' size={20} />
-                                                                    <span className='label'>Giá bán</span>
-                                                                    <CurrencyFormat value={item.salePrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} className='price' />
-                                                                </p>
-                                                            </> : ''
-                                                        }
-                                                        {
-                                                            (item.rentPrice && item.rentPrice !== 0) ?
-                                                            <p className="rent-price">
-                                                                <MdPointOfSale color='#00a76f' size={20} />
-                                                                <span className="label">Giá thuê</span>
-                                                                <CurrencyFormat value={item.rentPrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} className='price' />
-                                                            </p> : ''
-                                                        }
-                                                        <div className="actions-wrapper">
-                                                            <Switch onChange={(e) => handleChangeStatus(index, indexItem, e)} checked={item.status === 'active'} className="status" />
-                                                            <button className='btn btn-update' onClick={() => {
-                                                                setOpenModal(2)
-                                                                setProductIndex(index)
-                                                                setProductDetailIndex(indexItem)
-                                                                // setProductItemIdSelected(pt.id)
-                                                                // setProductItemDetailSelected(item)
-                                                            }}>
-                                                                Chỉnh sửa
-                                                            </button>
+                {
+                    loading ? <LoadingView loading /> :
+                    <>
+                        {
+                            productItems.length === 0 ? <NoProduct /> :
+                            <>
+                                <Row gutter={[12, 12]}>
+                                    {
+                                        productItems.map((pt, index) => (
+                                            <Col xs={24} xl={4} key={index}>
+                                                <Badge.Ribbon color={pt.type === 'normal' ? 'blue' : 'green'} placement='start' text={pt.type === 'normal' ? 'Số lượng lớn' : 'Duy nhất'} >
+                                                    <div className="mpi-item">
+                                                        <img src={pt.imageURL} alt='/' />
+                                                        <div className="mpi-item-infor">
+                                                            <p className="name">{pt.name}</p>
+                                                            {
+                                                                pt.productItemDetail.map((item, indexItem) => (
+                                                                    <div className="item-detail" key={indexItem}>
+                                                                        <p className="size-name">{item.size.sizeName} ({item.quantity})</p>
+                                                                        {
+                                                                            (item.salePrice && item.salePrice !== 0) ?
+                                                                            <>
+                                                                                <p className="sale-price">
+                                                                                    <SiConvertio color='#00a76f' size={20} />
+                                                                                    <span className='label'>Giá bán</span>
+                                                                                    <CurrencyFormat value={item.salePrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} className='price' />
+                                                                                </p>
+                                                                            </> : ''
+                                                                        }
+                                                                        {
+                                                                            (item.rentPrice && item.rentPrice !== 0) ?
+                                                                            <p className="rent-price">
+                                                                                <MdPointOfSale color='#00a76f' size={20} />
+                                                                                <span className="label">Giá thuê</span>
+                                                                                <CurrencyFormat value={item.rentPrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} className='price' />
+                                                                            </p> : ''
+                                                                        }
+                                                                        <div className="actions-wrapper">
+                                                                            <Switch onChange={(e) => handleChangeStatus(index, indexItem, e)} checked={item.status === 'active'} className="status" />
+                                                                            <button className='btn btn-update' onClick={() => {
+                                                                                setOpenModal(2)
+                                                                                setProductIndex(index)
+                                                                                setProductDetailIndex(indexItem)
+                                                                                // setProductItemIdSelected(pt.id)
+                                                                                // setProductItemDetailSelected(item)
+                                                                            }}>
+                                                                                Chỉnh sửa
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                ))
+                                                            }
+                                                        </div>
+                                                        <div className="mpi-actions">
+                                                            <div className="mpi-box">
+                                                                <Tooltip title="Chỉnh sửa thông tin sản phẩm" color='#108ee9'>
+                                                                    <AiFillEdit color='#5cb9d8' size={20} cursor='pointer' style={{marginRight: '5px'}} onClick={() => {
+                                                                        setOpenModal(1)
+                                                                        setProductIndex(index)
+                                                                        // setProductItemSelected(pt)
+                                                                    }} />
+                                                                </Tooltip>
+                                                                <Tooltip title="Tạo mới thông tin chi tiết" color='#108ee9'>
+                                                                    <AiOutlinePlusSquare color='#5cb9d8' size={20} cursor='pointer' onClick={() => handleCreateProductItemDetail(index)} />
+                                                                </Tooltip>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                ))
-                                            }
-                                        </div>
-                                        <div className="mpi-actions">
-                                            <div className="mpi-box">
-                                                <Tooltip title="Chỉnh sửa thông tin sản phẩm" color='#108ee9'>
-                                                    <AiFillEdit color='#5cb9d8' size={20} cursor='pointer' style={{marginRight: '5px'}} onClick={() => {
-                                                        setOpenModal(1)
-                                                        setProductIndex(index)
-                                                        // setProductItemSelected(pt)
-                                                    }} />
-                                                </Tooltip>
-                                                <Tooltip title="Tạo mới thông tin chi tiết" color='#108ee9'>
-                                                    <AiOutlinePlusSquare color='#5cb9d8' size={20} cursor='pointer' onClick={() => handleCreateProductItemDetail(index)} />
-                                                </Tooltip>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Badge.Ribbon>
-                            </Col>
-                        ))
-                    }
-                </Row>
-                <div style={{marginTop: '10px', textAlign: 'center'}}>
-                    <Pagination
-                        pageSize={paging?.pageSize || 1}
-                        current={paging?.curPage || 1}
-                        total={paging?.recordCount || 1}
-                        onChange={(page: number) =>{navigate(`/panel/manage-product-item/${product?.id}?page=${page}`)}}
-                    />
-                </div>
+                                                </Badge.Ribbon>
+                                            </Col>
+                                        ))
+                                    }
+                                </Row>
+                                <div style={{marginTop: '10px', textAlign: 'center'}}>
+                                    <Pagination
+                                        pageSize={paging?.pageSize || 1}
+                                        current={paging?.curPage || 1}
+                                        total={paging?.recordCount || 1}
+                                        onChange={(page: number) =>{navigate(`/panel/manage-product-item/${product?.id}?page=${page}`)}}
+                                        hideOnSinglePage
+                                    />
+                                </div>
+                            </>
+                        }
+                    </>
+                }
             </section>
             {
                 openModal === 1 && 
