@@ -253,7 +253,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
             }
             onSubmit(serviceSubmit)
         }catch{
-
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
     }
     const handleChangeDateRange = (dates, dateStrings) =>{

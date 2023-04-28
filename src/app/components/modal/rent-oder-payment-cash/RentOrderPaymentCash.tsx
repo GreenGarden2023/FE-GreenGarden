@@ -42,7 +42,11 @@ const RentOrderPaymentCash: React.FC<RentOrderPaymentCashProps> = ({rentOrderLis
     }
 
     const handleChangeAmount = (values: CurrencyFormat.Values) =>{
-        const max = rentOrderList.remainMoney + rentOrderList.deposit
+        let max = rentOrderList.remainMoney
+        if(rentOrderList.status === 'unpaid' && rentOrderList.deposit !== 0){
+            max += rentOrderList.deposit
+        }
+
         const { floatValue } = values
         const data = Number(floatValue || 0)
 

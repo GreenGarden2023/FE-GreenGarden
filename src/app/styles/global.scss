@@ -73,6 +73,9 @@ button{
 :where(.css-dev-only-do-not-override-1km3mtt).ant-input-disabled, :where(.css-dev-only-do-not-override-1km3mtt).ant-input[disabled], .ant-select-disabled:where(.css-dev-only-do-not-override-1km3mtt).ant-select:not(.ant-select-customize-input) .ant-select-selector, :where(.css-dev-only-do-not-override-1km3mtt).ant-picker .ant-picker-input >input-disabled, :where(.css-dev-only-do-not-override-1km3mtt).ant-picker .ant-picker-input >input[disabled]{
     color: #000;
 }
+.ant-pagination-options{
+    display: none!important;
+}
 // override ckeditor
 .ck-rounded-corners .ck.ck-editor__main>.ck-editor__editable, .ck.ck-editor__main>.ck-editor__editable.ck-rounded-corners{
     height: 400px;

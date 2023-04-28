@@ -334,7 +334,10 @@ const ManageRentOrder:React.FC = () => {
     }
     const handlePaymentCash = async (orderId: string, amount: number) =>{
         const [order] = rentOrders.filter(x => x.rentOrderList[0].id === orderId)[0].rentOrderList
-        const total = order.remainMoney - amount
+        let total = order.remainMoney - amount
+        if(order.status === 'unpaid'){
+            total = order.remainMoney + order.deposit - amount
+        }
         try{
             await paymentService.paymentCash(orderId, amount, 'rent', total === 0 ? 'whole' : '')
 

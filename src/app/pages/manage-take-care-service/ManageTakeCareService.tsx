@@ -1,4 +1,4 @@
-import { Modal, Popover } from 'antd'
+import { Button, Modal, Popover } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import AssignTechnician from 'app/components/modal/assign-technician/AssignTechnician'
@@ -16,6 +16,7 @@ import orderService from 'app/services/order.service'
 import serviceService from 'app/services/service.service'
 import shippingFeeService from 'app/services/shipping-fee.service'
 import { setNoti } from 'app/slices/notification'
+import CONSTANT from 'app/utils/constant'
 import utilDateTime from 'app/utils/date-time'
 import React, { useEffect, useMemo, useState } from 'react'
 import { BiCommentDetail, BiDetail } from 'react-icons/bi'
@@ -28,6 +29,8 @@ const ManageTakeCareService: React.FC = () => {
     const [shipping, setShipping] = useState<ShippingFee[]>([])
 
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
+    const [loading, setLoading] = useState(true)
+    const [loadingAction, setLoadingAction] = useState(false)
 
     useEffect(() =>{
         const init = async () =>{
@@ -35,23 +38,25 @@ const ManageTakeCareService: React.FC = () => {
                 const res = await shippingFeeService.getList()
                 setShipping(res.data)
             }catch{
-
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
         }
         init()
-    }, [])
+    }, [dispatch])
 
     useEffect(() =>{
         const init = async () =>{
+            setLoading(true)
             try{
                 const res = await serviceService.getAllServiceRequest()
                 setServiceOrders(res.data)
             }catch{
-
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
+            setLoading(false)
         }
         init()
-    }, [])
+    }, [dispatch])
 
    
 
@@ -74,7 +79,7 @@ const ManageTakeCareService: React.FC = () => {
                     </div>
                 }
                 {
-                    (record.status === 'processing' || record.status === 'reprocess' || record.status === 'accepted') &&
+                    (record.status === 'processing' || record.status === 'reprocess') &&
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.id, actionType: 'reject service', orderType: 'service', openIndex: -1})
                     }}>
@@ -230,23 +235,34 @@ const ManageTakeCareService: React.FC = () => {
     }
     const handleConfirmService = async() =>{
         const serviceId = actionMethod?.orderId || ''
-
-        serviceService.updateServiceRequestStatus(serviceId, 'accepted')
-        const serviceIndex = serviceOrders.findIndex(x => x.id === serviceId)
-        serviceOrders[serviceIndex].status = 'accepted'
-        setServiceOrders([...serviceOrders])
-        dispatch(setNoti({type: 'success', message: 'Cập nhật trạng thái yêu cầu chăm sóc thành công'}))
-        handleClose()
+        setLoadingAction(true)
+        try{
+            await serviceService.updateServiceRequestStatus(serviceId, 'accepted')
+            const serviceIndex = serviceOrders.findIndex(x => x.id === serviceId)
+            serviceOrders[serviceIndex].status = 'accepted'
+            setServiceOrders([...serviceOrders])
+            dispatch(setNoti({type: 'success', message: 'Cập nhật trạng thái yêu cầu chăm sóc thành công'}))
+            handleClose()
+        }catch{
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+        }
+        setLoadingAction(false)
     }
 
     const handleRejectService = async () =>{
         const serviceId = actionMethod?.orderId || ''
-        serviceService.updateServiceRequestStatus(serviceId, 'rejected')
-        const [service] = serviceOrders.filter(x => x.id === serviceId)
-        service.status = 'rejected'
-        setServiceOrders([...serviceOrders])
-        dispatch(setNoti({type: 'success', message: 'Cập nhật trạng thái yêu cầu chăm sóc thành công'}))
-        handleClose()
+        setLoadingAction(true)
+        try{
+            await serviceService.updateServiceRequestStatus(serviceId, 'rejected')
+            const [service] = serviceOrders.filter(x => x.id === serviceId)
+            service.status = 'rejected'
+            setServiceOrders([...serviceOrders])
+            dispatch(setNoti({type: 'success', message: 'Cập nhật trạng thái yêu cầu chăm sóc thành công'}))
+            handleClose()
+        }catch{
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+        }
+        setLoadingAction(false)
     }
 
     const handleUpdateService = (service: Service) =>{
@@ -265,7 +281,7 @@ const ManageTakeCareService: React.FC = () => {
             setServiceOrders([...serviceOrders])
             handleClose()
         }catch{
-
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
     }
 
@@ -278,6 +294,7 @@ const ManageTakeCareService: React.FC = () => {
                     columns={ColumnServiceOrder} 
                     dataSource={DataSourceServiceOrder} 
                     scroll={{ y: 680, x: 2000 }}
+                    loading={loading}
                 />
             </section>
             {
@@ -294,9 +311,14 @@ const ManageTakeCareService: React.FC = () => {
                     title={`Chấp nhận yêu cầu "${serviceOrders.filter(x => x.id === actionMethod.orderId)[0].serviceCode}"`}
                     open
                     onCancel={handleClose}
-                    onOk={handleConfirmService}
+                    footer={false}
                 >
-
+                    <div className='btn-form-wrapper mt-10'>
+                        <Button htmlType='button' disabled={loadingAction} type='default' className='btn-cancel' size='large' onClick={handleClose} >Hủy bỏ</Button>
+                        <Button htmlType='submit' loading={loadingAction} type='primary' className='btn-update' size='large' onClick={handleConfirmService}>
+                            Chấp nhận
+                        </Button>
+                    </div>
                 </Modal>
             }
             {
@@ -305,9 +327,14 @@ const ManageTakeCareService: React.FC = () => {
                     title={`Từ chối yêu cầu "${serviceOrders.filter(x => x.id === actionMethod.orderId)[0].serviceCode}"`}
                     open
                     onCancel={handleClose}
-                    onOk={handleRejectService}
+                    footer={false}
                 >
-
+                    <div className='btn-form-wrapper mt-10'>
+                        <Button htmlType='button' disabled={loadingAction} type='default' className='btn-cancel' size='large' onClick={handleClose} >Hủy bỏ</Button>
+                        <Button htmlType='submit' loading={loadingAction} type='primary' className='btn-update' size='large' onClick={handleRejectService}>
+                            Từ chối
+                        </Button>
+                    </div>
                 </Modal>
             }
             {
@@ -326,9 +353,14 @@ const ManageTakeCareService: React.FC = () => {
                     title={`Tạo đơn hàng cho dịch vụ chăm sóc "${serviceOrders.filter(x => x.id === actionMethod.orderId)[0].serviceCode}"`}
                     open
                     onCancel={handleClose}
-                    onOk={handleCreateServiceOrder}
+                    footer={false}
                 >
-
+                    <div className='btn-form-wrapper mt-10'>
+                        <Button htmlType='button' disabled={loadingAction} type='default' className='btn-cancel' size='large' onClick={handleClose} >Hủy bỏ</Button>
+                        <Button htmlType='submit' loading={loadingAction} type='primary' className='btn-update' size='large' onClick={handleCreateServiceOrder}>
+                            Tạo đơn hàng
+                        </Button>
+                    </div>
                 </Modal>
             }
         </div>

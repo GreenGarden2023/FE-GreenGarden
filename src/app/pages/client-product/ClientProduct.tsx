@@ -74,49 +74,53 @@ const ClientProduct: React.FC = () => {
               </div>
             </section>
             <section className="cp-box">
-              {loading && <LoadingView loading />}
               {
-                (!loading && products.length === 0) ? <NoProduct /> : 
+                loading ? <LoadingView loading /> :
                 <>
-                  <Row gutter={[10, 10]}>
-                    {
-                      products.map((product, index) => (
-                        <Col xs={24} xl={12} key={index}>
-                          {/* <div className='cp-item'> */}
-                            <Link to={`/product/${product.id}?page=1`} className='cp-item'>
-                              <div className="left">
-                                <img src={product.imgUrl} alt="/" onError={utilGeneral.setDefaultImage}  />
-                              </div>
-                              <div className="right">
-                                <h3 className='name'>{product.name}</h3>
-                                <p className="description">
-                                  {product.description}
-                                </p>
-                                <div className="tags-box">
-                                  {
-                                    product.isForRent && <Tag color='#87d068' >Thuê</Tag>
-                                  }
-                                  {
-                                    product.isForSale && <Tag color='#108ee9' >Bán</Tag>
-                                  }
-                                </div>
-                              </div>
-                            </Link>
-                          {/* </div> */}
-                        </Col>
-                      ))
-                    }
-                  </Row>
-                  <div className="cp-pagination">
-                    <Pagination 
-                      pageSize={paging?.pageSize || 1} 
-                      current={paging?.curPage || 1}
-                      total={paging?.recordCount || 1}
-                      onChange={(page: number) =>{
-                        navigate(`/category/${categoryId}?page=${page}`)
-                      }}
-                    />
-                  </div>
+                  {
+                    products.length === 0 ? <NoProduct /> :
+                    <>
+                      <Row gutter={[10, 10]}>
+                        {
+                          products.map((product, index) => (
+                            <Col xs={24} xl={12} key={index}>
+                              {/* <div className='cp-item'> */}
+                                <Link to={`/product/${product.id}?page=1`} className='cp-item'>
+                                  <div className="left">
+                                    <img src={product.imgUrl} alt="/" onError={utilGeneral.setDefaultImage}  />
+                                  </div>
+                                  <div className="right">
+                                    <h3 className='name'>{product.name}</h3>
+                                    <p className="description">
+                                      {product.description}
+                                    </p>
+                                    <div className="tags-box">
+                                      {
+                                        product.isForRent && <Tag color='#87d068' >Thuê</Tag>
+                                      }
+                                      {
+                                        product.isForSale && <Tag color='#108ee9' >Bán</Tag>
+                                      }
+                                    </div>
+                                  </div>
+                                </Link>
+                              {/* </div> */}
+                            </Col>
+                          ))
+                        }
+                      </Row>
+                      <div className="cp-pagination">
+                        <Pagination 
+                          pageSize={paging?.pageSize || 1} 
+                          current={paging?.curPage || 1}
+                          total={paging?.recordCount || 1}
+                          onChange={(page: number) =>{
+                            navigate(`/category/${categoryId}?page=${page}`)
+                          }}
+                        />
+                      </div>
+                    </>
+                  }
                 </>
               }
             </section>
