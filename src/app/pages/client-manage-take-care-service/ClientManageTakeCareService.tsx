@@ -177,13 +177,15 @@ const ClientManageTakeCareService: React.FC = () => {
                     <div className="container-wrapper cmtcs-wrapper">
                         <HeaderInfor title='Yêu cầu chăm sóc cây của bạn' />
                         {
-                            loading && <LoadingView loading />
-                        }
-                        {
-                            (!loading && services.length === 0) ? <NoProduct /> :
-                            <div className="default-layout">
-                                <Table columns={Column} dataSource={DataSource} scroll={{x: 1500}} />
-                            </div>
+                            loading ? <LoadingView loading /> :
+                            <>
+                                {
+                                    services.length === 0 ? <NoProduct /> :
+                                    <div className="default-layout">
+                                        <Table columns={Column} dataSource={DataSource} scroll={{x: 1500}} />
+                                    </div>
+                                }
+                            </>
                         }
                     </div>
                 </div>

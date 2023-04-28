@@ -467,7 +467,7 @@ const ClientOrder: React.FC = () =>{
                     </div>
                 }
                 {
-                    (record.status === 'unpaid') &&
+                    ((record.status === 'unpaid' && record.deposit !== 0)) &&
                     <div className="item" onClick={() => {
                         handlePaymentRent({orderId: record.orderId, actionType: 'deposit', orderType: 'rent', openIndex: -1})
                     }} >
@@ -476,7 +476,7 @@ const ClientOrder: React.FC = () =>{
                     </div>
                 }
                 {
-                    (record.status === 'ready' || record.deposit === 0) &&
+                    (record.status === 'ready' || record.status === 'unpaid') &&
                     <div className="item" onClick={() => {
                         handlePaymentRent({orderId: record.orderId, actionType: 'remaining', orderType: 'rent', openIndex: -1})
                     }} >

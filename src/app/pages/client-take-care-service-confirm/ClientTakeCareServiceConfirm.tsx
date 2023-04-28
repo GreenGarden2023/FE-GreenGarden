@@ -1,4 +1,4 @@
-import { Col, Modal, Row } from 'antd'
+import { Button, Col, Modal, Row } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import LandingFooter from 'app/components/footer/LandingFooter'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
@@ -30,6 +30,7 @@ const ClientTakeCareServiceConfirm: React.FC = () => {
     const [service, setService] = useState<Service>()
     const [openModal, setOpenModal] = useState(0)
     const [loading, setLoading] = useState(true)
+    const [loadingAction, setLoadingAction] = useState(false)
 
     useEffect(() =>{
         pagingPath.scrollTop()
@@ -106,14 +107,20 @@ const ClientTakeCareServiceConfirm: React.FC = () => {
     const handleSubmit = async () =>{
         if(!service) return;
 
+        setLoadingAction(true)
         try{
-             await serviceService.updateServiceRequestStatus(service.id, 'user approved')
+            await serviceService.updateServiceRequestStatus(service.id, 'user approved')
             dispatch(setNoti({type: 'success', message: 'Xác nhận yêu cầu thành công'}))
             setOpenModal(0)
             navigate('/take-care-service/me')
         }catch{
-
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
+        setLoadingAction(false)
+    }
+
+    const handleCloseModal = () =>{
+        setOpenModal(0)
     }
 
     return (
@@ -131,8 +138,8 @@ const ClientTakeCareServiceConfirm: React.FC = () => {
                             {
                                 service?.status === 'accepted' &&
                                 <section className="default-layout">
-                                    <button className='btn btn-create' onClick={() => setOpenModal(1)}>
-                                        <AiOutlineCheck />
+                                    <button style={{marginLeft: 'auto'}} className='btn btn-create' onClick={() => setOpenModal(1)}>
+                                        <AiOutlineCheck size={25} />
                                         <span>Xác nhận thông tin</span>
                                     </button>
                                 </section>
@@ -208,10 +215,17 @@ const ClientTakeCareServiceConfirm: React.FC = () => {
             <Modal
                 open={openModal === 1}
                 title='Bạn đồng ý với tất cả thông tin chi tiết của yêu cầu chăm sóc này?'
-                onCancel={() => setOpenModal(0)}
-                onOk={handleSubmit}
+                onCancel={handleCloseModal}
+                width={600}
+                footer={false}
             >
-
+                
+                <div className='btn-form-wrapper mt-10'>
+                    <Button htmlType='button' disabled={loadingAction} type='default' className='btn-cancel' size='large' onClick={handleCloseModal} >Hủy bỏ</Button>
+                    <Button htmlType='submit' loading={loadingAction} type='primary' className='btn-update' size='large' onClick={handleSubmit}>
+                        Xác nhận
+                    </Button>
+                </div>
             </Modal>
         </div>
     )

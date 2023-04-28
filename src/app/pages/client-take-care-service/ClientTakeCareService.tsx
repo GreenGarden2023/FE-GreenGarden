@@ -58,10 +58,11 @@ const ClientTakeCareService: React.FC = () => {
 
     const [viewAll, setViewAll] = useState(false)
     const [loading, setLoading] = useState(true)
+    const [loadingAction, setLoadingAction] = useState(false)
 
     const { formState: { errors, isSubmitting }, handleSubmit, setValue, control, setError, clearErrors } = useForm<ServiceCreate>({
         defaultValues: {
-
+            
         },
         resolver: yupResolver(schema)
     })
@@ -135,6 +136,7 @@ const ClientTakeCareService: React.FC = () => {
     }
     const handleUpdateStatus = async () =>{
         const [item] = listTrees.filter(x => x.id === modalState.tree?.id)
+        setLoadingAction(true)
         try{
             const status = 'disable'
             await userTreeService.updateUserTreeStatus(item.id, status)
@@ -142,9 +144,11 @@ const ClientTakeCareService: React.FC = () => {
             listTrees[index].status = status
             setListTrees([...listTrees])
             dispatch(setNoti({type: 'success', message: 'Xóa cây khỏi kho thành công'}))
+            handleCloseModal()
         }catch{
-
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
+        setLoadingAction(false)
     }
     const handleCreateTakeCareService = () =>{
         if(treesSelect.length === 0){
@@ -188,7 +192,7 @@ const ClientTakeCareService: React.FC = () => {
             setModalState({openModal: 0})
             setTreesSelect([])
         }catch{
-
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
     }
     const handleChangeDateRange = (dates, dateStrings) =>{
@@ -201,6 +205,9 @@ const ClientTakeCareService: React.FC = () => {
         setValue('startDate', utilDateTime.dayjsToLocalString(start))
         setValue('endDate', utilDateTime.dayjsToLocalString(end))
         clearErrors('startDate')
+    }
+    const handleCloseModal = () =>{
+        setModalState({openModal: 0, tree: undefined})
     }
     return (
         <div>
@@ -297,7 +304,7 @@ const ClientTakeCareService: React.FC = () => {
                 (modalState.openModal === 1 || modalState.openModal === 2) && 
                 <ModalTakeCareCreateTree 
                     tree={modalState.tree}
-                    onClose={() => setModalState({openModal: 0, tree: undefined})}
+                    onClose={handleCloseModal}
                     onSubmit={handleCreateUpdateTree}
                 />
             }
@@ -306,8 +313,8 @@ const ClientTakeCareService: React.FC = () => {
                     open={modalState.openModal === 3}
                     title='Tạo yêu cầu chăm sóc cây'
                     footer={null}
-                    onCancel={() => setModalState({openModal: 0, tree: undefined})}
-                    width={1000}
+                    onCancel={handleCloseModal}
+                    width={1200}
                 >
                     <div className='request-service-wrapper'>
                         <h1>Các cây đã chọn</h1>
@@ -453,10 +460,15 @@ const ClientTakeCareService: React.FC = () => {
                 <Modal
                     open
                     title={`Xác nhận xóa cây "${modalState.tree?.treeName}" khỏi kho của bạn?`}
-                    onCancel={() => setModalState({openModal: 0, tree: undefined})}
-                    onOk={handleUpdateStatus}
+                    onCancel={handleCloseModal}
+                    footer={false}
                 >
-
+                    <div className='btn-form-wrapper mt-10'>
+                        <Button htmlType='button' disabled={loadingAction} type='default' className='btn-cancel' size='large' onClick={handleCloseModal} >Hủy bỏ</Button>
+                        <Button htmlType='submit' loading={loadingAction} type='primary' className='btn-update' size='large' onClick={handleUpdateStatus}>
+                            Xác nhận xóa
+                        </Button>
+                    </div>
                 </Modal>
             }
         </div>

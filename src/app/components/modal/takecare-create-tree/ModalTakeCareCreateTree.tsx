@@ -33,7 +33,7 @@ const ModalTakeCareCreateTree:React.FC<ModalTakeCareCreateTreeProps> = ({ tree, 
   const { setValue, formState: { errors, isSubmitting }, control, handleSubmit, setError, trigger, getValues } = useForm<Partial<UserTree>>({
     defaultValues: {
       status: 'active',
-      quantity: 0,
+      quantity: 1,
     },
     resolver: yupResolver(schema)
   })
@@ -72,7 +72,7 @@ const ModalTakeCareCreateTree:React.FC<ModalTakeCareCreateTreeProps> = ({ tree, 
         dispatch(setNoti({type: 'success', message: `Tạo mới cây của bạn thành công`}))
         onSubmit(res.data, true)
       }catch{
-
+        dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
       }
     }else{
       // update
@@ -81,7 +81,7 @@ const ModalTakeCareCreateTree:React.FC<ModalTakeCareCreateTreeProps> = ({ tree, 
         dispatch(setNoti({type: 'success', message: `Cập nhật cây của bạn thành công`}))
         onSubmit(res.data, false)
       }catch{
-
+        dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
       }
     }
   }
