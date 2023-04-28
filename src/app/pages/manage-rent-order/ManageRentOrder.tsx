@@ -52,6 +52,7 @@ const ManageRentOrder:React.FC = () => {
 
     const [paging, setPaging] = useState<Partial<Paging>>({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_RENT})
     const [recall, setRecall] = useState(true)
+    const [loading, setLoading] = useState(true)
 
     useEffect(() =>{
         const currentPage = searchParams.get('page');
@@ -66,30 +67,46 @@ const ManageRentOrder:React.FC = () => {
 
         if(isSearching && (orderCode || phone || status)){
             const initSearch = async () =>{
-                const res = await orderService.getRentOrderDetailByOrderCode({curPage: Number(currentPage), pageSize: paging.pageSize}, {orderCode, phone, status})
-                setRentOrders(res.data.rentOrderGroups)
-                setPaging(res.data.paging)
+                setLoading(true)
+                try{
+                    const res = await orderService.getRentOrderDetailByOrderCode({curPage: Number(currentPage), pageSize: paging.pageSize}, {orderCode, phone, status})
+                    setRentOrders(res.data.rentOrderGroups)
+                    setPaging(res.data.paging)
+                }catch{
+                    dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+                }
+                setLoading(false)
             }
             initSearch()
         }else if(filter.isFiltering && filter.startDate && filter.endDate){
             const initFilter = async () =>{
-                const res = await orderService.getRentOrderDetailByRangeDate({curPage: Number(currentPage), pageSize: paging.pageSize}, filter.startDate || '', filter.endDate || '')
-                console.log(res.data)
-                setRentOrders(res.data.rentOrderGroups)
-                setPaging(res.data.paging)
+                setLoading(true)
+                try{
+                    const res = await orderService.getRentOrderDetailByRangeDate({curPage: Number(currentPage), pageSize: paging.pageSize}, filter.startDate || '', filter.endDate || '')
+                    console.log(res.data)
+                    setRentOrders(res.data.rentOrderGroups)
+                    setPaging(res.data.paging)
+                }catch{
+                    dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+                }
+                setLoading(false)
             }
             initFilter();
         }else{
             const init = async () =>{
-                const res = await orderService.getAllRentOrders({curPage: Number(currentPage), pageSize: paging.pageSize});
-                setRentOrders(res.data.rentOrderGroups)
-                setPaging(res.data.paging)
+                setLoading(true)
+                try{
+                    const res = await orderService.getAllRentOrders({curPage: Number(currentPage), pageSize: paging.pageSize});
+                    setRentOrders(res.data.rentOrderGroups)
+                    setPaging(res.data.paging)
+                }catch{
+                    dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+                }
+                setLoading(false)
             }
             init()
         }
-        // setRecall(false)
-
-    }, [filter, search, recall, navigate, paging.pageSize, searchParams])
+    }, [filter, search, recall, navigate, paging.pageSize, searchParams, dispatch])
 
     const ColumnRentOrder: ColumnsType<any> = [
         {
@@ -312,7 +329,7 @@ const ManageRentOrder:React.FC = () => {
             // setRecall(!recall)
             handleClose()
         }catch{
-
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
     }
     const handlePaymentCash = async (orderId: string, amount: number) =>{
@@ -331,7 +348,7 @@ const ManageRentOrder:React.FC = () => {
             // setRecall(!recall)
             handleClose()
         }catch{
-
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
     }
     const handleCancelOrder = (reason: string, canceledBy: string) =>{
@@ -399,6 +416,7 @@ const ManageRentOrder:React.FC = () => {
                         dataSource={DataSourceRentOrder} 
                         columns={ColumnRentOrder} 
                         scroll={{ y: 680, x: 2500 }}
+                        loading={loading}
                         pagination={{
                             current: paging.curPage || 1,
                             pageSize: paging.pageSize || 1,

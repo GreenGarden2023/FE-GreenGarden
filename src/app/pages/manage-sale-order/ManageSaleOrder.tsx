@@ -398,6 +398,7 @@ const ManageSaleOrder: React.FC = () => {
                 isOrderCode
                 isPhone
                 isStatus
+                statusType='sale'
             />
             <section className="mso-box default-layout">
             {

@@ -34,6 +34,7 @@ import { MdCancelPresentation, MdOutlineKeyboardReturn, MdOutlinePayment, MdOutl
 import { VscServerProcess } from "react-icons/vsc";
 import { useParams } from "react-router-dom";
 import "./style.scss";
+import LoadingView from "app/components/loading-view/LoadingView";
 
 const ManageRentOrderGroup: React.FC = () => {
   const { groupId, orderId } = useParams();
@@ -44,6 +45,7 @@ const ManageRentOrderGroup: React.FC = () => {
   const [actionMethod, setActionMethod] = useState<PaymentControlState>()
 
   const [recall, setRecall] = useState(true);
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     pagingPath.scrollTop()
@@ -52,18 +54,18 @@ const ManageRentOrderGroup: React.FC = () => {
     if(!recall) return;
 
     const init = async () => {
+      setLoading(true)
       try {
         const res = await orderService.getRentOrderGroup(groupId);
-        // const newRes = {...res.data}
-        // newRes.rentOrderList = newRes.rentOrderList.reverse()
         setGroupOrder(res.data);
       } catch {
-
+        dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
       }
       setRecall(false)
+      setLoading(false)
     };
     init();
-  }, [groupId, recall]);
+  }, [groupId, recall, dispatch]);
 
   const ColumnRentOrder: ColumnsType<any> = [
     {
@@ -320,7 +322,9 @@ const ManageRentOrderGroup: React.FC = () => {
       setGroupOrder({...groupOrder})
       // setRecall(true)
       handleClose();
-    } catch {}
+    } catch {
+      dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+    }
   };
 
   const handlePaymentCash = async (orderId: string, amount: number,) => {
@@ -338,7 +342,9 @@ const ManageRentOrderGroup: React.FC = () => {
       dispatch(setNoti({ type: "success", message: "Thanh toán đơn hàng thành công" }));
       // setRecall(true)
       handleClose();
-    } catch {}
+    } catch {
+      dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+    }
   };
   
   const handleCancelOrder = (reason: string, canceledBy: string) =>{
@@ -394,6 +400,9 @@ const ManageRentOrderGroup: React.FC = () => {
     <div className="mrog-wrapper">
       <HeaderInfor title="Xem nhóm đơn hàng cho thuê" />
       <section className="mso-box default-layout">
+        {
+          loading && <LoadingView loading />
+        }
         {
           groupOrder &&
           <Table
@@ -827,7 +836,9 @@ const ViewAllOrderGroup: React.FC<ViewAllOrderGroupProps> = ({orderId, recall}) 
       // setRecall(true)
       handleClose();
       checkReCallOrder(order.id)
-    } catch {}
+    } catch {
+      dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+    }
   };
   const handlePaymentCash = async (orderId: string, amount: number,) => {
     if(!groupOrder) return;
@@ -845,7 +856,9 @@ const ViewAllOrderGroup: React.FC<ViewAllOrderGroupProps> = ({orderId, recall}) 
       // setRecall(true)
       handleClose();
       checkReCallOrder(order.id)
-    } catch {}
+    } catch {
+      dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+    }
   };
   const handleCancelOrder = (reason: string) =>{
     if(!groupOrder) return;

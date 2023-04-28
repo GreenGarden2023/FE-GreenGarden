@@ -1,13 +1,15 @@
-import { Modal, Popover } from 'antd'
+import { Button, Modal, Popover } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import CancelOrder from 'app/components/modal/cancel-order/CancelOrder'
+import FinishOrder from 'app/components/modal/finish-order/FinishOrder'
 import RefundOrder from 'app/components/modal/refundOrder.tsx/RefundOrder'
 import TransactionDetail from 'app/components/modal/transaction-detail/TransactionDetail'
 import UpdateConfirmServiceDetail from 'app/components/modal/update-confirm-service-detail/UpdateConfirmServiceDetail'
 import MoneyFormat from 'app/components/money/MoneyFormat'
 import TechnicianName from 'app/components/renderer/technician/TechnicianName'
 import Transport from 'app/components/renderer/transport/Transport'
+import Filtering from 'app/components/search-and-filter/filter/Filtering'
 import NoResult from 'app/components/search-and-filter/no-result/NoResult'
 import Searching from 'app/components/search-and-filter/search/Searching'
 import OrderStatusComp from 'app/components/status/OrderStatusComp'
@@ -15,6 +17,7 @@ import UserInforTable from 'app/components/user-infor/UserInforTable'
 import UserInforOrder from 'app/components/user-infor/user-infor-order/UserInforOrder'
 import useDispatch from 'app/hooks/use-dispatch'
 import useSelector from 'app/hooks/use-selector'
+import { OrderStatus } from 'app/models/general-type'
 import { Paging } from 'app/models/paging'
 import { PaymentControlState } from 'app/models/payment'
 import { ServiceDetailList, ServiceOrderList } from 'app/models/service'
@@ -30,6 +33,7 @@ import pagingPath from 'app/utils/paging-path'
 import React, { useEffect, useMemo, useState } from 'react'
 import CurrencyFormat from 'react-currency-format'
 import { BiCommentDetail, BiDetail } from 'react-icons/bi'
+import { BsCheck2All } from 'react-icons/bs'
 import { GrMore } from 'react-icons/gr'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
@@ -37,7 +41,7 @@ const ManageTakeCareOrder: React.FC = () => {
     const dispatch = useDispatch()
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const { search } = useSelector(state => state.SearchFilter)
+    const { search, filter } = useSelector(state => state.SearchFilter)
 
     const [serviceOrders, setServiceOrders] = useState<ServiceOrderList[]>([])
     const [paging, setPaging] = useState<Partial<Paging>>({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_RENT})
@@ -46,6 +50,8 @@ const ManageTakeCareOrder: React.FC = () => {
     const [shipping, setShipping] = useState<ShippingFee[]>([])
 
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
+    const [loadingAction, setLoadingAction] = useState(false)
+    const [loading, setLoading] = useState(true)
 
     useEffect(() =>{
         const init = async () =>{
@@ -71,93 +77,104 @@ const ManageTakeCareOrder: React.FC = () => {
         const { isSearching, orderCode, phone, status } = search
         if(isSearching && (orderCode || phone || status)){
             const initSearch = async () =>{
-                const res = await orderService.getServiceOrderDetailByOrderCode({curPage: Number(currentPage), pageSize: paging.pageSize}, {orderCode, phone, status})
-                setServiceOrders(res.data.serviceOrderList)
-                setPaging(res.data.paging)
+                setLoading(true)
+                try{
+                    const res = await orderService.getServiceOrderDetailByOrderCode({curPage: Number(currentPage), pageSize: paging.pageSize}, {orderCode, phone, status})
+                    setServiceOrders(res.data.serviceOrderList)
+                    setPaging(res.data.paging)
+                }catch{
+                    dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+                }
+                setLoading(false)
             }
             initSearch()
+        }else if(filter.isFiltering && filter.startDate && filter.endDate){
+            const init = async () =>{
+                setLoading(true)
+                try{
+                    const res = await orderService.getSerivceOrderDetailByRangeDate({curPage: Number(currentPage), pageSize: paging.pageSize}, filter.startDate || '', filter.endDate || '')
+                    setServiceOrders(res.data.serviceOrderList)
+                    setPaging(res.data.paging)
+                }catch{
+                    dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+                }
+                setLoading(false)
+            }
+            init()
         }else{
             const init = async () =>{
-                const res = await orderService.getAllServiceOrders({curPage: Number(currentPage), pageSize: paging.pageSize})
-                setServiceOrders(res.data.serviceOrderList)
-                setPaging(res.data.paging)
+                setLoading(true)
+                try{
+                    const res = await orderService.getAllServiceOrders({curPage: Number(currentPage), pageSize: paging.pageSize})
+                    setServiceOrders(res.data.serviceOrderList)
+                    setPaging(res.data.paging)
+                }catch{
+                    dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+                }
+                setLoading(false)
             }
             init()
         }
-    }, [navigate, searchParams, paging.pageSize, search])
-
-    const handleAction = (data: PaymentControlState) =>{
-        const { actionType, orderId } = data
-        console.log(orderId)
-        const [order] = serviceOrders.filter(x => x.id === orderId)
-
-        if(actionType === 'deposit'){
-            switch(order.status){
-                case 'cancel': return dispatch(setNoti({type: 'info', message: 'Không thể thanh toán tiền cọc cho đơn hàng đã bị hủy'}))
-                case 'completed': 
-                case 'paid': 
-                case 'ready': return dispatch(setNoti({type: 'info', message: 'Không thể thanh toán tiền cọc cho đơn hàng đã thanh toán'}))
-            }
-        }
-        if(actionType === 'remaining'){
-            switch(order.status){
-                case 'cancel': return dispatch(setNoti({type: 'info', message: 'Không thể thanh toán tổng tiền cho đơn hàng đã bị hủy'}))
-                case 'completed': 
-                case 'paid': return dispatch(setNoti({type: 'info', message: 'Không thể thanh toán tổng tiền cho đơn hàng đã thanh toán'}))
-            }
-        }
-        setActionMethod(data)
-    }
+    }, [navigate, searchParams, paging.pageSize, search, filter, dispatch])
 
     const contextService = (record) =>{
         return (
             <div className='context-menu-wrapper'>
                 <div className="item" onClick={() => {
-                    handleAction({orderId: record.orderId, actionType: 'detail', orderType: 'service', openIndex: -1})
+                    setActionMethod({orderId: record.orderId, actionType: 'detail', orderType: 'service', openIndex: -1})
                 }}>
                     <BiCommentDetail size={25} className='icon'/>
                     <span>Chi tiết đơn hàng</span>
                 </div>
                 <div className="item" onClick={() => {
-                    handleAction({orderId: record.orderId, actionType: 'view transaction', orderType: 'service', openIndex: -1})
+                    setActionMethod({orderId: record.orderId, actionType: 'view transaction', orderType: 'service', openIndex: -1})
                 }}>
                     <BiCommentDetail size={25} className='icon'/>
                     <span>Xem giao dịch</span>
                 </div>
                 {
-                    (record.status === 'unpaid' && record.remainMoney === record.totalPrice) && 
+                    (record.status === 'unpaid') && 
                     <div className="item" onClick={() => {
-                        handleAction({orderId: record.orderId, actionType: 'deposit', orderType: 'service', openIndex: -1})
+                        setActionMethod({orderId: record.orderId, actionType: 'deposit', orderType: 'service', openIndex: -1})
                     }}>
                         <BiDetail size={25} className='icon'/>
                         <span>Thanh toán tiền cọc</span>
                     </div>
                 }
                 {
-                    (record.status === 'ready' || record.status === 'unpaid') &&
+                    (record.status === 'ready') &&
                     <div className="item" onClick={() => {
-                        handleAction({orderId: record.orderId, actionType: 'remaining', orderType: 'service', openIndex: -1})
+                        setActionMethod({orderId: record.orderId, actionType: 'remaining', orderType: 'service', openIndex: -1})
                     }}>
                         <BiDetail size={25} className='icon'/>
                         <span>Thanh toán đơn hàng</span>
                     </div>
                 }
                 {
-                    (record.status !== 'completed' && record.status !== 'cancel') &&
+                    ((record.status === 'paid' && !record.isTransport) || record.status === 'delivery') && 
                     <div className="item" onClick={() => {
-                        handleAction({orderId: record.orderId, actionType: 'cancel', orderType: 'service', openIndex: -1})
+                        setActionMethod({orderId: record.orderId, actionType: 'finished', orderType: 'sale', openIndex: -1})
                     }}>
-                        <BiDetail size={25} className='icon'/>
-                        <span>Hủy đơn hàng</span>
+                        <BsCheck2All size={25} className='icon'/>
+                        <span>Hoàn thành</span>
                     </div>
                 }
                 {
                     record.status === 'cancel' &&
                     <div className="item" onClick={() => {
-                        handleAction({orderId: record.orderId, actionType: 'refund', orderType: 'service', openIndex: -1})
+                        setActionMethod({orderId: record.orderId, actionType: 'refund', orderType: 'service', openIndex: -1})
                     }}>
                         <BiDetail size={25} className='icon'/>
                         <span>Hoàn tiền</span>
+                    </div>
+                }
+                {
+                    (record.status !== 'completed' && record.status !== 'cancel') &&
+                    <div className="item" onClick={() => {
+                        setActionMethod({orderId: record.orderId, actionType: 'cancel', orderType: 'service', openIndex: -1})
+                    }}>
+                        <BiDetail size={25} className='icon'/>
+                        <span>Hủy đơn hàng</span>
                     </div>
                 }
             </div>
@@ -323,6 +340,7 @@ const ManageTakeCareOrder: React.FC = () => {
         setActionMethod(undefined)
     }
     const handlePaymentDeposit = async () =>{
+        setLoadingAction(true)
         try{
             await paymentService.depositPaymentCash(actionMethod?.orderId || '', 'service')
             setServiceOrders(serviceOrders.map(x => x.id === actionMethod?.orderId ? ({
@@ -333,8 +351,9 @@ const ManageTakeCareOrder: React.FC = () => {
             handleClose()
             dispatch(setNoti({type: 'success', message: 'Thanh toán đặt cọc thành công'}))
         }catch{
-
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
+        setLoadingAction(false)
     }
     const handlePaymentCash = async () =>{
         const [order] = serviceOrders.filter(x => x.id === actionMethod?.orderId)
@@ -344,7 +363,7 @@ const ManageTakeCareOrder: React.FC = () => {
             dispatch(setNoti({type: 'error', message: CONSTANT.PAYMENT_MESSAGE.MIN_AMOUNT_PAYMENT}))
             return;
         }
-        
+        setLoadingAction(true)
         try{
             await paymentService.paymentCash(actionMethod?.orderId || '', amount, 'service', total === 0 ? 'whole' : '')
             if(total === 0){
@@ -360,6 +379,7 @@ const ManageTakeCareOrder: React.FC = () => {
         }catch{
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
+        setLoadingAction(false)
     }
     
     const handleCancelOrder = () =>{
@@ -425,6 +445,13 @@ const ManageTakeCareOrder: React.FC = () => {
         }
     }, [actionMethod, serviceOrders])
 
+    const updateOrderStatus = (orderStatus: OrderStatus) =>{
+        const [order] = serviceOrders.filter(x => x.id === actionMethod?.orderId)
+        order.status = orderStatus
+        setServiceOrders([...serviceOrders])
+        handleClose()
+    }
+
     return (
         <div className="mtko-wrapper">
             <HeaderInfor title='Quản lý đơn hàng chăm sóc' />
@@ -432,6 +459,10 @@ const ManageTakeCareOrder: React.FC = () => {
                 isOrderCode
                 isPhone
                 isStatus
+                statusType='service'
+            />
+            <Filtering 
+                isRangeDate
             />
             <section className="mtko-box default-layout">
                 {
@@ -441,6 +472,7 @@ const ManageTakeCareOrder: React.FC = () => {
                         columns={ColumnServiceOrder} 
                         dataSource={DataSourceServiceOrder} 
                         scroll={{ y: 680, x: 3000 }}
+                        loading={loading}
                         pagination={{
                             current: paging.curPage,
                             pageSize: paging.pageSize,
@@ -460,9 +492,16 @@ const ManageTakeCareOrder: React.FC = () => {
                     onCancel={handleClose}
                     onOk={handlePaymentDeposit}
                     width={1000}
+                    footer={false}
                 >
                     <p>Xác nhận thanh toán tiền cọc cho đơn hàng ${serviceOrders.filter(x => x.id === actionMethod.orderId)[0].orderCode}</p>
                     <UserInforOrder {...OrderDetail} />
+                    <div className='btn-form-wrapper mt-10'>
+                        <Button htmlType='button' disabled={loadingAction} type='default' className='btn-cancel' size='large' onClick={handleClose} >Hủy bỏ</Button>
+                        <Button htmlType='submit' loading={loadingAction} type='primary' className='btn-update' size='large' onClick={handlePaymentDeposit}>
+                            Thanh toán
+                        </Button>
+                    </div>
                 </Modal>
             }
             {
@@ -473,6 +512,7 @@ const ManageTakeCareOrder: React.FC = () => {
                     onCancel={handleClose}
                     onOk={handlePaymentCash}
                     width={1000}
+                    footer={false}
                 >
                     <p>Nhập số tiền cần thanh toán (VND)</p>
                     <CurrencyFormat isAllowed={(values) => {
@@ -489,6 +529,12 @@ const ManageTakeCareOrder: React.FC = () => {
                     value={amount} 
                     max={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].remainAmount} thousandSeparator/>
                     <UserInforOrder {...OrderDetail} />
+                    <div className='btn-form-wrapper mt-10'>
+                        <Button htmlType='button' disabled={loadingAction} type='default' className='btn-cancel' size='large' onClick={handleClose} >Hủy bỏ</Button>
+                        <Button htmlType='submit' loading={loadingAction} type='primary' className='btn-update' size='large' onClick={handlePaymentCash}>
+                            Thanh toán
+                        </Button>
+                    </div>
                 </Modal>
             }
             {
@@ -530,6 +576,16 @@ const ManageTakeCareOrder: React.FC = () => {
                     onSubmit={handleClose}
                     service={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].service}
                     shipping={shipping}
+                />
+            }
+            {
+                actionMethod?.actionType === 'finished' &&
+                <FinishOrder
+                    orderId={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].id}
+                    orderCode={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].orderCode}
+                    type='service'
+                    onClose={handleClose}
+                    onSubmit={() => updateOrderStatus('completed')}
                 />
             }
         </div>

@@ -8,7 +8,7 @@ import React, { useState } from 'react'
 interface FinishOrderProps{
     orderId: string;
     orderCode: string;
-    type: 'rent' | 'sale'
+    type: 'rent' | 'sale' | 'service'
     onClose: () => void;
     onSubmit: () => void;
 }
@@ -20,22 +20,35 @@ const FinishOrder: React.FC<FinishOrderProps> = ({ orderId, orderCode, type, onC
 
     const handleSubmitForm = async () =>{
         setLoading(true)
-        if(type === 'sale'){
-            try{
-                await orderService.updateSaleOrderStatus(orderId, 'completed')
-                dispatch(setNoti({type: 'success', message: `Cập nhật trạng thái hoàn thành cho đơn hàng ${orderCode}`}))
-                onSubmit()
-            }catch{
-                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
-            }
-        }else{
-            try{
-                await orderService.updateRentOrderStatus(orderId, 'completed')
-                dispatch(setNoti({type: 'success', message: `Cập nhật trạng thái hoàn thành cho đơn hàng ${orderCode}`}))
-                onSubmit()
-            }catch{
-                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
-            }
+
+        switch(type){
+            case 'sale':
+                try{
+                    await orderService.updateSaleOrderStatus(orderId, 'completed')
+                    dispatch(setNoti({type: 'success', message: `Cập nhật trạng thái hoàn thành cho đơn hàng ${orderCode}`}))
+                    onSubmit()
+                }catch{
+                    dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+                }
+                break;
+            case 'rent':
+                try{
+                    await orderService.updateRentOrderStatus(orderId, 'completed')
+                    dispatch(setNoti({type: 'success', message: `Cập nhật trạng thái hoàn thành cho đơn hàng ${orderCode}`}))
+                    onSubmit()
+                }catch{
+                    dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+                }
+                break;
+            case 'service':
+                try{
+                    await orderService.updateServiceOrderStatus(orderId, 'completed')
+                    dispatch(setNoti({type: 'success', message: `Cập nhật trạng thái hoàn thành cho đơn hàng ${orderCode}`}))
+                    onSubmit()
+                }catch{
+                    dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+                }
+                break;
         }
         setLoading(false)
     }

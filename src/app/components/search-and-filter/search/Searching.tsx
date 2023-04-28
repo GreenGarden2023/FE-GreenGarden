@@ -11,7 +11,7 @@ interface SearchingProps{
     isOrderCode?: boolean;
     isPhone?: boolean;
     isStatus?: boolean;
-    statusType?: 'rent' | 'sale'
+    statusType?: 'rent' | 'sale' | 'service'
     // onSearch: (data: SearchResult) => void;
     // onDefault: () => void;
 }
@@ -79,7 +79,7 @@ const Searching: React.FC<SearchingProps> = ({ isOrderCode, isPhone, isStatus, s
                                 <p className='mb-5'>Trạng thái đơn hàng</p>
                                 <Select value={statusSearch} onChange={(e) => setStatusSearch(e)} style={{width: '100%'}} >
                                     {
-                                        statusType === 'rent' ? 
+                                        statusType === 'rent' &&
                                         <>
                                             <Select.Option value='' >None</Select.Option>
                                             <Select.Option value='unpaid' >Đang xử lý</Select.Option>
@@ -88,13 +88,27 @@ const Searching: React.FC<SearchingProps> = ({ isOrderCode, isPhone, isStatus, s
                                             <Select.Option value='renting' >Đang thuê</Select.Option>
                                             <Select.Option value='completed' >Đã hoàn thành</Select.Option>
                                             <Select.Option value='cancel' >Đã hủy</Select.Option>
-                                        </> :
+                                        </>
+                                    }
+                                    {
+                                        statusType === 'sale' &&
                                         <>
                                             <Select.Option value='' >None</Select.Option>
                                             <Select.Option value='unpaid' >Đang xử lý</Select.Option>
                                             <Select.Option value='ready' >Đã thanh toán cọc</Select.Option>
                                             <Select.Option value='paid' >Đã thanh toán đủ</Select.Option>
                                             <Select.Option value='delivery' >Vận chuyển</Select.Option>
+                                            <Select.Option value='completed' >Đã hoàn thành</Select.Option>
+                                            <Select.Option value='cancel' >Đã hủy</Select.Option>
+                                        </>
+                                    }
+                                    {
+                                        statusType === 'service' &&
+                                        <>
+                                            <Select.Option value='' >None</Select.Option>
+                                            <Select.Option value='unpaid' >Đang xử lý</Select.Option>
+                                            <Select.Option value='ready' >Đã thanh toán cọc</Select.Option>
+                                            <Select.Option value='paid' >Đã thanh toán đủ</Select.Option>
                                             <Select.Option value='completed' >Đã hoàn thành</Select.Option>
                                             <Select.Option value='cancel' >Đã hủy</Select.Option>
                                         </>
