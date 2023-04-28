@@ -1,30 +1,36 @@
+import { yupResolver } from '@hookform/resolvers/yup';
 import { Button, Col, DatePicker, Form, Input, Modal, Row, Select } from 'antd';
+import locale from 'antd/es/date-picker/locale/vi_VN';
 import Table, { ColumnsType } from 'antd/es/table';
+import ErrorMessage from 'app/components/message.tsx/ErrorMessage';
+import MoneyFormat from 'app/components/money/MoneyFormat';
+import CurrencyInput from 'app/components/renderer/currency-input/CurrencyInput';
+import Description from 'app/components/renderer/description/Description';
+import ListImage from 'app/components/renderer/list-image/ListImage';
+import TreeName from 'app/components/renderer/tree-name/TreeName';
+import ServiceStatusComp from 'app/components/status/ServiceStatusComp';
 import useDispatch from 'app/hooks/use-dispatch';
+import { OrderPreview } from 'app/models/cart';
 import { Service, ServiceUpdate, UpdateServiceDetail } from 'app/models/service';
+import { ShippingFee } from 'app/models/shipping-fee';
 import serviceService from 'app/services/service.service';
 import { setNoti } from 'app/slices/notification';
+import CONSTANT from 'app/utils/constant';
+import utilDateTime from 'app/utils/date-time';
+import utilGeneral from 'app/utils/general';
+import Dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react';
 import CurrencyFormat from 'react-currency-format';
 import { Controller, useForm } from 'react-hook-form';
-import locale from 'antd/es/date-picker/locale/vi_VN'
-import Dayjs from 'dayjs'
 import { AiOutlinePlusSquare } from 'react-icons/ai';
-import './style.scss'
-import Description from 'app/components/renderer/description/Description';
-import TreeName from 'app/components/renderer/tree-name/TreeName';
+import { FaSortAmountUp } from 'react-icons/fa';
+import { GiSevenPointedStar } from 'react-icons/gi';
+import { GrStatusCriticalSmall } from 'react-icons/gr';
+import { MdCreditScore, MdMore, MdSummarize } from 'react-icons/md';
+import { SiVirustotal } from 'react-icons/si';
+import { TbDiscount, TbTruckDelivery } from 'react-icons/tb';
 import * as yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
-import CONSTANT from 'app/utils/constant';
-import ErrorMessage from 'app/components/message.tsx/ErrorMessage';
-import ListImage from 'app/components/renderer/list-image/ListImage';
-import CurrencyInput from 'app/components/renderer/currency-input/CurrencyInput';
-import utilGeneral from 'app/utils/general';
-import utilDateTime from 'app/utils/date-time';
-import { ShippingFee } from 'app/models/shipping-fee';
-import { OrderPreview } from 'app/models/cart';
-import { FaMoneyBillAlt } from 'react-icons/fa';
-import MoneyFormat from 'app/components/money/MoneyFormat';
+import './style.scss';
 
 const schema = yup.object().shape({
     name: yup.string().trim().required('Tên không được để trống').max(50, 'Tối đa 50 ký tự'),
@@ -342,7 +348,20 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                     <Col span={6}>
                         <div className='order-infor-item'>
                             <div className="left">
-                                <FaMoneyBillAlt size={25} color='#00a76f' /> 
+                                <GrStatusCriticalSmall size={25} color='#00a76f' /> 
+                                <span>Trạng thái yêu cầu</span>
+                            </div>
+                            <div className="right">
+                                <span className='right-content'>
+                                    <ServiceStatusComp status={service.status} />
+                                </span>
+                            </div>
+                        </div>
+                    </Col>
+                    <Col span={6}>
+                        <div className='order-infor-item'>
+                            <div className="left">
+                                <MdSummarize size={25} color='#00a76f' /> 
                                 <span>Tổng số ngày chăm sóc</span>
                             </div>
                             <div className="right">
@@ -353,6 +372,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                     <Col span={6}>
                         <div className='order-infor-item'>
                             <div className="left">
+                                <MdCreditScore size={25} color='#00a76f' />
                                 <span>Số điểm đã dùng</span>
                             </div>
                             <div className="right">
@@ -363,6 +383,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                     <Col span={6}>
                         <div className='order-infor-item'>
                             <div className="left">
+                                <MdMore size={25} color='#00a76f' />
                                 <span>Tích điểm</span>
                             </div>
                             <div className="right">
@@ -373,6 +394,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                     <Col span={6}>
                         <div className='order-infor-item'>
                             <div className="left">
+                                <SiVirustotal size={25} color='#00a76f' />
                                 <span>Tổng tiền hàng</span>
                             </div>
                             <div className="right">
@@ -383,6 +405,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                     <Col span={6}>
                         <div className='order-infor-item'>
                             <div className="left">
+                                <TbTruckDelivery size={25} color='#00a76f' />
                                 <span>Phí vận chuyển</span>
                             </div>
                             <div className="right">
@@ -393,6 +416,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                     <Col span={6}>
                         <div className='order-infor-item'>
                             <div className="left">
+                                <TbDiscount size={25} color='#00a76f' />
                                 <span>Tiền được giảm</span>
                             </div>
                             <div className="right">
@@ -403,6 +427,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                     <Col span={6}>
                         <div className='order-infor-item'>
                             <div className="left">
+                                <FaSortAmountUp size={25} color='#00a76f' />
                                 <span>Tổng tiền thanh toán</span>
                             </div>
                             <div className="right">
@@ -413,6 +438,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                     <Col span={6}>
                         <div className='order-infor-item'>
                             <div className="left">
+                                <GiSevenPointedStar size={25} color='#00a76f' />
                                 <span>Tiền cọc</span>
                             </div>
                             <div className="right">

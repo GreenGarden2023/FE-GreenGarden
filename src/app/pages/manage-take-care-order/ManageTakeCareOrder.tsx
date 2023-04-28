@@ -585,6 +585,7 @@ const ManageTakeCareOrder: React.FC = () => {
                 <FinishOrder
                     orderId={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].id}
                     orderCode={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].orderCode}
+                    serviceId={serviceOrders.filter(x => x.id === actionMethod.orderId)[0].service.id}
                     type='service'
                     onClose={handleClose}
                     onSubmit={() => updateOrderStatus('completed')}

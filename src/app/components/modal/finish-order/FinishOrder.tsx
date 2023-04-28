@@ -1,6 +1,7 @@
 import { Button, Modal } from 'antd';
 import useDispatch from 'app/hooks/use-dispatch';
 import orderService from 'app/services/order.service';
+import serviceService from 'app/services/service.service';
 import { setNoti } from 'app/slices/notification';
 import CONSTANT from 'app/utils/constant';
 import React, { useState } from 'react'
@@ -8,12 +9,13 @@ import React, { useState } from 'react'
 interface FinishOrderProps{
     orderId: string;
     orderCode: string;
+    serviceId?: string;
     type: 'rent' | 'sale' | 'service'
     onClose: () => void;
     onSubmit: () => void;
 }
 
-const FinishOrder: React.FC<FinishOrderProps> = ({ orderId, orderCode, type, onClose, onSubmit }) => {
+const FinishOrder: React.FC<FinishOrderProps> = ({ orderId, orderCode, serviceId, type, onClose, onSubmit }) => {
     const dispatch = useDispatch();
     
     const [loading, setLoading] = useState(false)
@@ -43,6 +45,7 @@ const FinishOrder: React.FC<FinishOrderProps> = ({ orderId, orderCode, type, onC
             case 'service':
                 try{
                     await orderService.updateServiceOrderStatus(orderId, 'completed')
+                    await serviceService.updateServiceRequestStatus(serviceId || '', 'completed')
                     dispatch(setNoti({type: 'success', message: `Cập nhật trạng thái hoàn thành cho đơn hàng ${orderCode}`}))
                     onSubmit()
                 }catch{
