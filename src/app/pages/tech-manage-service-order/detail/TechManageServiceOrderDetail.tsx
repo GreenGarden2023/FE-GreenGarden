@@ -133,7 +133,8 @@ const TechManageServiceOrderDetail: React.FC = () => {
                     </div>
                 }
                 {
-                    (record.status === 'pending' && dayjs(new Date()).valueOf() >= dayjs(record.serviceDate).valueOf()) &&
+                    // && dayjs(new Date()).valueOf() >= dayjs(record.serviceDate).valueOf()
+                    (record.status === 'pending' ) &&
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.id, actionType: 'update calendar', orderType: 'service', openIndex: -1})
                     }}>

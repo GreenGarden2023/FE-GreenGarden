@@ -230,32 +230,34 @@ const CartPage: React.FC = () => {
                     <div className="container-wrapper cart-wrapper">
                         <HeaderInfor title='Giỏ hàng' />
                         {
-                            loading && <LoadingView loading />
-                        }
-                        {
-                            (!loading && !cart) ? <NoProduct /> : 
+                            loading ? <LoadingView loading /> : 
                             <>
-                                <section className="default-layout">
-                                    <h3>Loại cây</h3>
-                                    <Segmented size="large" value={pageType} onChange={handleChangeSegment} options={SegmentedOptions} />
-                                </section>
                                 {
-                                    (pageType === 'sale' && cart) &&
-                                    <CartSale
-                                        items={cart.saleItems}
-                                        shipping={shipping}
-                                        onChange={handleCartChange}
-                                        onSubmit={handleSubmitCart}
-                                    />
-                                }
-                                {
-                                    (pageType === 'rent' && cart) &&
-                                    <CartRent
-                                        items={cart.rentItems}
-                                        shipping={shipping}
-                                        onChange={handleCartChange}
-                                        onSubmit={handleSubmitCart}
-                                    />
+                                    !cart ? <NoProduct /> :
+                                    <>
+                                        <section className="default-layout">
+                                            <h3>Loại cây</h3>
+                                            <Segmented size="large" value={pageType} onChange={handleChangeSegment} options={SegmentedOptions} />
+                                        </section>
+                                        {
+                                            (pageType === 'sale' && cart) &&
+                                            <CartSale
+                                                items={cart.saleItems}
+                                                shipping={shipping}
+                                                onChange={handleCartChange}
+                                                onSubmit={handleSubmitCart}
+                                            />
+                                        }
+                                        {
+                                            (pageType === 'rent' && cart) &&
+                                            <CartRent
+                                                items={cart.rentItems}
+                                                shipping={shipping}
+                                                onChange={handleCartChange}
+                                                onSubmit={handleSubmitCart}
+                                            />
+                                        }
+                                    </>
                                 }
                             </>
                         }
