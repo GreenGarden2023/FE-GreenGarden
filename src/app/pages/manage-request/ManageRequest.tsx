@@ -36,7 +36,7 @@ const ManageRequest: React.FC = () => {
         const currentPage = searchParams.get('page');
         if(!pagingPath.isValidPaging(currentPage)){
             setPaging({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.REQUEST})
-            return navigate('/panel/manage-request?page=1')
+            return navigate('/panel/manage-request?page=1', { replace: true })
         }
 
         const init = async () =>{

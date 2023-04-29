@@ -9,8 +9,10 @@ import useSelector from 'app/hooks/use-selector'
 import { OrderPreview, OrderUserInfor } from 'app/models/cart'
 import { OrderCreate, RentOrderList } from 'app/models/order'
 import { ShippingFee } from 'app/models/shipping-fee'
+import orderService from 'app/services/order.service'
 import { setNoti } from 'app/slices/notification'
 import CONSTANT from 'app/utils/constant'
+import utilCalculate from 'app/utils/order-calculate'
 import Dayjs from 'dayjs'
 import 'dayjs/locale/vi'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -21,8 +23,6 @@ import { FaMoneyBillAlt } from 'react-icons/fa'
 import { GrFormSubtract } from 'react-icons/gr'
 import * as yup from 'yup'
 import './style.scss'
-import orderService from 'app/services/order.service'
-import utilCalculate from 'app/utils/order-calculate'
 
 const schema = yup.object().shape({
     recipientAddress: yup.string().when("isTransport", {
@@ -38,7 +38,7 @@ interface ClientExtendOrderProps{
     rentOrderList: RentOrderList
     shipping: ShippingFee[]
     onClose: () => void
-    onExtend: () => void
+    onExtend: (newOrderId: string) => void
 }
 
 const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shipping, onClose, onExtend}) => {
@@ -237,10 +237,12 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
         try{
             const calculatorRent = await orderService.calculateOrder(body)
             if(utilCalculate.compare2Orders(calculatorRent.data, OrderPreview())){
-                await orderService.createOrder(body)
+                const res = await orderService.createOrder(body)
+                console.log(res.data)
                 dispatch(setNoti({type: 'success', message: 'Gia hạn đơn hàng thành công'}))
-                onExtend()
+                onExtend(res.data.id)
                 onClose()
+                
             }else{
                 dispatch(setNoti({type: 'info', message: 'Đã có sự thay đổi về giá. Quý khách vui lòng tải lại trang để đặt hàng'}))
             }

@@ -37,7 +37,9 @@ button, input{
 button{
     cursor: pointer;
 }
-
+img{
+    border-radius: 10px;
+}
 // global class css
 .container-wrapper{
     max-width: $max-width-container;

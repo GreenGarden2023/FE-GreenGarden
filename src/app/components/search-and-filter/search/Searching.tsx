@@ -1,23 +1,27 @@
 import { Col, Input, Row, Select } from 'antd';
 import useDispatch from 'app/hooks/use-dispatch';
+import { OrderStatus } from 'app/models/general-type';
 import { setEmptyFilter, setEmptySearch, setOrderCode, setPhone, setSearch, setStatus } from 'app/slices/search-and-filter';
+import CONSTANT from 'app/utils/constant';
 import React, { useEffect, useState } from 'react';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { FaIoxhost } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import './style.scss';
-import { OrderStatus } from 'app/models/general-type';
 
 interface SearchingProps{
     isOrderCode?: boolean;
     isPhone?: boolean;
     isStatus?: boolean;
     statusType?: 'rent' | 'sale' | 'service'
+    defaultUrl: string;
     // onSearch: (data: SearchResult) => void;
     // onDefault: () => void;
 }
 
-const Searching: React.FC<SearchingProps> = ({ isOrderCode, isPhone, isStatus, statusType }) => {
+const Searching: React.FC<SearchingProps> = ({ isOrderCode, isPhone, isStatus, statusType, defaultUrl }) => {
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const [orderCodeSearch, setOrderCodeSearch] = useState('')
     const [phoneSearch, setPhoneSearch] = useState('')
@@ -35,7 +39,16 @@ const Searching: React.FC<SearchingProps> = ({ isOrderCode, isPhone, isStatus, s
     const handleClickSearch = () =>{
         // -----------------
         dispatch(setOrderCode(orderCodeSearch.trim()))
-        dispatch(setPhone(phoneSearch.trim()))
+
+        if(phoneSearch.trim()){
+            const isValidPhone = CONSTANT.PHONE_REGEX.test(phoneSearch.trim())
+            if(isValidPhone){
+                dispatch(setPhone(phoneSearch.trim()))
+            }else{
+                dispatch(setPhone(''))
+            }
+        }
+
         dispatch(setStatus(statusSearch))
         dispatch(setSearch(true))
         dispatch(setEmptyFilter())
@@ -48,6 +61,7 @@ const Searching: React.FC<SearchingProps> = ({ isOrderCode, isPhone, isStatus, s
         setStatusSearch('')
         // --------------
         dispatch(setSearch(false))
+        navigate(defaultUrl)
     }
 
     return (

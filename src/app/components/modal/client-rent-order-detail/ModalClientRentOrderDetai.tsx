@@ -102,7 +102,7 @@ const ModalClientRentOrderDetai: React.FC<ModalClientRentOrderDetaiProps> = ({re
             status,
             transportFee,
             totalOrder: totalPrice,
-            remainMoney,
+            remainMoney: status === 'unpaid' ? remainMoney + deposit : remainMoney,
             deposit, reason,
             nameCancelBy, contract: contractURL
         }

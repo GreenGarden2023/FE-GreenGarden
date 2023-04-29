@@ -73,7 +73,7 @@ const ManageTakeCareOrder: React.FC = () => {
         
         if(!pagingPath.isValidPaging(currentPage)){
             setPaging({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_RENT})
-            return navigate('/panel/take-care-order?page=1')
+            return navigate('/panel/take-care-order?page=1', { replace: true })
         }
         
         const { isSearching, orderCode, phone, status } = search
@@ -462,6 +462,7 @@ const ManageTakeCareOrder: React.FC = () => {
                 isPhone
                 isStatus
                 statusType='service'
+                defaultUrl='/panel/take-care-order?page=1'
             />
             <Filtering 
                 isRangeDate

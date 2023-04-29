@@ -129,7 +129,7 @@ const Routers: React.FC = () =>{
                 <Route path='/product-item/:productItemId' element={<ClientProductItemDetail />} />
                 <Route path='/orders' element={<AuthGuard rolesAuth={['Admin', 'Customer', 'Manager', 'Technician']} ><ClientOrder /></AuthGuard>} />
                 <Route path='/order/sale/feedback/:orderId' element={<FeedbackSale />} />
-                <Route path='/order-group/:groupId' element={<ClientRentOrderGroup />} />
+                <Route path='/order-group/:groupId/:orderId' element={<ClientRentOrderGroup />} />
                 <Route path='/checkout-success' element={<CheckoutSuccess />} />
                 <Route path='/take-care-service' element={<ClientTakeCareService />} />
                 <Route path='/take-care-service/me' element={<ClientManageTakeCareService />} />
@@ -155,6 +155,7 @@ const Routers: React.FC = () =>{
                     <Route path='users' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_USERS} ><AdminRoute><UserPage /></AdminRoute></AuthGuard>} />
                 </Route>
                 <Route path='/file-not-found' element={<FileNotFound />} />
+                <Route path='*' element={<FileNotFound />} />
             </Routes>
         </>
     );

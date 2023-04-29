@@ -62,7 +62,7 @@ const ManageSaleOrder: React.FC = () => {
         const currentPage = searchParams.get('page');
         if(!pagingPath.isValidPaging(currentPage)){
             setPaging({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_SALE})
-            return navigate('/panel/sale-order?page=1')
+            return navigate('/panel/sale-order?page=1', { replace: true })
         }
         
         const { isSearching, orderCode, phone, status } = search
@@ -399,6 +399,7 @@ const ManageSaleOrder: React.FC = () => {
                 isPhone
                 isStatus
                 statusType='sale'
+                defaultUrl='/panel/sale-order?page=1'
             />
             <section className="mso-box default-layout">
             {

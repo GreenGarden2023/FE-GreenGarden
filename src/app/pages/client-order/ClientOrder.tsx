@@ -63,6 +63,13 @@ const ClientOrder: React.FC = () =>{
 
     useEffect(() =>{
         dispatch(setTitle(`${CONSTANT.APP_NAME} | Đơn hàng`))
+
+        const orderType = localStorage.getItem('order-type') as OrderPage
+        if(!orderType) {
+            localStorage.setItem('order-type', 'rent')
+            return;
+        }
+        setPageType(orderType)
     }, [dispatch])
 
     useEffect(() =>{
@@ -380,6 +387,12 @@ const ClientOrder: React.FC = () =>{
             render: (v) => (<OrderStatusComp status={v} />)
         },
         {
+            title: "Số lượng đơn hàng",
+            key: "numberOfOrder",
+            dataIndex: "numberOfOrder",
+            render: (v) => (v)
+        },
+        {
             title: 'Phí vận chuyển',
             key: 'transportFee',
             dataIndex: 'transportFee',
@@ -453,7 +466,7 @@ const ClientOrder: React.FC = () =>{
                     <BiCommentDetail size={25} className='icon'/>
                     <span>Chi tiết đơn hàng</span>
                 </div>
-                <div className="item" onClick={() => navigate(`/order-group/${record.groupID}`)}>
+                <div className="item" onClick={() => navigate(`/order-group/${record.groupID}/${record.orderId}`)}>
                     <FaLayerGroup size={25} className='icon'/>
                     <span>Xem nhóm đơn hàng</span>
                 </div>
@@ -509,16 +522,23 @@ const ClientOrder: React.FC = () =>{
             deposit: x.rentOrderList[0].deposit,
             orderCode: x.rentOrderList[0].orderCode,
             transportFee: x.rentOrderList[0].transportFee,
-            discountAmount: x.rentOrderList[0].discountAmount
+            discountAmount: x.rentOrderList[0].discountAmount,
+            numberOfOrder: x.numberOfOrder
         }))
     }, [rentOrders])
 
     const handleChangeSegment = (value: string | number) =>{
         navigate('/orders?page=1')
         switch(value){
-            case 'Thuê': return setPageType('rent')
-            case 'Mua': return setPageType('sale')
-            default: setPageType('service')
+            case 'rent': 
+                localStorage.setItem('order-type', 'rent')
+                return setPageType('rent')
+            case 'sale': 
+                localStorage.setItem('order-type', 'sale')
+                return setPageType('sale')
+            default: 
+                localStorage.setItem('order-type', 'service')
+                setPageType('service')
         }
     }
     const handlePaymentService = async (data: PaymentControlState) =>{
@@ -556,7 +576,7 @@ const ClientOrder: React.FC = () =>{
                     // setActionMethod({orderId: record.orderId, actionType: 'detail', orderType: 'service', openIndex: -1})
                     navigate(`/order/service/${record.orderId}`)
                 }}>
-                    <BiCommentDetail size={25} className='icon'/>
+                    <BiDetail size={25} className='icon'/>
                     <span>Chi tiết đơn hàng</span>
                 </div>
                 {
@@ -573,7 +593,7 @@ const ClientOrder: React.FC = () =>{
                     <div className="item" onClick={() => {
                         handlePaymentService({orderId: record.orderId, actionType: 'remaining', orderType: 'service', openIndex: -1})
                     }} >
-                        <MdOutlinePayments size={25} className='icon'/>
+                        <MdOutlinePayment size={25} className='icon'/>
                         <span>Thanh toán đơn hàng bằng Momo</span>
                     </div> 
                 }
@@ -582,7 +602,7 @@ const ClientOrder: React.FC = () =>{
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.orderId, actionType: 'cancel', orderType: 'service', openIndex: -1})
                     }} >
-                        <MdOutlinePayments size={25} className='icon'/>
+                        <MdCancelPresentation size={25} className='icon'/>
                         <span>Hủy đơn hàng</span>
                     </div>
                 }
@@ -778,7 +798,23 @@ const ClientOrder: React.FC = () =>{
                     <HeaderInfor title='Quản lý đơn hàng của bạn' />
                     <section className="default-layout">
                         <h3 style={{marginBottom: '5px'}}>Loại đơn hàng</h3>
-                        <Segmented size="large" onChange={handleChangeSegment} options={['Thuê', 'Mua', 'Dịch vụ']} />
+                        <Segmented size="large" value={pageType} onChange={handleChangeSegment} options={[
+                            {
+                                icon: undefined,
+                                value: 'rent',
+                                label: 'Thuê'
+                            },
+                            {
+                                icon: undefined,
+                                value: 'sale',
+                                label: 'Bán'
+                            },
+                            {
+                                icon: undefined,
+                                value: 'service',
+                                label: 'Dịch vụ'
+                            }
+                        ]} />
                     </section>
                     {
                         loading ?  <LoadingView loading /> : 

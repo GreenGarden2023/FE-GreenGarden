@@ -81,6 +81,11 @@ const UploadCalendar: React.FC<UploadCalendarProps> = ({ serviceCalendarDetail, 
             return false
         }
 
+        if(sumary.length > 500){
+            dispatch(setNoti({type: 'error', message: 'Mô tả không nhiều hơn 500 ký tự'}))
+            return false
+        }
+
         if(!IsEndDate){
             if(!date) {
                 dispatch(setNoti({type: 'error', message: 'Lịch chăm sóc không được để trống'}))

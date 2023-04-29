@@ -67,7 +67,7 @@ const RentOrderPaymentCash: React.FC<RentOrderPaymentCashProps> = ({rentOrderLis
             status,
             transportFee,
             totalOrder: totalPrice,
-            remainMoney,
+            remainMoney: status === 'unpaid' ? remainMoney + deposit : remainMoney,
             deposit
         }
     }, [rentOrderList])

@@ -77,7 +77,7 @@ const LandingPage: React.FC = () =>{
                                     {
                                         categories.map((item, index) => (
                                             <div key={index} className='category-item'>
-                                                <Link to={`/category/${item.id}?page=1`}>
+                                                <Link to={`/category/${item.id}`}>
                                                     <img src={item.imgUrl} alt="/" className='category-image' />
                                                     <div className="category-infor">
                                                         <p>{item.name}</p>

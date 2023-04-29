@@ -34,11 +34,9 @@ const ClientProductItem: React.FC = () => {
     useEffect(() =>{
         pagingPath.scrollTop()
         const currentPage = searchParams.get('page');
-        if(!productId){
-            return navigate('/category')
-        }
+        if(!productId) return;
         if(!pagingPath.isValidPaging(currentPage)){
-            return navigate(`/category/${productId}/product-item?page=1`)
+            return navigate(`/product/${productId}?page=1`, { replace: true })
         }
 
         const init = async () =>{

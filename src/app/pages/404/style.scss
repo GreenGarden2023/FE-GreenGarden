@@ -1,1 +1,48 @@
 @import 'app/styles/variable.scss';
+
+.fnf-wrapper{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .left{
+        width: 50%;
+        text-align: center;
+        .fnf-code{
+            letter-spacing: 2px;
+            font-size: 10.625rem;
+            line-height: 0.8;
+            font-weight: 700;
+            margin: 0;
+            color: #2cccc4;
+        }
+        .fnf-message{
+            letter-spacing: 0px;
+            font-size: 1.5rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            margin: 20px 25px 0;
+            color: #41807c;
+        }
+        button{
+            border-style: solid;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            background-image: none;
+            align-self: center;
+            margin: 51px auto 0;
+            padding: 15px 55px;
+            color: #2cccc4;
+            border-color: #2cccc4;
+            &:hover{
+                color: initial;
+            }
+        }
+    }
+    .right{
+        width: 50%;
+        img{
+            width: 100%;
+        }
+    }
+}

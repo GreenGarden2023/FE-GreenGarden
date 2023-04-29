@@ -128,85 +128,87 @@ const ClientTakeCareServiceConfirm: React.FC = () => {
             <LandingHeader />
             <div className="main-content-not-home">
                 <div className="container-wrapper ctcsc-wrapper">
-                    <HeaderInfor title={`Thông tin chi tiết yêu cầu chăm sóc cây (${service?.serviceCode})`} />
                     {
-                        loading && <LoadingView loading />
-                    }
-                    {
-                        (!loading && !service) ? <NoProduct /> : 
+                        loading ? <LoadingView loading /> :
                         <>
                             {
-                                service?.status === 'accepted' &&
-                                <section className="default-layout">
-                                    <button style={{marginLeft: 'auto'}} className='btn btn-create' onClick={() => setOpenModal(1)}>
-                                        <AiOutlineCheck size={25} />
-                                        <span>Xác nhận thông tin</span>
-                                    </button>
-                                </section>
-                            }
-                            <section className="default-layout">
-                                {
-                                    service && 
-                                    <Row gutter={[24, 24]}>
-                                        <Col span={8}>
-                                            <span className="title">Tên khách hàng: </span>
-                                            <span className="content">{service.name}</span>
-                                        </Col>
-                                        <Col span={8}>
-                                            <span className="title">Địa chỉ: </span>
-                                            <span className="content">{service.address}</span>
-                                        </Col>
-                                        <Col span={8}>
-                                            <span className="title">Số điện thoại: </span>
-                                            <span className="content">{service.phone}</span>
-                                        </Col>
-                                        <Col span={8}>
-                                            <span className="title">Email: </span>
-                                            <span className="content">{service.email}</span>
-                                        </Col>
-                                        <Col span={8}>
-                                            <span className="title">Thời gian chăm sóc cây: </span>
-                                            <span className="content">{utilDateTime.dateToString(service.startDate.toString())} - {utilDateTime.dateToString(service.endDate.toString())}</span>
-                                        </Col>
-                                        <Col span={8}>
-                                            <span className="title">Nơi chăm sóc: </span>
-                                            <span className="content">{service.isTransport ? 'Tại nhà' : 'Tại cửa hàng'}</span>
-                                        </Col>
+                                !service ? <NoProduct /> :
+                                <>
+                                    <HeaderInfor title={`Thông tin chi tiết yêu cầu chăm sóc cây (${service?.serviceCode})`} />
+                                    {
+                                        service?.status === 'accepted' &&
+                                        <section className="default-layout">
+                                            <button style={{marginLeft: 'auto'}} className='btn btn-create' onClick={() => setOpenModal(1)}>
+                                                <AiOutlineCheck size={25} />
+                                                <span>Xác nhận thông tin</span>
+                                            </button>
+                                        </section>
+                                    }
+                                    <section className="default-layout">
                                         {
-                                            (service.transportFee && service.transportFee !== 0) ?
-                                            <Col span={8}>
-                                                <span className="title">Phí vận chuyển: </span>
-                                                <span className="content">{service.transportFee}</span>
-                                            </Col> : undefined
-                                        }
-                                        <Col span={8} style={{display: 'flex'}}>
-                                            <span className="title">Trạng thái yêu cầu: </span>
-                                            <span className="content">
-                                                <ServiceStatusComp status={service.status} />
-                                                {/* {service.status} */}
-                                            </span>
-                                        </Col>
-                                        <Col span={24}>
-                                            <span className="title" style={{marginBottom: '10px', display: 'block'}}>Thông tin hợp đồng chăm sóc cây</span>
-                                            <div className='rule-wrapper'>
+                                            service && 
+                                            <Row gutter={[24, 24]}>
+                                                <Col span={8}>
+                                                    <span className="title">Tên khách hàng: </span>
+                                                    <span className="content">{service.name}</span>
+                                                </Col>
+                                                <Col span={8}>
+                                                    <span className="title">Địa chỉ: </span>
+                                                    <span className="content">{service.address}</span>
+                                                </Col>
+                                                <Col span={8}>
+                                                    <span className="title">Số điện thoại: </span>
+                                                    <span className="content">{service.phone}</span>
+                                                </Col>
+                                                <Col span={8}>
+                                                    <span className="title">Email: </span>
+                                                    <span className="content">{service.email}</span>
+                                                </Col>
+                                                <Col span={8}>
+                                                    <span className="title">Thời gian chăm sóc cây: </span>
+                                                    <span className="content">{utilDateTime.dateToString(service.startDate.toString())} - {utilDateTime.dateToString(service.endDate.toString())}</span>
+                                                </Col>
+                                                <Col span={8}>
+                                                    <span className="title">Nơi chăm sóc: </span>
+                                                    <span className="content">{service.isTransport ? 'Tại nhà' : 'Tại cửa hàng'}</span>
+                                                </Col>
                                                 {
-                                                    service.rules ?
-                                                        
-                                                            service.rules.split('\n').map((x, index) => (
-                                                                <p key={index}>{x}</p>
-                                                            ))
-                                                        
-                                                    : <p>Chưa có thông tin hợp đồng</p>
+                                                    (service.transportFee && service.transportFee !== 0) ?
+                                                    <Col span={8}>
+                                                        <span className="title">Phí vận chuyển: </span>
+                                                        <span className="content">{service.transportFee}</span>
+                                                    </Col> : undefined
                                                 }
-                                            </div>
-                                            {/* <Input.TextArea autoSize={{minRows: 4, maxRows: 10}} value={service.rules} disabled></Input.TextArea> */}
-                                        </Col>
-                                    </Row>
-                                }
-                            </section>
-                            <div className="default-layout">
-                                <Table columns={ColumnServiceOrder} dataSource={DataSourceServiceOrder} pagination={false} />
-                            </div>
+                                                <Col span={8} style={{display: 'flex'}}>
+                                                    <span className="title">Trạng thái yêu cầu: </span>
+                                                    <span className="content">
+                                                        <ServiceStatusComp status={service.status} />
+                                                        {/* {service.status} */}
+                                                    </span>
+                                                </Col>
+                                                <Col span={24}>
+                                                    <span className="title" style={{marginBottom: '10px', display: 'block'}}>Thông tin hợp đồng chăm sóc cây</span>
+                                                    <div className='rule-wrapper'>
+                                                        {
+                                                            service.rules ?
+                                                                
+                                                                    service.rules.split('\n').map((x, index) => (
+                                                                        <p key={index}>{x}</p>
+                                                                    ))
+                                                                
+                                                            : <p>Chưa có thông tin hợp đồng</p>
+                                                        }
+                                                    </div>
+                                                    {/* <Input.TextArea autoSize={{minRows: 4, maxRows: 10}} value={service.rules} disabled></Input.TextArea> */}
+                                                </Col>
+                                            </Row>
+                                        }
+                                    </section>
+                                    <div className="default-layout">
+                                        <Table columns={ColumnServiceOrder} dataSource={DataSourceServiceOrder} pagination={false} />
+                                    </div>
+                                </>
+                            }
                         </>
                     }
                 </div>

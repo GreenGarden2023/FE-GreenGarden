@@ -52,29 +52,29 @@ export interface ServiceDetailUpdate {
 
 export interface Service {
     id: string
-    serviceOrderID?: string;
     serviceCode: string
-    userID: string
+    userId: string
+    serviceOrderID: string
     userCurrentPoint: number
-    createDate: string
+    createDate: Date
     startDate: Date
     endDate: Date
     name: string
     phone: string
     email: string
     address: string
+    districtID: number
     isTransport: boolean
     transportFee: number
     rewardPointUsed: number
+    rules: string
     status: ServiceStatus
     technicianID: string
     technicianName: string
+    cancelBy: string
+    nameCancelBy: string
+    reason: string
     serviceDetailList: ServiceDetailList[]
-    rules: string
-    districtID: number;
-    reason: string;
-    cancelBy: string;
-    nameCancelBy: string;
 }
   
 export interface ServiceDetailList {

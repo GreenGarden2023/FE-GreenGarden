@@ -54,7 +54,7 @@ const ManageCategory: React.FC = () => {
   useEffect(() =>{
     const currentPage = searchParams.get('page');
     if(!pagingPath.isValidPaging(currentPage)){
-      navigate('/panel/manage-category?page=1')
+      navigate('/panel/manage-category?page=1', { replace: true })
       return;
     }
 
@@ -229,41 +229,6 @@ const ManageCategory: React.FC = () => {
     setAction('')
     reset()
   }
-
-  // function range(start: any, end: any) {
-  //   const result = [];
-  //   for (let i = start; i < end; i++) {
-  //     result.push(i);
-  //   }
-  //   return result;
-  // }
-  // function disabledDate(current: any) {
-  //   // Can not select days before today and today
-  //   return current && current < moment().endOf('day');
-  // }
-  // function disabledDateTime() {
-  //   return {
-  //     disabledHours: () => range(0, 24).splice(4, 20),
-  //     disabledMinutes: () => range(30, 60),
-  //     disabledSeconds: () => [55, 56],
-  //   };
-  // }
-  // const [disableDate, setDisableDate] = useState([15, 20])
-  // const startDate = '2023-02-10'
-  // const endDate = '2023-02-28'
-
-  // const isValidaDate = (currentDate: dayjs.Dayjs | null | undefined) =>{
-  //   if(!currentDate) return false
-  //   if(currentDate.isBefore(startDate, 'days') || currentDate.isAfter(endDate, 'days') || disableDate.includes(currentDate.date())) return false
-
-  //   return true
-  // }
-  // const handleChangeTime = (date: DatePickerProps['value'], dateString: string) =>{
-  //   if(!isValidaDate(date)) return
-  //   setDisableDate([...disableDate, date?.date() || 0])
-  //   // console.log('Selected Time: ', date);
-  //   // console.log('Formatted Selected Time: ', dateString);
-  // }
   
   return (
     <div className='mc-wrapper'>
@@ -276,24 +241,6 @@ const ManageCategory: React.FC = () => {
           reset()
         }}>Tạo mới 1 thể loại cây</button>
       </section>
-      <>
-        {/* <DatePicker
-          format="YYYY-MM-DD HH:mm:ss"
-          // disabledDate={disabledDate}
-          // disabledDate={() => true}
-          disabledTime={disabledDateTime}
-          // showTime={{ defaultValue: dayjs('00:00:00', 'HH:mm:ss') }}
-          open
-          dateRender={(currentDate) => (
-            <>
-              {isValidaDate(currentDate) ? <p style={{color: 'red'}}>{currentDate.date()}</p> : <p style={{color: 'blue'}}>{currentDate.date()}</p>}
-            </>
-          )}
-          onChange={handleChangeTime}
-          // panelRender={() => (<p>Node</p>)}
-          // style={{display: 'none'}}
-        /> */}
-      </>
       <section className="mc-box default-layout">
         <Table loading={loading} className='mc-table' dataSource={DataSource} columns={Column} pagination={{
           pageSize: paging?.pageSize || 1,

@@ -162,7 +162,8 @@ const ReturnDepositRentOrder: React.FC<ReturnDepositRentOrderProps> = ({rentOrde
             endDate: utilDateTime.dateToString(endRentDate.toString()),
             status, transportFee,
             totalOrder: totalPrice,
-            remainMoney, deposit, reason
+            remainMoney: status === 'unpaid' ? remainMoney + deposit : remainMoney, 
+            deposit, reason
         }
     }, [rentOrderList])
 

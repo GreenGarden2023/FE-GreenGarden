@@ -27,9 +27,13 @@ const setDefaultImage = ({currentTarget}) =>{
 
 const setCurrency = (setValue, key: string, values: CurrencyFormat.Values) =>{
     const { floatValue } = values
-        const data = Number(floatValue || 0)
+    const data = Number(floatValue || 0)
+    if(!floatValue || floatValue < 0){
+        setValue(key as any, 0)
+    }else{
         console.log(data)
         setValue(key as any, data)
+    }
 }
 
 const utilGeneral = {

@@ -26,7 +26,7 @@ const assignServiceTechnician = async (serviceID: string, technicianID: string) 
     return res.data
 }
 const updateServiceDetail = async (data: UpdateServiceDetail) =>{
-    const res = await golbalAxios.post(`/service/update-service-detail`, data)
+    const res = await golbalAxios.post<Response<Service>>(`/service/update-service-detail`, data)
     return res.data
 }
 const getAServiceRequestDetail = async (serviceRequestID: string) =>{

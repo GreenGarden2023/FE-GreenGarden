@@ -23,6 +23,7 @@ import { BiDetail } from 'react-icons/bi';
 import { GrMore } from 'react-icons/gr';
 import { useParams } from 'react-router-dom';
 import './style.scss';
+import Transport from 'app/components/renderer/transport/Transport';
 
 const TechManageServiceOrderDetail: React.FC = () => {
     const { orderId } = useParams()
@@ -147,7 +148,8 @@ const TechManageServiceOrderDetail: React.FC = () => {
         )
     }
     const DataSourceCalendar = useMemo(() =>{
-        return calendars.map(x => ({
+        return calendars.map((x, i)=> ({
+            key: String(i + 1),
             ...x
         }))
     }, [calendars])
@@ -193,9 +195,10 @@ const TechManageServiceOrderDetail: React.FC = () => {
     const DataSourceServiceOrder = useMemo(() =>{
         if(!serviceOrder) return
         
-        return serviceOrder.service.serviceDetailList.map(x => {
+        return serviceOrder.service.serviceDetailList.map((x, i) => {
             const { treeName, imgUrls, quantity, description, managerDescription, servicePrice } = x
             return {
+                key: String(i + 1),
                 treeName, imgUrls, quantity, description, managerDescription, servicePrice
             }
         })
@@ -262,7 +265,9 @@ const TechManageServiceOrderDetail: React.FC = () => {
                                 <Col span={8}>
                                     <div className="item">
                                         <span className="label">Nơi chăm sóc</span>
-                                        <span className="content">{serviceOrder.service.isTransport ? 'Tại vườn' : 'Tại nhà'}</span>
+                                        <span className="content">
+                                            <Transport isTransport={serviceOrder.service.isTransport} isRequest />
+                                        </span>
                                     </div>
                                 </Col>
                                 <Col span={8}>

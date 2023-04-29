@@ -34,7 +34,7 @@ const ClientProduct: React.FC = () => {
       const currentPage = searchParams.get('page');
   
       if(!categoryId || !currentPage || !pagingPath.isValidPaging(currentPage)) {
-        return navigate(`/category?page=1`)
+        return navigate(`/category/${categoryId}?page=1`, { replace: true })
       };
       const init = async () =>{
         setLoading(true)
@@ -85,7 +85,7 @@ const ClientProduct: React.FC = () => {
                           products.map((product, index) => (
                             <Col xs={24} xl={12} key={index}>
                               {/* <div className='cp-item'> */}
-                                <Link to={`/product/${product.id}?page=1`} className='cp-item'>
+                                <Link to={`/product/${product.id}`} className='cp-item'>
                                   <div className="left">
                                     <img src={product.imgUrl} alt="/" onError={utilGeneral.setDefaultImage}  />
                                   </div>

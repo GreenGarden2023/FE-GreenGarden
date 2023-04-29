@@ -58,7 +58,7 @@ const ManageRentOrder:React.FC = () => {
         const currentPage = searchParams.get('page');
         if(!pagingPath.isValidPaging(currentPage)){
             setPaging({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_RENT})
-            return navigate('/panel/rent-order?page=1')
+            return navigate('/panel/rent-order?page=1', { replace: true })
         }
 
         
@@ -403,7 +403,7 @@ const ManageRentOrder:React.FC = () => {
             status: status,
             transportFee,
             totalOrder: totalPrice,
-            remainMoney,
+            remainMoney: status === 'unpaid' ? remainMoney + deposit : remainMoney,
             deposit, reason, nameCancelBy
         }
     }, [actionMethod, rentOrders])
@@ -416,6 +416,7 @@ const ManageRentOrder:React.FC = () => {
                 isPhone
                 isStatus
                 statusType='rent'
+                defaultUrl='/panel/rent-order?page=1'
             />
             <Filtering
                 isRangeDate

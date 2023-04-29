@@ -1,5 +1,5 @@
 import { OrderStatus, OrderType } from "app/models/general-type";
-import { CreateServiceOrder, OrderCalculate, OrderCreate, OrderExtendDetail, RentOrder, RentOrderResponse, SaleOrderDetail, SaleOrderResponse } from "app/models/order";
+import { CreateServiceOrder, OrderCalculate, OrderCreate, OrderExtendDetail, RentOrder, RentOrderList, RentOrderResponse, SaleOrderDetail, SaleOrderResponse } from "app/models/order";
 import { Paging } from "app/models/paging";
 import { Response } from "app/models/response";
 import { ServiceOrderDetail, ServiceResponse } from "app/models/service";
@@ -7,7 +7,7 @@ import queryString from "query-string";
 import golbalAxios from "../utils/http-client";
 
 const createOrder = async (orderCreate: OrderCreate) =>{
-    const res = await golbalAxios.post('/order/create-order', orderCreate)
+    const res = await golbalAxios.post<Response<RentOrderList>>('/order/create-order', orderCreate)
     return res.data
 }
 

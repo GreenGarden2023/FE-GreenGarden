@@ -61,6 +61,7 @@ interface UpdateConfirmServiceDetailProps{
 }
 
 const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({service, shipping, isOnlyView, onClose, onSubmit}) => {
+    console.log({service})
     const dispatch = useDispatch()
 
     const { setValue, formState: {errors, isSubmitting}, control, trigger, handleSubmit, setError, clearErrors, getValues } = useForm<ServiceUpdate>({
@@ -78,26 +79,27 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
     const [listPrice, setListPrice] = useState<string[]>([])
 
     useEffect(() =>{
-        const { id, name, phone, email, address, rewardPointUsed, startDate, endDate, isTransport, rules, districtID } = service
-        console.log({startDate, endDate})
+        const { id, name, phone, email, address, rewardPointUsed, startDate, endDate, isTransport, rules, districtID, transportFee } = service
         setValue('serviceID', id)
         setValue('name', name)
         setValue('phone', phone)
         setValue('email', email)
         setValue('address', address)
-        setValue('transportFee', 0)
-        setValue('rewardPointUsed', rewardPointUsed)
+        setValue('transportFee', transportFee || 0)
+        setValue('rewardPointUsed', rewardPointUsed || 0)
 
         setValue('rules', rules || '')
         setValue('isTranSport', isTransport || false)
 
         setValue('districtID', districtID)
+        setValue('startDate', startDate)
+        setValue('endDate', endDate)
 
         // setTransport(isTransport)
 
-        // trigger()
+        trigger()
 
-    }, [service, setValue, trigger])
+    }, [service, setValue, trigger, isOnlyView])
 
     const ColumnTree: ColumnsType<any> = [
         {
@@ -287,7 +289,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
 
     const OrderPreview = () =>{
         const { startDate, endDate, transportFee, rewardPointUsed } = getValues()
-
+        // console.log(getValues())
         let diff = 0
 
         if(!startDate || !endDate) {
@@ -321,9 +323,9 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
         return data
     }
     const MaxPointCanUse = () =>{
-        const { totalPriceOrder, transportFee, totalRentDays } = OrderPreview()
+        const { totalPriceOrder, transportFee } = OrderPreview()
 
-        console.log({ totalPriceOrder, transportFee, totalRentDays })
+        // console.log({ totalPriceOrder, transportFee, totalRentDays })
 
         const totalPricePayment = totalPriceOrder + transportFee
 
@@ -376,7 +378,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                 <span>Số điểm đã dùng</span>
                             </div>
                             <div className="right">
-                                <span className='right-content'>{OrderPreview().pointUsed || 0}</span>
+                                <span className='right-content'>{OrderPreview().pointUsed}</span>
                             </div>
                         </div>
                     </Col>
@@ -462,7 +464,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                     name='name'
                                     render={({field}) => (<Input disabled={isOnlyView} {...field} />)}
                                 />
-                                {errors.name && <ErrorMessage message={errors.name.message} />}
+                                {(errors.name && !isOnlyView) && <ErrorMessage message={errors.name.message} />}
                             </Form.Item>
                         </Col>
                         <Col span={8}>
@@ -472,7 +474,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                     name='phone'
                                     render={({field}) => (<Input disabled={isOnlyView} {...field} />)}
                                 />
-                                {errors.phone && <ErrorMessage message={errors.phone.message} />}
+                                {(errors.phone && !isOnlyView) && <ErrorMessage message={errors.phone.message} />}
                             </Form.Item>
                         </Col>
                         <Col span={8}>
@@ -482,7 +484,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                     name='email'
                                     render={({field}) => (<Input disabled={isOnlyView} {...field} />)}
                                 />
-                                {errors.email && <ErrorMessage message={errors.email.message} />}
+                                {(errors.email && !isOnlyView) && <ErrorMessage message={errors.email.message} />}
                             </Form.Item>
                         </Col>
                         <Col span={8}>
@@ -529,7 +531,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                     name='address'
                                     render={({field}) => (<Input disabled={isOnlyView} {...field} />)}
                                 />
-                                {errors.address && <ErrorMessage message={errors.address.message} />}
+                                {(errors.address && !isOnlyView) && <ErrorMessage message={errors.address.message} />}
                             </Form.Item>
                         </Col>
                         <Col span={8}>
@@ -557,7 +559,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                     // clearIcon={null}
                                     disabled={isOnlyView}
                                 />
-                                {errors.startDate && <ErrorMessage message={errors.startDate.message} />}
+                                {(errors.startDate && !isOnlyView) && <ErrorMessage message={errors.startDate.message} />}
                             </Form.Item>
                         </Col>
                         <Col span={8}>
@@ -568,14 +570,14 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                     render={({field: { value }}) => (<Input disabled={isOnlyView} type='number' min={0} value={value} onChange={(e) =>{
                                         const data = Number(e.target.value || 0) < service.userCurrentPoint ? Number(e.target.value || 0) : service.userCurrentPoint
                                         if(data <= MaxPointCanUse()){
-                                            setValue('rewardPointUsed', data)
+                                            setValue('rewardPointUsed', data >= 0 ? data : 0)
                                         }else{
                                             setValue('rewardPointUsed', MaxPointCanUse())
                                         }
                                         trigger('rewardPointUsed')
                                     }} />)}
                                 />
-                                {errors.rewardPointUsed && <ErrorMessage message={errors.rewardPointUsed.message} />}
+                                {(errors.rewardPointUsed && !isOnlyView) && <ErrorMessage message={errors.rewardPointUsed.message} />}
                             </Form.Item>
                         </Col>
                         <Col span={24}>
@@ -597,7 +599,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                         <Input.TextArea disabled={isOnlyView} {...field} autoSize={{minRows: 4, maxRows: 10}}></Input.TextArea>
                                     )}
                                 />
-                                {errors.rules && <ErrorMessage message={errors.rules.message} />}
+                                {(errors.rules && !isOnlyView) && <ErrorMessage message={errors.rules.message} />}
                             </Form.Item>
                         </Col>
                         <Col span={24} >
