@@ -807,7 +807,7 @@ const ClientOrder: React.FC = () =>{
                             {
                                 icon: undefined,
                                 value: 'sale',
-                                label: 'Bán'
+                                label: 'Mua'
                             },
                             {
                                 icon: undefined,
