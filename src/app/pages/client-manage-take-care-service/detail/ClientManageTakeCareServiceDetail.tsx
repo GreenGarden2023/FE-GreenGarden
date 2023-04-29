@@ -252,6 +252,24 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
                                                 <OrderStatusComp status={serviceOrder.status} />
                                             </span>
                                         </Col>
+                                        <Col span={8} style={{display: 'flex'}}>
+                                            <span className="label">Tiền cọc</span>
+                                            <span className="content">
+                                                <MoneyFormat value={serviceOrder.deposit} color='Orange' />
+                                            </span>
+                                        </Col>
+                                        <Col span={8} style={{display: 'flex'}}>
+                                            <span className="label">Tổng đơn hàng</span>
+                                            <span className="content">
+                                                <MoneyFormat value={serviceOrder.totalPrice} color='Light Blue' />
+                                            </span>
+                                        </Col>
+                                        <Col span={8} style={{display: 'flex'}}>
+                                            <span className="label">Tiền còn thiếu</span>
+                                            <span className="content">
+                                                <MoneyFormat value={serviceOrder.remainAmount} color='Blue' isHighlight />
+                                            </span>
+                                        </Col>
                                         {
                                             serviceOrder.nameCancelBy &&
                                             <>

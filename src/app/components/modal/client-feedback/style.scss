@@ -35,6 +35,18 @@
     }
     .images{
         margin-bottom: 10px;
+        display: flex;
+        gap: 10px;
+        .img-item{
+            position: relative;
+            .img-icon{
+                position: absolute;
+                top: 0;
+                right: 0;
+                cursor: pointer;
+                background-color: $orange-text;
+            }
+        }
     }
     .comment{
         margin-bottom: 10px;

@@ -16,7 +16,6 @@ import AdminUpdateUser from 'app/components/modal/admin-update-user/AdminUpdateU
 import { ShippingFee } from 'app/models/shipping-fee'
 import shippingFeeService from 'app/services/shipping-fee.service'
 
-
 const UserPage: React.FC = () => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
@@ -36,26 +35,30 @@ const UserPage: React.FC = () => {
                 const res = await shippingFeeService.getList();
                 setShipping(res.data)
             }catch{
-
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
         }
         init()
-    }, [])
+    }, [dispatch])
 
     useEffect(() =>{
         const currentPage = searchParams.get('page');
         if(!pagingPath.isValidPaging(currentPage)){
             setPaging({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_USER})
-            return navigate('/panel/users?page=1')
+            return navigate('/panel/users?page=1', { replace: true })
         }
 
         const init = async () =>{
-            const res = await userService.getListAccountByAdmin({curPage: Number(currentPage), pageSize: paging.pageSize})
-            setUsers(res.data.users)
-            setPaging(res.data.paging)
+            try{
+                const res = await userService.getListAccountByAdmin({curPage: Number(currentPage), pageSize: paging.pageSize})
+                setUsers(res.data.users)
+                setPaging(res.data.paging)
+            }catch{
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+            }
         }
         init()
-    }, [navigate, searchParams, paging.pageSize])
+    }, [navigate, searchParams, paging.pageSize, dispatch])
 
     const Column: ColumnsType<any> = [
         {

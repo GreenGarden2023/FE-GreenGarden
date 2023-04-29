@@ -1,6 +1,8 @@
 import { Badge, Col, Pagination, Row, Switch, Tooltip } from 'antd';
+import LoadingView from 'app/components/loading-view/LoadingView';
 import ModalProductItemDetail from 'app/components/modal/product-item-detail/ModalProductItemDetail';
 import ModalProductItem from 'app/components/modal/product-item/ModalProductItem';
+import NoProduct from 'app/components/no-product/NoProduct';
 import useDispatch from 'app/hooks/use-dispatch';
 import { Status } from 'app/models/general-type';
 import { Paging } from 'app/models/paging';
@@ -12,14 +14,12 @@ import CONSTANT from 'app/utils/constant';
 import pagingPath from 'app/utils/paging-path';
 import React, { useEffect, useState } from 'react';
 import CurrencyFormat from 'react-currency-format';
-import { AiFillEdit, AiOutlinePlusSquare } from 'react-icons/ai';
+import { AiFillEdit, AiOutlinePlus } from 'react-icons/ai';
 import { IoCreateOutline } from 'react-icons/io5';
 import { MdPointOfSale } from 'react-icons/md';
 import { SiConvertio } from 'react-icons/si';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import './style.scss';
-import LoadingView from 'app/components/loading-view/LoadingView';
-import NoProduct from 'app/components/no-product/NoProduct';
 
 const ManageProductItem: React.FC = () => {
     const { productId } = useParams()
@@ -193,14 +193,14 @@ const ManageProductItem: React.FC = () => {
                                                         <div className="mpi-actions">
                                                             <div className="mpi-box">
                                                                 <Tooltip title="Chỉnh sửa thông tin sản phẩm" color='#108ee9'>
-                                                                    <AiFillEdit color='#5cb9d8' size={20} cursor='pointer' style={{marginRight: '5px'}} onClick={() => {
+                                                                    <AiFillEdit color='#fff' size={20} className='action-icon' style={{marginRight: '5px'}} onClick={() => {
                                                                         setOpenModal(1)
                                                                         setProductIndex(index)
                                                                         // setProductItemSelected(pt)
                                                                     }} />
                                                                 </Tooltip>
                                                                 <Tooltip title="Tạo mới thông tin chi tiết" color='#108ee9'>
-                                                                    <AiOutlinePlusSquare color='#5cb9d8' size={20} cursor='pointer' onClick={() => handleCreateProductItemDetail(index)} />
+                                                                    <AiOutlinePlus color='#fff' size={20} className='action-icon' onClick={() => handleCreateProductItemDetail(index)} />
                                                                 </Tooltip>
                                                             </div>
                                                         </div>

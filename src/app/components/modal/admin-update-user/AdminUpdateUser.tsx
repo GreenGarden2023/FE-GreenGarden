@@ -218,8 +218,8 @@ const AdminUpdateUser: React.FC<AdminUpdateUserProps> = ({user, shippingFees, on
                     }
                     <Col span={24}>
                         <div className='btn-form-wrapper'>
-                            <Button htmlType='button' loading={isSubmitting} disabled={isSubmitting} type='default' className='btn-cancel' size='large' onClick={onClose} >Hủy bỏ</Button>
-                            <Button htmlType='submit' loading={isSubmitting} disabled={isSubmitting} type='primary' className='btn-update' size='large'>
+                            <Button htmlType='button' disabled={isSubmitting} type='default' className='btn-cancel' size='large' onClick={onClose} >Hủy bỏ</Button>
+                            <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large'>
                                 {user ? 'Cập nhật' : 'Tạo mới'}
                             </Button>
                         </div>

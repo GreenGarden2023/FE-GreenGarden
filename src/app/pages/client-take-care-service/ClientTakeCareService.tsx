@@ -91,7 +91,7 @@ const ClientTakeCareService: React.FC = () => {
                 console.log(res)
                 setListTrees(res.data)
             }catch{
-                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+                // dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
             setLoading(false)
         }

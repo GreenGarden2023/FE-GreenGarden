@@ -88,13 +88,11 @@ const ManageSize: React.FC = () => {
     const handleSubmitModal = (size: Size) =>{
         const index = sizes.findIndex(x => x.id === size.id)
 
-        if(index < 1){
+        if(index < 0){
             setSizes([size, ...sizes])
         }else{
-            setSizes(sizes.map((s => s.id === size.id ? ({
-                ...s,
-                sizeName: size.sizeName
-            }) : s)))
+            sizes[index] = size
+            setSizes([...sizes])
         }
     }
     return (
@@ -102,7 +100,7 @@ const ManageSize: React.FC = () => {
             <HeaderInfor title='Quản lý kích thước' />
             <section className="ms-search-wrapper default-layout">
                 <div className="ms-btn-wrapper">
-                    <button onClick={handleCreateSize} className='btn-create'>
+                    <button onClick={handleCreateSize} className='btn-create' style={{marginLeft: 'auto'}}>
                         <IoCreateOutline size={20} />
                         Tạo mới 1 kích thước
                     </button>

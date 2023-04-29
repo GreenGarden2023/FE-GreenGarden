@@ -20,7 +20,7 @@ const LandingFooter: React.FC = () =>{
                     </div>
                     <div className="right">
                         <div className="header">
-                            <p>Hoặc vui lòng để lại thông tin liên lạc, Joy Garden sẽ phản hồi trong thời gian sớm nhất</p>
+                            <p>Hoặc vui lòng để lại thông tin liên lạc, Green Garden sẽ phản hồi trong thời gian sớm nhất</p>
                         </div>
                         <Form
                             layout='vertical'

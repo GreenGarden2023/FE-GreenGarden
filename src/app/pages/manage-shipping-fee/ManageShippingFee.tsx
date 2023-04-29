@@ -1,4 +1,4 @@
-import { Modal, Tooltip } from 'antd'
+import { Button, Modal, Tooltip } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import MoneyFormat from 'app/components/money/MoneyFormat'
@@ -18,6 +18,7 @@ const ManageShippingFee: React.FC = () => {
     const [shipping, setShipping] = useState<ShippingFee[]>([])
     const [itemSelect, setItemSelect] = useState<ShippingFee>();
     const [amount, setAmount] = useState(0)
+    const [loadingAction, setLoadingAction] = useState(false)
 
     useEffect(() =>{
         const init = async () =>{
@@ -25,11 +26,11 @@ const ManageShippingFee: React.FC = () => {
                 const res = await shippingFeeService.getList()
                 setShipping(res.data)
             }catch{
-
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
         }
         init()
-    }, [])
+    }, [dispatch])
 
     const Column: ColumnsType<any> = [
         {
@@ -51,7 +52,7 @@ const ManageShippingFee: React.FC = () => {
             key: 'feeAmount',
             dataIndex: 'feeAmount',
             align: 'center',
-            render: (v) => (<MoneyFormat value={v} color='Blue' />)
+            render: (v) => (<MoneyFormat value={v} color='Blue' isHighlight />)
         },
         {
             title: 'Xử lý',
@@ -60,7 +61,7 @@ const ManageShippingFee: React.FC = () => {
             align: 'center',
             render: (_, record) => (
                 <>
-                    <Tooltip title='Chỉnh sửa tiền vận chuyển' color='#0099FF' >
+                    <Tooltip title='Chỉnh sửa phí vận chuyển' color='#0099FF' >
                         <GrUpdate size={20} cursor='pointer' color='#00a76f' onClick={() => {
                             setItemSelect(record)
                             setAmount(record.feeAmount)
@@ -80,24 +81,29 @@ const ManageShippingFee: React.FC = () => {
         if(!itemSelect) return;
 
         itemSelect.feeAmount = amount
-
+        setLoadingAction(true)
         try{
             await shippingFeeService.updateShippingFee(itemSelect)
             const index = shipping.findIndex(x => x.districtID === itemSelect.districtID)
             shipping[index] = itemSelect
             setShipping([...shipping])
+            dispatch(setNoti({type: 'success', message: 'Cập nhật phí vận chuyển thành công'}))
             setAmount(0)
             setItemSelect(undefined)
-            dispatch(setNoti({type: 'success', message: 'Cập nhật phí vận chuyển thành công'}))
         }catch{
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
+        setLoadingAction(false)
     }
 
     const handleChangeAmount = (values: CurrencyFormat.Values) =>{
         const { floatValue } = values
         const data = Number(floatValue || 0)
         setAmount(data)
+    }
+
+    const handleCloseModal = () =>{
+        setItemSelect(undefined)
     }
 
     return (
@@ -111,10 +117,16 @@ const ManageShippingFee: React.FC = () => {
                 <Modal
                     open
                     title={`Cập nhật phí vận chuyển cho ${itemSelect.district} (VND)`}
-                    onCancel={() => setItemSelect(undefined)}
-                    onOk={handleSubmit}
+                    onCancel={handleCloseModal}
+                    footer={false}
                 >
                     <CurrencyInput min={0} value={amount} onChange={handleChangeAmount} />
+                    <div className='btn-form-wrapper mt-10'>
+                        <Button htmlType='button' disabled={loadingAction} type='default' className='btn-cancel' size='large' onClick={handleCloseModal} >Hủy bỏ</Button>
+                        <Button htmlType='submit' loading={loadingAction} type='primary' className='btn-update' size='large' onClick={handleSubmit}>
+                            Cập nhật
+                        </Button>
+                    </div>
                 </Modal>
             }
         </div>

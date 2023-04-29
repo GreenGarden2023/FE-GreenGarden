@@ -1,5 +1,4 @@
 import { Button, Form, Image, Input, Modal } from 'antd'
-import ErrorMessage from 'app/components/message.tsx/ErrorMessage'
 import useDispatch from 'app/hooks/use-dispatch'
 import { CreateFeedback, UpdateFeedback } from 'app/models/feedback'
 import { SaleOrderDetail } from 'app/models/order'
@@ -8,7 +7,7 @@ import uploadService from 'app/services/upload.service'
 import { setNoti } from 'app/slices/notification'
 import CONSTANT from 'app/utils/constant'
 import React, { useEffect, useRef, useState } from 'react'
-import { AiFillStar, AiOutlineStar } from 'react-icons/ai'
+import { AiFillStar, AiOutlineClose, AiOutlineStar } from 'react-icons/ai'
 import './style.scss'
 
 interface ClientFeedbackProps{
@@ -27,8 +26,7 @@ const ClientFeedback: React.FC<ClientFeedbackProps> = ({ orderId, order, fbIndex
     const [comment, setComment] = useState('')
     const [rating, setRating] = useState(5)
     const [imagesUrls, setImagesUrls] = useState<string[]>([])
-
-    const [erorrUpload, setErrorUpload] = useState('')
+    const [loadingAction, setLoadingAction] = useState(false)
 
     useEffect(() =>{
         if(fbIndex < 0) return;
@@ -50,19 +48,18 @@ const ClientFeedback: React.FC<ClientFeedbackProps> = ({ orderId, order, fbIndex
         const finalFiles: File[] = []
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
-            if(!CONSTANT.SUPPORT_FORMATS.includes(file.type)){
-                setErrorUpload('File không đúng định dạng')
+            if(!CONSTANT.SUPPORT_FORMATS.includes(file.type) || CONSTANT.FILE_SIZE_ACCEPTED < file.size ){
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.INVALID_FILE}))
                 return;
             }
             finalFiles.push(file)
         }
 
-        setErrorUpload('')
         try{
             const res = await uploadService.uploadListFiles(finalFiles)
             setImagesUrls([...imagesUrls, ...res.data])
         }catch{
-            // dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
     }
 
@@ -72,9 +69,11 @@ const ClientFeedback: React.FC<ClientFeedbackProps> = ({ orderId, order, fbIndex
 
     const handleSubmitForm = async () =>{
         if(imagesUrls.length === 0){
-            setErrorUpload('Có ít nhất 1 ảnh cho phần đánh giá này')
+            dispatch(setNoti({type: 'error', message: 'Cần có ít nhất 1 hình ảnh cho đánh giá này'}))
             return;
         }
+
+        setLoadingAction(true)
         if(fbIndex < 0){
             try{
                 const body: CreateFeedback = {
@@ -101,6 +100,12 @@ const ClientFeedback: React.FC<ClientFeedbackProps> = ({ orderId, order, fbIndex
             onSubmit()
             dispatch(setNoti({type: 'success', message: 'Cập nhật đánh giá thành công'}))
         }
+        setLoadingAction(false)
+    }
+
+    const removeImage = (index: number) =>{
+        imagesUrls.splice(index, 1)
+        setImagesUrls([...imagesUrls])
     }
 
     return (
@@ -142,13 +147,15 @@ const ClientFeedback: React.FC<ClientFeedbackProps> = ({ orderId, order, fbIndex
                         <Image.PreviewGroup>
                             {
                                 imagesUrls.map((item, index) => (
-                                    <Image 
-                                        key={index}
-                                        src={item}
-                                        width={100}
-                                        height={100}
-                                        style={{objectFit: 'cover'}}
-                                    />
+                                    <div key={index} className='img-item'>
+                                        <Image 
+                                            src={item}
+                                            width={100}
+                                            height={100}
+                                            style={{objectFit: 'cover'}}
+                                        />
+                                        <AiOutlineClose color='#fff' size={18} className='img-icon' onClick={() => removeImage(index)} />
+                                    </div>
                                 ))
                             }
                         </Image.PreviewGroup>
@@ -159,12 +166,11 @@ const ClientFeedback: React.FC<ClientFeedbackProps> = ({ orderId, order, fbIndex
                     <div className="uploader">
                         <input type='file' multiple ref={ref} hidden accept='.png,.jpg,.jpeg' onChange={handleUploadFiles} />
                         <button type='button' className="btn" onClick={() => ref.current?.click()}>Thêm hình ảnh</button>
-                        {erorrUpload && <ErrorMessage message={erorrUpload} />}
                     </div>
                 </div>
                 <div className='btn-form-wrapper'>
-                    <Button htmlType='button' type='default' className='btn-cancel' size='large' onClick={onClose}>Hủy bỏ</Button>
-                    <Button htmlType='submit'  type='primary' className='btn-update' size='large' >
+                    <Button htmlType='button' disabled={loadingAction} type='default' className='btn-cancel' size='large' onClick={onClose}>Hủy bỏ</Button>
+                    <Button htmlType='submit' loading={loadingAction} type='primary' className='btn-update' size='large' >
                         {
                             fbIndex < 0 ? 'Đăng tải' : 'Cập nhật'
                         }

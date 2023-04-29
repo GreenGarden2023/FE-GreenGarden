@@ -21,6 +21,7 @@ import ServiceStatusComp from 'app/components/status/ServiceStatusComp'
 import CONSTANT from 'app/utils/constant'
 import LoadingView from 'app/components/loading-view/LoadingView'
 import NoProduct from 'app/components/no-product/NoProduct'
+import Transport from 'app/components/renderer/transport/Transport'
 
 const ClientTakeCareServiceConfirm: React.FC = () => {
     const { serviceId } = useParams()
@@ -168,9 +169,11 @@ const ClientTakeCareServiceConfirm: React.FC = () => {
                                                     <span className="title">Thời gian chăm sóc cây: </span>
                                                     <span className="content">{utilDateTime.dateToString(service.startDate.toString())} - {utilDateTime.dateToString(service.endDate.toString())}</span>
                                                 </Col>
-                                                <Col span={8}>
+                                                <Col span={8} style={{display: 'flex'}}>
                                                     <span className="title">Nơi chăm sóc: </span>
-                                                    <span className="content">{service.isTransport ? 'Tại nhà' : 'Tại cửa hàng'}</span>
+                                                    <span className="content">
+                                                        <Transport isTransport={service.isTransport} isRequest />
+                                                    </span>
                                                 </Col>
                                                 {
                                                     (service.transportFee && service.transportFee !== 0) ?
@@ -183,7 +186,6 @@ const ClientTakeCareServiceConfirm: React.FC = () => {
                                                     <span className="title">Trạng thái yêu cầu: </span>
                                                     <span className="content">
                                                         <ServiceStatusComp status={service.status} />
-                                                        {/* {service.status} */}
                                                     </span>
                                                 </Col>
                                                 <Col span={24}>

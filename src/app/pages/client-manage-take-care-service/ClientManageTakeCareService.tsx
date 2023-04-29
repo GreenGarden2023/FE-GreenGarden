@@ -9,7 +9,7 @@ import { Service, ServiceDetailList } from 'app/models/service'
 import serviceService from 'app/services/service.service'
 import utilDateTime from 'app/utils/date-time'
 import React, { useEffect, useMemo, useState } from 'react'
-import { BiCommentDetail } from 'react-icons/bi'
+import { BiCommentDetail, BiDetail } from 'react-icons/bi'
 import { GrMore } from 'react-icons/gr'
 import { MdCancelPresentation } from 'react-icons/md'
 import { useNavigate } from 'react-router-dom'
@@ -48,6 +48,8 @@ const ClientManageTakeCareService: React.FC = () => {
             title: 'Mã dịch vụ',
             key: 'serviceCode',
             dataIndex: 'serviceCode',
+            width: 240,
+            fixed: 'left'
         },
         {
             title: 'Ngày tạo đơn hàng',
@@ -117,7 +119,7 @@ const ClientManageTakeCareService: React.FC = () => {
                     // handleAction({orderId: record.id, actionType: 'detail', orderType: 'service', openIndex: -1})
                     navigate(`/take-care-service/me/${record.id}`)
                 }}>
-                    <BiCommentDetail size={25} className='icon'/>
+                    <BiDetail size={25} className='icon'/>
                     <span>Chi tiết yêu cầu</span>
                 </div>
                 {
