@@ -30,7 +30,7 @@ const schema = yup.object().shape({
 interface CartSaleProps{
     items: CartItemDetail[]
     shipping: ShippingFee[]
-    onChange: (type: string, common: string, items: CartItemDetail[], id: string) => void
+    onChange: (type: string, common: string, items: CartItemDetail[], id: string) => Promise<void>
     onSubmit: (type: string, data: OrderUserInfor, orderPreview: OrderPreview) => Promise<void>
 }
 
@@ -38,6 +38,7 @@ const CartSale: React.FC<CartSaleProps> = ({items, shipping, onChange, onSubmit}
     const userState = useSelector(state => state.userInfor)
 
     const [idRemove, setIdRemove] = useState('')
+    const [loadingAction, setLoadingAction] = useState(false)
 
     const { setValue, getValues, trigger, formState: { errors, isSubmitting }, handleSubmit, control } = useForm<OrderUserInfor>({
         defaultValues: {
@@ -164,11 +165,13 @@ const CartSale: React.FC<CartSaleProps> = ({items, shipping, onChange, onSubmit}
         setIdRemove('')
     }
 
-    const handleRemoveItem = () =>{
+    const handleRemoveItem = async () =>{
         const itemsRemoved = items.filter(x => x.productItemDetail.id !== idRemove)
-        onChange('sale', 'remove', itemsRemoved, idRemove)
+        setLoadingAction(true)
+        await onChange('sale', 'remove', itemsRemoved, idRemove)
         clearPoint()
         handleClose()
+        setLoadingAction(false)
     }
 
     const onSubmitForm = async (data: OrderUserInfor) =>{
@@ -199,7 +202,7 @@ const CartSale: React.FC<CartSaleProps> = ({items, shipping, onChange, onSubmit}
 
         const rewardPoint = Math.ceil(totalPricePayment / CONSTANT.REWARD_POINT_RATE)
 
-        const deposit = totalPricePayment < CONSTANT.SALE_DEPOSIT_RATE ? 0 : Math.ceil(totalPricePayment * CONSTANT.DEPOSIT_MIN_RATE)
+        const deposit = totalPricePayment > CONSTANT.SALE_DEPOSIT_RATE ? Math.ceil(totalPricePayment * CONSTANT.DEPOSIT_MIN_RATE) : 0 
 
         const data: OrderPreview = {
             rewardPoint,
@@ -441,9 +444,14 @@ const CartSale: React.FC<CartSaleProps> = ({items, shipping, onChange, onSubmit}
                     open
                     title={`Xác nhận xóa "${items.filter(x => x.productItemDetail.id)[0].productItem.name}" khỏi giỏ hàng ?`}
                     onCancel={handleClose}
-                    onOk={handleRemoveItem}
+                    footer={false}
                 >
-                    
+                    <div className='btn-form-wrapper mt-10'>
+                        <Button htmlType='button' disabled={loadingAction} type='default' className='btn-cancel' size='large' onClick={handleClose} >Hủy bỏ</Button>
+                        <Button htmlType='submit' loading={loadingAction} type='primary' className='btn-update' size='large' onClick={handleRemoveItem}>
+                            Xác nhận
+                        </Button>
+                    </div>
                 </Modal>
             }
         </div>

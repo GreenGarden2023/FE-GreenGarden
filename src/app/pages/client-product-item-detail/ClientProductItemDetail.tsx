@@ -73,9 +73,14 @@ const ClientProductItemDetail: React.FC = () => {
                 setProItem(res.data.productItem)
                 setproduct(res.data.product)
                 setCategory(res.data.category)
-                setSizeSelect(res.data.productItem.productItemDetail[0].size.id)
+                if(res.data.productItem){
+                    if(res.data.productItem.productItemDetail.length === 0){
+                        setProItem(undefined)
+                    }
+                    setSizeSelect(res.data.productItem.productItemDetail[0].size.id)
+                }
             }catch{
-                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+                // dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
             setLoading(false)
         }

@@ -297,7 +297,7 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
 
         const rewardPoint = Math.ceil(totalPricePayment / CONSTANT.REWARD_POINT_RATE)
 
-        const deposit = totalPricePayment < CONSTANT.RENT_DEPOSIT_RATE ? 0 : Math.ceil(totalPricePayment * CONSTANT.DEPOSIT_MIN_RATE)
+        const deposit = totalPricePayment > CONSTANT.RENT_DEPOSIT_RATE ? Math.ceil(totalPricePayment * CONSTANT.DEPOSIT_MIN_RATE) : 0 
 
         const data: OrderPreview = {
             rewardPoint,

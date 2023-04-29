@@ -140,7 +140,7 @@ const ManageRentOrderGroup: React.FC = () => {
       render: (v) => <MoneyFormat value={v} color='Yellow' isHighlight />
     },
     {
-      title: "Tổng tiền",
+      title: "Giá trị đơn hàng",
       key: "totalPrice",
       dataIndex: "totalPrice",
       align: "right",
@@ -295,7 +295,7 @@ const ManageRentOrderGroup: React.FC = () => {
       startDateRent: x.startRentDate,
       endDateRent: x.endRentDate,
       status: x.status,
-      remainMoney: x.remainMoney,
+      remainMoney: x.status === 'unpaid' ? x.remainMoney + x.deposit : x.remainMoney,
       deposit: x.deposit,
       recipientName: x.recipientName,
       recipientPhone: x.recipientPhone,
@@ -438,7 +438,7 @@ const ManageRentOrderGroup: React.FC = () => {
           <div className="infor-box">
             <div className="left">
               <HiArrowTopRightOnSquare size={20} color="#0099FF" />
-              <span>Số lượng đơn đã gia hạn</span>
+              <span>Số lượng đơn</span>
             </div>
             <div className="right">
               <span>{groupOrder?.numberOfOrder}</span>
@@ -656,7 +656,7 @@ const ViewAllOrderGroup: React.FC<ViewAllOrderGroupProps> = ({orderId, recall}) 
       render: (v) => <MoneyFormat value={v} color='Yellow'  />
     },
     {
-      title: "Tổng tiền",
+      title: "Giá trị đơn hàng",
       key: "totalPrice",
       dataIndex: "totalPrice",
       align: "right",
@@ -802,7 +802,7 @@ const ViewAllOrderGroup: React.FC<ViewAllOrderGroupProps> = ({orderId, recall}) 
       startDateRent: x.startRentDate,
       endDateRent: x.endRentDate,
       status: x.status,
-      remainMoney: x.remainMoney,
+      remainMoney: x.status === 'unpaid' ? x.remainMoney + x.deposit : x.remainMoney,
       deposit: x.deposit,
       recipientName: x.recipientName,
       recipientPhone: x.recipientPhone,

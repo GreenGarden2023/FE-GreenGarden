@@ -501,7 +501,7 @@ const ClientOrder: React.FC = () =>{
             key: String(index + 1),
             orderId: x.rentOrderList[0].id,
             groupID: x.id,
-            totalPrice: x.rentOrderList[0].remainMoney,
+            totalPrice: x.rentOrderList[0].totalPrice,
             startDateRent: x.rentOrderList[0].startRentDate,
             endDateRent: x.rentOrderList[0].endRentDate,
             status: x.rentOrderList[0].status,

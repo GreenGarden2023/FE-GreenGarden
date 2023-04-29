@@ -40,8 +40,8 @@ const PAGING_ITEMS = {
     REQUEST: 20,
 }
 const STATUS = {
-    ACTIVE: 'Active',
-    DISABLE: 'Disable'
+    ACTIVE: 'active',
+    DISABLE: 'disable'
 }
 const ACTION = {
     CREATE: 'Create',

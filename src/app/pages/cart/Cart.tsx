@@ -81,7 +81,7 @@ const CartPage: React.FC = () => {
             }catch{
                 setCart({rentItems: [], saleItems: [], totalPrice: 0, totalRentPrice: 0, totalSalePrice: 0})
                 dispatch(setCartSlice({rentItems: [], saleItems: []}))
-                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+                // dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
             setLoading(false)
         }

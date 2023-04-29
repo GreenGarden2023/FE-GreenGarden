@@ -183,6 +183,14 @@ const ManageRentOrder:React.FC = () => {
             render: (v) => <MoneyFormat value={v} color='Yellow' />
         },
         {
+            title: 'Giá trị đơn hàng',
+            key: 'totalPrice',
+            dataIndex: 'totalPrice',
+            align: 'right',
+            width: 200,
+            render: (v) => (<MoneyFormat value={v} color='Light Blue' />)
+        },
+        {
             title: 'Tiền còn thiếu',
             key: 'remainMoney',
             dataIndex: 'remainMoney',
@@ -236,7 +244,7 @@ const ManageRentOrder:React.FC = () => {
                     <span>Xem nhóm đơn hàng</span>
                 </div>
                 {
-                    (record.status === 'unpaid' && record.deposit !== 0 && record.remainMoney === record.totalPrice) &&
+                    (record.status === 'unpaid' && record.deposit !== 0) &&
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.orderId, actionType: 'deposit', orderType: 'rent', openIndex: -1})
                     }}>
@@ -254,7 +262,7 @@ const ManageRentOrder:React.FC = () => {
                     </div>
                 }
                 {
-                    (record.status === 'paid') && 
+                    (record.status === 'paid' && utilDateTime.getDiff2Days(record.startDateRent, new Date()) >= 0) && 
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.orderId, actionType: 'renting', orderType: 'rent', openIndex: -1})
                     }}>
@@ -303,7 +311,7 @@ const ManageRentOrder:React.FC = () => {
             startDateRent: x.rentOrderList[0].startRentDate,
             endDateRent: x.rentOrderList[0].endRentDate,
             status: x.rentOrderList[0].status,
-            remainMoney: x.rentOrderList[0].remainMoney,
+            remainMoney: x.rentOrderList[0].status === 'unpaid' ? x.rentOrderList[0].remainMoney + x.rentOrderList[0].deposit : x.rentOrderList[0].remainMoney,
             deposit: x.rentOrderList[0].deposit,
             recipientName: x.rentOrderList[0].recipientName,
             recipientPhone: x.rentOrderList[0].recipientPhone,
@@ -311,7 +319,7 @@ const ManageRentOrder:React.FC = () => {
             transportFee: x.rentOrderList[0].transportFee,
             discountAmount: x.rentOrderList[0].discountAmount,
             isTransport: x.rentOrderList[0].isTransport,
-            numberOfOrder: x.rentOrderList.length,
+            numberOfOrder: x.numberOfOrder,
             totalGroupAmount: x.totalGroupAmount
         }))
     }, [rentOrders])
@@ -322,7 +330,7 @@ const ManageRentOrder:React.FC = () => {
         try{
             await paymentService.depositPaymentCash(orderId, 'rent')
             const [order] = rentOrders.filter(x => x.rentOrderList[0].id === orderId)[0].rentOrderList
-            order.remainMoney = order.remainMoney - order.deposit
+            order.remainMoney = (order.remainMoney + order.deposit) - order.deposit
             order.status = 'ready'
             setRentOrders([...rentOrders])
             dispatch(setNoti({type: 'success', message: 'Thanh toán cọc thành công'}))

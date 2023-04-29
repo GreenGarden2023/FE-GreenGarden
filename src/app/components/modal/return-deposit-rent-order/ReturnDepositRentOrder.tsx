@@ -98,6 +98,21 @@ const ReturnDepositRentOrder: React.FC<ReturnDepositRentOrderProps> = ({rentOrde
                     await transactionService.createTransaction(data_4)
                     break;
             }
+
+            // hoàn cọc
+            if(rentOrderList.deposit !== 0){
+                const bodyRefundDeposit: TransactionHandle = {
+                    amount: rentOrderList.deposit,
+                    description: 'Hoàn cọc',
+                    orderID: rentOrderList.id,
+                    orderType: 'rent',
+                    paymentType: 'cash',
+                    status: 'refund',
+                    transactionType: 'compensation payment',
+                }
+                await transactionService.createTransaction(bodyRefundDeposit)
+            }
+
             dispatch(setNoti({type: 'success', message: `Xác nhận tất toán cho đơn hàng "${rentOrderList.orderCode}" thành công`}))
             onSubmit()
         }catch{
