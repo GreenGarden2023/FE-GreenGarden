@@ -135,6 +135,9 @@ const FeedbackSale: React.FC = () => {
                                                             ))
                                                         }
                                                     </div>
+                                                    {
+                                                        item.feedbackList && item.feedbackList.length !== 0 && <Divider></Divider>
+                                                    }
                                                 </div>
                                             ))
                                         }
