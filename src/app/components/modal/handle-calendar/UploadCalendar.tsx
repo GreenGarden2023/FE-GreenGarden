@@ -67,8 +67,7 @@ const UploadCalendar: React.FC<UploadCalendarProps> = ({ serviceCalendarDetail, 
     }
     const handleRemoveImage = (index: number) =>{
         images.splice(index, 1)
-        setImages({...images})
-        dispatch(setNoti({type: 'success', message: 'Xóa ảnh thành công'}))
+        setImages([...images])
     }
 
     const handleChangeDateUpdateCalendar: DatePickerProps['onChange'] = (date, dateString) =>{
@@ -109,8 +108,6 @@ const UploadCalendar: React.FC<UploadCalendarProps> = ({ serviceCalendarDetail, 
                 sumary
             }
             const res = await serviceCalendar.createServiceCalendar({calendarUpdate: body})
-
-            console.log(utilDateTime.getDiff2Days(serviceOrderDetail.serviceEndDate, new Date()))
             
             // if(IsEndDate){
             //     // await orderService.updateServiceOrderStatus(serviceOrderDetail.id, 'completed')

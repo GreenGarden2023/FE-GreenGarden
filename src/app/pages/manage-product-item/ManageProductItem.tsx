@@ -128,7 +128,6 @@ const ManageProductItem: React.FC = () => {
                 <h1>{product?.name}</h1>
             </section>
             <section className="mpi-search-wrapper default-layout">
-                {/* <FilterBox sizeFilter /> */}
                 <div className="mpi-btn-wrapper">
                     <button onClick={handleCreateProduct} className='btn-create'>
                         <IoCreateOutline size={20} />

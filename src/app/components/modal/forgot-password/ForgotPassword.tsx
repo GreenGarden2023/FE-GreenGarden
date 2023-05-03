@@ -25,8 +25,6 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onClose }) => {
         resolver: yupResolver(schema)
     })
 
-    console.log(errors)
-
     const [sentCode, setSentCode] = useState(false)
 
     const handleSubmitForm = async (data: ResetPassword) =>{

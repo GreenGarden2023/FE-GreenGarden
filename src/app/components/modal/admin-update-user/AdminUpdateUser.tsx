@@ -24,9 +24,9 @@ interface AdminUpdateUserProps{
 
 const AdminUpdateUser: React.FC<AdminUpdateUserProps> = ({user, shippingFees, onClose, onSubmit}) => {
     const schema = yup.object().shape({
-        userName: !user ? yup.string().trim().required('Tài khoản không được để trống').min(5, 'Tài khoản có ít nhất 5 ký tự').max(30, 'Tài khoản có nhiều nhất 30 ký tự') : yup.string(),
+        userName: !user ? yup.string().trim().required('Tài khoản không được để trống').min(2, 'Tài khoản có ít nhất 2 ký tự').max(30, 'Tài khoản có nhiều nhất 50 ký tự') : yup.string(),
         password: !user ? yup.string().trim().required('Mật khẩu không được để trống').min(6, 'Mật khẩu có ít nhất 6 ký tự').max(30, 'Mật khẩu có nhiều nhất 30 ký tự') : yup.string(),
-        fullName: yup.string().trim().required('Họ và tên không được để trống').min(5, 'Họ và tên có ít nhất 5 ký tự').max(50, 'Họ và tên có nhiều nhất 50 ký tự'),
+        fullName: yup.string().trim().required('Họ và tên không được để trống').min(2, 'Họ và tên có ít nhất 2 ký tự').max(50, 'Họ và tên có nhiều nhất 50 ký tự'),
         address: yup.string().trim().required('Địa chỉ không được để trống').min(5, 'Địa chỉ có ít nhất 5 ký tự').max(100, 'Địa chỉ có nhiều nhất 100 ký tự'),
         phone: yup.string().trim().required('Số điện thoại không được để trống').matches(CONSTANT.PHONE_REGEX, 'Số điện thoại không hợp lệ'),
         mail: yup.string().trim().required('Email không được để trống').matches(CONSTANT.EMAIL_REGEX, 'Email không hợp lệ'),

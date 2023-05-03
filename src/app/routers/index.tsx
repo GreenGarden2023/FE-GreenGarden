@@ -122,19 +122,18 @@ const Routers: React.FC = () =>{
                 <Route path='/register' element={<Register />} />
                 <Route path='/login' element={<Login />} />
                 <Route path='/term-of-services' element={<TermOfService />} />
-                <Route path='/cart' element={<CartPage />} />
+                <Route path='/cart' element={<AuthGuard rolesAuth={['Customer']} ><CartPage /></AuthGuard>} />
                 <Route path='/thanks' element={<ThankYou />} />
                 <Route path='/category/:categoryId' element={<ClientProduct />} />
                 <Route path='/product/:productId' element={<ClientProductItem />} />
                 <Route path='/product-item/:productItemId' element={<ClientProductItemDetail />} />
-                <Route path='/orders' element={<AuthGuard rolesAuth={['Admin', 'Customer', 'Manager', 'Technician']} ><ClientOrder /></AuthGuard>} />
-                <Route path='/order/sale/feedback/:orderId' element={<FeedbackSale />} />
-                <Route path='/order-group/:groupId/:orderId' element={<ClientRentOrderGroup />} />
-                <Route path='/checkout-success' element={<CheckoutSuccess />} />
+                <Route path='/orders' element={<AuthGuard rolesAuth={['Customer']} ><ClientOrder /></AuthGuard>} />
+                <Route path='/order/sale/feedback/:orderId' element={<AuthGuard rolesAuth={['Customer']} ><FeedbackSale /></AuthGuard>} />
+                <Route path='/order-group/:groupId/:orderId' element={<AuthGuard rolesAuth={['Customer']} ><ClientRentOrderGroup /></AuthGuard>} />
                 <Route path='/take-care-service' element={<ClientTakeCareService />} />
-                <Route path='/take-care-service/me' element={<ClientManageTakeCareService />} />
-                <Route path='/take-care-service/me/:serviceId' element={<ClientTakeCareServiceConfirm />} />
-                <Route path='/order/service/:orderId' element={<ClientManageTakeCareServiceDetail />} />
+                <Route path='/take-care-service/me' element={<AuthGuard rolesAuth={['Customer']} ><ClientManageTakeCareService /></AuthGuard>} />
+                <Route path='/take-care-service/me/:serviceId' element={<AuthGuard rolesAuth={['Customer']} ><ClientTakeCareServiceConfirm /></AuthGuard>} />
+                <Route path='/order/service/:orderId' element={<AuthGuard rolesAuth={['Customer']} ><ClientManageTakeCareServiceDetail /></AuthGuard>} />
                 <Route path='/checkout-success' element={<CheckoutSuccess />} />
 
                 <Route path='panel' >

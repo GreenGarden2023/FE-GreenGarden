@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import './styles.scss';
 import LandingHeader from 'app/components/header/LandingHeader';
 import LandingFooter from 'app/components/footer/LandingFooter';
@@ -8,6 +8,11 @@ import { useNavigate } from 'react-router-dom';
 
 const ThankYou: React.FC = () => {
   const navigate = useNavigate()
+
+  useEffect(() =>{
+    
+  }, [])
+
   return (
     <div>
       <LandingHeader />

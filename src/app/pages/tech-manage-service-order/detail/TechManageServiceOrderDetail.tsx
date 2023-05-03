@@ -16,7 +16,7 @@ import { ServiceCalendar } from 'app/models/service-calendar';
 import orderService from 'app/services/order.service';
 import serviceCalendar from 'app/services/service-calendar.service';
 import utilDateTime from 'app/utils/date-time';
-// import dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import React, { useEffect, useMemo, useState } from 'react';
 import { AiOutlineCloudUpload } from 'react-icons/ai';
 import { BiDetail } from 'react-icons/bi';
@@ -135,8 +135,8 @@ const TechManageServiceOrderDetail: React.FC = () => {
                     </div>
                 }
                 {
-                    // && dayjs(new Date()).valueOf() >= dayjs(record.serviceDate).valueOf()
-                    (record.status === 'pending' ) &&
+                    // 
+                    (record.status === 'pending' && dayjs(new Date()).valueOf() >= dayjs(record.serviceDate).valueOf()) &&
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.id, actionType: 'update calendar', orderType: 'service', openIndex: -1})
                     }}>

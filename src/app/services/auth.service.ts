@@ -42,6 +42,11 @@ const resetPassword = async (data: ResetPassword) =>{
     return res.data
 }
 
+const userSupport = async (name: string, phone: string) =>{
+    const res = await golbalAxios.post<Response<null>>('/user/user-support', {name, phone})
+    return res.data
+}
+
 const authService = {
     register,
     login,
@@ -50,7 +55,8 @@ const authService = {
     getUserListByRole,
     sendEmailCode,
     verifyRegisterOtpCode,
-    resetPassword
+    resetPassword,
+    userSupport
 }
 
 export default authService

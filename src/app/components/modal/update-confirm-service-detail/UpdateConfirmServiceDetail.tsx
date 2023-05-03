@@ -61,7 +61,6 @@ interface UpdateConfirmServiceDetailProps{
 }
 
 const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({service, shipping, isOnlyView, onClose, onSubmit}) => {
-    console.log({service})
     const dispatch = useDispatch()
 
     const { setValue, formState: {errors, isSubmitting}, control, trigger, handleSubmit, setError, clearErrors, getValues } = useForm<ServiceUpdate>({
@@ -239,7 +238,6 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
             })
             return
         }
-        console.log({data})
         
         const body: UpdateServiceDetail = {
             serviceUpdate: data,
@@ -581,7 +579,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                             </Form.Item>
                         </Col>
                         <Col span={24}>
-                            <Form.Item label='Thông tin hợp đồng' required>
+                            <Form.Item label='Thông tin cam kết hai bên' required>
                                 <div className='policy-wrapper'>
                                     {
                                         POLICY.map((item, index) => (

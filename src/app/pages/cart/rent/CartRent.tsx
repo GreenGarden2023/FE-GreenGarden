@@ -208,6 +208,7 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
             setValue('endDateRent', utilDateTime.dayjsToLocalString(end))
             clearErrors('startDateRent')
         }
+        setValue('rewardPointUsed', 0)
     }
 
     const onSubmitForm = async (data: OrderUserInfor) =>{

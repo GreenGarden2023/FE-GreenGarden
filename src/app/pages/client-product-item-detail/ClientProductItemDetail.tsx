@@ -37,7 +37,7 @@ const ClientProductItemDetail: React.FC = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const cartState = useSelector(state => state.CartStore)
-    const { id } = useSelector(state => state.userInfor.user)
+    const { id, roleName } = useSelector(state => state.userInfor.user)
 
     const [proItem, setProItem] = useState<ProductItem>();
     const [product, setproduct] = useState<Product>();
@@ -341,24 +341,29 @@ const ClientProductItemDetail: React.FC = () => {
                                                                         <p className="price">
                                                                             <CurrencyFormat value={proItemSelectBySize.rentPrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
                                                                         </p>
-                                                                        <div className="quantity">
-                                                                            <p>Số lượng</p>
-                                                                            <div className="quantity-box">
-                                                                                <button className="decrease" onClick={() => controlRent('-')}>
-                                                                                    <GrFormSubtract />
-                                                                                </button>
-                                                                                <input type="number" value={quanRent} onChange={handleChangeRent} disabled={proItem.type === 'unique'} />
-                                                                                <button className="increase" onClick={() => controlRent('+')}>
-                                                                                    <BiPlus />
-                                                                                </button>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="atc">
-                                                                            <button onClick={() => handleAddCart('Rent', proItemSelectBySize.id)}>
-                                                                                <AiOutlineShoppingCart size={40} />
-                                                                                <span>Thêm vào giỏ hàng</span>
-                                                                            </button>
-                                                                        </div>
+                                                                        {
+                                                                            (!roleName || roleName === 'Customer') &&
+                                                                            <>
+                                                                                <div className="quantity">
+                                                                                    <p>Số lượng</p>
+                                                                                    <div className="quantity-box">
+                                                                                        <button className="decrease" onClick={() => controlRent('-')}>
+                                                                                            <GrFormSubtract />
+                                                                                        </button>
+                                                                                        <input type="number" value={quanRent} onChange={handleChangeRent} disabled={proItem.type === 'unique'} />
+                                                                                        <button className="increase" onClick={() => controlRent('+')}>
+                                                                                            <BiPlus />
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div className="atc">
+                                                                                    <button onClick={() => handleAddCart('Rent', proItemSelectBySize.id)}>
+                                                                                        <AiOutlineShoppingCart size={40} />
+                                                                                        <span>Thêm vào giỏ hàng</span>
+                                                                                    </button>
+                                                                                </div>
+                                                                            </>
+                                                                        }
                                                                     </div> : undefined
                                                                 }
                                                                 {
@@ -368,24 +373,29 @@ const ClientProductItemDetail: React.FC = () => {
                                                                         <p className="price">
                                                                             <CurrencyFormat value={proItemSelectBySize.salePrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
                                                                         </p>
-                                                                        <div className="quantity">
-                                                                            <p>Số lượng</p>
-                                                                            <div className="quantity-box">
-                                                                                <button className="decrease" onClick={() => controlSale('-')}>
-                                                                                    <GrFormSubtract  />
-                                                                                </button>
-                                                                                <input type="number" value={quanSale} onChange={handleChangeSale} disabled={proItem.type === 'unique'} />
-                                                                                <button className="increase" onClick={() => controlSale('+')}>
-                                                                                    <BiPlus  />
-                                                                                </button>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="atc">
-                                                                            <button onClick={() => handleAddCart('Sale', proItemSelectBySize.id)}>
-                                                                                <AiOutlineShoppingCart size={40} />
-                                                                                <span>Thêm vào giỏ hàng</span>
-                                                                            </button>
-                                                                        </div>
+                                                                        {
+                                                                            (!roleName || roleName === 'Customer') &&
+                                                                            <>
+                                                                                <div className="quantity">
+                                                                                    <p>Số lượng</p>
+                                                                                    <div className="quantity-box">
+                                                                                        <button className="decrease" onClick={() => controlSale('-')}>
+                                                                                            <GrFormSubtract  />
+                                                                                        </button>
+                                                                                        <input type="number" value={quanSale} onChange={handleChangeSale} disabled={proItem.type === 'unique'} />
+                                                                                        <button className="increase" onClick={() => controlSale('+')}>
+                                                                                            <BiPlus  />
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div className="atc">
+                                                                                    <button onClick={() => handleAddCart('Sale', proItemSelectBySize.id)}>
+                                                                                        <AiOutlineShoppingCart size={40} />
+                                                                                        <span>Thêm vào giỏ hàng</span>
+                                                                                    </button>
+                                                                                </div>
+                                                                            </>
+                                                                        }
                                                                     </div> : undefined
                                                                 }
                                                             </div>

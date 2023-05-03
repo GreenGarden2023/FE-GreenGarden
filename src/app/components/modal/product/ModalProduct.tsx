@@ -48,7 +48,6 @@ const ModalProduct: React.FC<ModalProductProps> = ({ categoryId, product, action
     })
     
     useEffect(() =>{
-        console.log('mount')
         setValue('categoryId', categoryId)
 
         if(!product) return;

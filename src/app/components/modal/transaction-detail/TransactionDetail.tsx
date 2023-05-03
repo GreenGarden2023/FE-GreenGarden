@@ -33,7 +33,6 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({orderId, orderType
             try{
                 const res = await transactionService.getTransactionByOrder(orderId, orderType)
                 setTransactions(res.data)
-                console.log(res)
             }catch{
                 dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }

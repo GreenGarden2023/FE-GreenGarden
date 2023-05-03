@@ -28,7 +28,6 @@ interface ModalTakeCareCreateTreeProps{
 }
 
 const ModalTakeCareCreateTree:React.FC<ModalTakeCareCreateTreeProps> = ({ tree, onClose, onSubmit }) => {
-  console.log({tree})
   const dispatch = useDispatch()
   const { setValue, formState: { errors, isSubmitting }, control, handleSubmit, setError, trigger, getValues } = useForm<Partial<UserTree>>({
     defaultValues: {
@@ -55,7 +54,7 @@ const ModalTakeCareCreateTree:React.FC<ModalTakeCareCreateTreeProps> = ({ tree, 
   const handleSubmitForm = async (data: Partial<UserTree>) =>{
     if(!data) return;
 
-    if((data.quantity || 0) > (data.imgUrls ? data.imgUrls.length : 0)){
+    if((data.quantity || 0) < (data.imgUrls ? data.imgUrls.length : 0)){
       setError('imgUrls', {
         type: 'pattern',
         message: 'Số lượng ảnh không đủ so với số lượng cây'
@@ -197,7 +196,7 @@ const ModalTakeCareCreateTree:React.FC<ModalTakeCareCreateTreeProps> = ({ tree, 
           <Col span={24} >
             <div className='btn-form-wrapper'>
                 <Button htmlType='button' disabled={isSubmitting} type='default' className='btn-cancel' size='large' onClick={handleCloseModal}>Hủy bỏ</Button>
-                <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large' onClick={() => console.log(errors)}>
+                <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large' >
                     {
                         tree ? 'Cập nhật' : 'Tạo mới'
                     }

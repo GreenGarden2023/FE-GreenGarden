@@ -56,7 +56,8 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
             startDateRent: startDate,
             endDateRent: endDate,
             rewardPointUsed: 0,
-            rentOrderGroupID: rentOrderList.rentOrderGroupID
+            rentOrderGroupID: rentOrderList.rentOrderGroupID,
+            isTransport: false
         },
         resolver: yupResolver(schema)
     })
@@ -74,7 +75,7 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
         setValue('recipientName', fullName)
         setValue('recipientPhone', phone)
         setValue('shippingID', districtID)
-        setValue('isTransport', rentOrderList.isTransport)
+        // setValue('isTransport', rentOrderList.isTransport)
 
         trigger()
     }, [setValue, trigger, userSate, rentOrderList])
@@ -238,11 +239,9 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
             const calculatorRent = await orderService.calculateOrder(body)
             if(utilCalculate.compare2Orders(calculatorRent.data, OrderPreview())){
                 const res = await orderService.createOrder(body)
-                console.log(res.data)
                 dispatch(setNoti({type: 'success', message: 'Gia hạn đơn hàng thành công'}))
                 onExtend(res.data.id)
                 onClose()
-                
             }else{
                 dispatch(setNoti({type: 'info', message: 'Đã có sự thay đổi về giá. Quý khách vui lòng tải lại trang để đặt hàng'}))
             }
@@ -455,7 +454,7 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
                                         {errors.recipientPhone && <ErrorMessage message={errors.recipientPhone.message} />}
                                     </Form.Item>
                                 </Col>
-                                <Col span={12}>
+                                {/* <Col span={12}>
                                     <Form.Item label='Chọn nơi nhận cây'>
                                         <Controller 
                                             control={control}
@@ -472,8 +471,8 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
                                             )}
                                         />
                                     </Form.Item>
-                                </Col>
-                                <Col span={12}>
+                                </Col> */}
+                                <Col span={24}>
                                     <Form.Item label='Chọn thời gian thuê' required>
                                         <DatePicker.RangePicker 
                                             locale={locale}
@@ -483,6 +482,7 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
                                             defaultValue={[Dayjs(Dayjs(getValues('startDateRent')).format('DD/MM/YYYY'), 'DD/MM/YYYY'), Dayjs(Dayjs(getValues('endDateRent')).format('DD/MM/YYYY'), 'DD/MM/YYYY')]}
                                             onChange={handleChangeDateRange}
                                             disabled={[true, false]}
+                                            style={{width: '100%'}}
                                         />
                                         {errors.startDateRent && <ErrorMessage message={errors.startDateRent.message} />}
                                     </Form.Item>

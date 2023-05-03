@@ -163,7 +163,6 @@ const ModalProductItemDetail: React.FC<ModalSizeProductItemProps> = ({ productIt
             rentPrice: data.rentPrice,
             salePrice: data.salePrice,
         }
-        console.log(finalData)
         if(!data.id){
             try{
                 const res = await productItemService.createProductItemDetail(finalData)
@@ -301,7 +300,7 @@ const ModalProductItemDetail: React.FC<ModalSizeProductItemProps> = ({ productIt
                     <Col span={24} >
                         <div className='btn-form-wrapper'>
                             <Button htmlType='button' disabled={isSubmitting} type='default' className='btn-cancel' size='large' onClick={handleCloseModal}>Hủy bỏ</Button>
-                            <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large' onClick={() => console.log(errors)}>
+                            <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large' >
                                 {
                                     productDetailIndex > -1 ? 'Cập nhật' : 'Tạo mới'
                                 }

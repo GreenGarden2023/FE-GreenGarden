@@ -201,7 +201,7 @@ const ManageRentOrderGroup: React.FC = () => {
           <span>Xem giao dịch</span>
         </div>
         {
-          (record.status === 'unpaid' && record.deposit !== 0 && record.remainMoney === record.totalPrice) &&
+          (record.status === 'unpaid' && record.deposit !== 0) &&
           <div
             className="item"
             onClick={() => {
@@ -225,7 +225,7 @@ const ManageRentOrderGroup: React.FC = () => {
           </div>
         }
         {
-          (record.status === 'paid') &&
+          (record.status === 'paid' && utilDateTime.getDiff2Days(record.startDateRent, new Date()) >= 0) &&
           <div className="item" onClick={() => {
             handleSetAction({orderId: record.orderId, actionType: 'renting', orderType: 'rent', openIndex: -1})
           }}>
@@ -716,7 +716,7 @@ const ViewAllOrderGroup: React.FC<ViewAllOrderGroupProps> = ({orderId, recall}) 
           <span>Xem giao dịch</span>
         </div>
         {
-          (record.status === 'unpaid' && record.deposit !== 0 && record.remainMoney === record.totalPrice) &&
+          (record.status === 'unpaid' && record.deposit !== 0) &&
           <div
             className="item"
             onClick={() => {
@@ -740,7 +740,7 @@ const ViewAllOrderGroup: React.FC<ViewAllOrderGroupProps> = ({orderId, recall}) 
           </div>
         }
         {
-          (record.status === 'paid') &&
+          (record.status === 'paid' && utilDateTime.getDiff2Days(record.startDateRent, new Date()) >= 0) &&
           <div className="item" onClick={() => {
             handleSetAction({orderId: record.orderId, actionType: 'renting', orderType: 'rent', openIndex: -1})
           }}>

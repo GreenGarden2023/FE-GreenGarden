@@ -189,7 +189,7 @@ const ClientTakeCareServiceConfirm: React.FC = () => {
                                                     </span>
                                                 </Col>
                                                 <Col span={24}>
-                                                    <span className="title" style={{marginBottom: '10px', display: 'block'}}>Thông tin hợp đồng chăm sóc cây</span>
+                                                    <span className="title" style={{marginBottom: '10px', display: 'block'}}>Thông tin cam kết 2 bên</span>
                                                     <div className='rule-wrapper'>
                                                         {
                                                             service.rules ?
@@ -198,7 +198,7 @@ const ClientTakeCareServiceConfirm: React.FC = () => {
                                                                         <p key={index}>{x}</p>
                                                                     ))
                                                                 
-                                                            : <p>Chưa có thông tin hợp đồng</p>
+                                                            : <p>Chưa có thông tin</p>
                                                         }
                                                     </div>
                                                     {/* <Input.TextArea autoSize={{minRows: 4, maxRows: 10}} value={service.rules} disabled></Input.TextArea> */}

@@ -70,6 +70,16 @@ const ClientTakeCareService: React.FC = () => {
     const userState = useSelector(state => state.userInfor)
 
     useEffect(() =>{
+        if(!userState.token){
+            return navigate('/login')
+        }
+        if(userState.user.roleName !== 'Customer'){
+            return navigate('/file-not-found')
+        }
+
+    }, [userState, navigate])
+
+    useEffect(() =>{
         const init = async () =>{
             try{
                 const res = await shippingFeeService.getList()
@@ -173,13 +183,13 @@ const ClientTakeCareService: React.FC = () => {
             })
             return;
         }
-        if(utilDateTime.getDiff2Days(new Date(), startDate) > 14){
-            setError('startDate', {
-                message: 'Thời gian đặt trước lịch chăm sóc tối đa 14 ngày',
-                type: 'pattern'
-            })
-            return;
-        }
+        // if(utilDateTime.getDiff2Days(new Date(), startDate) > 14){
+        //     setError('startDate', {
+        //         message: 'Thời gian đặt trước lịch chăm sóc tối đa 14 ngày',
+        //         type: 'pattern'
+        //     })
+        //     return;
+        // }
         
         try{
             const userTreeIDList = treesSelect.map(x => x.id)

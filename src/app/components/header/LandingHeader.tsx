@@ -86,7 +86,6 @@ const LandingHeader: React.FC = () =>{
         }
           dispatch(setCartSlice(cartProps))
         }catch{
-          // console.log('asdsa')
           // dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
       }
@@ -142,6 +141,11 @@ const LandingHeader: React.FC = () =>{
           break;
       }
     }
+
+    const IsCustomer = useMemo(() =>{
+      return userState.token && userState.user.roleName === 'Customer'
+    }, [userState])
+
     return (
         <>
             <header className='landing-header'>
@@ -153,7 +157,7 @@ const LandingHeader: React.FC = () =>{
                     </div>
                     <div className="right">
                       {
-                        userState.token &&
+                        IsCustomer &&
                         <div className="cart-box">
                             <Link to='/cart' >
                                 <Badge count={cartQuantity} >
@@ -176,6 +180,9 @@ const LandingHeader: React.FC = () =>{
                                       <span>Bảng điều khiển</span>
                                     </div>
                                   }
+                                  {
+                                    IsCustomer &&
+                                    <>
                                       <div className='user-infor-box' onClick={() => navigate('/take-care-service/me')}>
                                           <BiGitPullRequest size={20} />
                                           <span>Yêu cầu của bạn</span>
@@ -184,14 +191,16 @@ const LandingHeader: React.FC = () =>{
                                           <BsBagCheckFill size={20} />
                                           <span>Đơn hàng của bạn</span>
                                       </div>
-                                      <div className='user-infor-box' onClick={handleViewInfor}>
-                                          <FaUserCircle size={20} />
-                                          <span>{userState.user.fullName}</span>
-                                      </div>
-                                      <div className="log-out" onClick={handleLogout}>
-                                          <GiExitDoor size={20} />
-                                          <span>Đăng xuất</span>
-                                      </div>
+                                    </>
+                                  }
+                                  <div className='user-infor-box' onClick={handleViewInfor}>
+                                      <FaUserCircle size={20} />
+                                      <span>{userState.user.fullName}</span>
+                                  </div>
+                                  <div className="log-out" onClick={handleLogout}>
+                                      <GiExitDoor size={20} />
+                                      <span>Đăng xuất</span>
+                                  </div>
                                   </> :
                                   <>
                                   <Link to='/register' >

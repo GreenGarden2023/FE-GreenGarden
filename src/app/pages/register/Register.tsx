@@ -25,7 +25,7 @@ const defaultValues: UserRegister = {
   fullName: '',
   address: '',
   phone: '',
-  favorite: '',
+  favorite: 'Hoa giấy',
   mail: '',
   confirmPassword: '',
   isAgreeTerm: false,
@@ -34,9 +34,9 @@ const defaultValues: UserRegister = {
 }
 /* eslint-disable no-useless-escape */
 const schema = yup.object().shape({
-  userName: yup.string().trim().required('Tài khoản không được để trống').min(5, 'Tài khoản có ít nhất 5 ký tự').max(30, 'Tài khoản có nhiều nhất 30 ký tự'),
+  userName: yup.string().trim().required('Tài khoản không được để trống').min(2, 'Tài khoản có ít nhất 2 ký tự').max(50, 'Tài khoản có nhiều nhất 50 ký tự'),
   password: yup.string().required('Mật khẩu không được để trống').min(6, 'Mật khẩu có ít nhất 6 ký tự').max(30, 'Mật khẩu có nhiều nhất 30 ký tự'),
-  fullName: yup.string().trim().required('Họ và tên không được để trống').min(5, 'Họ và tên có ít nhất 5 ký tự').max(50, 'Họ và tên có nhiều nhất 50 ký tự'),
+  fullName: yup.string().trim().required('Họ và tên không được để trống').min(2, 'Họ và tên có ít nhất 2 ký tự').max(50, 'Họ và tên có nhiều nhất 50 ký tự'),
   address: yup.string().trim().required('Địa chỉ không được để trống').min(5, 'Địa chỉ có ít nhất 5 ký tự').max(100, 'Địa chỉ có nhiều nhất 100 ký tự'),
   phone: yup.string().trim().required('Số điện thoại không được để trống').matches(CONSTANT.PHONE_REGEX, 'Số điện thoại không hợp lệ'),
   mail: yup.string().trim().required('Email không được để trống').matches(CONSTANT.EMAIL_REGEX, 'Email không hợp lệ'),
@@ -98,7 +98,7 @@ const Register: React.FC = () => {
         dispatch(setNoti({type: 'success', message: `Mã xác thực đăng ký đã gửi tới email ${data.mail}. Vui lòng kiểm tra email của bạn.`}))
         return;
       }
-      dispatch(setNoti({type: 'success', message: res.message}))
+      dispatch(setNoti({type: 'warning', message: res.message}))
     }catch(err){
       dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
     }
@@ -205,7 +205,7 @@ const Register: React.FC = () => {
                         </Form.Item>
                       </Col>
                       <Col span={12}>
-                        <Form.Item label='Sở thích' required validateStatus={errors.favorite ? 'error' : ''}>
+                        <Form.Item label='Sở thích' validateStatus={errors.favorite ? 'error' : ''}>
                           <Controller
                             control={control}
                             name='favorite'
