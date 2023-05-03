@@ -49,18 +49,20 @@ const ClientProductItemDetail: React.FC = () => {
     const [loading, setLoading] = useState(true)
 
     useEffect(() =>{
-        if(!productItemId) return;
+        if(!productItemId || !sizeSelect || !proItem) return;
 
+        
         const init = async () =>{
             try{
-                const res = await feedbackService.getListFeedbackByProductItemDetail(productItemId)
+                const id = proItem.productItemDetail.filter(x => x.size.id === sizeSelect)[0].id 
+                const res = await feedbackService.getListFeedbackByProductItemDetail(id)
                 setFeedback(res.data)
             }catch{
                 dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
         }
         init()
-    }, [productItemId, dispatch])
+    }, [productItemId, dispatch, sizeSelect, proItem])
 
     useEffect(() =>{
         pagingPath.scrollTop()
@@ -426,40 +428,45 @@ const ClientProductItemDetail: React.FC = () => {
                                                     <span>Chưa có đánh giá nào cho sản phẩm này</span>
                                                 </div> : 
                                                 feedback.map((fb, index) => (
-                                                    <div className="feedback-item" key={index}>
-                                                        <div className="feedback-detail" >
-                                                            <div className="left-feedback">
-                                                                <RxAvatar size={50} color='#707070' />
-                                                            </div>
-                                                            <div className="right-feedback">
-                                                                <p className="user-name">{fb.user.fullName}</p>
-                                                                <p className="rating">
-                                                                    {
-                                                                        [...Array(fb.rating)].map((_, i) => (<AiFillStar key={i} color='#f95441' />))
-                                                                    }
-                                                                </p>
-                                                                <div className="images">
-                                                                    <Image.PreviewGroup>
-                                                                        {
-                                                                            fb.imageURL.map((image, j) => (
-                                                                                <Image 
-                                                                                    key={j}
-                                                                                    src={image}
-                                                                                    width={100}
-                                                                                    height={100}
-                                                                                    style={{objectFit: 'cover', borderRadius: '5px'}}
-                                                                                />
-                                                                            ))
-                                                                        }
-                                                                    </Image.PreviewGroup>
+                                                    <>
+                                                        <div className="feedback-item" key={index}>
+                                                            <div className="feedback-detail" >
+                                                                <div className="left-feedback">
+                                                                    <RxAvatar size={50} color='#707070' />
                                                                 </div>
-                                                                <p className="comment">{fb.comment}</p>
-                                                                <p className="time">
-                                                                    {utilDateTime.dateTimeToString(fb.updateDate ? fb.updateDate : fb.createDate)}
-                                                                </p>
+                                                                <div className="right-feedback">
+                                                                    <p className="user-name">{fb.user.fullName}</p>
+                                                                    <p className="rating">
+                                                                        {
+                                                                            [...Array(fb.rating)].map((_, i) => (<AiFillStar key={i} color='#f95441' />))
+                                                                        }
+                                                                    </p>
+                                                                    <div className="images">
+                                                                        <Image.PreviewGroup>
+                                                                            {
+                                                                                fb.imageURL.map((image, j) => (
+                                                                                    <Image 
+                                                                                        key={j}
+                                                                                        src={image}
+                                                                                        width={100}
+                                                                                        height={100}
+                                                                                        style={{objectFit: 'cover', borderRadius: '5px'}}
+                                                                                    />
+                                                                                ))
+                                                                            }
+                                                                        </Image.PreviewGroup>
+                                                                    </div>
+                                                                    <p className="comment">{fb.comment}</p>
+                                                                    <p className="time">
+                                                                        {utilDateTime.dateTimeToString(fb.updateDate ? fb.updateDate : fb.createDate)}
+                                                                    </p>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                        {
+                                                            index !== feedback.length - 1 && <Divider ></Divider>
+                                                        }
+                                                    </>
                                                 ))
                                             }
                                     </section>

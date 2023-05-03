@@ -82,7 +82,7 @@ const Filtering: React.FC<FilteringProps> = ({ isRangeDate, isRole }) => {
                         isRangeDate && 
                         <Col span={6}>
                             <div className='range-date'>
-                                <p className='mb-5'>Chọn khoảng ngày từ hôm này</p>
+                                <p className='mb-5'>Chọn khoảng ngày từ hôm nay</p>
                                 <Input type='number'min={1} value={rangeDateNew} onChange={(e) => {
                                     if(!e.target.value || Number(e.target.value) < 0){
                                         setRangeDateNew(0)

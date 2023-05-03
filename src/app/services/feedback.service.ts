@@ -15,11 +15,17 @@ const getListFeedbackByProductItemDetail = async (productItemDetailId: string) =
     return res.data
 }
 
+const getListFeedbackByProductItem = async (productItemId: string) =>{
+    const res = await golbalAxios.get<Response<FeedbackGet[]>>(`/feedback/get-list-feedback-by-product-item?productItemId=${productItemId}`)
+    return res.data
+}
+
 
 const feedbackService = {
     createFeedback,
     updateFeedback,
-    getListFeedbackByProductItemDetail
+    getListFeedbackByProductItemDetail,
+    getListFeedbackByProductItem
 }
 
 export default feedbackService

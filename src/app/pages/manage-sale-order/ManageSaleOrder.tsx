@@ -71,8 +71,8 @@ const ManageSaleOrder: React.FC = () => {
                 setLoading(true)
                 try{
                     const res = await orderService.getSaleOrderDetailByOrderCode({curPage: Number(currentPage), pageSize: paging.pageSize}, {orderCode, phone, status})
-                    setSaleOrders(res.data.saleOrderList)
-                    setPaging(res.data.paging)
+                    setSaleOrders(res.data ? res.data.saleOrderList : [])
+                    setPaging(res.data ? res.data.paging : {curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_SALE})
                 }catch{
                     dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
                 }
@@ -84,8 +84,8 @@ const ManageSaleOrder: React.FC = () => {
                 setLoading(true)
                 try{
                     const res = await orderService.getAllSaleOrders({curPage: Number(currentPage), pageSize: paging.pageSize})
-                    setSaleOrders(res.data.saleOrderList)
-                    setPaging(res.data.paging)
+                    setSaleOrders(res.data ? res.data.saleOrderList : [])
+                    setPaging(res.data ? res.data.paging : {curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_SALE})
                 }catch{
                     dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
                 }

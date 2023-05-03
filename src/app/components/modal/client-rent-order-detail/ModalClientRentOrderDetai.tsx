@@ -90,7 +90,7 @@ const ModalClientRentOrderDetai: React.FC<ModalClientRentOrderDetaiProps> = ({re
 
     const OrderDetail = useMemo(() =>{
         const { recipientName, recipientPhone, recipientAddress, createDate, startRentDate, endRentDate, status, 
-            transportFee, totalPrice, remainMoney, deposit, reason, nameCancelBy, contractURL } = rentOrderList
+            transportFee, totalPrice, remainMoney, deposit, reason, nameCancelBy, contractURL, isTransport } = rentOrderList
 
         return {
             name: recipientName,
@@ -104,7 +104,7 @@ const ModalClientRentOrderDetai: React.FC<ModalClientRentOrderDetaiProps> = ({re
             totalOrder: totalPrice,
             remainMoney: status === 'unpaid' ? remainMoney + deposit : remainMoney,
             deposit, reason,
-            nameCancelBy, contract: contractURL
+            nameCancelBy, contract: contractURL, isTransport
         }
     }, [rentOrderList])
 

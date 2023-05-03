@@ -82,8 +82,8 @@ const ManageTakeCareOrder: React.FC = () => {
                 setLoading(true)
                 try{
                     const res = await orderService.getServiceOrderDetailByOrderCode({curPage: Number(currentPage), pageSize: paging.pageSize}, {orderCode, phone, status})
-                    setServiceOrders(res.data.serviceOrderList)
-                    setPaging(res.data.paging)
+                    setServiceOrders(res.data ? res.data.serviceOrderList : [])
+                    setPaging(res.data ? res.data.paging : {curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_RENT})
                 }catch{
                     dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
                 }
@@ -95,8 +95,8 @@ const ManageTakeCareOrder: React.FC = () => {
                 setLoading(true)
                 try{
                     const res = await orderService.getSerivceOrderDetailByRangeDate({curPage: Number(currentPage), pageSize: paging.pageSize}, filter.startDate || '', filter.endDate || '')
-                    setServiceOrders(res.data.serviceOrderList)
-                    setPaging(res.data.paging)
+                    setServiceOrders(res.data ? res.data.serviceOrderList : [])
+                    setPaging(res.data ? res.data.paging : {curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_RENT})
                 }catch{
                     dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
                 }
@@ -108,8 +108,8 @@ const ManageTakeCareOrder: React.FC = () => {
                 setLoading(true)
                 try{
                     const res = await orderService.getAllServiceOrders({curPage: Number(currentPage), pageSize: paging.pageSize})
-                    setServiceOrders(res.data.serviceOrderList)
-                    setPaging(res.data.paging)
+                    setServiceOrders(res.data ? res.data.serviceOrderList : [])
+                    setPaging(res.data ? res.data.paging : {curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.MANAGE_ORDER_RENT})
                 }catch{
                     dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
                 }

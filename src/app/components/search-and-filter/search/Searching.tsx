@@ -2,7 +2,7 @@ import { Col, Input, Row, Select } from 'antd';
 import useDispatch from 'app/hooks/use-dispatch';
 import { OrderStatus } from 'app/models/general-type';
 import { setEmptyFilter, setEmptySearch, setOrderCode, setPhone, setSearch, setStatus } from 'app/slices/search-and-filter';
-import CONSTANT from 'app/utils/constant';
+// import CONSTANT from 'app/utils/constant';
 import React, { useEffect, useState } from 'react';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { FaIoxhost } from 'react-icons/fa';
@@ -40,14 +40,7 @@ const Searching: React.FC<SearchingProps> = ({ isOrderCode, isPhone, isStatus, s
         // -----------------
         dispatch(setOrderCode(orderCodeSearch.trim()))
 
-        if(phoneSearch.trim()){
-            const isValidPhone = CONSTANT.PHONE_REGEX.test(phoneSearch.trim())
-            if(isValidPhone){
-                dispatch(setPhone(phoneSearch.trim()))
-            }else{
-                dispatch(setPhone(''))
-            }
-        }
+        dispatch(setPhone(phoneSearch.trim()))
 
         dispatch(setStatus(statusSearch))
         dispatch(setSearch(true))

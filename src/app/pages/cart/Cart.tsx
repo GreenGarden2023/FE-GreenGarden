@@ -171,6 +171,7 @@ const CartPage: React.FC = () => {
                 console.log('rent------', calculatorRent.data)
                 console.log('rent------', orderPreview)
                 if(utilCalculate.compare2Orders(calculatorRent.data, orderPreview)){
+                    
                     await orderService.createOrder(body)
                     dispatch(setNoti({type: 'success', message: 'Tạo đơn hàng thuê thành công. Vui lòng kiểm tra đơn hàng và thanh toán để nhận cây'}))
                     cart.rentItems = []

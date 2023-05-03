@@ -10,6 +10,7 @@ import { HiOutlineStatusOnline } from 'react-icons/hi';
 import { FaMoneyBillWave } from 'react-icons/fa';
 import OrderStatusComp from 'app/components/status/OrderStatusComp';
 import { Link } from 'react-router-dom';
+import Transport from 'app/components/renderer/transport/Transport';
 
 interface UserInforOrderProps{
     name?: string;
@@ -19,6 +20,7 @@ interface UserInforOrderProps{
     startDate?: string;
     endDate?: string;
     status?: OrderStatus;
+    isTransport?: boolean;
     transportFee?: number;
     totalOrder?: number;
     remainMoney?: number;
@@ -30,7 +32,7 @@ interface UserInforOrderProps{
 }
 
 const UserInforOrder: React.FC<UserInforOrderProps> = ({name, phone, address, createOrderDate, startDate, 
-    endDate, status, transportFee, totalOrder, remainMoney, deposit, reason, nameCancelBy, columnNumber, contract}) => {
+    endDate, status, isTransport, transportFee, totalOrder, remainMoney, deposit, reason, nameCancelBy, columnNumber, contract}) => {
 
     const ColumnNumber = useMemo(() =>{
         if(!columnNumber) return 8;
@@ -137,6 +139,20 @@ const UserInforOrder: React.FC<UserInforOrderProps> = ({name, phone, address, cr
                                     </div>
                                     <div className="content">
                                         <OrderStatusComp status={status} />
+                                    </div>
+                                </div>
+                            </Col>
+                        }
+                        {
+                            isTransport && 
+                            <Col span={ColumnNumber}>
+                                <div className="item">
+                                    <div className="label">
+                                        <HiOutlineStatusOnline color='#5cb9d8' size={20} />
+                                        <span>Nơi nhận cây</span>
+                                    </div>
+                                    <div className="content">
+                                        <Transport isTransport={isTransport} />
                                     </div>
                                 </div>
                             </Col>
