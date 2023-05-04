@@ -29,9 +29,9 @@ const LandingFooter: React.FC = () =>{
                 dispatch(setNoti({type: 'success', message: 'Đã gửi thông tin yêu cầu tư vấn cho quản trị viên'}))
                 setName('')
                 setPhone('')
-                return;
+            }else{
+                dispatch(setNoti({type: 'warning', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
-            dispatch(setNoti({type: 'warning', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }catch{
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
