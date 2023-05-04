@@ -7,7 +7,7 @@ import UserInforTable from 'app/components/user-infor/UserInforTable'
 import useSelector from 'app/hooks/use-selector'
 import { Paging } from 'app/models/paging'
 import { PaymentControlState } from 'app/models/payment'
-import { ServiceRequest } from 'app/models/service'
+import { Service, ServiceRequest } from 'app/models/service'
 import serviceService from 'app/services/service.service'
 import CONSTANT from 'app/utils/constant'
 import utilDateTime from 'app/utils/date-time'
@@ -17,9 +17,14 @@ import { BiDetail } from 'react-icons/bi'
 import { GrMore } from 'react-icons/gr'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import './style.scss'
+import UpdateConfirmServiceDetail from 'app/components/modal/update-confirm-service-detail/UpdateConfirmServiceDetail'
+import { ShippingFee } from 'app/models/shipping-fee'
+import useDispatch from 'app/hooks/use-dispatch'
+import shippingFeeService from 'app/services/shipping-fee.service'
+import { setNoti } from 'app/slices/notification'
 
 const ManageRequest: React.FC = () => {
-    // const dispatch = useDispatch();
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const { user } = useSelector(state => state.userInfor)
@@ -29,6 +34,19 @@ const ManageRequest: React.FC = () => {
 
     const [loading, setLoading] = useState(false)
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
+    const [shipping, setShipping] = useState<ShippingFee[]>([])
+
+    useEffect(() =>{
+        const init = async () =>{
+            try{
+                const res = await shippingFeeService.getList()
+                setShipping(res.data)
+            }catch{
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+            }
+        }
+        init()
+    }, [dispatch])
 
     useEffect(() =>{
         setLoading(true)
@@ -154,6 +172,28 @@ const ManageRequest: React.FC = () => {
         }))
     }, [requests])
 
+    const ServiceSelect = useMemo(() =>{
+        const [request] = requests.filter(x => x.id === actionMethod?.orderId)
+        if(!request) return;
+
+        const { id, address, createDate, districtID, email, endDate, isTransport, name, phone,
+        rewardPointUsed, rules, serviceCode, serviceDetailList, startDate, status, technician, technicianName,
+        transportFee, user, userCurrentPoint, cancelBy, nameCancelBy, reason, serviceOrderID } = request
+
+        const data: Service = {
+            address, cancelBy, createDate, districtID, email, endDate, id, isTransport, name, nameCancelBy,
+            phone, reason, rewardPointUsed, rules, serviceCode, serviceDetailList, serviceOrderID, startDate,
+            status, technicianID: technician.technicianID, technicianName, transportFee, userCurrentPoint, userId: user.id
+        }
+
+        return data
+
+    }, [actionMethod?.orderId, requests])
+    
+    const handleClose = () =>{
+        setActionMethod(undefined)
+    }
+
     return (
         <div className='mr-wrapper'>
             <HeaderInfor title='Yêu cầu chăm sóc' />
@@ -174,6 +214,16 @@ const ManageRequest: React.FC = () => {
                     loading={loading}
                 />
             </section>
+            {
+                (actionMethod?.actionType === 'detail' && ServiceSelect) &&
+                <UpdateConfirmServiceDetail
+                    service={ServiceSelect}
+                    shipping={shipping}
+                    isOnlyView
+                    onClose={handleClose}
+                    onSubmit={handleClose}
+                />
+            }
         </div>
     )
 }

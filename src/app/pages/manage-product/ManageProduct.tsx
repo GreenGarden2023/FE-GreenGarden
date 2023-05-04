@@ -37,7 +37,7 @@ const ManageProduct: React.FC = () => {
   useEffect(() =>{
     const init = async () =>{
       try{
-        const res = await categoryService.getAllCategory()
+        const res = await categoryService.getAllCategory({curPage: 1, pageSize: 500})
         setCategories(res.data.result)
       }catch(err){
         dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))

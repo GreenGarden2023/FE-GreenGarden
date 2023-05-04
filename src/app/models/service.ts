@@ -148,17 +148,17 @@ export interface ServiceOrderDetail{
 export interface ServiceRequest{
     id: string
     serviceCode: string
-    startDate: string
-    endDate: string
+    startDate: Date
+    endDate: Date
     name: string
     userCurrentPoint: number
     phone: string
     email: string
     address: string
-    status: string
+    status: ServiceStatus
     districtID: number
     user: User
-    createDate: string
+    createDate: Date
     technicianName: string
     isTransport: boolean
     transportFee: number
@@ -166,6 +166,10 @@ export interface ServiceRequest{
     rewardPointUsed: number
     technician: Technician
     serviceDetailList: ServiceDetailList[]
+    cancelBy: string;
+    nameCancelBy: string;
+    reason: string;
+    serviceOrderID: string;
 }
 
 export interface ServiceRequestResponse{
