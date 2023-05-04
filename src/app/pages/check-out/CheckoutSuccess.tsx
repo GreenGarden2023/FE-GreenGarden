@@ -13,7 +13,6 @@ const CheckoutSuccess: React.FC = () => {
     const navigate = useNavigate();
     const { rentItems, saleItems } = useSelector(state => state.CartStore)
 
-
     useEffect(() =>{
         pagingPath.scrollTop()
     }, [])

@@ -125,12 +125,13 @@ const ModalProductItemDetail: React.FC<ModalSizeProductItemProps> = ({ productIt
         const finalFiles: File[] = []
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
-            if(!CONSTANT.SUPPORT_FORMATS.includes(file.type)){
-                setError('imagesUrls', {
-                    type: 'pattern',
-                    message: `Định dạng ảnh chỉ chấp nhận ${CONSTANT.SUPPORT_FORMATS.join(' - ')}`
-                })
-                trigger('imagesUrls')
+            if(!CONSTANT.SUPPORT_FORMATS.includes(file.type) || file.size > CONSTANT.FILE_SIZE_ACCEPTED){
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.INVALID_FILE}))
+                // setError('imagesUrls', {
+                //     type: 'pattern',
+                //     message: `Định dạng ảnh chỉ chấp nhận ${CONSTANT.SUPPORT_FORMATS.join(' - ')}`
+                // })
+                // trigger('imagesUrls')
                 return;
             }
             finalFiles.push(file)

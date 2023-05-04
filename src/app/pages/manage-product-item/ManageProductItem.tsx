@@ -145,7 +145,7 @@ const ManageProductItem: React.FC = () => {
                                 <Row gutter={[12, 12]}>
                                     {
                                         productItems.map((pt, index) => (
-                                            <Col xs={24} xl={4} key={index}>
+                                            <Col xs={24} xl={6} key={index}>
                                                 <Badge.Ribbon color={pt.type === 'normal' ? 'blue' : 'green'} placement='start' text={pt.type === 'normal' ? 'Số lượng lớn' : 'Duy nhất'} >
                                                     <div className="mpi-item">
                                                         <img src={pt.imageURL} alt='/' />

@@ -35,7 +35,7 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productId, productIt
 
     const ref = useRef<HTMLInputElement>(null);
 
-    const { setValue, getValues, control, handleSubmit, formState: { errors, isSubmitting },  trigger, setError, reset } = useForm<Partial<ProductItem>>({
+    const { setValue, getValues, control, handleSubmit, formState: { errors, isSubmitting },  trigger, reset } = useForm<Partial<ProductItem>>({
         resolver: yupResolver(schema)
     })
 
@@ -99,13 +99,14 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productId, productIt
 
         const file = files[0]
 
-        if(!CONSTANT.SUPPORT_FORMATS.includes(file.type)){
-            setValue('imageURL', '')
-            setError('imageURL', {
-                type: 'pattern',
-                message: `Định dạng ảnh chỉ chấp nhận ${CONSTANT.SUPPORT_FORMATS.join(' - ')}`
-            })
-            trigger('imageURL')
+        if(!CONSTANT.SUPPORT_FORMATS.includes(file.type) || file.size > CONSTANT.FILE_SIZE_ACCEPTED){
+            // setValue('imageURL', '')
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.INVALID_FILE}))
+            // setError('imageURL', {
+            //     type: 'pattern',
+            //     message: `Định dạng ảnh chỉ chấp nhận ${CONSTANT.SUPPORT_FORMATS.join(' - ')}`
+            // })
+            // trigger('imageURL')
             return;
         }
 

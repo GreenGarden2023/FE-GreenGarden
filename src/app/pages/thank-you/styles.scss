@@ -33,4 +33,17 @@
             padding: 10px;
         }
     }
+    &.fail{
+        border-color: #e91e63;
+        .content{
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #e91e63;
+            span{
+                font-size: 28px;
+                font-weight: 500;
+            }
+        }
+    }
 }
