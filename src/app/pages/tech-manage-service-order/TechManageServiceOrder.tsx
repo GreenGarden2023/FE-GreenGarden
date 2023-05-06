@@ -2,6 +2,7 @@ import { Popover } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import MoneyFormat from 'app/components/money/MoneyFormat'
+import Filtering from 'app/components/search-and-filter/filter/Filtering'
 import OrderStatusComp from 'app/components/status/OrderStatusComp'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
 import useSelector from 'app/hooks/use-selector'
@@ -15,13 +16,14 @@ import pagingPath from 'app/utils/paging-path'
 import React, { useEffect, useMemo, useState } from 'react'
 import { BiCommentDetail } from 'react-icons/bi'
 import { GrMore } from 'react-icons/gr'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 
 const TechManageServiceOrder: React.FC = () => {
     // const dispatch = useDispatch()
     const navigate = useNavigate()
     const [searchParams] = useSearchParams();
     const {user} = useSelector(state => state.userInfor)
+    const { filter } = useSelector(state => state.SearchFilter)
 
     // data
     const [serviceOrders, setServiceOrders] = useState<ServiceOrderList[]>([])
@@ -32,7 +34,7 @@ const TechManageServiceOrder: React.FC = () => {
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
 
     useEffect(() =>{
-        setLoading(true)
+        
         pagingPath.scrollTop()
         const currentPage = searchParams.get('page');
         if(!pagingPath.isValidPaging(currentPage)){
@@ -40,19 +42,39 @@ const TechManageServiceOrder: React.FC = () => {
             return navigate('/panel/take-care-order-assigned?page=1', { replace: true })
         }
 
-        const init = async () =>{
-            try{
-                if(!user.id) return;
-                const res = await orderService.getServiceOrdersByTechnician(user.id, {curPage: Number(currentPage), pageSize: paging.pageSize})
-                setServiceOrders(res.data.serviceOrderList)
-                setPaging(res.data.paging)
-            }catch{
-
+        if(filter.isFiltering && filter.takeCareStatus){
+            const init = async () =>{
+                try{
+                    if(!user.id || !filter.takeCareStatus) return;
+    
+                    setLoading(true)
+                    const res = await orderService.getServiceOrdersByTechnicianToday(user.id, filter.takeCareStatus, {curPage: Number(currentPage), pageSize: paging.pageSize})
+                    setServiceOrders(res.data.serviceOrderList)
+                    setPaging(res.data.paging)
+                }catch{
+    
+                }
+                setLoading(false)
             }
+            init()
+        }else{
+            const init = async () =>{
+                try{
+                    if(!user.id) return;
+    
+                    setLoading(true)
+                    const res = await orderService.getServiceOrdersByTechnician(user.id, {curPage: Number(currentPage), pageSize: paging.pageSize})
+                    setServiceOrders(res.data.serviceOrderList)
+                    setPaging(res.data.paging)
+                }catch{
+    
+                }
+                setLoading(false)
+            }
+            init()
         }
-        init()
-        setLoading(false)
-    }, [user.id, paging.pageSize, navigate, searchParams])
+
+    }, [user.id, paging.pageSize, navigate, searchParams, filter])
 
     const ColumnServiceOrder: ColumnsType<any> = [
         {
@@ -132,13 +154,25 @@ const TechManageServiceOrder: React.FC = () => {
     const contextService = (record) =>{
         return (
             <div className='context-menu-wrapper'>
-                <div className="item" onClick={() => {
+                <Link to={`/panel/take-care-order-assigned/${record.orderId}`} target='_blank' >
+                    <div className="item" onClick={() => {
+                        setActionMethod(undefined)
+                        // handleAction({orderId: record.orderId, actionType: 'detail', orderType: 'service', openIndex: -1})
+                        // navigate(`/panel/take-care-order-assigned/${record.orderId}`)
+                    }}>
+                        <BiCommentDetail size={25} className='icon'/>
+                        <span>Chi tiết đơn hàng</span>
+                    </div>
+                    {/* <BiCommentDetail size={25} className='icon'/>
+                    <span>Chi tiết đơn hàng</span> */}
+                </Link>
+                {/* <div className="item" onClick={() => {
                     // handleAction({orderId: record.orderId, actionType: 'detail', orderType: 'service', openIndex: -1})
                     navigate(`/panel/take-care-order-assigned/${record.orderId}`)
                 }}>
                     <BiCommentDetail size={25} className='icon'/>
                     <span>Chi tiết đơn hàng</span>
-                </div>
+                </div> */}
             </div>
         )
     }
@@ -197,6 +231,9 @@ const TechManageServiceOrder: React.FC = () => {
     return (
         <div className='tmso-wrapper'>
             <HeaderInfor title='Quản lý những yêu cầu chăm sóc cây của bạn' />
+            <Filtering 
+                isOrderToDay
+            />
             <section className="default-layout">
                 <Table
                     className='table' 

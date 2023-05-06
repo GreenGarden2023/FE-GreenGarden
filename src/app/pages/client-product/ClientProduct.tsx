@@ -16,12 +16,16 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import './style.scss';
 import LoadingView from 'app/components/loading-view/LoadingView';
 import NoProduct from 'app/components/no-product/NoProduct';
+import Searching from 'app/components/search-and-filter/search/Searching';
+import useSelector from 'app/hooks/use-selector';
+import GridConfig from 'app/components/grid-config/GridConfig';
 
 const ClientProduct: React.FC = () => {
     const { categoryId } = useParams()
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
+    const { search } = useSelector(state => state.SearchFilter)
 
     const [products, setProducts] = useState<Product[]>([])
     const [paging, setPaging] = useState<Partial<Paging>>({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.CLIENT_PRODUCT});
@@ -36,20 +40,37 @@ const ClientProduct: React.FC = () => {
       if(!categoryId || !currentPage || !pagingPath.isValidPaging(currentPage)) {
         return navigate(`/category/${categoryId}?page=1`, { replace: true })
       };
-      const init = async () =>{
-        setLoading(true)
-        try{
-          const res = await productServcie.getAllProduct({curPage: Number(currentPage), pageSize: paging.pageSize}, categoryId, 'active', isRent)
-          setProducts(res.data.result)
-          setPaging(res.data.paging)
-          setCategory(res.data.category)
-        }catch(err){
-          dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+
+      if(search.isSearching && search.productName){
+        const init = async () =>{
+          setLoading(true)
+          try{
+            const res = await productServcie.getProductsBySearchText({curPage: Number(currentPage), pageSize: paging.pageSize || 20, searchText: search.productName || ''}, categoryId)
+            setProducts(res.data.result)
+            setPaging(res.data.paging)
+            setCategory(res.data.category)
+          }catch{
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+          }
+          setLoading(false)
         }
-        setLoading(false)
+        init()
+      }else{
+        const init = async () =>{
+          setLoading(true)
+          try{
+            const res = await productServcie.getAllProduct({curPage: Number(currentPage), pageSize: paging.pageSize}, categoryId, 'active', isRent)
+            setProducts(res.data.result)
+            setPaging(res.data.paging)
+            setCategory(res.data.category)
+          }catch(err){
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+          }
+          setLoading(false)
+        }
+        init();
       }
-      init();
-    }, [searchParams, navigate, categoryId, dispatch, isRent, paging.pageSize])
+    }, [searchParams, navigate, categoryId, dispatch, isRent, paging.pageSize, search])
     
     return (
       <div>
@@ -73,6 +94,10 @@ const ClientProduct: React.FC = () => {
                 <span className={`cp-for-sale ${isRent === 'sale' ? 'active' : ''}`} onClick={() => setIsRent('sale')}>Bán</span>
               </div>
             </section>
+            <Searching 
+              isProductName
+              defaultUrl={`/category/${categoryId}?page=1`}
+            />
             <section className="cp-box">
               {
                 loading ? <LoadingView loading /> :
@@ -80,10 +105,11 @@ const ClientProduct: React.FC = () => {
                   {
                     products.length === 0 ? <NoProduct /> :
                     <>
+                    <GridConfig>
                       <Row gutter={[10, 10]}>
                         {
                           products.map((product, index) => (
-                            <Col xs={24} xl={12} key={index}>
+                            <Col xs={24} sm={12} lg={24} xl={12} key={index}>
                               {/* <div className='cp-item'> */}
                                 <Link to={`/product/${product.id}`} className='cp-item'>
                                   <div className="left">
@@ -109,6 +135,7 @@ const ClientProduct: React.FC = () => {
                           ))
                         }
                       </Row>
+                    </GridConfig>
                       <div className="cp-pagination">
                         <Pagination 
                           pageSize={paging?.pageSize || 1} 

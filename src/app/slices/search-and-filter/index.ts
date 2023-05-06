@@ -1,16 +1,18 @@
 import { createSlice, PayloadAction, CaseReducer } from '@reduxjs/toolkit';
-import { OrderStatus, Role } from 'app/models/general-type';
+import { OrderStatus, Role, TakeCareStatus } from 'app/models/general-type';
 
 interface SearchProps{
     orderCode?: string;
     phone?: string;
     status?: OrderStatus
+    productName?: string;
     isSearching: boolean;
 }
 interface FilterProps{
     startDate?: string;
     endDate?: string;
     role?: Role;
+    takeCareStatus?: TakeCareStatus
     isFiltering: boolean;
 }
 
@@ -67,15 +69,7 @@ const setEmptyFilterCR: CR<void> = (state, action) =>{
         }
     }
 }
-const setOrderCodeCR: CR<string> = (state, action) => {
-    return {
-        ...state,
-        search: {
-            ...state.search,
-            orderCode: action.payload
-        }
-    }
-}
+
 const setRangeDateCR: CR<{start: string, end: string}> = (state, action) => {
     return {
         ...state,
@@ -83,24 +77,6 @@ const setRangeDateCR: CR<{start: string, end: string}> = (state, action) => {
             ...state.filter,
             startDate: action.payload.start,
             endDate: action.payload.end
-        }
-    }
-}
-const setPhoneCR: CR<string> = (state, action) =>{
-    return {
-        ...state,
-        search: {
-            ...state.search,
-            phone: action.payload
-        }
-    }
-}
-const setStatusCR: CR<OrderStatus> = (state, action) =>{
-    return {
-        ...state,
-        search: {
-            ...state.search,
-            status: action.payload
         }
     }
 }
@@ -115,21 +91,43 @@ const setRoleCR: CR<Role> = (state, action) =>{
     }
 }
 
+const setOrderTodayCR: CR<TakeCareStatus> = (state, action) =>{
+    return {
+        ...state,
+        filter:{
+            ...state.filter,
+            takeCareStatus: action.payload
+        }
+    }
+}
+
+const setSearchValuesCR: CR<SearchProps> = (state, action) =>{
+    return {
+        search: action.payload,
+        filter: {
+            isFiltering: false,
+            endDate: undefined,
+            role: undefined,
+            startDate: undefined,
+            takeCareStatus: undefined
+        }
+    }
+}
+
 const slice = createSlice({
     name: 'searchAndFilter/slice',
     initialState,
     reducers: {
         setSearch: setSearchCR,
         setFilter: setFilterCR,
-        setOrderCode: setOrderCodeCR,
         setRangeDate: setRangeDateCR,
         setEmptySearch: setEmptySearchCR,
         setEmptyFilter: setEmptyFilterCR,
-        setPhone: setPhoneCR,
-        setStatus: setStatusCR,
-        setRole: setRoleCR
+        setRole: setRoleCR,
+        setOrderToday: setOrderTodayCR,
+        setSearchValues: setSearchValuesCR
     },
 });
 
-export const { setSearch, setFilter, setOrderCode, setRangeDate, setEmptySearch, setEmptyFilter, setPhone, setStatus, setRole } = slice.actions
+export const { setSearch, setFilter, setRangeDate, setEmptySearch, setEmptyFilter, setRole, setOrderToday, setSearchValues } = slice.actions
 export default slice.reducer

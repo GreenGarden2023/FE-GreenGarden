@@ -30,6 +30,7 @@ import feedbackService from 'app/services/feedback.service';
 import utilDateTime from 'app/utils/date-time';
 import LoadingView from 'app/components/loading-view/LoadingView';
 import NoProduct from 'app/components/no-product/NoProduct';
+import GridConfig from 'app/components/grid-config/GridConfig';
 
 const text = `Đối với các sản phẩm cây/ bao gồm cây:\n- Chỉ giao hàng tại TP HCM`
 const ClientProductItemDetail: React.FC = () => {
@@ -272,147 +273,149 @@ const ClientProductItemDetail: React.FC = () => {
                                     {
                                         proItem && 
                                         <section className="cpid-product-infor default-layout">
-                                            <Row gutter={[24, 24]}>
-                                                <Col xs={12} xl={12}>
-                                                    <div className="left carousel-warpper">
-                                                        <Carousel 
-                                                            infiniteLoop 
-                                                            useKeyboardArrows 
-                                                            showIndicators={false}
-                                                            renderArrowPrev={(clickHandler) => (
-                                                                <div className='pre-custom' onClick={clickHandler}>
-                                                                    <GrFormPrevious className='pre-icon' />
-                                                                </div>
-                                                            )}
-                                                            renderArrowNext={(clickHandler) => (
-                                                                <div className='next-custom' onClick={clickHandler}>
-                                                                    <GrFormNext className='next-icon' />
-                                                                </div>
-                                                            )}
-                                                        >
-                                                            {
-                                                                proItem.productItemDetail.filter(x => x.size.id === sizeSelect)[0].imagesURL.map((detail, index) => (
-                                                                    <div key={index} className='root-image'>
-                                                                        {/* <Image src='/assets/inventory-empty.png' alt='/' /> */}
-                                                                        <img src={detail} alt='/' />
+                                            <GridConfig>
+                                                <Row gutter={[24, 24]}>
+                                                    <Col xs={24} lg={12} xl={12} sm={24} >
+                                                        <div className="left carousel-warpper">
+                                                            <Carousel 
+                                                                infiniteLoop 
+                                                                useKeyboardArrows 
+                                                                showIndicators={false}
+                                                                renderArrowPrev={(clickHandler) => (
+                                                                    <div className='pre-custom' onClick={clickHandler}>
+                                                                        <GrFormPrevious className='pre-icon' />
                                                                     </div>
-                                                                ))
-                                                            }
-                                                        </Carousel>
-                                                    </div>
-                                                </Col>
-                                                <Col xs={12} xl={12}>
-                                                    <div className="right">
-                                                        <div className="title title-name-wrapper">
-                                                            <IoFlowerOutline size={30} color='#e91e63' />
-                                                            <h1>{proItem.name}</h1>
-                                                        </div>
-                                                        <div className="infor-detail">
-                                                            {/* proItem.description */}
-                                                            <ul>
+                                                                )}
+                                                                renderArrowNext={(clickHandler) => (
+                                                                    <div className='next-custom' onClick={clickHandler}>
+                                                                        <GrFormNext className='next-icon' />
+                                                                    </div>
+                                                                )}
+                                                            >
                                                                 {
-                                                                    proItem?.description?.split('\n').map((item, index) => (
-                                                                        <li key={index}>
-                                                                            {item}
-                                                                        </li>
+                                                                    proItem.productItemDetail.filter(x => x.size.id === sizeSelect)[0].imagesURL.map((detail, index) => (
+                                                                        <div key={index} className='root-image'>
+                                                                            {/* <Image src='/assets/inventory-empty.png' alt='/' /> */}
+                                                                            <img src={detail} alt='/' />
+                                                                        </div>
                                                                     ))
                                                                 }
-                                                            </ul>
+                                                            </Carousel>
                                                         </div>
-                                                        <div className="size-wrapper">
-                                                            <span className='title'>Thể loại</span>
-                                                            {
-                                                                proItem.productItemDetail.map((proItemDe, i) => (
-                                                                    <Tag style={{cursor: 'pointer'}} color={proItemDe.size.id === sizeSelect ? '#00a76f' : ''} key={i} onClick={() => handleSelectSize(proItemDe.size.id)} >{proItemDe.size.sizeName}</Tag>
-                                                                ))
-                                                            }
-                                                        </div>
-                                                        <div className="num-tree">
-                                                            <span className='title'>Số lượng cây còn lại</span>
-                                                            <span className='result'>{proItemSelectBySize?.quantity}</span>
-                                                        </div>
-                                                        {
-                                                            proItemSelectBySize && 
-                                                            <div className="price-box">
+                                                    </Col>
+                                                    <Col xs={24} lg={12} xl={12} sm={24}>
+                                                        <div className="right">
+                                                            <div className="title title-name-wrapper">
+                                                                <IoFlowerOutline size={30} color='#e91e63' />
+                                                                <h1>{proItem.name}</h1>
+                                                            </div>
+                                                            <div className="infor-detail">
+                                                                {/* proItem.description */}
+                                                                <ul>
+                                                                    {
+                                                                        proItem?.description?.split('\n').map((item, index) => (
+                                                                            <li key={index}>
+                                                                                {item}
+                                                                            </li>
+                                                                        ))
+                                                                    }
+                                                                </ul>
+                                                            </div>
+                                                            <div className="size-wrapper">
+                                                                <span className='title'>Thể loại</span>
                                                                 {
-                                                                    proItemSelectBySize.rentPrice ?
-                                                                    <div className="rent-price" style={{flex: !proItemSelectBySize.salePrice ? '1' : 'initial'}}>
-                                                                        <p className='title-price'>Giá thuê / ngày</p>
-                                                                        <p className="price">
-                                                                            <CurrencyFormat value={proItemSelectBySize.rentPrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
-                                                                        </p>
-                                                                        {
-                                                                            (!roleName || roleName === 'Customer') &&
-                                                                            <>
-                                                                                <div className="quantity">
-                                                                                    <p>Số lượng</p>
-                                                                                    <div className="quantity-box">
-                                                                                        <button className="decrease" onClick={() => controlRent('-')}>
-                                                                                            <GrFormSubtract />
-                                                                                        </button>
-                                                                                        <input type="number" value={quanRent} onChange={handleChangeRent} disabled={proItem.type === 'unique'} />
-                                                                                        <button className="increase" onClick={() => controlRent('+')}>
-                                                                                            <BiPlus />
-                                                                                        </button>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div className="atc">
-                                                                                    <button onClick={() => handleAddCart('Rent', proItemSelectBySize.id)}>
-                                                                                        <AiOutlineShoppingCart size={40} />
-                                                                                        <span>Thêm vào giỏ hàng</span>
-                                                                                    </button>
-                                                                                </div>
-                                                                            </>
-                                                                        }
-                                                                    </div> : undefined
-                                                                }
-                                                                {
-                                                                    proItemSelectBySize.salePrice ? 
-                                                                    <div className="sale-price">
-                                                                        <p className='title-price'>Giá bán</p>
-                                                                        <p className="price">
-                                                                            <CurrencyFormat value={proItemSelectBySize.salePrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
-                                                                        </p>
-                                                                        {
-                                                                            (!roleName || roleName === 'Customer') &&
-                                                                            <>
-                                                                                <div className="quantity">
-                                                                                    <p>Số lượng</p>
-                                                                                    <div className="quantity-box">
-                                                                                        <button className="decrease" onClick={() => controlSale('-')}>
-                                                                                            <GrFormSubtract  />
-                                                                                        </button>
-                                                                                        <input type="number" value={quanSale} onChange={handleChangeSale} disabled={proItem.type === 'unique'} />
-                                                                                        <button className="increase" onClick={() => controlSale('+')}>
-                                                                                            <BiPlus  />
-                                                                                        </button>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div className="atc">
-                                                                                    <button onClick={() => handleAddCart('Sale', proItemSelectBySize.id)}>
-                                                                                        <AiOutlineShoppingCart size={40} />
-                                                                                        <span>Thêm vào giỏ hàng</span>
-                                                                                    </button>
-                                                                                </div>
-                                                                            </>
-                                                                        }
-                                                                    </div> : undefined
+                                                                    proItem.productItemDetail.map((proItemDe, i) => (
+                                                                        <Tag style={{cursor: 'pointer'}} color={proItemDe.size.id === sizeSelect ? '#00a76f' : ''} key={i} onClick={() => handleSelectSize(proItemDe.size.id)} >{proItemDe.size.sizeName}</Tag>
+                                                                    ))
                                                                 }
                                                             </div>
-                                                        }
-                                                        <Divider orientation='left' plain >Chính sách</Divider>
-                                                        <div className="policy">
-                                                        <Collapse defaultActiveKey={['1']} ghost>
-                                                            <Collapse.Panel header="Chính sách vận chuyển" key="1">
-                                                                <p className='panel-text'>
-                                                                    {text}
-                                                                </p>
-                                                            </Collapse.Panel>
-                                                        </Collapse>
+                                                            <div className="num-tree">
+                                                                <span className='title'>Số lượng cây còn lại</span>
+                                                                <span className='result'>{proItemSelectBySize?.quantity}</span>
+                                                            </div>
+                                                            {
+                                                                proItemSelectBySize && 
+                                                                <div className="price-box">
+                                                                    {
+                                                                        proItemSelectBySize.rentPrice ?
+                                                                        <div className="rent-price" style={{flex: !proItemSelectBySize.salePrice ? '1' : 'initial'}}>
+                                                                            <p className='title-price'>Giá thuê / ngày</p>
+                                                                            <p className="price">
+                                                                                <CurrencyFormat value={proItemSelectBySize.rentPrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
+                                                                            </p>
+                                                                            {
+                                                                                (!roleName || roleName === 'Customer') &&
+                                                                                <>
+                                                                                    <div className="quantity">
+                                                                                        <p>Số lượng</p>
+                                                                                        <div className="quantity-box">
+                                                                                            <button className="decrease" onClick={() => controlRent('-')}>
+                                                                                                <GrFormSubtract />
+                                                                                            </button>
+                                                                                            <input type="number" value={quanRent} onChange={handleChangeRent} disabled={proItem.type === 'unique'} />
+                                                                                            <button className="increase" onClick={() => controlRent('+')}>
+                                                                                                <BiPlus />
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div className="atc">
+                                                                                        <button onClick={() => handleAddCart('Rent', proItemSelectBySize.id)}>
+                                                                                            <AiOutlineShoppingCart size={40} />
+                                                                                            <span>Thêm vào giỏ hàng</span>
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </>
+                                                                            }
+                                                                        </div> : undefined
+                                                                    }
+                                                                    {
+                                                                        proItemSelectBySize.salePrice ? 
+                                                                        <div className="sale-price">
+                                                                            <p className='title-price'>Giá bán</p>
+                                                                            <p className="price">
+                                                                                <CurrencyFormat value={proItemSelectBySize.salePrice} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} />
+                                                                            </p>
+                                                                            {
+                                                                                (!roleName || roleName === 'Customer') &&
+                                                                                <>
+                                                                                    <div className="quantity">
+                                                                                        <p>Số lượng</p>
+                                                                                        <div className="quantity-box">
+                                                                                            <button className="decrease" onClick={() => controlSale('-')}>
+                                                                                                <GrFormSubtract  />
+                                                                                            </button>
+                                                                                            <input type="number" value={quanSale} onChange={handleChangeSale} disabled={proItem.type === 'unique'} />
+                                                                                            <button className="increase" onClick={() => controlSale('+')}>
+                                                                                                <BiPlus  />
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div className="atc">
+                                                                                        <button onClick={() => handleAddCart('Sale', proItemSelectBySize.id)}>
+                                                                                            <AiOutlineShoppingCart size={40} />
+                                                                                            <span>Thêm vào giỏ hàng</span>
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </>
+                                                                            }
+                                                                        </div> : undefined
+                                                                    }
+                                                                </div>
+                                                            }
+                                                            <Divider orientation='left' plain >Chính sách</Divider>
+                                                            <div className="policy">
+                                                            <Collapse defaultActiveKey={['1']} ghost>
+                                                                <Collapse.Panel header="Chính sách vận chuyển" key="1">
+                                                                    <p className='panel-text'>
+                                                                        {text}
+                                                                    </p>
+                                                                </Collapse.Panel>
+                                                            </Collapse>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </Col>
-                                            </Row>
+                                                    </Col>
+                                                </Row>
+                                            </GridConfig>
                                             {
                                                 proItem && 
                                                 <>

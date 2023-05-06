@@ -5,6 +5,8 @@ import { Product, ProductHandle } from "app/models/product";
 import { Response } from "app/models/response";
 import queryString from "query-string";
 import golbalAxios from "../utils/http-client";
+import { PagingProps } from "app/models/paging";
+import { ProductItemResponse } from "app/models/product-item";
 
 interface GetData{
     paging: Paging;
@@ -20,6 +22,18 @@ const getAllProduct = async (pagingProps: Partial<Paging>, categoryId: string, s
         rentSale: typeOfSale
     }
     const result = await golbalAxios.get<Response<GetData>>(`/product/get-products-by-category-status?${queryString.stringify(params)}`);
+    return result.data
+}
+
+const getProductsBySearchText = async (pagingProps: PagingProps, categoryID: string) =>{
+    const params = { ...pagingProps, categoryID }
+    const result = await golbalAxios.get<Response<GetData>>(`/product/get-products-by-search-text?${queryString.stringify(params)}`);
+    return result.data
+}
+
+const getProductItemsBySearchText = async (pagingProps: PagingProps, productID: string) =>{
+    const params = { ...pagingProps, productID }
+    const result = await golbalAxios.get<Response<ProductItemResponse>>(`/product/get-product-items-by-search-text?${queryString.stringify(params)}`);
     return result.data
 }
 
@@ -80,7 +94,9 @@ const productServcie = {
     getAllProduct,
     createProduct,
     updateProduct,
-    toggleProduct
+    toggleProduct,
+    getProductsBySearchText,
+    getProductItemsBySearchText
 }
 
 export default productServcie

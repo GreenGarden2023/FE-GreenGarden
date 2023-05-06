@@ -1,7 +1,7 @@
 import { Col, Input, Row, Select } from 'antd';
 import useDispatch from 'app/hooks/use-dispatch';
-import { Role } from 'app/models/general-type';
-import { setEmptyFilter, setEmptySearch, setFilter, setRangeDate, setRole } from 'app/slices/search-and-filter';
+import { Role, TakeCareStatus } from 'app/models/general-type';
+import { setEmptyFilter, setEmptySearch, setFilter, setOrderToday, setRangeDate, setRole } from 'app/slices/search-and-filter';
 import CONSTANT from 'app/utils/constant';
 import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react';
@@ -11,15 +11,17 @@ import './style.scss';
 
 interface FilteringProps{
     isRangeDate?: boolean;
+    isOrderToDay?: boolean;
     isRole?: boolean;
 }
 
-const Filtering: React.FC<FilteringProps> = ({ isRangeDate, isRole }) => {
+const Filtering: React.FC<FilteringProps> = ({ isRangeDate, isOrderToDay, isRole }) => {
     const dispatch = useDispatch()
 
     const [rangeDateNew, setRangeDateNew] = useState<number>()
     // const [rangeDateFilter, setRangeDateFilter] = useState<[Dayjs, Dayjs]>()
     const [roleFilter, setRoleFilter] = useState<Role>()
+    const [statusRequest, setStatusRequest] = useState<TakeCareStatus>('')
 
     useEffect(() =>{
         dispatch(setFilter(false))
@@ -39,18 +41,13 @@ const Filtering: React.FC<FilteringProps> = ({ isRangeDate, isRole }) => {
             const end = dayjs(current).format('DD/MM/YYYY')
             dispatch(setRangeDate({start, end}))
         }
-
-        // if(isRangeDate && rangeDateFilter){
-        //     const [start, end] = rangeDateFilter
-        //     data.startDate = start.format('DD/MM/YYYY')
-        //     data.endDate = end.format('DD/MM/YYYY')
-        //     dispatch(setRangeDate({start: start.format('DD/MM/YYYY'), end: end.format('DD/MM/YYYY')}))
-        // }else{
-        //     dispatch(setRangeDate({start: '', end: ''}))
-        // }
         
         if(isRole && roleFilter){
             dispatch(setRole(roleFilter))
+        }
+
+        if(isOrderToDay && statusRequest){
+            dispatch(setOrderToday(statusRequest))
         }
 
         // ----------------------
@@ -62,6 +59,7 @@ const Filtering: React.FC<FilteringProps> = ({ isRangeDate, isRole }) => {
         setRangeDateNew(undefined)
         // setRangeDateFilter(undefined)
         setRoleFilter(undefined)
+        setStatusRequest('')
         // ----------------------
         dispatch(setFilter(false))
     }
@@ -90,15 +88,25 @@ const Filtering: React.FC<FilteringProps> = ({ isRangeDate, isRole }) => {
                                         setRangeDateNew(Number(e.target.value))
                                     }
                                 }} />
-                                {/* <DatePicker.RangePicker 
-                                    locale={locale}
-                                    placeholder={["Từ ngày", "Đến ngày"]}
-                                    format={CONSTANT.DATE_FORMAT_LIST}
-                                    onChange={handleChangeDateRange}
-                                    value={rangeDateFilter}
-                                    style={{width: '100%'}}
-                                /> */}
-                                {/* <Input placeholder='WS16MG56OY' value={orderCode} onChange={(e) => setOrderCode(e.target.value)} /> */}
+                            </div>
+                        </Col>
+                    }
+                    {
+                        isOrderToDay &&
+                        <Col span={6}>
+                            <div className='order-today'>
+                                <p className='mb-5'>Chọn trạng thái chăm sóc hôm nay</p>
+                                <Select value={statusRequest} onChange={(e) => setStatusRequest(e)} style={{ width: '100%' }} placeholder='Đã chăm sóc' >
+                                    <Select.Option value=''>
+                                        None
+                                    </Select.Option>
+                                    <Select.Option value='done'>
+                                        Đã chăm sóc
+                                    </Select.Option>
+                                    <Select.Option value='pending'>
+                                        Chưa chăm sóc
+                                    </Select.Option>
+                                </Select>
                             </div>
                         </Col>
                     }

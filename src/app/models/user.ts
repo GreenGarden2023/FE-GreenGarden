@@ -23,6 +23,7 @@ export interface UserUpdate{
     mail: string;
     favorite: string;
     districtID: number;
+    currentPoint: number;
 }
 
 export interface LoginResponse{

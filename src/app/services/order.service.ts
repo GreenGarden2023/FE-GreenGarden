@@ -1,4 +1,4 @@
-import { OrderStatus, OrderType } from "app/models/general-type";
+import { OrderStatus, OrderType, TakeCareStatus } from "app/models/general-type";
 import { CreateServiceOrder, OrderCalculate, OrderCreate, OrderExtendDetail, RentOrder, RentOrderList, RentOrderResponse, SaleOrderDetail, SaleOrderResponse } from "app/models/order";
 import { Paging } from "app/models/paging";
 import { Response } from "app/models/response";
@@ -89,6 +89,11 @@ const createServiceOrder = async (serviceId: string) =>{
 const getServiceOrdersByTechnician = async (technicianID: string, paging: Partial<Paging>) =>{
     const params = {technicianID, ...paging}
     const res = await golbalAxios.get<Response<ServiceResponse>>(`/order/get-service-orders-by-technician?${queryString.stringify(params)}`)
+    return res.data
+}
+const getServiceOrdersByTechnicianToday = async (technicianID: string, takecareStatus: TakeCareStatus, paging: Partial<Paging>) =>{
+    const params = {technicianID, takecareStatus, ...paging}
+    const res = await golbalAxios.get<Response<ServiceResponse>>(`/order/get-service-orders-by-technician-today?${queryString.stringify(params)}`)
     return res.data
 }
 const getAServiceOrderDetail = async (orderID: string) =>{
@@ -184,7 +189,8 @@ const orderService = {
     getServiceOrderDetailByOrderCode,
     getRentOrderDetailByRangeDate,
     updateServiceOrderStatus,
-    getSerivceOrderDetailByRangeDate
+    getSerivceOrderDetailByRangeDate,
+    getServiceOrdersByTechnicianToday
 }
 
 export default orderService
