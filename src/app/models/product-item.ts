@@ -36,6 +36,10 @@ export interface ProductItem{
     imageURL: string;
     productItemDetail: ProductItemDetail[];
     rule: string;
+    minSale: number;
+    maxSale: number;
+    minRent: number;
+    maxRent: number;
 }
 export interface ProductItemResponse{
     paging: Paging;

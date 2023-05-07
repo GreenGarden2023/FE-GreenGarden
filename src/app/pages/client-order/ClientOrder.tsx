@@ -120,6 +120,8 @@ const ClientOrder: React.FC = () =>{
         if(pageType !== 'service') return;
         const currentPage = searchParams.get('page');
 
+        if(!pagingPath.isValidPaging(currentPage)) return;
+        
         const init = async () =>{
             setLoading(true)
             try{
@@ -218,7 +220,6 @@ const ClientOrder: React.FC = () =>{
             dataIndex: 'orderCode',
             align: 'center',
             width: 170,
-            fixed: 'left',
             render: (v) => (v)
         },
         {
@@ -240,43 +241,41 @@ const ClientOrder: React.FC = () =>{
             key: 'transportFee',
             dataIndex: 'transportFee',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} color='Default' />)
+            render: (v) => (<MoneyFormat value={v} color='Default' minWidth={130} />)
         },
         {
             title: 'Tiền cọc',
             key: 'deposit',
             dataIndex: 'deposit',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} color='Orange' />)
+            render: (v) => (<MoneyFormat value={v} color='Orange' minWidth={130} />)
         },
         {
             title: 'Tiền được giảm',
             key: 'discountAmount',
             dataIndex: 'discountAmount',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} color='Yellow' />)
+            render: (v) => (<MoneyFormat value={v} color='Yellow' minWidth={130} />)
         },
         {
             title: 'Tổng đơn hàng',
             key: 'totalPrice',
             dataIndex: 'totalPrice',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} color='Light Blue' />)
+            render: (v) => (<MoneyFormat value={v} color='Light Blue' minWidth={130} />)
         },
         {
             title: 'Số tiền cần trả',
             key: 'remainMoney',
             dataIndex: 'remainMoney',
             align: 'right',
-            fixed:'right',
-            render: (v) => (<MoneyFormat value={v} color='Blue' />)
+            render: (v) => (<MoneyFormat value={v} color='Blue' minWidth={130} />)
         },
         {
             title: 'Xử lý',
             key: 'actions',
             dataIndex: 'actions',
             align: 'center',
-            fixed:'right',
             render: (_, record, index) => (
                 <Popover 
                 content={() => contextSale(record)} 
@@ -291,7 +290,7 @@ const ClientOrder: React.FC = () =>{
                     }
                 }}
                 >
-                    <GrMore size={25} cursor='pointer' color='#00a76f' />
+                    <GrMore size={25} cursor='pointer' color='#00a76f' style={{minWidth: '100px'}} />
                 </Popover>
             )
         },
@@ -363,7 +362,6 @@ const ClientOrder: React.FC = () =>{
             key: 'orderCode',
             dataIndex: 'orderCode',
             align: 'center',
-            fixed: 'left',
             width: 170,
             render: (v) => (v)
         },
@@ -390,53 +388,48 @@ const ClientOrder: React.FC = () =>{
             title: "Số lượng đơn hàng",
             key: "numberOfOrder",
             dataIndex: "numberOfOrder",
-            render: (v) => (v)
+            render: (v) => <p style={{minWidth: '70px'}}>{v}</p>
         },
         {
             title: 'Phí vận chuyển',
             key: 'transportFee',
             dataIndex: 'transportFee',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} color='Default' />)
+            render: (v) => (<MoneyFormat value={v} color='Default' minWidth={130} />)
         },
         {
             title: 'Tiền cọc',
             key: 'deposit',
             dataIndex: 'deposit',
             align: 'right',
-            width: 200,
-            render: (v) => (<MoneyFormat value={v} color='Orange' />)
+            render: (v) => (<MoneyFormat value={v} color='Orange' minWidth={130} />)
         },
         {
             title: 'Tiền được giảm',
             key: 'discountAmount',
             dataIndex: 'discountAmount',
             align: 'right',
-            width: 200,
-            render: (v) => (<MoneyFormat value={v} color='Yellow' />)
+            render: (v) => (<MoneyFormat value={v} color='Yellow' minWidth={130} />)
         },
         {
             title: 'Giá trị đơn hàng',
             key: 'totalPrice',
             dataIndex: 'totalPrice',
             align: 'right',
-            width: 200,
-            render: (v) => (<MoneyFormat value={v} color='Light Blue' />)
+            render: (v) => (<MoneyFormat value={v} color='Light Blue' minWidth={130} />)
         },
         {
             title: 'Số tiền cần trả',
             key: 'remainMoney',
             dataIndex: 'remainMoney',
             align: 'right',
-            width: 200,
-            render: (v) => (<MoneyFormat value={v} color='Blue' />)
+            render: (v) => (<MoneyFormat value={v} color='Blue' minWidth={130} />)
         },
         {
             title: 'Xử lý',
             key: 'action',
             dataIndex: 'action',
             align: 'center',
-            fixed: 'right',
             render: (_, record, index) => (
                     <Popover 
                         content={() => contextRent(record)} 
@@ -451,7 +444,7 @@ const ClientOrder: React.FC = () =>{
                             }
                         }}
                     >
-                        <GrMore size={25} cursor='pointer' color='#00a76f' />
+                        <GrMore size={25} cursor='pointer' color='#00a76f' style={{minWidth: '100px'}} />
                     </Popover>
             )
         },
@@ -614,7 +607,6 @@ const ClientOrder: React.FC = () =>{
             title: 'Mã đơn hàng',
             key: 'orderCode',
             dataIndex: 'orderCode',
-            fixed: 'left'
         },
         {
             title: 'Mã dịch vụ',
@@ -650,55 +642,54 @@ const ClientOrder: React.FC = () =>{
             title: 'Người chăm sóc',
             key: 'technicianName',
             dataIndex: 'technicianName',
-            render: (v) => <TechnicianName name={v} />
+            render: (v) => <TechnicianName name={v} minWidth={100} />
         },
         {
             title: 'Tổng số cây',
             key: 'totalQuantity',
             dataIndex: 'totalQuantity',
+            render: (v) => <p style={{minWidth: '70px'}}>{v}</p>
         },
         {
             title: 'Phí vận chuyển',
             key: 'transportFee',
             dataIndex: 'transportFee',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} color='Default' />)
+            render: (v) => (<MoneyFormat value={v} color='Default' minWidth={130} />)
         },
         {
             title: 'Tiền cọc',
             key: 'deposit',
             dataIndex: 'deposit',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} color='Orange' />)
+            render: (v) => (<MoneyFormat value={v} color='Orange' minWidth={130} />)
         },
         {
             title: 'Tiền được giảm',
             key: 'discountAmount',
             dataIndex: 'discountAmount',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} color='Yellow' />)
+            render: (v) => (<MoneyFormat value={v} color='Yellow' minWidth={130} />)
         },
         {
             title: 'Tổng đơn hàng',
             key: 'totalPrice',
             dataIndex: 'totalPrice',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} color='Light Blue' />)
+            render: (v) => (<MoneyFormat value={v} color='Light Blue' minWidth={130} />)
         },
         {
             title: 'Số tiền cần trả',
             key: 'remainAmount',
             dataIndex: 'remainAmount',
             align: 'right',
-            fixed: 'right',
-            render: (v) => (<MoneyFormat value={v} color='Blue' />)
+            render: (v) => (<MoneyFormat value={v} color='Blue' minWidth={130} />)
         },
         {
             title: 'Xử lý',
             key: 'action',
             dataIndex: 'action',
             align: 'center',
-            fixed: 'right',
             render: (_, record, index) => (
                     <Popover 
                         content={() => contextService(record)} 
@@ -713,7 +704,7 @@ const ClientOrder: React.FC = () =>{
                             }
                         }}
                     >
-                        <GrMore size={25} cursor='pointer' color='#00a76f' />
+                        <GrMore size={25} cursor='pointer' color='#00a76f' style={{minWidth: '100px'}} />
                     </Popover>
             )
         },
@@ -826,7 +817,7 @@ const ClientOrder: React.FC = () =>{
                                         className='cart-table' 
                                         columns={ColumnRentOrder} 
                                         dataSource={DataSourceRentOrder} 
-                                        scroll={{x: 2000}}
+                                        scroll={{x: 480}}
                                         pagination={{
                                             current: paging.curPage,
                                             pageSize: paging.pageSize,
@@ -845,7 +836,7 @@ const ClientOrder: React.FC = () =>{
                                         className='cart-table' 
                                         columns={ColumnSaleOrder} 
                                         dataSource={DataSourceSaleOrder} 
-                                        scroll={{x: 1500}}
+                                        scroll={{x: 480}}
                                         pagination={{
                                             current: paging.curPage,
                                             pageSize: paging.pageSize,
@@ -864,7 +855,7 @@ const ClientOrder: React.FC = () =>{
                                         className='cart-table' 
                                         columns={ColumnServiceOrder} 
                                         dataSource={DataSourceServiceOrder} 
-                                        scroll={{x: 2500}}
+                                        scroll={{x: 480}}
                                         pagination={{
                                             current: paging.curPage,
                                             pageSize: paging.pageSize,

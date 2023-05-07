@@ -76,13 +76,17 @@ const LandingHeader: React.FC = () => {
 
   useEffect(() =>{
     const handleResize = () => {
-        setMenuHeight(window.innerHeight);
+      if(window.innerWidth > 768){
+        setIsShowMenuMobile(false)
+      }
+      setMenuHeight(window.innerHeight);
     }
   
     window.addEventListener('resize', handleResize);
 
     // Set initial height on mount
     setMenuHeight(window.innerHeight);
+    
 
     // Remove event listener on unmount
     return () => window.removeEventListener('resize', handleResize);
@@ -103,6 +107,9 @@ const LandingHeader: React.FC = () => {
       element.style.display = isShowMenuMobile ? 'none' : 'initial'
     }
 
+    return () =>{
+      body.style.overflow = 'auto'
+    }
   }, [isShowMenuMobile])
 
   useEffect(() => {
@@ -338,7 +345,24 @@ const LandingHeader: React.FC = () => {
                                     <BsBagCheckFill size={20} />
                                     <span>Đơn hàng của bạn</span>
                                 </div>
+                                <div className="menu-item" onClick={handleLogout}>
+                                    <GiExitDoor size={20} />
+                                    <span>Đăng xuất</span>
+                                </div>
                             </>
+                        }
+                        {
+                          (userState.token && !IsCustomer) &&
+                          <>
+                            <div className="menu-item" onClick={navigateToPanel}>
+                              <BiGitPullRequest size={20} />
+                              <span>Bảng điều khiển</span>
+                            </div>
+                            <div className="menu-item" onClick={handleViewInfor}>
+                              <FaUserCircle size={20} />
+                              <span>{userState.user.fullName}</span>
+                            </div>
+                          </>
                         }
                     </div>
                     <div className="menu-close" onClick={() => setIsShowMenuMobile(false)}>

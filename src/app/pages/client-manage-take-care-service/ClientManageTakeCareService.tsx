@@ -49,7 +49,6 @@ const ClientManageTakeCareService: React.FC = () => {
             key: 'serviceCode',
             dataIndex: 'serviceCode',
             width: 240,
-            fixed: 'left'
         },
         {
             title: 'Ngày tạo đơn hàng',
@@ -80,19 +79,19 @@ const ClientManageTakeCareService: React.FC = () => {
             title: 'Người chăm sóc',
             key: 'technicianName',
             dataIndex: 'technicianName',
-            render: (v) => (<TechnicianName name={v} />)
+            render: (v) => (<TechnicianName name={v} minWidth={100} />)
         },
         {
             title: 'Tổng số cây',
             key: 'totalQuantity',
             dataIndex: 'totalQuantity',
+            render: (v) => <p style={{minWidth: 80}}>{v}</p>
         },
         {
             title: 'Xử lý',
             key: 'action',
             dataIndex: 'action',
             align: 'center',
-            fixed: 'right',
             render: (_, record, index) => (
                     <Popover
                         content={() => contextService(record)} 
@@ -107,7 +106,7 @@ const ClientManageTakeCareService: React.FC = () => {
                             }
                         }}
                     >
-                        <GrMore size={25} cursor='pointer' color='#00a76f' />
+                        <GrMore size={25} cursor='pointer' color='#00a76f' style={{minWidth: 80}} />
                     </Popover>
             )
         },
@@ -184,7 +183,7 @@ const ClientManageTakeCareService: React.FC = () => {
                                 {
                                     services.length === 0 ? <NoProduct /> :
                                     <div className="default-layout">
-                                        <Table columns={Column} dataSource={DataSource} scroll={{x: 1500}} />
+                                        <Table columns={Column} dataSource={DataSource} scroll={{x: 480}} />
                                     </div>
                                 }
                             </>

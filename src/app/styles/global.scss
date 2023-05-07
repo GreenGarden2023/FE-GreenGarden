@@ -171,6 +171,7 @@ table{
 }
 // context menu
 .context-menu-wrapper{
+    min-width: 200px;
     .item{
         display: flex;
         align-items: center;

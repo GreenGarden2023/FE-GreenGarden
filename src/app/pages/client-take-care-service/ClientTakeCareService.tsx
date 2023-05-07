@@ -27,6 +27,7 @@ import CONSTANT from 'app/utils/constant'
 import { ShippingFee } from 'app/models/shipping-fee'
 import shippingFeeService from 'app/services/shipping-fee.service'
 import LoadingView from 'app/components/loading-view/LoadingView'
+import GridConfig from 'app/components/grid-config/GridConfig'
 
 
 const schema = yup.object().shape({
@@ -70,12 +71,12 @@ const ClientTakeCareService: React.FC = () => {
     const userState = useSelector(state => state.userInfor)
 
     useEffect(() =>{
-        if(!userState.token){
-            return navigate('/login')
-        }
-        if(userState.user.roleName !== 'Customer'){
-            return navigate('/file-not-found')
-        }
+        // if(!userState.token){
+        //     return navigate('/login')
+        // }
+        // if(userState.user.roleName !== 'Customer'){
+        //     return navigate('/file-not-found')
+        // }
 
     }, [userState, navigate])
 
@@ -259,49 +260,51 @@ const ClientTakeCareService: React.FC = () => {
                                                 <Checkbox checked={viewAll} onChange={(e) => setViewAll(e.target.checked)} >Hiển thị các cây đã chọn</Checkbox>
                                             </div>
                                         }
-                                        <Row gutter={[12, 12]}>
-                                            {
-                                                (viewAll ? treesSelect : listTrees).map((item, index) => (
-                                                    <>
-                                                        {
-                                                            item.status === 'active' &&
-                                                            <Col key={index} span={6}>
-                                                                <div className="item-detail">
-                                                                    <div className="actions-wrapper">
-                                                                        <Tooltip color='#f95441' title='Chỉnh sửa'>
-                                                                            <AiOutlineEdit size={20} onClick={() => setModalState({openModal: 2, tree: item})} />
-                                                                        </Tooltip>
-                                                                        <Tooltip color='#f95441' title='Xóa'>
-                                                                            <IoCloseSharp size={20} onClick={() => {
-                                                                                if(treesSelect.find(x => x.id === item.id)){
-                                                                                    dispatch(setNoti({type: 'warning', message: 'Vui lòng bỏ chọn cây trước khi xóa khỏi kho'}))
-                                                                                    return
-                                                                                }
-                                                                                setModalState({openModal: 4, tree: item})
-                                                                            }} />
-                                                                        </Tooltip>
+                                        <GridConfig>
+                                            <Row gutter={[12, 12]}>
+                                                {
+                                                    (viewAll ? treesSelect : listTrees).map((item, index) => (
+                                                        <>
+                                                            {
+                                                                item.status === 'active' &&
+                                                                <Col key={index} xs={24} sm={12} md={12} lg={8} xl={6} xxl={6}>
+                                                                    <div className="item-detail">
+                                                                        <div className="actions-wrapper">
+                                                                            <Tooltip color='#f95441' title='Chỉnh sửa'>
+                                                                                <AiOutlineEdit size={20} onClick={() => setModalState({openModal: 2, tree: item})} />
+                                                                            </Tooltip>
+                                                                            <Tooltip color='#f95441' title='Xóa'>
+                                                                                <IoCloseSharp size={20} onClick={() => {
+                                                                                    if(treesSelect.find(x => x.id === item.id)){
+                                                                                        dispatch(setNoti({type: 'warning', message: 'Vui lòng bỏ chọn cây trước khi xóa khỏi kho'}))
+                                                                                        return
+                                                                                    }
+                                                                                    setModalState({openModal: 4, tree: item})
+                                                                                }} />
+                                                                            </Tooltip>
+                                                                        </div>
+                                                                        <img src={item.imgUrls[0]} alt="/" />
+                                                                        <div className="item-infor">
+                                                                            <h1>
+                                                                                {item.treeName}
+                                                                                <span>({item.quantity})</span>
+                                                                            </h1>
+                                                                            <p className='description'>
+                                                                                Mô tả 
+                                                                                <span>{item.description}</span>
+                                                                            </p>
+                                                                        </div>
+                                                                        <div className="select-tree">
+                                                                            <Checkbox onChange={() => handleSelectTree(item)} checked={treesSelect.findIndex(x => x.id === item.id) > -1} >Chọn cây để chăm sóc</Checkbox>
+                                                                        </div>
                                                                     </div>
-                                                                    <img src={item.imgUrls[0]} alt="/" />
-                                                                    <div className="item-infor">
-                                                                        <h1>
-                                                                            {item.treeName}
-                                                                            <span>({item.quantity})</span>
-                                                                        </h1>
-                                                                        <p className='description'>
-                                                                            Mô tả 
-                                                                            <span>{item.description}</span>
-                                                                        </p>
-                                                                    </div>
-                                                                    <div className="select-tree">
-                                                                        <Checkbox onChange={() => handleSelectTree(item)} checked={treesSelect.findIndex(x => x.id === item.id) > -1} >Chọn cây để chăm sóc</Checkbox>
-                                                                    </div>
-                                                                </div>
-                                                            </Col>
-                                                        }
-                                                    </>
-                                                ))
-                                            }
-                                        </Row>
+                                                                </Col>
+                                                            }
+                                                        </>
+                                                    ))
+                                                }
+                                            </Row>
+                                        </GridConfig>
                                     </>
                                 }
                             </section>
@@ -329,139 +332,144 @@ const ClientTakeCareService: React.FC = () => {
                     <div className='request-service-wrapper'>
                         <h1>Các cây đã chọn</h1>
                         {/* <div className='tree-item-select'> */}
-                        <Row gutter={[24, 24]}>
-                            {
-                                treesSelect.map((item, index) => (
-                                    <Col span={12} key={index} className='tree-select-wrapper'>
-                                        <div className="left">
-                                            <img src={item.imgUrls[0]} alt="/" />
-                                        </div>
-                                        <div className="right">
-                                            <p className="name">{item.treeName} ({item.quantity})</p>
-                                            <p className="description">{item.description}</p>
-                                        </div>
-                                    </Col>
-                                ))
-                            }
-                        </Row>
+                        <GridConfig>
+                            <Row gutter={[24, 24]}>
+                                {
+                                    treesSelect.map((item, index) => (
+                                        <Col xs={24} sm={12} md={8} lg={8} xl={8} xxl={8} key={index} className='tree-select-wrapper'>
+                                            <div className="left">
+                                                <img src={item.imgUrls[0]} alt="/" />
+                                            </div>
+                                            <div className="right">
+                                                <p className="name">{item.treeName} ({item.quantity})</p>
+                                                <p className="description">{item.description}</p>
+                                            </div>
+                                        </Col>
+                                    ))
+                                }
+                            </Row>
+                        </GridConfig>
                         {/* </div> */}
                     </div>
                     <Form
                         layout='vertical'
                         onFinish={handleSubmit(handleSubmitForm)}
+                        labelAlign='left'
                     >
-                        <Row gutter={[12, 0]}>
-                            <Col span={12}>
-                                <Form.Item label='Tên' required>
-                                    <Controller 
-                                        control={control}
-                                        name='name'
-                                        render={({field}) => (<Input {...field} />)}
-                                    />
-                                    {errors.name && <ErrorMessage message={errors.name.message} />}
-                                </Form.Item>
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item label='Email' required>
-                                    <Controller 
-                                        control={control}
-                                        name='email'
-                                        render={({field}) => (<Input {...field} />)}
-                                    />
-                                    {errors.email && <ErrorMessage message={errors.email.message} />}
-                                </Form.Item>
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item label='Số điện thoại' required>
-                                    <Controller 
-                                        control={control}
-                                        name='phone'
-                                        render={({field}) => (<Input {...field} />)}
-                                    />
-                                    {errors.phone && <ErrorMessage message={errors.phone.message} />}
-                                </Form.Item>
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item label='Chọn nơi chăm sóc cây'>
-                                    <Controller 
-                                        control={control}
-                                        name='isTransport'
-                                        render={({field: { value, onChange }}) => (
-                                            <Select value={value} onChange={onChange} >
-                                                <Select.Option value={true} >Chăm sóc tại cửa hàng</Select.Option>
-                                                <Select.Option value={false} >Chăm sóc tại nhà</Select.Option>
-                                            </Select>
-                                        )}
-                                    />
-                                </Form.Item>
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item label='Nơi chăm sóc' required>
-                                    <Controller
-                                        control={control}
-                                        name='districtID'
-                                        render={({field}) => (
-                                            <Select {...field}>
-                                                {
-                                                    shipping.map((item, index) => (
-                                                        <Select.Option value={item.districtID} key={index} >
-                                                            {item.district}
-                                                        </Select.Option>
-                                                    ))
+                        <GridConfig>
+                            <Row gutter={[12, 0]}>
+                                <Col xs={24} sm={12}>
+                                    <Form.Item label='Tên' required>
+                                        <Controller 
+                                            control={control}
+                                            name='name'
+                                            render={({field}) => (<Input {...field} />)}
+                                        />
+                                        {errors.name && <ErrorMessage message={errors.name.message} />}
+                                    </Form.Item>
+                                </Col>
+                                <Col xs={24} sm={12}>
+                                    <Form.Item label='Email' required>
+                                        <Controller 
+                                            control={control}
+                                            name='email'
+                                            render={({field}) => (<Input {...field} />)}
+                                        />
+                                        {errors.email && <ErrorMessage message={errors.email.message} />}
+                                    </Form.Item>
+                                </Col>
+                                <Col xs={24} sm={12}>
+                                    <Form.Item label='Số điện thoại' required>
+                                        <Controller 
+                                            control={control}
+                                            name='phone'
+                                            render={({field}) => (<Input {...field} />)}
+                                        />
+                                        {errors.phone && <ErrorMessage message={errors.phone.message} />}
+                                    </Form.Item>
+                                </Col>
+                                <Col xs={24} sm={12}>
+                                    <Form.Item label='Chọn nơi chăm sóc cây'>
+                                        <Controller 
+                                            control={control}
+                                            name='isTransport'
+                                            render={({field: { value, onChange }}) => (
+                                                <Select value={value} onChange={onChange} >
+                                                    <Select.Option value={true} >Chăm sóc tại cửa hàng</Select.Option>
+                                                    <Select.Option value={false} >Chăm sóc tại nhà</Select.Option>
+                                                </Select>
+                                            )}
+                                        />
+                                    </Form.Item>
+                                </Col>
+                                <Col xs={24} sm={12}>
+                                    <Form.Item label='Nơi chăm sóc' required>
+                                        <Controller
+                                            control={control}
+                                            name='districtID'
+                                            render={({field}) => (
+                                                <Select {...field}>
+                                                    {
+                                                        shipping.map((item, index) => (
+                                                            <Select.Option value={item.districtID} key={index} >
+                                                                {item.district}
+                                                            </Select.Option>
+                                                        ))
+                                                    }
+                                                </Select>
+                                            )}
+                                        />
+                                    </Form.Item>
+                                </Col>
+                                <Col xs={24} sm={12}>
+                                    <Form.Item label='Địa chỉ' required>
+                                        <Controller 
+                                            control={control}
+                                            name='address'
+                                            render={({field}) => (<Input {...field} />)}
+                                        />
+                                        {errors.address && <ErrorMessage message={errors.address.message} />}
+                                    </Form.Item>
+                                </Col>
+                                <Col xs={24} sm={24} md={12}>
+                                    <Form.Item label='Chọn ngày chăm sóc' required>
+                                        <DatePicker.RangePicker 
+                                            locale={locale} 
+                                            placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
+                                            format={dateFormatList}
+                                            disabledDate={(current) => current && current.valueOf()  < Date.now()}
+                                            onChange={handleChangeDateRange}
+                                            style={{width: '100%'}}
+                                        />
+                                        {errors.startDate && <ErrorMessage message={errors.startDate.message} />}
+                                    </Form.Item>
+                                </Col>
+                                <Col xs={24} sm={24} md={12}>
+                                    <Form.Item label={`Sử dụng điểm thưởng (Số điểm bạn đang có là ${userState.user.currentPoint})`}>
+                                        <Controller 
+                                            control={control}
+                                            name='rewardPointUsed'
+                                            render={({field: { value }}) => (<Input type='number' min={0} value={value} onChange={(e) => {
+                                                const data = Number(e.target.value || 0)
+                                                if(data >= userState.user.currentPoint){
+                                                    setValue('rewardPointUsed', userState.user.currentPoint)
+                                                }else{
+                                                    setValue('rewardPointUsed', data)
                                                 }
-                                            </Select>
-                                        )}
-                                    />
-                                </Form.Item>
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item label='Địa chỉ' required>
-                                    <Controller 
-                                        control={control}
-                                        name='address'
-                                        render={({field}) => (<Input {...field} />)}
-                                    />
-                                    {errors.address && <ErrorMessage message={errors.address.message} />}
-                                </Form.Item>
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item label='Chọn ngày chăm sóc' required>
-                                    <DatePicker.RangePicker 
-                                        locale={locale} 
-                                        placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
-                                        format={dateFormatList}
-                                        disabledDate={(current) => current && current.valueOf()  < Date.now()}
-                                        onChange={handleChangeDateRange}
-                                        style={{width: '100%'}}
-                                    />
-                                    {errors.startDate && <ErrorMessage message={errors.startDate.message} />}
-                                </Form.Item>
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item label={`Sử dụng điểm thưởng (Số điểm bạn đang có là ${userState.user.currentPoint})`}>
-                                    <Controller 
-                                        control={control}
-                                        name='rewardPointUsed'
-                                        render={({field: { value }}) => (<Input type='number' min={0} value={value} onChange={(e) => {
-                                            const data = Number(e.target.value || 0)
-                                            if(data >= userState.user.currentPoint){
-                                                setValue('rewardPointUsed', userState.user.currentPoint)
-                                            }else{
-                                                setValue('rewardPointUsed', data)
-                                            }
-                                        }} />)}
-                                    />
-                                </Form.Item>
-                            </Col>
-                            <Col span={24} >
-                                <div className='btn-form-wrapper'>
-                                    <Button htmlType='button' disabled={isSubmitting} type='default' className='btn-cancel' size='large' onClick={() => setModalState({openModal: 0, tree: undefined})}>Hủy bỏ</Button>
-                                    <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large' onClick={() => console.log(errors)}>
-                                        Tạo yêu cầu
-                                    </Button>
-                                </div>
-                            </Col>
-                        </Row>
+                                            }} />)}
+                                        />
+                                    </Form.Item>
+                                </Col>
+                                <Col span={24} >
+                                    <div className='btn-form-wrapper'>
+                                        <Button htmlType='button' disabled={isSubmitting} type='default' className='btn-cancel' size='large' onClick={() => setModalState({openModal: 0, tree: undefined})}>Hủy bỏ</Button>
+                                        <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large' onClick={() => console.log(errors)}>
+                                            Tạo yêu cầu
+                                        </Button>
+                                    </div>
+                                </Col>
+                            </Row>
+                        </GridConfig>
                     </Form>
                 </Modal>
             }

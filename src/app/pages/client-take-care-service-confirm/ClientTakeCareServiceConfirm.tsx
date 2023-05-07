@@ -22,6 +22,7 @@ import CONSTANT from 'app/utils/constant'
 import LoadingView from 'app/components/loading-view/LoadingView'
 import NoProduct from 'app/components/no-product/NoProduct'
 import Transport from 'app/components/renderer/transport/Transport'
+import GridConfig from 'app/components/grid-config/GridConfig'
 
 const ClientTakeCareServiceConfirm: React.FC = () => {
     const { serviceId } = useParams()
@@ -60,7 +61,7 @@ const ClientTakeCareServiceConfirm: React.FC = () => {
             title: 'Tên cây',
             key: 'treeName',
             dataIndex: 'treeName',
-            render: (v) => (<TreeName name={v} />)
+            render: (v) => (<TreeName name={v} minWidth={100} />)
         },
         {
             title: 'Hình ảnh',
@@ -72,25 +73,26 @@ const ClientTakeCareServiceConfirm: React.FC = () => {
             title: 'Số lượng',
             key: 'quantity',
             dataIndex: 'quantity',
+            render: (v) => <p style={{minWidth: 80}}>{v}</p>
         },
         {
             title: 'Mô tả của bạn',
             key: 'description',
             dataIndex: 'description',
-            render: (v) => (<Description content={v} />)
+            render: (v) => (<Description content={v} minWidth={130} />)
         },
         {
             title: 'Mô tả của quản trị viên',
             key: 'managerDescription',
             dataIndex: 'managerDescription',
-            render: (v) => (<Description content={v} />)
+            render: (v) => (<Description content={v} minWidth={130} />)
         },
         {
             title: 'Giá tiền',
             key: 'servicePrice',
             dataIndex: 'servicePrice',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} color='Light Blue' isHighlight />)
+            render: (v) => (<MoneyFormat value={v} color='Light Blue' isHighlight minWidth={130} />)
         },
     ]
     const DataSourceServiceOrder = useMemo(() =>{
@@ -148,66 +150,68 @@ const ClientTakeCareServiceConfirm: React.FC = () => {
                                     <section className="default-layout">
                                         {
                                             service && 
-                                            <Row gutter={[24, 24]}>
-                                                <Col span={8}>
-                                                    <span className="title">Tên khách hàng: </span>
-                                                    <span className="content">{service.name}</span>
-                                                </Col>
-                                                <Col span={8}>
-                                                    <span className="title">Địa chỉ: </span>
-                                                    <span className="content">{service.address}</span>
-                                                </Col>
-                                                <Col span={8}>
-                                                    <span className="title">Số điện thoại: </span>
-                                                    <span className="content">{service.phone}</span>
-                                                </Col>
-                                                <Col span={8}>
-                                                    <span className="title">Email: </span>
-                                                    <span className="content">{service.email}</span>
-                                                </Col>
-                                                <Col span={8}>
-                                                    <span className="title">Thời gian chăm sóc cây: </span>
-                                                    <span className="content">{utilDateTime.dateToString(service.startDate.toString())} - {utilDateTime.dateToString(service.endDate.toString())}</span>
-                                                </Col>
-                                                <Col span={8} style={{display: 'flex'}}>
-                                                    <span className="title">Nơi chăm sóc: </span>
-                                                    <span className="content">
-                                                        <Transport isTransport={service.isTransport} isRequest />
-                                                    </span>
-                                                </Col>
-                                                {
-                                                    (service.transportFee && service.transportFee !== 0) ?
-                                                    <Col span={8}>
-                                                        <span className="title">Phí vận chuyển: </span>
-                                                        <span className="content">{service.transportFee}</span>
-                                                    </Col> : undefined
-                                                }
-                                                <Col span={8} style={{display: 'flex'}}>
-                                                    <span className="title">Trạng thái yêu cầu: </span>
-                                                    <span className="content">
-                                                        <ServiceStatusComp status={service.status} />
-                                                    </span>
-                                                </Col>
-                                                <Col span={24}>
-                                                    <span className="title" style={{marginBottom: '10px', display: 'block'}}>Thông tin cam kết 2 bên</span>
-                                                    <div className='rule-wrapper'>
-                                                        {
-                                                            service.rules ?
-                                                                
-                                                                    service.rules.split('\n').map((x, index) => (
-                                                                        <p key={index}>{x}</p>
-                                                                    ))
-                                                                
-                                                            : <p>Chưa có thông tin</p>
-                                                        }
-                                                    </div>
-                                                    {/* <Input.TextArea autoSize={{minRows: 4, maxRows: 10}} value={service.rules} disabled></Input.TextArea> */}
-                                                </Col>
-                                            </Row>
+                                            <GridConfig>
+                                                <Row gutter={[24, 24]}>
+                                                    <Col xs={12} sm={12} md={12} lg={8} xl={8}>
+                                                        <span className="title">Tên khách hàng: </span>
+                                                        <span className="content">{service.name}</span>
+                                                    </Col>
+                                                    <Col xs={12} sm={12} md={12} lg={8} xl={8}>
+                                                        <span className="title">Địa chỉ: </span>
+                                                        <span className="content">{service.address}</span>
+                                                    </Col>
+                                                    <Col xs={12} sm={12} md={12} lg={8} xl={8}>
+                                                        <span className="title">Số điện thoại: </span>
+                                                        <span className="content">{service.phone}</span>
+                                                    </Col>
+                                                    <Col xs={12} sm={12} md={12} lg={8} xl={8}>
+                                                        <span className="title">Email: </span>
+                                                        <span className="content">{service.email}</span>
+                                                    </Col>
+                                                    <Col xs={12} sm={12} md={12} lg={8} xl={8}>
+                                                        <span className="title">Thời gian chăm sóc cây: </span>
+                                                        <span className="content">{utilDateTime.dateToString(service.startDate.toString())} - {utilDateTime.dateToString(service.endDate.toString())}</span>
+                                                    </Col>
+                                                    <Col xs={12} sm={12} md={12} lg={8} xl={8} style={{display: 'flex', flexWrap: 'wrap'}}>
+                                                        <span className="title">Nơi chăm sóc: </span>
+                                                        <span className="content">
+                                                            <Transport isTransport={service.isTransport} isRequest />
+                                                        </span>
+                                                    </Col>
+                                                    {
+                                                        (service.transportFee && service.transportFee !== 0) ?
+                                                        <Col xs={12} sm={12} md={12} lg={8} xl={8}>
+                                                            <span className="title">Phí vận chuyển: </span>
+                                                            <span className="content">{service.transportFee}</span>
+                                                        </Col> : undefined
+                                                    }
+                                                    <Col xs={12} sm={12} md={12} lg={8} xl={8} style={{display: 'flex', flexWrap: 'wrap'}}>
+                                                        <span className="title">Trạng thái yêu cầu: </span>
+                                                        <span className="content">
+                                                            <ServiceStatusComp status={service.status} />
+                                                        </span>
+                                                    </Col>
+                                                    <Col span={24}>
+                                                        <span className="title" style={{marginBottom: '10px', display: 'block'}}>Thông tin cam kết 2 bên</span>
+                                                        <div className='rule-wrapper'>
+                                                            {
+                                                                service.rules ?
+                                                                    
+                                                                        service.rules.split('\n').map((x, index) => (
+                                                                            <p key={index}>{x}</p>
+                                                                        ))
+                                                                    
+                                                                : <p>Chưa có thông tin</p>
+                                                            }
+                                                        </div>
+                                                        {/* <Input.TextArea autoSize={{minRows: 4, maxRows: 10}} value={service.rules} disabled></Input.TextArea> */}
+                                                    </Col>
+                                                </Row>
+                                            </GridConfig>
                                         }
                                     </section>
                                     <div className="default-layout">
-                                        <Table columns={ColumnServiceOrder} dataSource={DataSourceServiceOrder} pagination={false} />
+                                        <Table columns={ColumnServiceOrder} dataSource={DataSourceServiceOrder} pagination={false} scroll={{x: 480}} />
                                     </div>
                                 </>
                             }

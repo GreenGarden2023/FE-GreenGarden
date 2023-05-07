@@ -118,6 +118,7 @@ const TechManageServiceOrder: React.FC = () => {
             title: 'Số lượng cây',
             key: 'totalQuantity',
             dataIndex: 'totalQuantity',
+            render: (v) => <p style={{minWidth: 80}}>{v}</p>
         },
         {
             title: 'Tổng tiền',
@@ -131,7 +132,6 @@ const TechManageServiceOrder: React.FC = () => {
             key: 'action',
             dataIndex: 'action',
             align: 'center',
-            fixed: 'right',
             render: (_, record, index) => (
                     <Popover
                         content={() => contextService(record)} 
@@ -146,7 +146,7 @@ const TechManageServiceOrder: React.FC = () => {
                             }
                         }}
                     >
-                        <GrMore size={25} cursor='pointer' color='#00a76f' />
+                        <GrMore size={25} cursor='pointer' color='#00a76f' style={{minWidth: 80}} />
                     </Popover>
             )
         },
@@ -239,7 +239,7 @@ const TechManageServiceOrder: React.FC = () => {
                     className='table' 
                     columns={ColumnServiceOrder} 
                     dataSource={DataSourceServiceOrder} 
-                    scroll={{ y: 680, x: 2200 }}
+                    scroll={{ x: 480 }}
                     loading={loading}
                     pagination={{
                         current: paging.curPage,

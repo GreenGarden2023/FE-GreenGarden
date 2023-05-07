@@ -71,4 +71,38 @@
             }
         }
     }
+    .mobile-header-wrapper{
+        background-color: #fff;
+        position: absolute;
+        top: 0;
+        
+        .info-item{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            .name{
+                display: flex;
+                gap: 5px;
+                align-items: center;
+                font-weight: 500;
+            }
+            .role{
+                .role-name{
+                    font-weight: 500;
+                    color: $orange-text;
+                }
+            }
+        }
+        .close-mobile-header{
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            border-radius: 9999px;
+            background-color: #24ab662b;
+            path{
+                stroke: $default-green;
+            }
+        }
+    }
 }

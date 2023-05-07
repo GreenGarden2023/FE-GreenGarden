@@ -20,8 +20,8 @@ const GridConfig: React.FC<any> = (props) => {
                 screenXLMin: 993,
                 screenXLMax: 1200,
                 screenXXLMin: 1201,
-                screenXXL: 1800
-            }
+                screenXXL: 1800,
+            },
         }}
     >
         {props.children}

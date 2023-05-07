@@ -133,10 +133,286 @@
                 color: $soft-text;
             }
         }
-        // p{
-        //     font-weight: 500;
-        //     font-size: 22px;
-        //     color: $default-green;
-        // }
+    }
+}
+@media screen and (max-width: $screen-lg){
+    .ts-wrapper{
+        .ts-box{
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            .ts-btn-create{
+                // background-color: $color-create;
+                // height: 40px;
+            }
+        }
+        .ts-infor{
+            .empty-tree{
+                text-align: center;
+                h1{
+                    font-size: 30px;
+                    color: $default-green;
+                }
+                button{
+                    margin: 10px auto;
+                }
+            }
+            .filtering{
+                display: flex;
+                justify-content: flex-end;
+                margin-bottom: 10px;
+            }
+        }
+        .item-detail{
+            border: 1px solid $default-green;
+            border-radius: 5px;
+            padding: 10px;
+            position: relative;
+            .actions-wrapper{
+                position: absolute;
+                top: 10px;
+                right: 5px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                svg{
+                    color: #fff;
+                    cursor: pointer;
+                    // border: 1px solid $orange-text;
+                    background-color: $orange-text;
+                    border-radius: 3px;
+                }
+            }
+            img{
+                display: flex;
+                margin: auto;
+                width: 220px;
+                height: 220px;
+                object-fit: cover;
+                border-radius: 5px;
+            }
+            .item-infor{
+                h1{
+                    font-size: 17px;
+                    min-height: 50px;
+                    color: #f95441;
+                    text-align: center;
+                    padding: 15px 15px 20px 15px;
+                    span{
+                        font-size: 20px;
+                        margin-left: 5px;
+                    }
+                }
+                .description{
+                    font-size: 16px;
+                    color: $soft-text;
+                    margin: 5px 0;
+                    span{
+                        color: $default-green;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 3; /* number of lines to show */
+                                line-clamp: 3; 
+                        -webkit-box-orient: vertical;
+                        height: 60px;
+                    }
+                }
+            }
+            .item-action{
+                display: flex;
+                gap: 10px;
+                align-items: center;
+            }
+        }
+    
+        .ts-create-service{
+            div{
+                display: flex;
+                justify-content: flex-end;
+            }
+        }
+    }
+    .request-service-wrapper{
+        border: 1px solid red;
+        border-radius: 5px;
+        position: relative;
+        padding: 20px 10px 10px;
+        margin: 20px 0;
+        h1{
+            position: absolute;
+            top: -22px;
+            left: 15px;
+            color: $orange-text;
+            font-weight: 500;
+            font-size: 26px;
+            background: #fff;
+            padding: 0 10px;
+        }
+        .tree-select-wrapper{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0;
+            .left{
+                width: 100%;
+                img{
+                    width: 100%;
+                    height: 150px;
+                    object-fit: cover;
+                    border-radius: 5px;
+                }
+            }
+            .right{
+                .name{
+                    font-weight: 500;
+                    font-size: 22px;
+                    color: $default-green;
+                }
+                .description{
+                    color: $soft-text;
+                }
+            }
+        }
+    }
+}
+@media screen and (max-width: $mobile-screen) {
+    .ts-wrapper{
+        .ts-box{
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            .ts-btn-create{
+                // background-color: $color-create;
+                // height: 40px;
+            }
+        }
+        .ts-infor{
+            .empty-tree{
+                text-align: center;
+                h1{
+                    font-size: 30px;
+                    color: $default-green;
+                }
+                button{
+                    margin: 10px auto;
+                }
+            }
+            .filtering{
+                display: flex;
+                justify-content: flex-end;
+                margin-bottom: 10px;
+            }
+        }
+        .item-detail{
+            border: 1px solid $default-green;
+            border-radius: 5px;
+            padding: 10px;
+            position: relative;
+            .actions-wrapper{
+                position: absolute;
+                top: 10px;
+                right: 5px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                svg{
+                    color: #fff;
+                    cursor: pointer;
+                    // border: 1px solid $orange-text;
+                    background-color: $orange-text;
+                    border-radius: 3px;
+                }
+            }
+            img{
+                display: flex;
+                margin: auto;
+                width: 220px;
+                height: 220px;
+                object-fit: cover;
+                border-radius: 5px;
+            }
+            .item-infor{
+                h1{
+                    font-size: 17px;
+                    min-height: 50px;
+                    color: #f95441;
+                    text-align: center;
+                    padding: 15px 15px 20px 15px;
+                    span{
+                        font-size: 20px;
+                        margin-left: 5px;
+                    }
+                }
+                .description{
+                    font-size: 16px;
+                    color: $soft-text;
+                    margin: 5px 0;
+                    span{
+                        color: $default-green;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 3; /* number of lines to show */
+                                line-clamp: 3; 
+                        -webkit-box-orient: vertical;
+                        height: 60px;
+                    }
+                }
+            }
+            .item-action{
+                display: flex;
+                gap: 10px;
+                align-items: center;
+            }
+        }
+    
+        .ts-create-service{
+            div{
+                display: flex;
+                justify-content: flex-end;
+            }
+        }
+    }
+    .request-service-wrapper{
+        border: 1px solid red;
+        border-radius: 5px;
+        position: relative;
+        padding: 20px 10px 10px;
+        margin: 20px 0;
+        h1{
+            position: absolute;
+            top: -22px;
+            left: 15px;
+            color: $orange-text;
+            font-weight: 500;
+            font-size: 26px;
+            background: #fff;
+            padding: 0 10px;
+        }
+        .tree-select-wrapper{
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 10px;
+            .left{
+                width: 150px;
+                img{
+                    width: 150px;
+                    height: 150px;
+                    object-fit: cover;
+                    border-radius: 5px;
+                }
+            }
+            .right{
+                .name{
+                    font-weight: 500;
+                    font-size: 16px;
+                    color: $default-green;
+                }
+                .description{
+                    font-size: 14px;
+                    color: $soft-text;
+                }
+            }
+        }
     }
 }

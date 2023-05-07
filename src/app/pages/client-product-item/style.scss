@@ -74,6 +74,17 @@
             font-weight: 500;
         }
     }
+    .price-box-info{
+        .rent, .sale{
+            margin-bottom: 10px;
+            .label{
+                display: block;
+                margin-right: 10px;
+                color: $soft-text;
+                font-weight: 500;
+            }
+        }
+    }
 }
 
 @media screen and (max-width: $mobile-screen) {

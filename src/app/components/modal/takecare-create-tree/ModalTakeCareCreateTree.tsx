@@ -1,18 +1,19 @@
-import { Button, Col, Form, Image, Input, Modal, Row } from 'antd';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Button, Col, Form, Input, Modal, Row } from 'antd';
+import GridConfig from 'app/components/grid-config/GridConfig';
+import ErrorMessage from 'app/components/message.tsx/ErrorMessage';
 import useDispatch from 'app/hooks/use-dispatch';
-import { UserTree } from 'app/models/user-tree'
+import { UserTree } from 'app/models/user-tree';
 import uploadService from 'app/services/upload.service';
+import userTreeService from 'app/services/user-tree.service';
 import { setNoti } from 'app/slices/notification';
 import CONSTANT from 'app/utils/constant';
-import React, { useEffect, useRef } from 'react'
-import { useForm, Controller } from 'react-hook-form'
+import React, { useEffect, useRef } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { AiOutlineCloudUpload } from 'react-icons/ai';
-import { CiSquareRemove } from 'react-icons/ci';
-import './style.scss';
+import { GrFormClose } from 'react-icons/gr';
 import * as yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
-import ErrorMessage from 'app/components/message.tsx/ErrorMessage';
-import userTreeService from 'app/services/user-tree.service';
+import './style.scss';
 
 const schema = yup.object().shape({
   treeName: yup.string().required('Tên của cây không được để trống').max(50, 'Tên của cây không nhiều hơn 50 ký tự'),
@@ -54,7 +55,7 @@ const ModalTakeCareCreateTree:React.FC<ModalTakeCareCreateTreeProps> = ({ tree, 
   const handleSubmitForm = async (data: Partial<UserTree>) =>{
     if(!data) return;
 
-    if((data.quantity || 0) < (data.imgUrls ? data.imgUrls.length : 0)){
+    if((data.quantity || 0) > (data.imgUrls ? data.imgUrls.length : 0)){
       setError('imgUrls', {
         type: 'pattern',
         message: 'Số lượng ảnh không đủ so với số lượng cây'
@@ -132,78 +133,79 @@ const ModalTakeCareCreateTree:React.FC<ModalTakeCareCreateTreeProps> = ({ tree, 
       <Form
         layout='vertical'
         onFinish={handleSubmit(handleSubmitForm)}
+        labelAlign='left'
       >
-        <Row gutter={24}>
-          <Col span={12}>
-            <Form.Item label='Tên cây' required >
-              <Controller
-                control={control}
-                name='treeName'
-                render={({ field }) => (<Input {...field} />)}
-              />
-              {errors.treeName && <ErrorMessage message={errors.treeName.message} />}
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label='Số lượng cây' required >
-              <Controller
-                control={control}
-                name='quantity'
-                render={({ field: { value } }) => (<Input type='number' min={0} value={value} onChange={(e) =>{
-                  const data = Number(e.target.value || 0)
-                  setValue('quantity', data)
-                  trigger('quantity')
-                }} />)}
-              />
-              {errors.quantity && <ErrorMessage message={errors.quantity.message} />}
-            </Form.Item>
-          </Col>
-          <Col span={24}>
-            <Form.Item label='Mô tả' required>
-                <Controller 
-                    control={control}
-                    name='description'
-                    render={({ field }) => <Input.TextArea {...field} autoSize={{minRows: 4, maxRows: 6}} />}
+        <GridConfig>
+          <Row gutter={24}>
+            <Col span={12}>
+              <Form.Item label='Tên cây' required >
+                <Controller
+                  control={control}
+                  name='treeName'
+                  render={({ field }) => (<Input {...field} />)}
                 />
-                {errors.description && <ErrorMessage message={errors.description.message} />}
-            </Form.Item>
+                {errors.treeName && <ErrorMessage message={errors.treeName.message} />}
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label='Số lượng cây' required >
+                <Controller
+                  control={control}
+                  name='quantity'
+                  render={({ field: { value } }) => (<Input type='number' min={0} value={value} onChange={(e) =>{
+                    const data = Number(e.target.value || 0)
+                    setValue('quantity', data)
+                    trigger('quantity')
+                  }} />)}
+                />
+                {errors.quantity && <ErrorMessage message={errors.quantity.message} />}
+              </Form.Item>
+            </Col>
+            <Col span={24}>
+              <Form.Item label='Mô tả' required>
+                  <Controller 
+                      control={control}
+                      name='description'
+                      render={({ field }) => <Input.TextArea {...field} autoSize={{minRows: 4, maxRows: 6}} />}
+                  />
+                  {errors.description && <ErrorMessage message={errors.description.message} />}
+              </Form.Item>
+            </Col>
+            <input type="file" hidden ref={ref} accept='.png,.jpg,.jpeg' multiple onChange={handleUploadFiles} />
+            <Col span={24} style={{marginBottom: '20px'}}>
+                <button className='btn btn-upload' type='button' onClick={() => ref.current?.click()}>
+                    <AiOutlineCloudUpload size={24} />
+                    Đăng tải hình ảnh
+                </button>
+                {errors.imgUrls && <ErrorMessage message={errors.imgUrls.message} />}
+            </Col>
+            {
+              getValues('imgUrls') &&
+                (getValues('imgUrls') || []).map((item, index) => (
+                    <Col xs={12} sm={12} md={8} lg={6} xl={6} key={index} >
+                      <div className='preview-wrapper-create-tree'>
+                        <img 
+                            src={item}
+                            alt='/'
+                            className='img-preview-create-tree'
+                        />
+                        <GrFormClose size={25} onClick={() => handleRemoveImage(index)} className='btn-remove' color='#fff' />
+                      </div>
+                    </Col>
+                ))
+            }
+            <Col span={24} >
+              <div className='btn-form-wrapper'>
+                  <Button htmlType='button' disabled={isSubmitting} type='default' className='btn-cancel' size='large' onClick={handleCloseModal}>Hủy bỏ</Button>
+                  <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large' >
+                      {
+                          tree ? 'Cập nhật' : 'Tạo mới'
+                      }
+                  </Button>
+              </div>
           </Col>
-          <input type="file" hidden ref={ref} accept='.png,.jpg,.jpeg' multiple onChange={handleUploadFiles} />
-          <Col span={24} style={{marginBottom: '20px'}}>
-              <button className='btn btn-upload' type='button' onClick={() => ref.current?.click()}>
-                  <AiOutlineCloudUpload size={24} />
-                  Đăng tải hình ảnh
-              </button>
-              {errors.imgUrls && <ErrorMessage message={errors.imgUrls.message} />}
-          </Col>
-          {
-            getValues('imgUrls') &&
-            <Image.PreviewGroup>
-                {
-                    (getValues('imgUrls') || []).map((item, index) => (
-                        <Col span={6} key={index} className='preview-wrapper'>
-                            <Image 
-                                src={item}
-                                alt='/'
-                                className='img-preview'
-                            />
-                            <CiSquareRemove size={30} onClick={() => handleRemoveImage(index)} className='btn-remove' />
-                        </Col>
-                    ))
-                }
-            </Image.PreviewGroup>
-          }
-          <Col span={24} >
-            <div className='btn-form-wrapper'>
-                <Button htmlType='button' disabled={isSubmitting} type='default' className='btn-cancel' size='large' onClick={handleCloseModal}>Hủy bỏ</Button>
-                <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large' >
-                    {
-                        tree ? 'Cập nhật' : 'Tạo mới'
-                    }
-                </Button>
-            </div>
-        </Col>
-        </Row>
+          </Row>
+        </GridConfig>
       </Form>
     </Modal>
   )

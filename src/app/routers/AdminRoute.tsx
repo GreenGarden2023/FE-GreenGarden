@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react'
-import { Button, Layout, Menu } from 'antd'
+import React, { useEffect, useMemo, useState } from 'react'
+import { Button, Divider, Layout, Menu } from 'antd'
 import type { MenuProps } from 'antd';
 import './style.scss';
 import { FaLongArrowAltRight, FaLongArrowAltLeft } from 'react-icons/fa';
@@ -8,11 +8,12 @@ import useDispatch from '../hooks/use-dispatch';
 import { setCollapsedHeader } from '../slices/admin-layout';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { BiCategoryAlt, BiUserCircle } from 'react-icons/bi';
-import { MdOutlineInventory2 } from 'react-icons/md'
+import { MdOutlineInventory2, MdOutlineMenu } from 'react-icons/md'
 import CONSTANT from 'app/utils/constant';
 import { Role } from 'app/models/general-type';
 import { setEmptyUser } from 'app/slices/user-infor';
 import { setCartSlice } from 'app/slices/cart';
+import { GrFormClose } from 'react-icons/gr';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -135,56 +136,126 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
         dispatch(setCartSlice({rentItems: [], saleItems: []}))
         navigate('/login')
     }
+
+    const [mobileMode, setMobileMode] = useState(false)
+    const [showMenu, setShowMenu] = useState(false)
+    const [menuHeight, setMenuHeight] = useState(0)
+    const [menuWidth, setMenuWidth] = useState(0)
+
+    useEffect(() =>{
+        const handler = () =>{
+            if(window.innerWidth < 992){
+                setMobileMode(true)
+            }else{
+                setMobileMode(false)
+            }
+            setMenuHeight(window.innerHeight)
+            setMenuWidth(window.innerWidth)
+        }
+
+        handler()
+
+        window.addEventListener('resize', handler)
+
+        return () => window.removeEventListener('resize', handler)
+    }, [])
+
+    const handleCloseMenu = () =>{
+        setShowMenu(false)
+    }
+
+    const MobileHeader: React.FC<any> = ({props}) =>{
+        return (
+            <>
+                <div className="mobile-header-wrapper" style={{height: menuHeight, width: menuWidth}}>
+                    <div className="info-wrapper">
+                        <div className="info-item">
+                            <div className="name">
+                                <BiUserCircle size={30} /> <span className="name">{fullName}</span>
+                            </div>
+                            <div className="role">
+                                <span className="role-name">{roleName}</span>
+                            </div>
+                        </div>
+                        <div className="info-item">
+                            <Link to='/'>Trang chủ</Link>
+                            <Button type='primary' htmlType='button' className='btn-update' size='large' onClick={handleLogout} >Đăng xuất</Button>
+                        </div>
+                    </div>
+                    <Divider  />
+                    <div className="routers-wrapper">
+                        <Menu onClick={handleCloseMenu} className='admin-menu' theme="light" mode="inline"  items={items} selectedKeys={defaultSelectedKey} openKeys={openedKey} />
+                    </div>
+                    <GrFormClose size={30} className='close-mobile-header' onClick={handleCloseMenu} />
+                </div>
+            </>
+        )
+    }
+
     return (
         <>
             <Layout className='admin-layout'>
                 <Header className='admin-header'>
                     <div className='left'>
-                        <div className="box-collapsed" onClick={handleCollapsedHeader}>
-                            {
-                                collapsedHeader ? <FaLongArrowAltRight /> : <FaLongArrowAltLeft />
-                            }
-                        </div>
+                        {
+                            !mobileMode && 
+                            <div className="box-collapsed" onClick={handleCollapsedHeader}>
+                                {
+                                    collapsedHeader ? <FaLongArrowAltRight /> : <FaLongArrowAltLeft />
+                                }
+                            </div>
+                        }
                     </div>
                     <div className="right">
-                        {/* <div className="manage-info"> */}
-                            <div className="info-name">
-                                <BiUserCircle size={30} /> <span className="name">{fullName}</span>
-                            </div>
-                            <div className="info-detail">
-                                <span className="role">{roleName}</span>
-                            </div>
-                            <div className="btn-tools">
-                                <Link to='/'>Trang chủ</Link>
-                                <Button type='primary' htmlType='button' className='btn-update' size='large' onClick={handleLogout} >Đăng xuất</Button>
-                            </div>
-                        {/* </div> */}
+                        {
+                            !mobileMode ?
+                            <>
+                                <div className="info-name">
+                                    <BiUserCircle size={30} /> <span className="name">{fullName}</span>
+                                </div>
+                                <div className="info-detail">
+                                    <span className="role">{roleName}</span>
+                                </div>
+                                <div className="btn-tools">
+                                    <Link to='/'>Trang chủ</Link>
+                                    <Button type='primary' htmlType='button' className='btn-update' size='large' onClick={handleLogout} >Đăng xuất</Button>
+                                </div>
+                            </> : <MdOutlineMenu size={30} color="#00a76f" className="menu-header" onClick={() => setShowMenu(true)} />
+                        }
                     </div>
+                    {
+                        showMenu && <MobileHeader />
+                    }
                 </Header>
                 <Layout className='admin-layout-inside'>
-                    <Sider
-                        className='admin-sider'
-                        style={{
-                        overflow: 'auto',
-                        height: '100vh',
-                        position: 'fixed',
-                        left: 0,
-                        top: 0,
-                        bottom: 0,
-                        }}
-                        collapsed={collapsedHeader}
-                    >
-                        <div style={{ height: 32, margin: 16, background: 'rgba(255, 255, 255, 0.2)' }} />
-                        <Menu className='admin-menu' theme="light" mode="inline"  items={items} selectedKeys={defaultSelectedKey} openKeys={openedKey} />
-                    </Sider>
-                    <Layout className="site-layout" style={{ marginLeft: collapsedHeader ? 80 : 200 }}>
-                        <Content>
-                        <div style={{ padding: 24}}>
-                            {children}
-                        </div>
-                        </Content>
-                        <Footer style={{ textAlign: 'center' }}>Designed by Us</Footer>
-                    </Layout>
+                    {
+                        !mobileMode ?
+                        <>
+                            <Sider
+                                className='admin-sider'
+                                style={{
+                                overflow: 'auto',
+                                height: '100vh',
+                                position: 'fixed',
+                                left: 0,
+                                top: 0,
+                                bottom: 0,
+                                }}
+                                collapsed={collapsedHeader}
+                            >
+                                <div style={{ height: 32, margin: 16, background: 'rgba(255, 255, 255, 0.2)' }} />
+                                <Menu className='admin-menu' theme="light" mode="inline"  items={items} selectedKeys={defaultSelectedKey} openKeys={openedKey} />
+                            </Sider>
+                            <Layout className="site-layout" style={{ marginLeft: collapsedHeader ? 80 : 200 }}>
+                                <Content>
+                                <div style={{ padding: 24}}>
+                                    {children}
+                                </div>
+                                </Content>
+                                <Footer style={{ textAlign: 'center' }}>Designed by Us</Footer>
+                            </Layout>
+                        </> : children
+                    }
                 </Layout>
             </Layout>
         </>

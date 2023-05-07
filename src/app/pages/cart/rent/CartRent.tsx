@@ -23,6 +23,7 @@ import useDispatch from 'app/hooks/use-dispatch'
 import { setNoti } from 'app/slices/notification'
 import RentPolicy from 'app/components/modal/rent-policy/RentPolicy'
 import utilDateTime from 'app/utils/date-time'
+import GridConfig from 'app/components/grid-config/GridConfig'
 
 const disbaledDate = new Date();
 disbaledDate.setDate(disbaledDate.getDate() + 3)
@@ -103,6 +104,9 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
             title: 'Tên sản phẩm',
             key: 'name',
             dataIndex: 'name',
+            render: (v) => <p style={{minWidth: '150px'}}>{v}</p>
+            // rowSpan: 3
+            // width: 150
         },
         {
             title: 'Kích thước',
@@ -329,7 +333,13 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
             <div className='default-layout'>
                 <div className="cart-rent-layout">
                     <h3 className="title-cart">Cây thuê</h3>
-                    <Table className='cart-table' dataSource={DataSourceRent} columns={ColumnRent} pagination={false} />
+                    <Table 
+                        className='cart-table' 
+                        dataSource={DataSourceRent} 
+                        columns={ColumnRent} 
+                        pagination={false}
+                        scroll={{x: 480}}
+                    />
                 </div>
             </div>
             {
@@ -416,135 +426,139 @@ const CartRent: React.FC<CartRentProps> = ({items, shipping, onChange, onSubmit}
                                 <Form
                                     layout='vertical'
                                     onFinish={handleSubmit(onSubmitForm)}
+                                    labelAlign='left'
                                 >
-                                    <Row gutter={[24, 0]}>
-                                        <Col span={12}>
-                                            <Form.Item label='Tên người nhận' required>
-                                                <Controller 
-                                                    control={control}
-                                                    name='recipientName'
-                                                    render={({field}) => (<Input {...field} />)}
-                                                />
-                                                {errors.recipientName && <ErrorMessage message={errors.recipientName.message} />}
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={12}>
-                                            <Form.Item label='Số điện thoại' required>
-                                                <Controller 
-                                                    control={control}
-                                                    name='recipientPhone'
-                                                    render={({field}) => (<Input {...field} />)}
-                                                />
-                                                {errors.recipientPhone && <ErrorMessage message={errors.recipientPhone.message} />}
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={12}>
-                                            <Form.Item label='Chọn nơi nhận cây'>
-                                                <Controller 
-                                                    control={control}
-                                                    name='isTransport'
-                                                    render={({ field: { value } }) => (
-                                                        <Select value={value} onChange={(e) => {
-                                                            setValue('isTransport', e)
-                                                            trigger('isTransport')
-                                                            clearPoint()
-                                                        }}>
-                                                            <Select.Option value={true}>Tại nhà riêng</Select.Option>
-                                                            <Select.Option value={false}>Tại cửa hàng</Select.Option>
-                                                        </Select>
-                                                    )}
-                                                />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={12}>
-                                            <Form.Item label='Chọn thời gian thuê' required>
-                                                <DatePicker.RangePicker 
-                                                    locale={locale}
-                                                    placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
-                                                    format={CONSTANT.DATE_FORMAT_LIST}
-                                                    disabledDate={(current) => current && current.valueOf()  < disbaledDate.valueOf()}
-                                                    defaultValue={[dayjs(dayjs(getValues('startDateRent')).format('DD/MM/YYYY'), 'DD/MM/YYYY'), dayjs(dayjs(getValues('endDateRent')).format('DD/MM/YYYY'), 'DD/MM/YYYY')]}
-                                                    onChange={handleChangeDateRange}
-                                                />
-                                                {errors.startDateRent && <ErrorMessage message={errors.startDateRent.message} />}
-                                            </Form.Item>
-                                        </Col>
-                                        {
-                                            getValues('isTransport') && 
-                                            <>
-                                                <Col span={12}>
-                                                    <Form.Item label='Nơi nhận' required>
-                                                        <Controller 
-                                                            control={control}
-                                                            name='shippingID'
-                                                            render={({ field: { value } }) => (
-                                                                <Select value={value} onChange={(e) => {
-                                                                    setValue('shippingID', e)
-                                                                    trigger('shippingID')
-                                                                    clearPoint()
-                                                                }}>
-                                                                    {
-                                                                        shipping.map((item, index) => (
-                                                                            <Select.Option value={item.districtID} key={index} >
-                                                                                {item.district}
-                                                                            </Select.Option>
-                                                                        ))
-                                                                    }
-                                                                </Select>
-                                                            )}
-                                                        />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={12}>
-                                                    <Form.Item label='Địa chỉ cụ thể' required>
-                                                        <Controller 
-                                                            control={control}
-                                                            name='recipientAddress'
-                                                            render={({field}) => (<Input {...field} />)}
-                                                        />
-                                                        {errors.recipientAddress && <ErrorMessage message={errors.recipientAddress.message} />}
-                                                    </Form.Item>
-                                                </Col>
-                                            </>
-                                        }
-                                        <Col span={24}>
-                                            <div className="point-infor">
-                                                <span>Số điểm bạn đang có là ({userState.user.currentPoint})</span>
-                                                <span>Số điểm bạn có thể dùng là ({MaxPointCanUse()})</span>
-                                            </div>
-                                            <Form.Item label='Số điểm sử dụng cho đơn hàng'>
-                                                <Controller 
-                                                    control={control}
-                                                    name='rewardPointUsed'
-                                                    render={({field: { value }}) => (<Input min={0} type='number' value={value} onChange={(e) =>{
-                                                        const data = Number(e.target.value || 0)
-                                                        if(data <= MaxPointCanUse()){
-                                                            setValue('rewardPointUsed', data)
-                                                        }else{
-                                                            setValue('rewardPointUsed', MaxPointCanUse())
-                                                        }
-                                                        trigger('rewardPointUsed')
-                                                    }} />)}
-                                                />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={24}>
-                                            <Checkbox checked={isConfirm} onChange={(e) => setIsConfirm(e.target.checked)} >Đồng ý với tất cả điều khoản khi thuê cây</Checkbox>
-                                            <div className="rent-policy">
-                                                <div className='view-policy' onClick={() => setIsViewPolicy(true)}>
-                                                    <span>Xem điều khoản thuê cây</span>
-                                                    <MdNavigateNext size={20} />
+                                    <GridConfig>
+                                        <Row gutter={[24, 0]}>
+                                            <Col xs={24} sm={12} lg={24} xl={12}>
+                                                <Form.Item label='Tên người nhận' required  >
+                                                    <Controller 
+                                                        control={control}
+                                                        name='recipientName'
+                                                        render={({field}) => (<Input {...field} />)}
+                                                    />
+                                                    {errors.recipientName && <ErrorMessage message={errors.recipientName.message} />}
+                                                </Form.Item>
+                                            </Col>
+                                            <Col xs={24} sm={12} lg={24} xl={12}>
+                                                <Form.Item label='Số điện thoại' required>
+                                                    <Controller 
+                                                        control={control}
+                                                        name='recipientPhone'
+                                                        render={({field}) => (<Input {...field} />)}
+                                                    />
+                                                    {errors.recipientPhone && <ErrorMessage message={errors.recipientPhone.message} />}
+                                                </Form.Item>
+                                            </Col>
+                                            <Col xs={24} sm={12} lg={24} xl={12}>
+                                                <Form.Item label='Chọn nơi nhận cây'>
+                                                    <Controller 
+                                                        control={control}
+                                                        name='isTransport'
+                                                        render={({ field: { value } }) => (
+                                                            <Select value={value} onChange={(e) => {
+                                                                setValue('isTransport', e)
+                                                                trigger('isTransport')
+                                                                clearPoint()
+                                                            }}>
+                                                                <Select.Option value={true}>Tại nhà riêng</Select.Option>
+                                                                <Select.Option value={false}>Tại cửa hàng</Select.Option>
+                                                            </Select>
+                                                        )}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col xs={24} sm={12} lg={24} xl={12}>
+                                                <Form.Item label='Chọn thời gian thuê' required>
+                                                    <DatePicker.RangePicker 
+                                                        locale={locale}
+                                                        placeholder={["Ngày bắt đầu", "Ngày kết thúc"]}
+                                                        format={CONSTANT.DATE_FORMAT_LIST}
+                                                        disabledDate={(current) => current && current.valueOf()  < disbaledDate.valueOf()}
+                                                        defaultValue={[dayjs(dayjs(getValues('startDateRent')).format('DD/MM/YYYY'), 'DD/MM/YYYY'), dayjs(dayjs(getValues('endDateRent')).format('DD/MM/YYYY'), 'DD/MM/YYYY')]}
+                                                        onChange={handleChangeDateRange}
+                                                        style={{width: '100%'}}
+                                                    />
+                                                    {errors.startDateRent && <ErrorMessage message={errors.startDateRent.message} />}
+                                                </Form.Item>
+                                            </Col>
+                                            {
+                                                getValues('isTransport') && 
+                                                <>
+                                                    <Col xs={24} sm={12} lg={24} xl={12}>
+                                                        <Form.Item label='Nơi nhận' required>
+                                                            <Controller 
+                                                                control={control}
+                                                                name='shippingID'
+                                                                render={({ field: { value } }) => (
+                                                                    <Select value={value} onChange={(e) => {
+                                                                        setValue('shippingID', e)
+                                                                        trigger('shippingID')
+                                                                        clearPoint()
+                                                                    }}>
+                                                                        {
+                                                                            shipping.map((item, index) => (
+                                                                                <Select.Option value={item.districtID} key={index} >
+                                                                                    {item.district}
+                                                                                </Select.Option>
+                                                                            ))
+                                                                        }
+                                                                    </Select>
+                                                                )}
+                                                            />
+                                                        </Form.Item>
+                                                    </Col>
+                                                    <Col xs={24} sm={12} lg={24} xl={12}>
+                                                        <Form.Item label='Địa chỉ cụ thể' required>
+                                                            <Controller 
+                                                                control={control}
+                                                                name='recipientAddress'
+                                                                render={({field}) => (<Input {...field} />)}
+                                                            />
+                                                            {errors.recipientAddress && <ErrorMessage message={errors.recipientAddress.message} />}
+                                                        </Form.Item>
+                                                    </Col>
+                                                </>
+                                            }
+                                            <Col span={24}>
+                                                <div className="point-infor">
+                                                    <span>Số điểm bạn đang có là ({userState.user.currentPoint})</span>
+                                                    <span>Số điểm bạn có thể dùng là ({MaxPointCanUse()})</span>
                                                 </div>
-                                            </div>
-                                        </Col>
-                                        <Col span={24} >
-                                            <div className='btn-form-wrapper'>
-                                                <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large'>
-                                                    Đặt hàng
-                                                </Button>
-                                            </div>
-                                        </Col>
-                                    </Row>
+                                                <Form.Item label='Số điểm sử dụng cho đơn hàng'>
+                                                    <Controller 
+                                                        control={control}
+                                                        name='rewardPointUsed'
+                                                        render={({field: { value }}) => (<Input min={0} type='number' value={value} onChange={(e) =>{
+                                                            const data = Number(e.target.value || 0)
+                                                            if(data <= MaxPointCanUse()){
+                                                                setValue('rewardPointUsed', data)
+                                                            }else{
+                                                                setValue('rewardPointUsed', MaxPointCanUse())
+                                                            }
+                                                            trigger('rewardPointUsed')
+                                                        }} />)}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={24}>
+                                                <Checkbox checked={isConfirm} onChange={(e) => setIsConfirm(e.target.checked)} >Đồng ý với tất cả điều khoản khi thuê cây</Checkbox>
+                                                <div className="rent-policy">
+                                                    <div className='view-policy' onClick={() => setIsViewPolicy(true)}>
+                                                        <span>Xem điều khoản thuê cây</span>
+                                                        <MdNavigateNext size={20} />
+                                                    </div>
+                                                </div>
+                                            </Col>
+                                            <Col span={24} >
+                                                <div className='btn-form-wrapper'>
+                                                    <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large'>
+                                                        Đặt hàng
+                                                    </Button>
+                                                </div>
+                                            </Col>
+                                        </Row>
+                                    </GridConfig>
                                 </Form>
                             </div>
                         </div>

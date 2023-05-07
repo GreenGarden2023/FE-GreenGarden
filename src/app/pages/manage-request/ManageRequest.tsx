@@ -72,7 +72,6 @@ const ManageRequest: React.FC = () => {
             title: 'Mã dịch vụ',
             key: 'serviceCode',
             dataIndex: 'serviceCode',
-            fixed: 'left'
         },
         {
             title: 'Thông tin khách hàng',
@@ -110,19 +109,19 @@ const ManageRequest: React.FC = () => {
             title: 'Nơi chăm sóc',
             key: 'isTransport',
             dataIndex: 'isTransport',
-            render: (v) => (<Transport isTransport={v} isRequest />)
+            render: (v) => (<Transport isTransport={v} isRequest minWidth={130} />)
         },
         {
             title: 'Tổng số cây',
             key: 'totalQuantity',
             dataIndex: 'totalQuantity',
+            render: (v) => <p style={{minWidth: 80}}>{v}</p>
         },
         {
             title: 'Xử lý',
             key: 'action',
             dataIndex: 'action',
             align: 'center',
-            fixed: 'right',
             render: (_, record, index) => (
                     <Popover
                         content={() => contextService(record)} 
@@ -137,7 +136,7 @@ const ManageRequest: React.FC = () => {
                             }
                         }}
                     >
-                        <GrMore size={25} cursor='pointer' color='#00a76f' />
+                        <GrMore size={25} cursor='pointer' color='#00a76f' style={{minWidth: 80}} />
                     </Popover>
             )
         },
@@ -202,7 +201,7 @@ const ManageRequest: React.FC = () => {
                     className='table' 
                     columns={ColumnServiceOrder} 
                     dataSource={DataSourceServiceOrder} 
-                    scroll={{ y: 680, x: 2000 }}
+                    scroll={{x: 480 }}
                     pagination={{
                         current: paging.curPage,
                         pageSize: paging.pageSize,

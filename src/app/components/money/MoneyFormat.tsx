@@ -8,9 +8,10 @@ interface MoneyFormatProps{
   value: string | number
   isHighlight?: boolean
   color?: Color
+  minWidth?: number
 }
 
-const MoneyFormat: React.FC<MoneyFormatProps> = ({value, isHighlight = false, color}) => {
+const MoneyFormat: React.FC<MoneyFormatProps> = ({value, isHighlight = false, color, minWidth}) => {
 
   const GetColor = useMemo(() =>{
     switch(color){
@@ -24,7 +25,14 @@ const MoneyFormat: React.FC<MoneyFormatProps> = ({value, isHighlight = false, co
   }, [color])
 
   return (
-        <CurrencyFormat value={value} displayType={'text'} thousandSeparator={true} suffix={'VNĐ'} className={isHighlight ? 'highlight' : 'normal'} style={{color: color ? GetColor : 'initial'}} />
+        <CurrencyFormat 
+          value={value} 
+          displayType={'text'} 
+          thousandSeparator={true} 
+          suffix={'VNĐ'} 
+          className={isHighlight ? 'highlight' : 'normal'} 
+          style={{color: color ? GetColor : 'initial', minWidth: minWidth || 'initial', display: minWidth ? 'inline-block' : 'initial'}}
+        />
   )
 }
 

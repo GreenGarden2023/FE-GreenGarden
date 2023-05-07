@@ -22,6 +22,7 @@ import Searching from 'app/components/search-and-filter/search/Searching';
 import useSelector from 'app/hooks/use-selector';
 import productServcie from 'app/services/product.service';
 import GridConfig from 'app/components/grid-config/GridConfig';
+import MoneyFormat from 'app/components/money/MoneyFormat';
 
 
 
@@ -126,6 +127,22 @@ const ClientProductItem: React.FC = () => {
                                                             <Link to={`/product-item/${proItem.id}`} className='cp-item'>
                                                                 <img src={proItem.imageURL} alt="/" onError={utilGeneral.setDefaultImage} />
                                                                 <p className='pro-name'>{proItem.name}</p>
+                                                                <div className="price-box-info">
+                                                                    <div className="rent">
+                                                                        <span className='label'>Giá thuê</span>
+                                                                        <span>
+                                                                            <MoneyFormat value={proItem.minRent} color='Green' />
+                                                                            &nbsp;- <MoneyFormat value={proItem.maxRent} color='Green' />
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="sale">
+                                                                        <span className='label'>Giá bán</span>
+                                                                        <span>
+                                                                            <MoneyFormat value={proItem.minSale} color='Green' />
+                                                                            &nbsp;- <MoneyFormat value={proItem.maxSale} color='Green' />
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
                                                                 <div className="size-box">
                                                                     <Divider style={{margin: 0}} >
                                                                         <div className="title">

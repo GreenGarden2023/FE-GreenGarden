@@ -15,14 +15,40 @@ interface ServiceReportDetailProps{
 }
 
 const ServiceReportDetail: React.FC<ServiceReportDetailProps> = ({orderCode, serviceCalendar, onClose}) => {
-    var settings = {
+    const settings = {
         dots: false,
         infinite: true,
         speed: 500,
-        slidesToShow: 4,
+        slidesToShow: 5,
         slidesToScroll: 1,
-        nextArrow: <GrFormNext />,
-        prevArrow: <GrFormPrevious />
+        prevArrow: <GrFormPrevious className='category-prev' />,
+        nextArrow: <GrFormNext className='category-next' />,
+        responsive: [
+            {
+              breakpoint: 1024,
+              settings: {
+                slidesToShow: 3,
+                slidesToScroll: 3,
+                infinite: true,
+                dots: true
+              }
+            },
+            {
+              breakpoint: 600,
+              settings: {
+                slidesToShow: 2,
+                slidesToScroll: 2,
+                initialSlide: 2
+              }
+            },
+            {
+              breakpoint: 480,
+              settings: {
+                slidesToShow: 2,
+                slidesToScroll: 1
+              }
+            }
+          ]
     };
     return (
         <Modal

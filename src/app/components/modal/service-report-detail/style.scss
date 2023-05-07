@@ -47,3 +47,45 @@
         object-fit: cover;
     }
 }
+
+@media screen and (max-width: $screen-sm) {
+    .report-wrapper{
+        .report-time{
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            .title{
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+            .content{
+                font-size: 20px;
+                font-weight: 500;
+                color: $color-link;
+            }
+        }
+        .report-images{
+            border: 1px solid $color-link;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            .image-item{
+                padding: 10px;
+                width: 230px;
+                height: 230px;
+                object-fit: cover;
+                border-radius: 15px;
+            }
+        }
+        .report-description{
+            border: 1px solid $soft-text;
+            padding: 10px;
+            border-radius: 5px;
+            color: $soft-text;
+            font-weight: 500;
+            min-height: 130px;
+        }
+    }
+}

@@ -26,6 +26,7 @@ import { setNoti } from 'app/slices/notification'
 import CONSTANT from 'app/utils/constant'
 import LoadingView from 'app/components/loading-view/LoadingView'
 import NoProduct from 'app/components/no-product/NoProduct'
+import GridConfig from 'app/components/grid-config/GridConfig'
 
 const ClientManageTakeCareServiceDetail: React.FC = () => {
     const { orderId } = useParams()
@@ -81,7 +82,7 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
             title: 'Tên cây',
             key: 'treeName',
             dataIndex: 'treeName',
-            render: (v) => (<TreeName name={v} />)
+            render: (v) => (<TreeName name={v} minWidth={100} />)
         },
         {
             title: 'Hình ảnh',
@@ -93,25 +94,26 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
             title: 'Số lượng',
             key: 'quantity',
             dataIndex: 'quantity',
+            render: (v) => <p style={{minWidth: 80}}>{v}</p>
         },
         {
             title: 'Mô tả của khách hàng',
             key: 'description',
             dataIndex: 'description',
-            render: (v) => (<Description content={v} />)
+            render: (v) => (<Description content={v} minWidth={150} />)
         },
         {
             title: 'Mô tả của quản trị',
             key: 'managerDescription',
             dataIndex: 'managerDescription',
-            render: (v) => (<Description content={v} />)
+            render: (v) => (<Description content={v} minWidth={150} />)
         },
         {
             title: 'Giá tiền',
             key: 'servicePrice',
             dataIndex: 'servicePrice',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} color='Light Blue' isHighlight />)
+            render: (v) => (<MoneyFormat value={v} color='Light Blue' isHighlight minWidth={100} />)
         },
     ]
     const DataSourceServiceOrder = useMemo(() =>{
@@ -149,12 +151,13 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
             title: 'Mô tả ngắn gọn',
             key: 'sumary',
             dataIndex: 'sumary',
-            render: (v) => (<Description content={v} />)
+            render: (v) => (<Description content={v} minWidth={230} />)
         },
         {
             title: 'Trạng thái',
             key: 'status',
             dataIndex: 'status',
+            render: (v) => <p style={{minWidth: 80}}>{v}</p>
         },
         {
             title: 'Xử lý',
@@ -164,7 +167,6 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
                 <>
                     <Popover
                         content={() => contextCalendar(record)} 
-                        placement='bottom' 
                         trigger="click"
                         open={index === actionMethod?.openIndex} 
                         onOpenChange={(open: boolean) => {
@@ -175,7 +177,7 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
                             }
                         }}
                     >
-                        <GrMore size={25} cursor='pointer' color='#00a76f' />
+                        <GrMore size={25} cursor='pointer' color='#00a76f' style={{minWidth: 80}} />
                     </Popover>
                 </>
             )
@@ -220,76 +222,80 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
                                 <HeaderInfor title={`Chi tiết đơn hàng chăm sóc cây "${serviceOrder.orderCode}"`} />
                                 <div className="default-layout">
                                     <h3>Thông tin của người chăm sóc</h3>
-                                    <Row gutter={[24, 24]} style={{marginTop: '20px'}}>
-                                        <Col span={8}>
-                                            <span className="label">Tên:</span>
-                                            <span className="content">{serviceOrder.technician.technicianFullName}</span>
-                                        </Col>
-                                        <Col span={8}>
-                                            <span className="label">Số điện thoại:</span>
-                                            <span className="content">{serviceOrder.technician.technicianPhone}</span>
-                                        </Col>
-                                        <Col span={8}>
-                                            <span className="label">Email:</span>
-                                            <span className="content">{serviceOrder.technician.technicianMail}</span>
-                                        </Col>
-                                    </Row>
+                                    <GridConfig>
+                                        <Row gutter={[24, 24]} style={{marginTop: '20px'}}>
+                                            <Col xs={12} sm={12} md={12} lg={8} xl={8} style={{display: 'flex', flexWrap: 'wrap'}}>
+                                                <span className="label">Tên:</span>
+                                                <span className="content">{serviceOrder.technician.technicianFullName}</span>
+                                            </Col>
+                                            <Col xs={12} sm={12} md={12} lg={8} xl={8} style={{display: 'flex', flexWrap: 'wrap'}}>
+                                                <span className="label">Số điện thoại:</span>
+                                                <span className="content">{serviceOrder.technician.technicianPhone}</span>
+                                            </Col>
+                                            <Col xs={24} sm={24} md={24} lg={8} xl={8} style={{display: 'flex', flexWrap: 'wrap'}}>
+                                                <span className="label">Email:</span>
+                                                <span className="content">{serviceOrder.technician.technicianMail}</span>
+                                            </Col>
+                                        </Row>
+                                    </GridConfig>
                                 </div>
                                 <div className="default-layout">
                                     <h3>Thông tin đơn hàng chăm sóc cây</h3>
-                                    <Row gutter={[24, 24]} style={{marginTop: '20px'}}>
-                                        <Col span={8}>
-                                            <span className="label">Ngày bắt đầu</span>
-                                            <span className="content">{utilDateTime.dateToString(serviceOrder.service.startDate.toString())}</span>
-                                        </Col>
-                                        <Col span={8}>
-                                            <span className="label">Ngày kết thúc</span>
-                                            <span className="content">{utilDateTime.dateToString(serviceOrder.service.endDate.toString())}</span>
-                                        </Col>
-                                        <Col span={8} style={{display: 'flex'}}>
-                                            <span className="label">Trạng thái đơn hàng</span>
-                                            <span className="content">
-                                                <OrderStatusComp status={serviceOrder.status} />
-                                            </span>
-                                        </Col>
-                                        <Col span={8} style={{display: 'flex'}}>
-                                            <span className="label">Tiền cọc</span>
-                                            <span className="content">
-                                                <MoneyFormat value={serviceOrder.deposit} color='Orange' />
-                                            </span>
-                                        </Col>
-                                        <Col span={8} style={{display: 'flex'}}>
-                                            <span className="label">Tổng đơn hàng</span>
-                                            <span className="content">
-                                                <MoneyFormat value={serviceOrder.totalPrice} color='Light Blue' />
-                                            </span>
-                                        </Col>
-                                        <Col span={8} style={{display: 'flex'}}>
-                                            <span className="label">Tiền còn thiếu</span>
-                                            <span className="content">
-                                                <MoneyFormat value={serviceOrder.remainAmount} color='Blue' isHighlight />
-                                            </span>
-                                        </Col>
-                                        {
-                                            serviceOrder.nameCancelBy &&
-                                            <>
-                                                <Col span={8}>
-                                                    <span className="label">Người hủy đơn</span>
-                                                    <span className="content">{serviceOrder.nameCancelBy}</span>
-                                                </Col>
-                                                <Col span={8}>
-                                                    <span className="label">Lý do</span>
-                                                    <span className="content">{serviceOrder.reason}</span>
-                                                </Col>
-                                            </>
-                                        }
-                                    </Row>
+                                    <GridConfig>
+                                        <Row gutter={[24, 24]} style={{marginTop: '20px'}}>
+                                            <Col xs={12} sm={12} md={12} lg={8} xl={8}>
+                                                <span className="label">Ngày bắt đầu</span>
+                                                <span className="content">{utilDateTime.dateToString(serviceOrder.service.startDate.toString())}</span>
+                                            </Col>
+                                            <Col xs={12} sm={12} md={12} lg={8} xl={8}>
+                                                <span className="label">Ngày kết thúc</span>
+                                                <span className="content">{utilDateTime.dateToString(serviceOrder.service.endDate.toString())}</span>
+                                            </Col>
+                                            <Col xs={12} sm={12} md={12} lg={8} xl={8} style={{display: 'flex', flexWrap: 'wrap'}}>
+                                                <span className="label">Trạng thái đơn hàng</span>
+                                                <span className="content">
+                                                    <OrderStatusComp status={serviceOrder.status} />
+                                                </span>
+                                            </Col>
+                                            <Col xs={12} sm={12} md={12} lg={8} xl={8} style={{display: 'flex', flexWrap: 'wrap'}}>
+                                                <span className="label">Tiền cọc</span>
+                                                <span className="content">
+                                                    <MoneyFormat value={serviceOrder.deposit} color='Orange' />
+                                                </span>
+                                            </Col>
+                                            <Col xs={12} sm={12} md={12} lg={8} xl={8} style={{display: 'flex', flexWrap: 'wrap'}}>
+                                                <span className="label">Tổng đơn hàng</span>
+                                                <span className="content">
+                                                    <MoneyFormat value={serviceOrder.totalPrice} color='Light Blue' />
+                                                </span>
+                                            </Col>
+                                            <Col xs={12} sm={12} md={12} lg={8} xl={8} style={{display: 'flex', flexWrap: 'wrap'}}>
+                                                <span className="label">Tiền còn thiếu</span>
+                                                <span className="content">
+                                                    <MoneyFormat value={serviceOrder.remainAmount} color='Blue' isHighlight />
+                                                </span>
+                                            </Col>
+                                            {
+                                                serviceOrder.nameCancelBy &&
+                                                <>
+                                                    <Col xs={12} sm={12} md={12} lg={8} xl={8}>
+                                                        <span className="label">Người hủy đơn</span>
+                                                        <span className="content">{serviceOrder.nameCancelBy}</span>
+                                                    </Col>
+                                                    <Col xs={12} sm={12} md={12} lg={8} xl={8}>
+                                                        <span className="label">Lý do</span>
+                                                        <span className="content">{serviceOrder.reason}</span>
+                                                    </Col>
+                                                </>
+                                            }
+                                        </Row>
+                                    </GridConfig>
                                 </div>
                                 <div className="default-layout">
-                                    <Table columns={ColumnServiceOrder} dataSource={DataSourceServiceOrder} pagination={false} />
+                                    <Table columns={ColumnServiceOrder} dataSource={DataSourceServiceOrder} pagination={false} scroll={{x: 480}} />
                                 </div>
                                 <div className="default-layout">
-                                    <Table columns={ColumnCalendar} dataSource={DataSourceCalendar} pagination={false} />
+                                    <Table columns={ColumnCalendar} dataSource={DataSourceCalendar} pagination={false} scroll={{x: 480}} />
                                 </div>
                             </>
                         }

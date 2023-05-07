@@ -16,6 +16,7 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import CONSTANT from 'app/utils/constant'
 import ErrorMessage from 'app/components/message.tsx/ErrorMessage'
+import GridConfig from 'app/components/grid-config/GridConfig'
 
 const schema = yup.object().shape({
     recipientAddress: yup.string().when("isTransport", {
@@ -68,19 +69,20 @@ const CartSale: React.FC<CartSaleProps> = ({items, shipping, onChange, onSubmit}
             key: '#',
             dataIndex: '#',
             align: 'center',
-            render: (v, _, index) => (<span style={{color: '#00a76f'}}>{index + 1}</span>)
+            render: (v, _, index) => (<span style={{color: '#00a76f'}}>{index + 1}</span>),
         },
         {
             title: 'Hình ảnh',
             key: 'imgUrl',
             dataIndex: 'imgUrl',
             align: 'center',
-            render: (v) => (<ListImage listImgs={v} />)
+            render: (v) => (<ListImage listImgs={v} />),
         },
         {
             title: 'Tên sản phẩm',
             key: 'name',
             dataIndex: 'name',
+            render: (v) => <p style={{minWidth: '150px'}}>{v}</p>
         },
         {
             title: 'Kích thước',
@@ -246,7 +248,13 @@ const CartSale: React.FC<CartSaleProps> = ({items, shipping, onChange, onSubmit}
             <div className='default-layout'>
                 <div className="cart-sale-layout">
                     <h3 className="title-cart">Cây bán</h3>
-                    <Table className='cart-table' dataSource={DataSourceSale} columns={ColumnSale} pagination={false} />
+                    <Table 
+                        className='cart-table' 
+                        dataSource={DataSourceSale} 
+                        columns={ColumnSale} 
+                        pagination={false}
+                        scroll={{x: 480}}
+                    />
                 </div>
             </div>
             {
@@ -324,114 +332,117 @@ const CartSale: React.FC<CartSaleProps> = ({items, shipping, onChange, onSubmit}
                                 <Form
                                     layout='vertical'
                                     onFinish={handleSubmit(onSubmitForm)}
+                                    labelAlign='left'
                                 >
-                                    <Row gutter={[24, 0]}>
-                                        <Col span={12}>
-                                            <Form.Item label='Tên người nhận' required>
-                                                <Controller 
-                                                    control={control}
-                                                    name='recipientName'
-                                                    render={({field}) => (<Input {...field} />)}
-                                                />
-                                                {errors.recipientName && <ErrorMessage message={errors.recipientName.message} />}
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={12}>
-                                            <Form.Item label='Số điện thoại' required>
-                                                <Controller 
-                                                    control={control}
-                                                    name='recipientPhone'
-                                                    render={({field}) => (<Input {...field} />)}
-                                                />
-                                                {errors.recipientPhone && <ErrorMessage message={errors.recipientPhone.message} />}
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={24}>
-                                            <Form.Item label='Chọn nơi nhận cây'>
-                                                <Controller 
-                                                    control={control}
-                                                    name='isTransport'
-                                                    render={({ field: { value } }) => (
-                                                        <Select value={value} onChange={(e) => {
-                                                            setValue('isTransport', e)
-                                                            trigger('isTransport')
-                                                            clearPoint()
-                                                        }}>
-                                                            <Select.Option value={true}>Tại nhà riêng</Select.Option>
-                                                            <Select.Option value={false}>Tại cửa hàng</Select.Option>
-                                                        </Select>
-                                                    )}
-                                                />
-                                            </Form.Item>
-                                        </Col>
-                                        {
-                                            getValues('isTransport') && 
-                                            <>
-                                                <Col span={12}>
-                                                    <Form.Item label='Nơi nhận' required>
-                                                        <Controller 
-                                                            control={control}
-                                                            name='shippingID'
-                                                            render={({ field: { value } }) => (
-                                                                <Select value={value} onChange={(e) => {
-                                                                    setValue('shippingID', e)
-                                                                    setValue('rewardPointUsed', 0)
-                                                                    trigger('shippingID')
-                                                                    trigger('rewardPointUsed')
-                                                                }}>
-                                                                    {
-                                                                        shipping.map((item, index) => (
-                                                                            <Select.Option value={item.districtID} key={index} >
-                                                                                {item.district}
-                                                                            </Select.Option>
-                                                                        ))
-                                                                    }
-                                                                </Select>
-                                                            )}
-                                                        />
-                                                    </Form.Item>
-                                                </Col>
-                                                <Col span={12}>
-                                                    <Form.Item label='Địa chỉ cụ thể' required>
-                                                        <Controller 
-                                                            control={control}
-                                                            name='recipientAddress'
-                                                            render={({field}) => (<Input {...field} />)}
-                                                        />
-                                                        {errors.recipientAddress && <ErrorMessage message={errors.recipientAddress.message} />}
-                                                    </Form.Item>
-                                                </Col>
-                                            </>
-                                        }
-                                        <Col span={24}>
-                                            <div className="point-infor">
-                                                <span>Số điểm bạn đang có là ({userState.user.currentPoint})</span>
-                                                <span>Số điểm bạn có thể dùng là ({MaxPointCanUse()})</span>
-                                            </div>
-                                            <Form.Item label='Số điểm sử dụng cho đơn hàng'>
-                                                <Controller 
-                                                    control={control}
-                                                    name='rewardPointUsed'
-                                                    render={({field: { value }}) => (<Input min={0} type='number' value={value} onChange={(e) =>{
-                                                        const data = Number(e.target.value || 0)
-                                                        if(data <= MaxPointCanUse()){
-                                                            setValue('rewardPointUsed', data)
-                                                        }else{
-                                                            setValue('rewardPointUsed', MaxPointCanUse())
-                                                        }
-                                                        trigger('rewardPointUsed')
-                                                    }} />)}
-                                                />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col span={24} >
-                                            <div className='btn-form-wrapper'>
-                                                <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large'>
-                                                    Đặt hàng
-                                                </Button>
-                                            </div>
-                                        </Col>
-                                    </Row>
+                                    <GridConfig>
+                                        <Row gutter={[24, 0]}>
+                                            <Col xs={24} sm={12} lg={24} xl={12}>
+                                                <Form.Item label='Tên người nhận' required>
+                                                    <Controller 
+                                                        control={control}
+                                                        name='recipientName'
+                                                        render={({field}) => (<Input {...field} />)}
+                                                    />
+                                                    {errors.recipientName && <ErrorMessage message={errors.recipientName.message} />}
+                                                </Form.Item>
+                                            </Col>
+                                            <Col xs={24} sm={12} lg={24} xl={12}>
+                                                <Form.Item label='Số điện thoại' required>
+                                                    <Controller 
+                                                        control={control}
+                                                        name='recipientPhone'
+                                                        render={({field}) => (<Input {...field} />)}
+                                                    />
+                                                    {errors.recipientPhone && <ErrorMessage message={errors.recipientPhone.message} />}
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={24}>
+                                                <Form.Item label='Chọn nơi nhận cây'>
+                                                    <Controller 
+                                                        control={control}
+                                                        name='isTransport'
+                                                        render={({ field: { value } }) => (
+                                                            <Select value={value} onChange={(e) => {
+                                                                setValue('isTransport', e)
+                                                                trigger('isTransport')
+                                                                clearPoint()
+                                                            }}>
+                                                                <Select.Option value={true}>Tại nhà riêng</Select.Option>
+                                                                <Select.Option value={false}>Tại cửa hàng</Select.Option>
+                                                            </Select>
+                                                        )}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            {
+                                                getValues('isTransport') && 
+                                                <>
+                                                    <Col xs={24} sm={12} lg={24} xl={12}>
+                                                        <Form.Item label='Nơi nhận' required>
+                                                            <Controller 
+                                                                control={control}
+                                                                name='shippingID'
+                                                                render={({ field: { value } }) => (
+                                                                    <Select value={value} onChange={(e) => {
+                                                                        setValue('shippingID', e)
+                                                                        setValue('rewardPointUsed', 0)
+                                                                        trigger('shippingID')
+                                                                        trigger('rewardPointUsed')
+                                                                    }}>
+                                                                        {
+                                                                            shipping.map((item, index) => (
+                                                                                <Select.Option value={item.districtID} key={index} >
+                                                                                    {item.district}
+                                                                                </Select.Option>
+                                                                            ))
+                                                                        }
+                                                                    </Select>
+                                                                )}
+                                                            />
+                                                        </Form.Item>
+                                                    </Col>
+                                                    <Col xs={24} sm={12} lg={24} xl={12}>
+                                                        <Form.Item label='Địa chỉ cụ thể' required>
+                                                            <Controller 
+                                                                control={control}
+                                                                name='recipientAddress'
+                                                                render={({field}) => (<Input {...field} />)}
+                                                            />
+                                                            {errors.recipientAddress && <ErrorMessage message={errors.recipientAddress.message} />}
+                                                        </Form.Item>
+                                                    </Col>
+                                                </>
+                                            }
+                                            <Col span={24}>
+                                                <div className="point-infor">
+                                                    <span>Số điểm bạn đang có là ({userState.user.currentPoint})</span>
+                                                    <span>Số điểm bạn có thể dùng là ({MaxPointCanUse()})</span>
+                                                </div>
+                                                <Form.Item label='Số điểm sử dụng cho đơn hàng'>
+                                                    <Controller 
+                                                        control={control}
+                                                        name='rewardPointUsed'
+                                                        render={({field: { value }}) => (<Input min={0} type='number' value={value} onChange={(e) =>{
+                                                            const data = Number(e.target.value || 0)
+                                                            if(data <= MaxPointCanUse()){
+                                                                setValue('rewardPointUsed', data)
+                                                            }else{
+                                                                setValue('rewardPointUsed', MaxPointCanUse())
+                                                            }
+                                                            trigger('rewardPointUsed')
+                                                        }} />)}
+                                                    />
+                                                </Form.Item>
+                                            </Col>
+                                            <Col span={24} >
+                                                <div className='btn-form-wrapper'>
+                                                    <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large'>
+                                                        Đặt hàng
+                                                    </Button>
+                                                </div>
+                                            </Col>
+                                        </Row>
+                                    </GridConfig>
                                 </Form>
                             </div>
                         </div>
