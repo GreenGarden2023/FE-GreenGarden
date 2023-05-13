@@ -1,5 +1,5 @@
 import { OrderStatus, OrderType, TakeCareStatus } from "app/models/general-type";
-import { CreateServiceOrder, OrderCalculate, OrderCreate, OrderExtendDetail, RentOrder, RentOrderList, RentOrderResponse, SaleOrderDetail, SaleOrderResponse } from "app/models/order";
+import { CreateServiceOrder, OrderCalculate, OrderCreate, OrderExtendDetail, RentOrder, RentOrderList, RentOrderResponse, SaleOrderDetail, SaleOrderResponse, UpdateCareGuide } from "app/models/order";
 import { Paging } from "app/models/paging";
 import { Response } from "app/models/response";
 import { ServiceOrderDetail, ServiceResponse } from "app/models/service";
@@ -91,8 +91,8 @@ const getServiceOrdersByTechnician = async (technicianID: string, paging: Partia
     const res = await golbalAxios.get<Response<ServiceResponse>>(`/order/get-service-orders-by-technician?${queryString.stringify(params)}`)
     return res.data
 }
-const getServiceOrdersByTechnicianToday = async (technicianID: string, takecareStatus: TakeCareStatus, paging: Partial<Paging>) =>{
-    const params = {technicianID, takecareStatus, ...paging}
+const getServiceOrdersByTechnicianToday = async (technicianID: string, takecareStatus: TakeCareStatus, nextDay: boolean, paging: Partial<Paging>) =>{
+    const params = {technicianID, takecareStatus, nextDay, ...paging}
     const res = await golbalAxios.get<Response<ServiceResponse>>(`/order/get-service-orders-by-technician-today?${queryString.stringify(params)}`)
     return res.data
 }
@@ -163,6 +163,10 @@ const getSerivceOrderDetailByRangeDate = async (paging: Partial<Paging>, fromDat
     const res = await golbalAxios.get<Response<ServiceResponse>>(`/order/get-service-order-detail-by-range-date?${queryString.stringify(params)}`)
     return res.data
 }
+const updateCareGuideByTechnician = async (body: UpdateCareGuide) =>{
+    const res = await golbalAxios.post<Response<null>>(`/order/update-care-guide-by-technician`, body)
+    return res.data
+}
 
 const orderService = {
     createOrder,
@@ -190,7 +194,8 @@ const orderService = {
     getRentOrderDetailByRangeDate,
     updateServiceOrderStatus,
     getSerivceOrderDetailByRangeDate,
-    getServiceOrdersByTechnicianToday
+    getServiceOrdersByTechnicianToday,
+    updateCareGuideByTechnician
 }
 
 export default orderService

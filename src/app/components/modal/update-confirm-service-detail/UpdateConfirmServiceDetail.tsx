@@ -171,7 +171,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
             imgUrls: x.imgUrls,
             description: x.description,
             managerDescription: x.managerDescription,
-            servicePrice: x.servicePrice
+            servicePrice: x.servicePrice,
         }))
     
     
@@ -245,17 +245,17 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                 serviceDetailID: x.id,
                 quantity: x.quantity,
                 servicePrice: x.servicePrice,
-                managerDescription: x.managerDescription
+                managerDescription: x.managerDescription,
             }))
         }
         try{
             await serviceService.updateServiceDetail(body)
             dispatch(setNoti({type: 'success', message: `Cập nhật thông tin dịch vụ chăm sóc cho đơn hàng "${service.serviceCode}" thành công`}))
-            const { name, phone, email, address, isTranSport, transportFee, districtID, startDate, endDate, rewardPointUsed,  } = data
+            const { name, phone, email, address, isTranSport, transportFee, districtID, startDate, endDate, rewardPointUsed, rules } = data
             
             const serviceSubmit: Service = {
                 ...service,
-                name, phone, email, address, isTransport: isTranSport, transportFee, districtID, startDate, endDate, rewardPointUsed,
+                name, phone, email, address, isTransport: isTranSport, transportFee, districtID, startDate, endDate, rewardPointUsed, rules
             }
             onSubmit(serviceSubmit)
         }catch{

@@ -4,7 +4,7 @@ import { OrderStatus, Role, TakeCareStatus } from 'app/models/general-type';
 interface SearchProps{
     orderCode?: string;
     phone?: string;
-    status?: OrderStatus
+    status?: OrderStatus;
     productName?: string;
     isSearching: boolean;
 }
@@ -12,7 +12,8 @@ interface FilterProps{
     startDate?: string;
     endDate?: string;
     role?: Role;
-    takeCareStatus?: TakeCareStatus
+    takeCareStatus?: TakeCareStatus;
+    nextDay?: boolean;
     isFiltering: boolean;
 }
 
@@ -113,6 +114,18 @@ const setSearchValuesCR: CR<SearchProps> = (state, action) =>{
         }
     }
 }
+const setFilterValuesCR: CR<FilterProps> = (state, action) =>{
+    return {
+        filter: action.payload,
+        search: {
+            isSearching: false,
+            orderCode: undefined,
+            phone: undefined,
+            productName: undefined,
+            status: undefined
+        }
+    }
+}
 
 const slice = createSlice({
     name: 'searchAndFilter/slice',
@@ -125,9 +138,10 @@ const slice = createSlice({
         setEmptyFilter: setEmptyFilterCR,
         setRole: setRoleCR,
         setOrderToday: setOrderTodayCR,
-        setSearchValues: setSearchValuesCR
+        setSearchValues: setSearchValuesCR,
+        setFilterValues: setFilterValuesCR
     },
 });
 
-export const { setSearch, setFilter, setRangeDate, setEmptySearch, setEmptyFilter, setRole, setOrderToday, setSearchValues } = slice.actions
+export const { setSearch, setFilter, setRangeDate, setEmptySearch, setEmptyFilter, setRole, setOrderToday, setSearchValues, setFilterValues } = slice.actions
 export default slice.reducer

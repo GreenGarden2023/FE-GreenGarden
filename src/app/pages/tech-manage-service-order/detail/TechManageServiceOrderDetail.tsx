@@ -1,4 +1,4 @@
-import { Col, Popover, Row } from 'antd';
+import { Button, Col, Input, Popover, Row } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 import HeaderInfor from 'app/components/header-infor/HeaderInfor';
 import CreateCalendar from 'app/components/modal/handle-calendar/CreateCalendar';
@@ -24,9 +24,15 @@ import { GrMore } from 'react-icons/gr';
 import { useParams } from 'react-router-dom';
 import './style.scss';
 import Transport from 'app/components/renderer/transport/Transport';
+import { UpdateCareGuide } from 'app/models/order';
+import useDispatch from 'app/hooks/use-dispatch';
+import { setNoti } from 'app/slices/notification';
+import CONSTANT from 'app/utils/constant';
+import GridConfig from 'app/components/grid-config/GridConfig';
 
 const TechManageServiceOrderDetail: React.FC = () => {
     const { orderId } = useParams()
+    const dispatch = useDispatch()
     // data
     const [serviceOrder, setServiceOrder] = useState<ServiceOrderDetail>();
     const [calendars, setCalendars] = useState<ServiceCalendar[]>([])
@@ -34,6 +40,7 @@ const TechManageServiceOrderDetail: React.FC = () => {
 
     // action
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
+    const [actionLoading, setActionLoading] = useState(false)
 
     // CalendarUpdate type
 
@@ -68,12 +75,6 @@ const TechManageServiceOrderDetail: React.FC = () => {
 
     const ColumnCalendar: ColumnsType<any> = [
         {
-            title: '#',
-            key: '#',
-            dataIndex: '#',
-            render:(v, _, index) => (index + 1)
-        },
-        {
             title: 'Ngày chăm sóc',
             key: 'serviceDate',
             dataIndex: 'serviceDate',
@@ -86,11 +87,11 @@ const TechManageServiceOrderDetail: React.FC = () => {
             render: (v) => (v && <ListImage listImgs={v} />)
         },
         {
-            title: 'Mô tả ngắn gọn',
+            title: 'Mô tả',
             key: 'sumary',
             dataIndex: 'sumary',
             width: 300,
-            render: (v) => (<Description content={v} />)
+            render: (v) => (<Description content={v} minWidth={180} />)
         },
         {
             title: 'Trạng thái',
@@ -117,7 +118,7 @@ const TechManageServiceOrderDetail: React.FC = () => {
                             }
                         }}
                     >
-                        <GrMore size={25} cursor='pointer' color='#00a76f' />
+                        <GrMore size={25} cursor='pointer' color='#00a76f' style={{minWidth: 80}} />
                     </Popover>
                 </>
             )
@@ -159,7 +160,7 @@ const TechManageServiceOrderDetail: React.FC = () => {
             title: 'Tên cây',
             key: 'treeName',
             dataIndex: 'treeName',
-            render: (v) => (<TreeName name={v} />)
+            render: (v) => (<TreeName name={v} minWidth={120} />)
         },
         {
             title: 'Hình ảnh',
@@ -171,35 +172,54 @@ const TechManageServiceOrderDetail: React.FC = () => {
             title: 'Số lượng',
             key: 'quantity',
             dataIndex: 'quantity',
+            render: (v) => <p style={{minWidth: 80}}>{v}</p>
         },
         {
             title: 'Mô tả của khách hàng',
             key: 'description',
             dataIndex: 'description',
-            render: (v) => (<Description content={v} />)
+            render: (v) => (<Description content={v} minWidth={180} />)
         },
         {
             title: 'Mô tả của quản trị',
             key: 'managerDescription',
             dataIndex: 'managerDescription',
-            render: (v) => (<Description content={v} />)
+            render: (v) => (<Description content={v} minWidth={180} />)
+        },
+        {
+            title: 'Hướng dẫn chăm sóc',
+            key: 'careGuide',
+            dataIndex: 'careGuide',
+            render: (v, _, index) => (<Input.TextArea style={Styled} value={v} onChange={(e) => {
+                if(!serviceOrder) return;
+                const value = e.target.value
+                serviceOrder.service.serviceDetailList[index].careGuide = value
+                setServiceOrder({...serviceOrder})
+            }} 
+            autoSize={{minRows: 4, maxRows: 4}}></Input.TextArea>)
         },
         {
             title: 'Giá tiền',
             key: 'servicePrice',
             dataIndex: 'servicePrice',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} isHighlight color='Blue' />)
+            render: (v) => (<MoneyFormat value={v} color='Blue'  />)
         },
     ]
+
+    const Styled: React.CSSProperties = {
+        display: 'inline-block',
+        minWidth: '180px'
+    }
+
     const DataSourceServiceOrder = useMemo(() =>{
         if(!serviceOrder) return
         
         return serviceOrder.service.serviceDetailList.map((x, i) => {
-            const { treeName, imgUrls, quantity, description, managerDescription, servicePrice } = x
+            const { treeName, imgUrls, quantity, description, managerDescription, servicePrice, careGuide } = x
             return {
                 key: String(i + 1),
-                treeName, imgUrls, quantity, description, managerDescription, servicePrice
+                treeName, imgUrls, quantity, description, managerDescription, servicePrice, careGuide
             }
         })
     }, [serviceOrder])
@@ -222,6 +242,22 @@ const TechManageServiceOrderDetail: React.FC = () => {
         }
         setCalendars([...calendars])
     }
+    const handleUpdateCareGuide = async () =>{
+        if(!serviceOrder || !orderId) return;
+
+        setActionLoading(true)
+        try{
+            const body: UpdateCareGuide = {
+                orderID: orderId,
+                listCareGuide: serviceOrder.service.serviceDetailList.map(x => ({userTreeID: x.userTreeID, careGuide: x.careGuide}))
+            }
+            await orderService.updateCareGuideByTechnician(body)
+            dispatch(setNoti({type: 'success', message: 'Cập nhật hướng dẫn chăm sóc thành công'}))
+        }catch{
+            dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+        }
+        setActionLoading(false)
+    }
     return (
         <div className='tmsod-wrapper'>
             {
@@ -231,59 +267,68 @@ const TechManageServiceOrderDetail: React.FC = () => {
                     <div className="default-layout">
                         <h3>Thông tin đơn hàng</h3>
                         <div className="order-infor-wrapper">
-                            <Row gutter={[24, 24]}>
-                                <Col span={8}>
-                                    <div className="item">
-                                        <span className="label">Tên khách hàng</span>
-                                        <span className="content">{serviceOrder.service.name}</span>
-                                    </div>
-                                </Col>
-                                <Col span={8}>
-                                    <div className="item">
-                                        <span className="label">Địa chỉ</span>
-                                        <span className="content">{serviceOrder.service.address}</span>
-                                    </div>
-                                </Col>
-                                <Col span={8}>
-                                    <div className="item">
-                                        <span className="label">Số điện thoại</span>
-                                        <span className="content">{serviceOrder.service.phone}</span>
-                                    </div>
-                                </Col>
-                                <Col span={8}>
-                                    <div className="item">
-                                        <span className="label">Email</span>
-                                        <span className="content">{serviceOrder.service.email}</span>
-                                    </div>
-                                </Col>
-                                <Col span={8}>
-                                    <div className="item">
-                                        <span className="label">Thời gian chăm sóc</span>
-                                        <span className="content">{utilDateTime.dateToString(serviceOrder.service.startDate.toString())} - {utilDateTime.dateToString(serviceOrder.service.endDate.toString())}</span>
-                                    </div>
-                                </Col>
-                                <Col span={8}>
-                                    <div className="item">
-                                        <span className="label">Nơi chăm sóc</span>
-                                        <span className="content">
-                                            <Transport isTransport={serviceOrder.service.isTransport} isRequest />
-                                        </span>
-                                    </div>
-                                </Col>
-                                <Col span={8}>
-                                    <div className="item">
-                                        <span className="label">Trạng thái đơn hàng</span>
-                                        <span className="content">
-                                            <OrderStatusComp status={serviceOrder.status} />
-                                        </span>
-                                    </div>
-                                </Col>
-                            </Row>
+                            <GridConfig>
+                                <Row gutter={[24, 24]}>
+                                    <Col xs={12} sm={12} md={12} lg={8} xl={8}>
+                                        <div className="item">
+                                            <span className="label">Tên khách hàng</span>
+                                            <span className="content">{serviceOrder.service.name}</span>
+                                        </div>
+                                    </Col>
+                                    <Col xs={12} sm={12} md={12} lg={8} xl={8}>
+                                        <div className="item">
+                                            <span className="label">Địa chỉ</span>
+                                            <span className="content">{serviceOrder.service.address}</span>
+                                        </div>
+                                    </Col>
+                                    <Col xs={12} sm={12} md={12} lg={8} xl={8}>
+                                        <div className="item">
+                                            <span className="label">Số điện thoại</span>
+                                            <span className="content">{serviceOrder.service.phone}</span>
+                                        </div>
+                                    </Col>
+                                    <Col xs={12} sm={12} md={12} lg={8} xl={8}>
+                                        <div className="item">
+                                            <span className="label">Email</span>
+                                            <span className="content">{serviceOrder.service.email}</span>
+                                        </div>
+                                    </Col>
+                                    <Col xs={12} sm={12} md={12} lg={8} xl={8}>
+                                        <div className="item">
+                                            <span className="label">Thời gian chăm sóc</span>
+                                            <span className="content">{utilDateTime.dateToString(serviceOrder.service.startDate.toString())} - {utilDateTime.dateToString(serviceOrder.service.endDate.toString())}</span>
+                                        </div>
+                                    </Col>
+                                    <Col xs={12} sm={12} md={12} lg={8} xl={8}>
+                                        <div className="item">
+                                            <span className="label">Nơi chăm sóc</span>
+                                            <span className="content">
+                                                <Transport isTransport={serviceOrder.service.isTransport} isRequest />
+                                            </span>
+                                        </div>
+                                    </Col>
+                                    <Col xs={12} sm={12} md={12} lg={8} xl={8}>
+                                        <div className="item">
+                                            <span className="label">Trạng thái đơn hàng</span>
+                                            <span className="content">
+                                                <OrderStatusComp status={serviceOrder.status} />
+                                            </span>
+                                        </div>
+                                    </Col>
+                                </Row>
+                            </GridConfig>
                         </div>
                     </div>
                     <div className="default-layout">
                         <h3>Thông tin của các cây cần chăm sóc</h3>
-                        <Table style={{marginTop: '20px'}} columns={ColumnServiceOrder} dataSource={DataSourceServiceOrder} pagination={false} />
+                        <Table 
+                            style={{marginTop: '20px'}} 
+                            columns={ColumnServiceOrder} 
+                            dataSource={DataSourceServiceOrder} 
+                            pagination={false}
+                            scroll={{x: 480}}
+                         />
+                        <Button loading={actionLoading} className='btn btn-create btn-update-care-guide' onClick={handleUpdateCareGuide} >Cập nhật hướng dẫn</Button>
                     </div>
                     {
                         (calendars.length === 0 && (serviceOrder.status === 'paid' || serviceOrder.status === 'ready')) &&
@@ -294,7 +339,13 @@ const TechManageServiceOrderDetail: React.FC = () => {
                     }
                     <div className="default-layout">
                         <h3>Thông tin báo cáo</h3>
-                        <Table style={{marginTop: '20px'}} columns={ColumnCalendar} dataSource={DataSourceCalendar} pagination={false} />
+                        <Table
+                            style={{marginTop: '20px'}} 
+                            columns={ColumnCalendar} 
+                            dataSource={DataSourceCalendar} 
+                            pagination={false}
+                            scroll={{x: 480}}
+                        />
                     </div>
                 </>
             }

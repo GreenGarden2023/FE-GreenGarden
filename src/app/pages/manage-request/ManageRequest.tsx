@@ -22,12 +22,14 @@ import { ShippingFee } from 'app/models/shipping-fee'
 import useDispatch from 'app/hooks/use-dispatch'
 import shippingFeeService from 'app/services/shipping-fee.service'
 import { setNoti } from 'app/slices/notification'
+import Searching from 'app/components/search-and-filter/search/Searching'
 
 const ManageRequest: React.FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const { user } = useSelector(state => state.userInfor)
+    const { search } = useSelector(state => state.SearchFilter)
 
     const [requests, setRequests] = useState<ServiceRequest[]>([])
     const [paging, setPaging] = useState<Partial<Paging>>({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.REQUEST})
@@ -49,27 +51,46 @@ const ManageRequest: React.FC = () => {
     }, [dispatch])
 
     useEffect(() =>{
-        setLoading(true)
         pagingPath.scrollTop()
         const currentPage = searchParams.get('page');
         if(!pagingPath.isValidPaging(currentPage)){
             setPaging({curPage: 1, pageSize: CONSTANT.PAGING_ITEMS.REQUEST})
             return navigate('/panel/manage-request?page=1', { replace: true })
         }
+        
+        if(search.isSearching && search.orderCode){
+            const init = async () =>{
+                setLoading(true)
+                try{
+                    const res = await serviceService.getRequestOrderByServiceCode({curPage: Number(currentPage), pageSize: paging.pageSize}, user.id, search.orderCode || '')
+                    setRequests(res.data.requestList)
+                    setPaging(res.data.paging)
+                }catch{
 
-        const init = async () =>{
-            if(!user.id) return;
-            const res = await serviceService.getRequestOrderByTechnician({curPage: Number(currentPage), pageSize: paging.pageSize}, user.id)
-            setRequests(res.data.requestList)
-            setPaging(res.data.paging)
+                }
+                setLoading(false)
+            }
+            init();
+        }else{
+            const init = async () =>{
+                if(!user.id) return;
+
+                setLoading(true)
+
+                const res = await serviceService.getRequestOrderByTechnician({curPage: Number(currentPage), pageSize: paging.pageSize}, user.id)
+                setRequests(res.data.requestList)
+                setPaging(res.data.paging)
+                
+                setLoading(false)
+            }
+            init()
         }
-        init()
-        setLoading(false)
-    }, [navigate, searchParams, user, paging.pageSize])
+
+    }, [navigate, searchParams, user, paging.pageSize, search.isSearching, search.orderCode])
 
     const ColumnServiceOrder: ColumnsType<any> = [
         {
-            title: 'Mã dịch vụ',
+            title: 'Mã đơn hàng',
             key: 'serviceCode',
             dataIndex: 'serviceCode',
         },
@@ -196,6 +217,10 @@ const ManageRequest: React.FC = () => {
     return (
         <div className='mr-wrapper'>
             <HeaderInfor title='Yêu cầu chăm sóc' />
+            <Searching 
+                isOrderCode
+                defaultUrl={`/panel/manage-request?page=1`}
+            />
             <section className="default-layout">
                 <Table
                     className='table' 

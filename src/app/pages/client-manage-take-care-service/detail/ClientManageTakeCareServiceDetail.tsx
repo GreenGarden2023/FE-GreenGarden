@@ -1,4 +1,4 @@
-import { Col, Popover, Row, Table } from 'antd'
+import { Col, Popover, Row, Table, Tooltip } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import LandingFooter from 'app/components/footer/LandingFooter'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
@@ -27,6 +27,10 @@ import CONSTANT from 'app/utils/constant'
 import LoadingView from 'app/components/loading-view/LoadingView'
 import NoProduct from 'app/components/no-product/NoProduct'
 import GridConfig from 'app/components/grid-config/GridConfig'
+// import CareGuide from 'app/components/care-guide/CareGuide'
+import { BsFillCaretDownSquareFill, BsFillCaretRightSquareFill } from 'react-icons/bs'
+import TakeCareStatusComp from 'app/components/status/TakeCareStatusComp'
+import CareGuideSummary from 'app/components/care-guide-summary/CareGuideSummary'
 
 const ClientManageTakeCareServiceDetail: React.FC = () => {
     const { orderId } = useParams()
@@ -73,16 +77,10 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
     
     const ColumnServiceOrder: ColumnsType<any> = [
         {
-            title: '#',
-            key: '#',
-            dataIndex: '#',
-            render:(v, _, index) => (index + 1)
-        },
-        {
             title: 'Tên cây',
             key: 'treeName',
             dataIndex: 'treeName',
-            render: (v) => (<TreeName name={v} minWidth={100} />)
+            render: (v) => (<TreeName name={v} minWidth={120} />)
         },
         {
             title: 'Hình ảnh',
@@ -120,10 +118,10 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
         if(!serviceOrder) return
         
         return serviceOrder.service.serviceDetailList.map((x, index) => {
-            const { treeName, imgUrls, quantity, description, managerDescription, servicePrice } = x
+            const { treeName, imgUrls, quantity, description, managerDescription, servicePrice, careGuide } = x
             return {
                 key: index,
-                treeName, imgUrls, quantity, description, managerDescription, servicePrice
+                treeName, imgUrls, quantity, description, managerDescription, servicePrice, careGuide
             }
         })
     }, [serviceOrder])
@@ -148,7 +146,7 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
             render: (v) => (v && <ListImage listImgs={v} />)
         },
         {
-            title: 'Mô tả ngắn gọn',
+            title: 'Mô tả',
             key: 'sumary',
             dataIndex: 'sumary',
             render: (v) => (<Description content={v} minWidth={230} />)
@@ -157,7 +155,7 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
             title: 'Trạng thái',
             key: 'status',
             dataIndex: 'status',
-            render: (v) => <p style={{minWidth: 80}}>{v}</p>
+            render:(v) => <TakeCareStatusComp status={v} />
         },
         {
             title: 'Xử lý',
@@ -292,7 +290,24 @@ const ClientManageTakeCareServiceDetail: React.FC = () => {
                                     </GridConfig>
                                 </div>
                                 <div className="default-layout">
-                                    <Table columns={ColumnServiceOrder} dataSource={DataSourceServiceOrder} pagination={false} scroll={{x: 480}} />
+                                    <Table 
+                                        columns={ColumnServiceOrder} 
+                                        dataSource={DataSourceServiceOrder} 
+                                        pagination={false} 
+                                        scroll={{x: 480}}
+                                        expandable={{
+                                            expandedRowRender: (record) => (<CareGuideSummary careGuide={record.careGuide} />),
+                                            expandIcon: ({ expanded, onExpand, record }) => 
+                                            expanded ? 
+                                                <Tooltip title="Đóng hướng dẫn chăm sóc" color='#0099FF' trigger='hover' >
+                                                    <BsFillCaretDownSquareFill color='#0099FF' onClick={(e: any) => onExpand(record, e)} cursor='pointer' /> 
+                                                </Tooltip>
+                                                : 
+                                                <Tooltip title="Xem hướng dẫn chăm sóc" color='#0099FF' trigger='hover' >
+                                                    <BsFillCaretRightSquareFill color='#0099FF' onClick={(e: any) => onExpand(record, e)} cursor='pointer' />
+                                                </Tooltip>
+                                        }}
+                                    />
                                 </div>
                                 <div className="default-layout">
                                     <Table columns={ColumnCalendar} dataSource={DataSourceCalendar} pagination={false} scroll={{x: 480}} />

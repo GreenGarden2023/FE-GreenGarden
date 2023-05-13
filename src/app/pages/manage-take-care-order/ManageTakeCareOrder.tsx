@@ -466,6 +466,7 @@ const ManageTakeCareOrder: React.FC = () => {
             />
             <Filtering 
                 isRangeDate
+                defaultUrl={`/panel/take-care-order?page=1`}
             />
             <section className="mtko-box default-layout">
                 {

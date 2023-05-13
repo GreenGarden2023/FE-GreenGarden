@@ -191,3 +191,25 @@ table{
         }
     }
 }
+.btn-remove-img{
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    border: 1px solid $default-green;
+    border-radius: 5px;
+    background-color: $default-green;
+    cursor: pointer;
+    transition: all 0.2s linear;
+    path{
+        stroke: #fff;
+    }
+    &:hover{
+        border: 1px solid $orange-text;
+        background-color: $orange-text;
+    }
+}
+.icon-view-order{
+    path{
+        stroke: #fff;
+    }
+}

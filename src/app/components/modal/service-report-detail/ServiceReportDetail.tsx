@@ -17,12 +17,12 @@ interface ServiceReportDetailProps{
 const ServiceReportDetail: React.FC<ServiceReportDetailProps> = ({orderCode, serviceCalendar, onClose}) => {
     const settings = {
         dots: false,
-        infinite: true,
         speed: 500,
         slidesToShow: 5,
         slidesToScroll: 1,
-        prevArrow: <GrFormPrevious className='category-prev' />,
-        nextArrow: <GrFormNext className='category-next' />,
+        infinite: false,
+        prevArrow: <GrFormPrevious />,
+        nextArrow: <GrFormNext />,
         responsive: [
             {
               breakpoint: 1024,
@@ -78,18 +78,17 @@ const ServiceReportDetail: React.FC<ServiceReportDetailProps> = ({orderCode, ser
                         <h3>Hình ảnh</h3>
                         <div className="report-images">
                             {
-                                (serviceCalendar && serviceCalendar.images.length > 4) &&
                                 <Slider {...settings}>
                                     {
                                         serviceCalendar.images.map((item, index) => (
                                             <div key={index} className='image-item-wrapper'>
-                                                <img src={item} alt="/" className='image-item-detail' />
+                                                <Image src={item} alt="/" className='image-item-detail' />
                                             </div>
                                         ))
                                     }
                                 </Slider>
                             }
-                            {
+                            {/* {
                                 (serviceCalendar && serviceCalendar.images.length <= 4) &&
                                 <Image.PreviewGroup>
                                     {
@@ -102,14 +101,14 @@ const ServiceReportDetail: React.FC<ServiceReportDetailProps> = ({orderCode, ser
                                         ))
                                     }
                                 </Image.PreviewGroup>
-                            }
+                            } */}
                         </div>
                     </>
                 }
                 {
                     (serviceCalendar.sumary && serviceCalendar.sumary.trim()) &&
                     <>
-                        <h3>Ghi chú</h3>
+                        <h3>Mô tả</h3>
                         <div className="report-description">
                             <p>{serviceCalendar.sumary}</p>
                         </div>

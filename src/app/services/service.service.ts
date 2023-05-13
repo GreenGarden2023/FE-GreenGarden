@@ -40,6 +40,12 @@ const getRequestOrderByTechnician = async (paging: Partial<Paging>, technicianID
     return res.data
 }
 
+const getRequestOrderByServiceCode = async (paging: Partial<Paging>, technicianID: string, serviceCode: string) =>{
+    const param = {...paging, technicianID, serviceCode}
+    const res = await golbalAxios.get<Response<ServiceRequestResponse>>(`/service/get-request-order-by-service-code?${queryString.stringify(param)}`)
+    return res.data
+}
+
 const cancelRequest = async (serviceID: string, reason: string) =>{
     const res = await golbalAxios.post('/service/cancel-request', { serviceID, reason})
     return res.data
@@ -55,7 +61,8 @@ const serviceService = {
     updateServiceDetail,
     getAServiceRequestDetail,
     getRequestOrderByTechnician,
-    cancelRequest
+    cancelRequest,
+    getRequestOrderByServiceCode
 }
 
 export default serviceService

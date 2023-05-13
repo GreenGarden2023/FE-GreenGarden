@@ -87,6 +87,7 @@ export interface ServiceDetailList {
     servicePrice: number
     managerDescription: string
     imgUrls: string[]
+    careGuide: string
 }
 
 export interface ServiceResponse{

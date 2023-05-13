@@ -40,14 +40,6 @@ const Searching: React.FC<SearchingProps> = ({ isOrderCode, isPhone, isStatus, s
     }, [dispatch])
 
     const handleClickSearch = () =>{
-        // -----------------
-        // dispatch(setOrderCode(orderCodeSearch.trim()))
-
-        // dispatch(setPhone(phoneSearch.trim()))
-
-        // dispatch(setStatus(statusSearch))
-        // dispatch(setSearch(true))
-
         dispatch(setSearchValues({
             isSearching: true,
             orderCode: orderCodeSearch.trim(),
@@ -55,18 +47,15 @@ const Searching: React.FC<SearchingProps> = ({ isOrderCode, isPhone, isStatus, s
             productName: productNameSearch.trim(),
             status: statusSearch
         }))
-
-
-        // dispatch(setEmptyFilter())
-        // onSearch(data)
     }
 
     const handleClickDefault = () =>{
+        // set default current value
         setOrderCodeSearch('')
         setPhoneSearch('')
         setStatusSearch('')
         setProductNameSearch('')
-        // --------------
+        // clear store and navigate to defaultUrl
         dispatch(setSearch(false))
         navigate(defaultUrl)
     }
@@ -78,7 +67,7 @@ const Searching: React.FC<SearchingProps> = ({ isOrderCode, isPhone, isStatus, s
                     <Row gutter={[24, 24]}>
                         {
                             isOrderCode &&
-                            <Col span={6}>
+                            <Col xs={24} sm={24} md={12} lg={8} xl={8} xxl={6}>
                                 <div className='order-code'>
                                     <p className='mb-5'>Mã đơn hàng</p>
                                     <Input placeholder='WS16MG56OY' value={orderCodeSearch} onChange={(e) => setOrderCodeSearch(e.target.value)} />

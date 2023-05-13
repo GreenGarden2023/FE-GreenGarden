@@ -42,13 +42,13 @@ const TechManageServiceOrder: React.FC = () => {
             return navigate('/panel/take-care-order-assigned?page=1', { replace: true })
         }
 
-        if(filter.isFiltering && filter.takeCareStatus){
+        if(filter.isFiltering){
             const init = async () =>{
                 try{
-                    if(!user.id || !filter.takeCareStatus) return;
+                    if(!user.id) return;
     
                     setLoading(true)
-                    const res = await orderService.getServiceOrdersByTechnicianToday(user.id, filter.takeCareStatus, {curPage: Number(currentPage), pageSize: paging.pageSize})
+                    const res = await orderService.getServiceOrdersByTechnicianToday(user.id, filter.takeCareStatus || 'pending', filter.nextDay || false ,{curPage: Number(currentPage), pageSize: paging.pageSize})
                     setServiceOrders(res.data.serviceOrderList)
                     setPaging(res.data.paging)
                 }catch{
@@ -74,7 +74,7 @@ const TechManageServiceOrder: React.FC = () => {
             init()
         }
 
-    }, [user.id, paging.pageSize, navigate, searchParams, filter])
+    }, [user.id, paging.pageSize, navigate, searchParams, filter.isFiltering, filter.takeCareStatus, filter.nextDay])
 
     const ColumnServiceOrder: ColumnsType<any> = [
         {
@@ -125,7 +125,7 @@ const TechManageServiceOrder: React.FC = () => {
             key: 'totalPrice',
             dataIndex: 'totalPrice',
             align: 'right',
-            render: (v) => <MoneyFormat value={v} color='Blue' isHighlight />
+            render: (v) => <MoneyFormat value={v} color='Blue' />
         },
         {
             title: 'Xử lý',
@@ -233,6 +233,8 @@ const TechManageServiceOrder: React.FC = () => {
             <HeaderInfor title='Quản lý những yêu cầu chăm sóc cây của bạn' />
             <Filtering 
                 isOrderToDay
+                isNextDay
+                defaultUrl={`/panel/take-care-order-assigned?page=1`}
             />
             <section className="default-layout">
                 <Table

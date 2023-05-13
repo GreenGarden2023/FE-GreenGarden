@@ -1,4 +1,4 @@
-import { Button, Col, DatePicker, DatePickerProps, Form, Image, Input, Modal, Row } from 'antd'
+import { Button, DatePicker, DatePickerProps, Form, Image, Input, Modal } from 'antd'
 import locale from 'antd/es/date-picker/locale/vi_VN'
 import useDispatch from 'app/hooks/use-dispatch'
 import { ServiceOrderDetail } from 'app/models/service'
@@ -12,7 +12,9 @@ import utilDateTime from 'app/utils/date-time'
 import dayjs, { Dayjs } from 'dayjs'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { AiOutlineCloudUpload } from 'react-icons/ai'
-import { CiSquareRemove } from 'react-icons/ci'
+import { GrFormClose, GrFormNext, GrFormPrevious } from 'react-icons/gr'
+import Slider from "react-slick"
+import './style.scss'
 
 interface UploadCalendarProps{
     serviceCalendarDetail: ServiceCalendar
@@ -128,6 +130,42 @@ const UploadCalendar: React.FC<UploadCalendarProps> = ({ serviceCalendarDetail, 
         setLoading(false)
     }
 
+    const settings = {
+        dots: false,
+        speed: 500,
+        slidesToShow: 5,
+        slidesToScroll: 1,
+        infinite: false,
+        prevArrow: <GrFormPrevious />,
+        nextArrow: <GrFormNext />,
+        responsive: [
+            {
+              breakpoint: 1024,
+              settings: {
+                slidesToShow: 3,
+                slidesToScroll: 3,
+                infinite: true,
+                dots: true
+              }
+            },
+            {
+              breakpoint: 600,
+              settings: {
+                slidesToShow: 2,
+                slidesToScroll: 2,
+                initialSlide: 2
+              }
+            },
+            {
+              breakpoint: 480,
+              settings: {
+                slidesToShow: 2,
+                slidesToScroll: 1
+              }
+            }
+          ]
+    };
+
     return (
         <Modal
             open
@@ -145,22 +183,21 @@ const UploadCalendar: React.FC<UploadCalendarProps> = ({ serviceCalendarDetail, 
                     <AiOutlineCloudUpload size={30} /> <span>Đăng tải hình ảnh chăm sóc</span>
                 </button>
                 {
-                    <Row style={{marginTop: '20px'}} gutter={[24, 0]}>
-                    <Image.PreviewGroup>
-                        {
-                            images.map((item, index) => (
-                                <Col span={6} key={index} className='preview-wrapper'>
-                                    <Image 
-                                        src={item}
-                                        alt='/'
-                                        className='img-preview'
-                                    />
-                                    <CiSquareRemove size={30} onClick={() => handleRemoveImage(index)} className='btn-remove' />
-                                </Col>
-                            ))
-                        }
-                    </Image.PreviewGroup>
-                </Row>
+                    images.length !== 0 &&
+                    <div className="image-view-wrapper">
+                        <Slider {...settings}>
+                            {
+                                images.map((item, index) => (
+                                    <div key={index} className='image-view-item'>
+                                        <div style={{position: 'relative'}}>
+                                            <Image src={item} alt="/" />
+                                            <GrFormClose size={30} onClick={() => handleRemoveImage(index)} className='btn-remove-img' />
+                                        </div>
+                                    </div>
+                                ))
+                            }
+                        </Slider>
+                    </div>
                 }
                 <Form.Item label='Mô tả' style={{marginTop: '30px'}}>
                     <Input.TextArea autoSize={{minRows: 4, maxRows: 6}} value={sumary} onChange={(e) => setSumary(e.target.value)} ></Input.TextArea>

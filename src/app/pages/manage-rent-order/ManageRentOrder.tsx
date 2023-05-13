@@ -420,6 +420,7 @@ const ManageRentOrder:React.FC = () => {
             />
             <Filtering
                 isRangeDate
+                defaultUrl={`/panel/rent-order?page=1`}
             />
             <section className="mso-box default-layout">
                 {

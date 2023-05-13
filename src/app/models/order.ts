@@ -40,6 +40,7 @@ export interface RentOrderDetailList {
     sizeName: string;
     totalPrice: number;
     salePricePerUnit: number;
+    careGuide: string
 }
 export interface RentOrderList {
     id: string
@@ -129,5 +130,12 @@ export interface CreateServiceOrder {
     serviceId: string
     rewardPointUsed: number
     transportFee: number
-  }
-  
+}
+
+export interface UpdateCareGuide{
+    orderID: string;
+    listCareGuide: {
+        userTreeID: string;
+        careGuide: string
+    }[]
+}

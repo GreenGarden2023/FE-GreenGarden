@@ -1,0 +1,19 @@
+@import 'app/styles/variable.scss';
+
+.care-guide-render{
+    .title{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        span{
+            color: $default-green;
+            font-size: 18px;
+            font-weight: 500;
+        }
+    }
+    .text{
+        p{
+            color: $soft-text;
+        }
+    }
+}

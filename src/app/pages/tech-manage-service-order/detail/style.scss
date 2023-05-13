@@ -5,12 +5,14 @@
         margin-top: 20px;
         .item{
             display: flex;
+            flex-wrap: wrap;
+            column-gap: 10px;
             .label{
                 color: $soft-text;
                 width: 160px;
             }
             .content{
-                margin-left: 10px;
+                // margin-left: 10px;
             }
         }
     }
@@ -21,6 +23,12 @@
         }
         button{
             margin: 10px auto auto auto;
+        }
+    }
+    .btn-update-care-guide{
+        margin: 10px 0 0 auto;
+        &:hover{
+            color: #fff;
         }
     }
 }

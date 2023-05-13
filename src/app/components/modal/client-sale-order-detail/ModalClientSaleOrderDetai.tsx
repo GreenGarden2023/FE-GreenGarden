@@ -1,4 +1,4 @@
-import { Button, Image, Modal } from 'antd';
+import { Button, Image, Modal, Tooltip } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 import MoneyFormat from 'app/components/money/MoneyFormat';
 import TreeName from 'app/components/renderer/tree-name/TreeName';
@@ -7,6 +7,12 @@ import { SaleOrderList } from 'app/models/order';
 import utilDateTime from 'app/utils/date-time';
 import React, { useMemo } from 'react';
 import './style.scss';
+import { BsFillCaretDownSquareFill, BsFillCaretRightSquareFill } from 'react-icons/bs';
+import CareGuideSummary from 'app/components/care-guide-summary/CareGuideSummary';
+import { BiHide } from 'react-icons/bi';
+import { useState } from 'react';
+import { GrFormView } from 'react-icons/gr';
+// import CareGuide from 'app/components/care-guide/CareGuide';
 
 interface ModalClientSaleOrderDetaiProps{
     saleOrderList: SaleOrderList;
@@ -14,20 +20,14 @@ interface ModalClientSaleOrderDetaiProps{
 }
 
 const ModalClientSaleOrderDetai: React.FC<ModalClientSaleOrderDetaiProps> = ({ saleOrderList, onClose }) => {
+    const [isViewOrderInfo, setIsViewOrderInfo] = useState(true)
 
     const Column: ColumnsType<any> = [
-        {
-            title: '#',
-            key: '#',
-            dataIndex: '#',
-            align: 'center',
-            render: (v, _, index) => (<span style={{color: '#00a76f'}}>{index + 1}</span>)
-        },
         {
             title: 'Tên sản phẩm',
             key: 'productItemName',
             dataIndex: 'productItemName',
-            render: (v) => (<TreeName name={v} />)
+            render: (v) => (<TreeName name={v} minWidth={120} />)
         },
         {
             title: 'Hình ảnh',
@@ -55,7 +55,7 @@ const ModalClientSaleOrderDetai: React.FC<ModalClientSaleOrderDetaiProps> = ({ s
             key: 'salePricePerUnit',
             dataIndex: 'salePricePerUnit',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} isHighlight color='Light Blue' />)
+            render: (v) => (<MoneyFormat value={v} color='Light Blue' />)
         },
         {
             title: 'Số lượng',
@@ -69,7 +69,7 @@ const ModalClientSaleOrderDetai: React.FC<ModalClientSaleOrderDetaiProps> = ({ s
             key: 'totalPrice',
             dataIndex: 'totalPrice',
             align: 'right',
-            render: (v) => (<MoneyFormat value={v} isHighlight color='Blue' />)
+            render: (v) => (<MoneyFormat value={v} color='Blue' />)
         },
     ]
     const DataSource = useMemo(() =>{
@@ -82,6 +82,7 @@ const ModalClientSaleOrderDetai: React.FC<ModalClientSaleOrderDetaiProps> = ({ s
             sizeName: x.sizeName,
             productItemName: x.productItemName,
             imgURL: x.imgURL,
+            careGuide: x.careGuide
         }))
     }, [saleOrderList])
 
@@ -113,10 +114,36 @@ const ModalClientSaleOrderDetai: React.FC<ModalClientSaleOrderDetaiProps> = ({ s
             className='mcsod-wrapper'
             footer={false}
         >
-            <Table className='table' dataSource={DataSource} columns={Column} pagination={false} />
-            <UserInforOrder {...OrderDetail} />
+            <Table 
+                className='table' 
+                dataSource={DataSource} 
+                columns={Column} 
+                pagination={false} 
+                scroll={{x: 480}}
+                expandable={{
+                    expandedRowRender: (record) => (<CareGuideSummary careGuide={record.careGuide} treeName={record.productItemName} />),
+                    expandIcon: ({ expanded, onExpand, record }) => 
+                    expanded ? 
+                        <Tooltip title="Đóng hướng dẫn chăm sóc" color='#0099FF' >
+                            <BsFillCaretDownSquareFill color='#0099FF' onClick={(e: any) => onExpand(record, e)} cursor='pointer' /> 
+                        </Tooltip>
+                        : 
+                        <Tooltip title="Xem hướng dẫn chăm sóc" color='#0099FF' >
+                            <BsFillCaretRightSquareFill color='#0099FF' onClick={(e: any) => onExpand(record, e)} cursor='pointer' />
+                        </Tooltip>
+                }}
+            />
+            <div style={{width: 'fit-content', margin: '20px 0 0 auto'}}>
+                <button className="ts-btn-create btn btn-create" onClick={() => setIsViewOrderInfo(!isViewOrderInfo)}>
+                    {isViewOrderInfo ? <BiHide size={25} /> : <GrFormView size={25} className='icon-view-order' />}
+                    {isViewOrderInfo ? 'Ẩn ' : 'Hiện '}thông tin đơn hàng
+                </button>
+            </div>
+            {
+                isViewOrderInfo && <UserInforOrder {...OrderDetail} />
+            }
             <div className='btn-form-wrapper mt-10'>
-                <Button type='primary' className='btn-update' size='large' onClick={onClose}>
+                <Button type='primary' className='btn-update' size='large' onClick={onClose} >
                     Đóng
                 </Button>
             </div>

@@ -1,4 +1,4 @@
-import { Breadcrumb, Col, Collapse, Divider, Image, Row, Tag } from 'antd';
+import { Breadcrumb, Col, Divider, Image, Row, Tag } from 'antd';
 import LandingFooter from 'app/components/footer/LandingFooter';
 import LandingHeader from 'app/components/header/LandingHeader';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -402,15 +402,24 @@ const ClientProductItemDetail: React.FC = () => {
                                                                     }
                                                                 </div>
                                                             }
-                                                            <Divider orientation='left' plain >Chính sách</Divider>
+                                                            {
+                                                                proItem.careGuide &&
+                                                                <div className='care-guide'>
+                                                                    <Divider orientation='left'>Hướng dẫn chăm sóc</Divider>
+                                                                    {
+                                                                        proItem.careGuide.split('\n').map((x, j) => (
+                                                                            <p key={j}>
+                                                                                - {x}
+                                                                            </p>
+                                                                        ))
+                                                                    }
+                                                                </div>
+                                                            }
                                                             <div className="policy">
-                                                            <Collapse defaultActiveKey={['1']} ghost>
-                                                                <Collapse.Panel header="Chính sách vận chuyển" key="1">
-                                                                    <p className='panel-text'>
-                                                                        {text}
-                                                                    </p>
-                                                                </Collapse.Panel>
-                                                            </Collapse>
+                                                                <Divider orientation='left'>Chính sách vận chuyển</Divider>
+                                                                <p className='panel-text'>
+                                                                    {text}
+                                                                </p>
                                                             </div>
                                                         </div>
                                                     </Col>

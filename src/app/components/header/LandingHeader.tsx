@@ -482,7 +482,7 @@ const LandingHeader: React.FC = () => {
               </Form.Item>
             </Col>
             <Col span={24}>
-              <Form.Item label="Điểm tích lũy">
+              <Form.Item label='Điểm tích lũy'>
                 <Controller
                   control={control}
                   name="currentPoint"

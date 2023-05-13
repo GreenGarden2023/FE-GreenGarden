@@ -10,7 +10,7 @@ interface DescriptionProps{
 const Description: React.FC<DescriptionProps> = ({content, minWidth}) => {
   const Styled = useMemo((): React.CSSProperties =>{
     return {
-      display: minWidth ? 'inline-block' : 'initial',
+      // display: minWidth ? 'inline-block' : 'initial',
       minWidth: minWidth || 'initial'
     }
   }, [minWidth])

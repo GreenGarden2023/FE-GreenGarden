@@ -33,7 +33,7 @@
                 gap: 5px;
             }
             .title{
-                margin-bottom: 50px;
+                margin-bottom: 30px;
                 h1{
                     color: #e91e63;
                     // color: $default-green;
@@ -174,16 +174,15 @@
                     flex: 1;
                 }
             }
-            .policy{
-                .ant-collapse-header-text{
-                    color: #131425;
-                    font-size: 14px;
-                    font-weight: bold;
+            .care-guide, .policy{
+                .ant-divider-inner-text{
+                    color: $color-link;
+                    font-size: 16px;
                 }
-                .panel-text{
-                    white-space: pre-wrap;
+                p{
                     color: #707070;
                     font-size: 14px;
+                    white-space: pre-wrap;
                 }
             }
         }
@@ -469,16 +468,15 @@
                         flex: 1;
                     }
                 }
-                .policy{
-                    .ant-collapse-header-text{
-                        color: #131425;
-                        font-size: 14px;
-                        font-weight: bold;
+                .care-guide, .policy{
+                    .ant-divider-inner-text{
+                        color: $color-link;
+                        font-size: 16px;
                     }
-                    .panel-text{
-                        white-space: pre-wrap;
+                    p{
                         color: #707070;
                         font-size: 14px;
+                        white-space: pre-wrap;
                     }
                 }
             }
@@ -632,7 +630,7 @@
                         color: #e91e63;
                         // color: $default-green;
                         font-weight: 600;
-                        font-size: 30px;
+                        font-size: 22px;
                         line-height: normal;
                     }
                 }
@@ -768,18 +766,25 @@
                         flex: 1;
                     }
                 }
-                .policy{
-                    .ant-collapse-header-text{
-                        color: #131425;
-                        font-size: 14px;
-                        font-weight: bold;
+                .care-guide, .policy{
+                    .ant-divider-inner-text{
+                        color: $color-link;
+                        font-size: 16px;
                     }
-                    .panel-text{
-                        white-space: pre-wrap;
+                    p{
                         color: #707070;
                         font-size: 14px;
+                        white-space: pre-wrap;
                     }
                 }
+            }
+        }
+        // .carousel .slider-wrapper{
+        // }
+        .root-image{
+            img{
+                height: 330px;
+                object-fit: cover;
             }
         }
     }

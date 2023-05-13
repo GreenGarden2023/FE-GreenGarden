@@ -61,8 +61,6 @@ const ManageTakeCareService: React.FC = () => {
         init()
     }, [dispatch])
 
-   
-
     const contextService = (record) =>{
         return (
             <div className='context-menu-wrapper'>

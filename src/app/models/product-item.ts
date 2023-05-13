@@ -40,6 +40,7 @@ export interface ProductItem{
     maxSale: number;
     minRent: number;
     maxRent: number;
+    careGuide: string;
 }
 export interface ProductItemResponse{
     paging: Paging;

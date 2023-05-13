@@ -1,28 +1,33 @@
 import { Col, Input, Row, Select } from 'antd';
+import GridConfig from 'app/components/grid-config/GridConfig';
 import useDispatch from 'app/hooks/use-dispatch';
 import { Role, TakeCareStatus } from 'app/models/general-type';
-import { setEmptyFilter, setEmptySearch, setFilter, setOrderToday, setRangeDate, setRole } from 'app/slices/search-and-filter';
+import { setEmptyFilter, setEmptySearch, setFilter, setFilterValues } from 'app/slices/search-and-filter';
 import CONSTANT from 'app/utils/constant';
 import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { FaIoxhost } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import './style.scss';
-import GridConfig from 'app/components/grid-config/GridConfig';
 
 interface FilteringProps{
     isRangeDate?: boolean;
     isOrderToDay?: boolean;
     isRole?: boolean;
+    isNextDay?: boolean;
+    defaultUrl: string;
 }
 
-const Filtering: React.FC<FilteringProps> = ({ isRangeDate, isOrderToDay, isRole }) => {
+const Filtering: React.FC<FilteringProps> = ({ isRangeDate, isOrderToDay, isRole, isNextDay, defaultUrl }) => {
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const [rangeDateNew, setRangeDateNew] = useState<number>()
     // const [rangeDateFilter, setRangeDateFilter] = useState<[Dayjs, Dayjs]>()
     const [roleFilter, setRoleFilter] = useState<Role>()
-    const [statusRequest, setStatusRequest] = useState<TakeCareStatus>('')
+    const [statusRequest, setStatusRequest] = useState<TakeCareStatus>('pending')
+    const [nextDayFilter, setNextDayFilter] = useState<boolean>(false)
 
     useEffect(() =>{
         dispatch(setFilter(false))
@@ -40,29 +45,36 @@ const Filtering: React.FC<FilteringProps> = ({ isRangeDate, isOrderToDay, isRole
             const start = dayjs(current).format('DD/MM/YYYY')
             current.setDate(current.getDate() + rangeDateNew)
             const end = dayjs(current).format('DD/MM/YYYY')
-            dispatch(setRangeDate({start, end}))
-        }
-        
-        if(isRole && roleFilter){
-            dispatch(setRole(roleFilter))
+            
+            dispatch(setFilterValues({
+                isFiltering: true,
+                startDate: start,
+                endDate: end,
+                nextDay: nextDayFilter,
+                role: roleFilter,
+                takeCareStatus: statusRequest
+            }))
+
+            return;
         }
 
-        if(isOrderToDay && statusRequest){
-            dispatch(setOrderToday(statusRequest))
-        }
-
-        // ----------------------
-        dispatch(setFilter(true))
-        dispatch(setEmptySearch())
+        dispatch(setFilterValues({
+            isFiltering: true,
+            nextDay: nextDayFilter,
+            role: roleFilter,
+            takeCareStatus: statusRequest
+        }))
     }
 
     const handleClickDefault = () =>{
         setRangeDateNew(undefined)
         // setRangeDateFilter(undefined)
         setRoleFilter(undefined)
-        setStatusRequest('')
+        setStatusRequest('pending')
+        setNextDayFilter(false)
         // ----------------------
         dispatch(setFilter(false))
+        navigate(defaultUrl)
     }
 
     // const handleChangeDateRange = (dates, dateStrings) =>{
@@ -99,14 +111,11 @@ const Filtering: React.FC<FilteringProps> = ({ isRangeDate, isOrderToDay, isRole
                                 <div className='order-today'>
                                     <p className='mb-5'>Chọn trạng thái chăm sóc hôm nay</p>
                                     <Select value={statusRequest} onChange={(e) => setStatusRequest(e)} style={{ width: '100%' }} placeholder='Đã chăm sóc' >
-                                        <Select.Option value=''>
-                                            None
+                                        <Select.Option value='pending'>
+                                            Chưa chăm sóc
                                         </Select.Option>
                                         <Select.Option value='done'>
                                             Đã chăm sóc
-                                        </Select.Option>
-                                        <Select.Option value='pending'>
-                                            Chưa chăm sóc
                                         </Select.Option>
                                     </Select>
                                 </div>
@@ -123,6 +132,22 @@ const Filtering: React.FC<FilteringProps> = ({ isRangeDate, isOrderToDay, isRole
                                                 <Select.Option value={item} key={index} >{item}</Select.Option>
                                             ))
                                         }
+                                    </Select>
+                                </div>
+                            </Col>
+                        }
+                        {
+                            isNextDay &&
+                            <Col xs={24} sm={24} md={12} lg={12} xl={8} xxl={6}>
+                                <div className='next-day'>
+                                    <p className='mb-5'>Thời gian chăm sóc</p>
+                                    <Select value={nextDayFilter} onChange={(e) => setNextDayFilter(e)} style={{ width: '100%' }} placeholder='Ngày hiện tại' >
+                                        <Select.Option value={false} key={2}>
+                                            Ngày hiện tại
+                                        </Select.Option>
+                                        <Select.Option value={true} key={3}>
+                                            Ngày tiếp theo
+                                        </Select.Option>
                                     </Select>
                                 </div>
                             </Col>

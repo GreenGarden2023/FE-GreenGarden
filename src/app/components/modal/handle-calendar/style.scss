@@ -1,0 +1,35 @@
+@import 'app/styles/variable.scss';
+
+.image-view-wrapper{
+    .image-view-item{
+        padding: 10px;
+        .ant-image{
+            width: 100%;
+        }
+        img{
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+    }
+    .slick-arrow{
+        border-radius: 9999px;
+        background-color: #fff;
+        z-index: 1;
+        polyline{
+            stroke: $deep-pink;
+        }
+    }
+    .slick-prev{
+        left: 15px;
+        &:hover{
+            background-color: #fff;
+        }
+    }
+    .slick-next{
+        right: 15px;
+        &:hover{
+            background-color: #fff;
+        }
+    }
+}

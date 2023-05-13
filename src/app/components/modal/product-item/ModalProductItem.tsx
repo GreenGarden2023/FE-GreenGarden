@@ -48,7 +48,7 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productId, productIt
     useEffect(() =>{
         if(!productItem) return;
 
-        const { id, productId, content, description, imageURL, name, type, productItemDetail, rule } = productItem
+        const { id, productId, content, description, imageURL, name, type, productItemDetail, rule, careGuide } = productItem
         setValue('id', id)
         setValue('productId', productId)
         setValue('content', content)
@@ -59,6 +59,8 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productId, productIt
         setValue('type', type)
         setValue('productItemDetail', productItemDetail)
         setValue('rule', rule || '')
+        setValue('careGuide', careGuide)
+
     }, [productItem, setValue, trigger])
 
     const handleCloseModal = () =>{
@@ -186,7 +188,7 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productId, productIt
                             <Controller 
                                 control={control}
                                 name='description'
-                                render={({ field }) => <Input.TextArea {...field} autoSize={{minRows: 4, maxRows: 6}} />}
+                                render={({ field }) => <Input.TextArea {...field} autoSize={{minRows: 4, maxRows: 4}} />}
                             />
                         </Form.Item>
                     </Col>
@@ -195,6 +197,15 @@ const ModalProductItem: React.FC<ModalProductItemProps> = ({productId, productIt
                             <Controller 
                                 control={control}
                                 name='rule'
+                                render={({ field }) => <Input.TextArea {...field} autoSize={{minRows: 4, maxRows: 4}} />}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col span={24}>
+                        <Form.Item label='Hướng dẫn chăm sóc'>
+                            <Controller 
+                                control={control}
+                                name='careGuide'
                                 render={({ field }) => <Input.TextArea {...field} autoSize={{minRows: 4, maxRows: 6}} />}
                             />
                         </Form.Item>
