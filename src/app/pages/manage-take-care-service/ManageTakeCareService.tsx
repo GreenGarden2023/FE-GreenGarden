@@ -288,7 +288,7 @@ const ManageTakeCareService: React.FC = () => {
 
     return (
         <div className="mtko-wrapper">
-            <HeaderInfor title='Quản lý yêu cầu chăm sóc' />
+            <HeaderInfor title='Quản lý yêu cầu chăm sóc tự chọn' />
             <section className="mtko-box default-layout">
                 <Table
                     className='table' 

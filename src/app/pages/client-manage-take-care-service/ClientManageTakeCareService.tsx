@@ -1,4 +1,4 @@
-import { Popover } from 'antd'
+import { Popover, Segmented } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import LandingFooter from 'app/components/footer/LandingFooter'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
@@ -21,6 +21,8 @@ import CONSTANT from 'app/utils/constant'
 import LoadingView from 'app/components/loading-view/LoadingView'
 import NoProduct from 'app/components/no-product/NoProduct'
 
+type TPageType = 'service' | 'package'
+
 const ClientManageTakeCareService: React.FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -28,6 +30,8 @@ const ClientManageTakeCareService: React.FC = () => {
     const [services, setServices] = useState<Service[]>([])
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
     const [loading, setLoading] = useState(true)
+
+    const [pageType, setPageType] = useState<TPageType>('service')
 
     useEffect(() =>{
         const init = async () =>{
@@ -171,12 +175,35 @@ const ClientManageTakeCareService: React.FC = () => {
         setServices([...services])
     }
 
+    const handleChangeSegment = (value: string | number) =>{
+        if(value === 'service'){
+            setPageType('service')
+        }else if(value === 'package'){
+            setPageType('package')
+        }
+    }
+
     return (
         <div>
             <LandingHeader />
                 <div className="main-content-not-home">
                     <div className="container-wrapper cmtcs-wrapper">
                         <HeaderInfor title='Yêu cầu chăm sóc cây của bạn' />
+                        <section className="default-layout">
+                            <h3 style={{marginBottom: '5px'}}>Loại yêu cầu</h3>
+                            <Segmented size="large" value={pageType} onChange={handleChangeSegment} options={[
+                                {
+                                    icon: undefined,
+                                    value: 'service',
+                                    label: 'Dịch vụ tự chọn'
+                                },
+                                {
+                                    icon: undefined,
+                                    value: 'package',
+                                    label: 'Dịch vụ theo gói'
+                                },
+                            ]} />
+                        </section>
                         {
                             loading ? <LoadingView loading /> :
                             <>

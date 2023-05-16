@@ -16,6 +16,7 @@ import { Divider } from 'antd';
 import { AiFillStar } from 'react-icons/ai';
 import { GrFormNext, GrFormPrevious } from 'react-icons/gr';
 import LoadingView from 'app/components/loading-view/LoadingView';
+import LandingPackage from 'app/components/landing-package/LandingPackage';
 
 const LandingPage: React.FC = () =>{
     const dispatch = useDispatch();
@@ -118,6 +119,7 @@ const LandingPage: React.FC = () =>{
                     </div>
                 </section>
                 <LandingWidget index={1} url='take-care-service' backgroundUrl='/assets/widget-1.jpg' />
+                <LandingPackage />
                 {/* <LandingWidget index={2} url='/take-care-service' backgroundUrl='/assets/widget-2.jpg' /> */}
                 <About />
                 {/* <Divider className='divider-custom'>Posts</Divider>

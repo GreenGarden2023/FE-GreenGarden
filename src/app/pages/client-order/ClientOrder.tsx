@@ -35,7 +35,7 @@ import OrderStatusComp from 'app/components/status/OrderStatusComp';
 import { FaLayerGroup } from 'react-icons/fa';
 import LoadingView from 'app/components/loading-view/LoadingView';
 
-type OrderPage = 'rent' | 'sale' | 'service'
+type OrderPage = 'rent' | 'sale' | 'service' | 'package'
 
 const ClientOrder: React.FC = () =>{
     const userState = useSelector(state => state.userInfor)
@@ -60,6 +60,22 @@ const ClientOrder: React.FC = () =>{
     const [shipping, setShipping] = useState<ShippingFee[]>([])
 
     const [loading, setLoading] = useState(true)
+
+    const [isMobile, setIsMobile] = useState(true)
+
+    useEffect(() =>{
+        const handler = () =>{
+            if(window.innerWidth <= 480){
+                setIsMobile(true)
+            }else{
+                setIsMobile(false)
+            }
+        }
+        handler()
+        window.addEventListener('resize', handler)
+
+        return () => window.removeEventListener('resize', handler)
+    }, [])
 
     useEffect(() =>{
         dispatch(setTitle(`${CONSTANT.APP_NAME} | Đơn hàng`))
@@ -529,9 +545,12 @@ const ClientOrder: React.FC = () =>{
             case 'sale': 
                 localStorage.setItem('order-type', 'sale')
                 return setPageType('sale')
-            default: 
+            case 'service':
                 localStorage.setItem('order-type', 'service')
-                setPageType('service')
+                return setPageType('service')
+            default: 
+                localStorage.setItem('order-type', 'package')
+                return setPageType('package')
         }
     }
     const handlePaymentService = async (data: PaymentControlState) =>{
@@ -803,8 +822,13 @@ const ClientOrder: React.FC = () =>{
                             {
                                 icon: undefined,
                                 value: 'service',
-                                label: 'Dịch vụ'
-                            }
+                                label: isMobile ? 'DV tự chọn' : 'Dịch vụ tự chọn'
+                            },
+                            {
+                                icon: undefined,
+                                value: 'package',
+                                label: isMobile ? 'DV theo gói' : 'Dịch vụ theo gói'
+                            },
                         ]} />
                     </section>
                     {

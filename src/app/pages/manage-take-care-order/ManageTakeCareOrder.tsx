@@ -456,7 +456,7 @@ const ManageTakeCareOrder: React.FC = () => {
 
     return (
         <div className="mtko-wrapper">
-            <HeaderInfor title='Quản lý đơn hàng chăm sóc' />
+            <HeaderInfor title='Quản lý đơn hàng chăm sóc tự chọn' />
             <Searching
                 isOrderCode
                 isPhone

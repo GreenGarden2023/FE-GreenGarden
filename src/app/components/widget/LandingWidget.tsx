@@ -24,7 +24,7 @@ const LandingWidget: React.FC<LandingWidgetProps> = ({ index, url, backgroundUrl
             } */}
             <div className="content-box" style={{backgroundImage: `url(${backgroundUrl})`}}>
                 <div className="content">
-                    <h1>Dịch vụ chăm sóc cây</h1>
+                    <h1>Dịch vụ chăm sóc cây tự chọn</h1>
                     <div className="divider"></div>
                     <Link to={url}>
                         <span>Xem Thêm</span>

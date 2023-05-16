@@ -105,29 +105,52 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
         }
 
     }, [location])
-    const openedKey = useMemo(() =>{
+
+    const [openKey, setOpenKey] = useState<string[]>([])
+
+    useEffect(() =>{
         const affix = location.pathname.split('/')[2]
 
-        const manageOrder = ['rent-order', 'sale-order', 'take-care-order']
+        const manageOrder = ['rent-order', 'sale-order']
+        const manageRequest = ['manage-take-care-service', 'take-care-order', 'manage-take-care-package', 'take-care-package']
+
         if(manageOrder.includes(affix)){
-            return ['4']
+            setOpenKey(['4'])
+        }else if(manageRequest.includes(affix)){
+            setOpenKey(['13'])
+        }else{
+            setOpenKey([])
         }
     }, [location])
+
+    // const pushOpenKey = (key: string) =>{
+    //     setOpenKey([...openKey, key])
+    // }
+
     const childrenOrder = [
-        CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/rent-order'>Đơn thuê</Link>, '5', <BiCategoryAlt size={18} />) : null,
-        CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/sale-order'>Đơn bán</Link>, '6', <BiCategoryAlt size={18} />) : null,
-        CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/take-care-order'>Đơn chăm sóc</Link>, '7', <BiCategoryAlt size={18} />) : null,
+        CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/rent-order'>Đơn thuê</Link>, '5', <MdOutlineInventory2 size={18} />) : null,
+        CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/sale-order'>Đơn bán</Link>, '6', <MdOutlineInventory2 size={18} />) : null,
     ]
+
+    const childrenRequest = [
+        CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/manage-take-care-service'>YCCS tự chọn</Link>, '8', <MdOutlineInventory2 size={18} />) : null,
+        CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/take-care-order'>Đơn tự chọn</Link>, '14', <MdOutlineInventory2 size={18} />) : null,
+        CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/manage-take-care-package'>YCCS theo gói</Link>, '15', <MdOutlineInventory2 size={18} />) : null,
+        CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/take-care-order-package'>Đơn theo gói</Link>, '16', <MdOutlineInventory2 size={18} />) : null,
+    ]
+
     const items: MenuItem[] = [
        CONSTANT.MANAGE_CATEGORY.includes(roleName as Role) ? getItem(<Link to='/panel/manage-category'>Danh mục</Link>, '1', <BiCategoryAlt size={18} />) : null,
        CONSTANT.MANAGE_PRODUCT.includes(roleName as Role) ? getItem(<Link to='/panel/manage-product'>Loại cây</Link>, '2', <MdOutlineInventory2 size={18} />) : null,
        CONSTANT.MANAGE_SIZE.includes(roleName as Role) ? getItem(<Link to='/panel/manage-size'>Kích thước</Link>, '3', <MdOutlineInventory2 size={18} />) : null,
-       CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem('Đơn hàng', '4', <BiCategoryAlt size={18} />, childrenOrder) : null,
-       CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/manage-take-care-service'>Yêu cầu chăm sóc</Link>, '8', <MdOutlineInventory2 size={18} />) : null,
+       CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/manage-package'>Gói chăm sóc</Link>, '17', <MdOutlineInventory2 size={18} />) : null,
+       CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem('Đơn thường', '4', <BiCategoryAlt size={18} />, childrenOrder) : null,
        CONSTANT.MANAGE_SHIPPING_FEE.includes(roleName as Role) ? getItem(<Link to='/panel/manage-shipping-fee'>Phí vận chuyển</Link>, '9', <MdOutlineInventory2 size={18} />) : null,
        CONSTANT.TAKE_CARE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/take-care-order-assigned'>Đơn chăm sóc</Link>, '10', <MdOutlineInventory2 size={18} />) : null,
        CONSTANT.MANAGE_USERS.includes(roleName as Role) ? getItem(<Link to='/panel/users'>Người dùng</Link>, '11', <MdOutlineInventory2 size={18} />) : null,
        CONSTANT.TAKE_CARE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/manage-request'>Yêu cầu chăm sóc</Link>, '12', <MdOutlineInventory2 size={18} />) : null,
+       CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem('Đơn chăm sóc', '13', <BiCategoryAlt size={18} />, childrenRequest) : null,
+
     ];
 
     const handleLogout = () =>{
@@ -184,7 +207,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
                     </div>
                     <Divider  />
                     <div className="routers-wrapper">
-                        <Menu onClick={handleCloseMenu} className='admin-menu' theme="light" mode="inline"  items={items} selectedKeys={defaultSelectedKey} openKeys={openedKey} />
+                        <Menu onClick={handleCloseMenu} className='admin-menu' theme="light" mode="inline"  items={items} selectedKeys={defaultSelectedKey} openKeys={openKey} />
                     </div>
                     <GrFormClose size={30} className='close-mobile-header' onClick={handleCloseMenu} />
                 </div>
@@ -244,7 +267,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
                                 collapsed={collapsedHeader}
                             >
                                 <div style={{ height: 32, margin: 16, background: 'rgba(255, 255, 255, 0.2)' }} />
-                                <Menu className='admin-menu' theme="light" mode="inline"  items={items} selectedKeys={defaultSelectedKey} openKeys={openedKey} />
+                                <Menu onSelect={(e) => console.log(e)} className='admin-menu' theme="light" mode="inline"  items={items} selectedKeys={defaultSelectedKey} defaultOpenKeys={openKey} />
                             </Sider>
                             <Layout className="site-layout" style={{ marginLeft: collapsedHeader ? 80 : 200 }}>
                                 <Content>

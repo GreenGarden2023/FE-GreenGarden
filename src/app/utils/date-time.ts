@@ -32,6 +32,12 @@ const dayjsToLocalString = (date: dayjs.Dayjs) => {
     return date.toDate().toLocaleDateString() as any
 }
 
+const dayjsToLocalStringTemp = (date: dayjs.Dayjs) => {
+    const dateString = date.toDate().toLocaleDateString()
+    const [_mm, _dd, _yyyy] = dateString.split('/')
+    return `${_dd}/${_mm}/${_yyyy}`
+}
+
 const plusDate = (date: Date | string, plusNumber: number) =>{
     const current = new Date(date)
     current.setDate(current.getDate() + plusNumber)
@@ -45,7 +51,8 @@ const utilDateTime = {
     getDiff2Days,
     dateTimeToString,
     dayjsToLocalString,
-    plusDate
+    plusDate,
+    dayjsToLocalStringTemp
 }
 
 export default utilDateTime;
