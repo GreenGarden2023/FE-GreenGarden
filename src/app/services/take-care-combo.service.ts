@@ -1,9 +1,9 @@
-import { Package, PackageHandle } from "app/models/package"
+import { TServicePkgStatus, TStatusPkg } from "app/models/general-type"
+import { Package, PackageHandle, PackageService, PackageServiceAssignHandle, PackageServiceHandle, PackageServiceStatusHandle } from "app/models/package"
 import { Response } from "app/models/response"
 import golbalAxios from "app/utils/http-client"
 
-
-const getAllTakeCareCombo = async (status: TStatus) =>{
+const getAllTakeCareCombo = async (status: TStatusPkg) =>{
     const res = await golbalAxios.get<Response<Package[]>>(`/takecare-combo/get-all-takecare-combo?status=${status}`)
     return res.data
 }
@@ -27,14 +27,44 @@ const updateTakeCareCombo = async (body: PackageHandle) =>{
     })
     return res.data
 }
+// -----------------------------
+const createTakeCareComboService = async (body: PackageServiceHandle) =>{
+    const res = await golbalAxios.post<Response<PackageService>>('/takecare-combo-service/create-takecare-combo-service', body)
+    return res.data
+}
+const getATakeCareComboService = async (takecareComboServiceID: string) =>{
+    const res = await golbalAxios.get<Response<PackageService>>(`/takecare-combo-service/get-a-takecare-combo-service?takecareComboServiceID=${takecareComboServiceID}`)
+    return res.data
+}
+const getAllTakeCareComboService = async (status: TServicePkgStatus) =>{
+    const res = await golbalAxios.get<Response<PackageService[]>>(`/takecare-combo-service/get-all-takecare-combo-service?status=${status}`)
+    return res.data
+}
+const changeTakeCareComboServiceStatus = async (body: PackageServiceStatusHandle) =>{
+    const res = await golbalAxios.post<Response<PackageService>>('/takecare-combo-service/change-takecare-combo-service-status', body)
+    return res.data
+}
+const assignTakeCareComboServiceTechnician = async (body: PackageServiceAssignHandle) =>{
+    const res = await golbalAxios.post<Response<PackageService>>('/takecare-combo-service/assign-takecare-combo-service-technician', body)
+    return res.data
+}
+const updateTakeCareComboService = async (body: PackageServiceHandle) =>{
+    const res = await golbalAxios.post<Response<PackageService>>('/takecare-combo-service/update-takecare-combo-service', body)
+    return res.data
+}
 
 const takeCareComboService = {
     getAllTakeCareCombo,
     getATakeCareCombo,
     createTakeCareCombo,
-    updateTakeCareCombo
+    updateTakeCareCombo,
+    // -----
+    createTakeCareComboService,
+    getATakeCareComboService,
+    getAllTakeCareComboService,
+    changeTakeCareComboServiceStatus,
+    assignTakeCareComboServiceTechnician,
+    updateTakeCareComboService,
 }
 
 export default takeCareComboService
-
-type TStatus = 'active' | 'disabled' | 'all'

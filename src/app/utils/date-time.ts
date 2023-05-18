@@ -35,7 +35,7 @@ const dayjsToLocalString = (date: dayjs.Dayjs) => {
 const dayjsToLocalStringTemp = (date: dayjs.Dayjs) => {
     const dateString = date.toDate().toLocaleDateString()
     const [_mm, _dd, _yyyy] = dateString.split('/')
-    return `${_dd}/${_mm}/${_yyyy}`
+    return `${_dd.length === 2 ? _dd : `0${_dd}`}/${_mm.length === 2 ? _mm : `0${_mm}`}/${_yyyy}`
 }
 
 const plusDate = (date: Date | string, plusNumber: number) =>{

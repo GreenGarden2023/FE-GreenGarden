@@ -1,0 +1,28 @@
+@import 'app/styles/variable.scss';
+
+.m-package-info{
+    h1{
+        font-size: 28px;
+        color: $default-green;
+    }
+    .item{
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+        .label-text{
+            width: 100%;
+            color: $soft-text;
+            text-decoration: underline;
+        }
+        .value-text{
+            flex: 1;
+            font-size: 18px;
+        }
+    }
+}
+.m-package-form{
+    h1{
+        font-size: 28px;
+        color: $default-green;
+    }
+}

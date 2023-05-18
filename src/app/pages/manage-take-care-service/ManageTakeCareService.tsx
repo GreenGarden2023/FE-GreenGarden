@@ -65,7 +65,7 @@ const ManageTakeCareService: React.FC = () => {
         return (
             <div className='context-menu-wrapper'>
                 <div className="item" onClick={() => {
-                    setActionMethod({orderId: record.id, actionType: 'detail', orderType: 'service', openIndex: -1})
+                    setActionMethod({orderId: record.id, actionType: 'detail', orderType: 'package', openIndex: -1})
                 }}>
                     <BiDetail size={25} className='icon'/>
                     <span>Chi tiết dịch vụ</span>
@@ -73,7 +73,7 @@ const ManageTakeCareService: React.FC = () => {
                 {
                     (record.status === 'processing' || record.status === 'reprocess') && 
                     <div className="item" onClick={() => {
-                        setActionMethod({orderId: record.id, actionType: 'accept service', orderType: 'service', openIndex: -1})
+                        setActionMethod({orderId: record.id, actionType: 'accept service', orderType: 'package', openIndex: -1})
                     }}>
                         <BsCheck2All size={25} className='icon'/>
                         <span>Xác nhận yêu cầu</span>
@@ -82,7 +82,7 @@ const ManageTakeCareService: React.FC = () => {
                 {
                     (record.status === 'processing' || record.status === 'reprocess') &&
                     <div className="item" onClick={() => {
-                        setActionMethod({orderId: record.id, actionType: 'reject service', orderType: 'service', openIndex: -1})
+                        setActionMethod({orderId: record.id, actionType: 'reject service', orderType: 'package', openIndex: -1})
                     }}>
                         <MdCancelPresentation size={25} className='icon'/>
                         <span>Từ chối yêu cầu</span>
@@ -92,7 +92,7 @@ const ManageTakeCareService: React.FC = () => {
                     (record.status === 'accepted') &&
                     <div className="item" 
                         onClick={() => {
-                            setActionMethod({orderId: record.id, actionType: 'assign', orderType: 'service', openIndex: -1})
+                            setActionMethod({orderId: record.id, actionType: 'assign', orderType: 'package', openIndex: -1})
                         }}
                     >
                         <BiUserPlus size={25} className='icon'/>
@@ -103,7 +103,7 @@ const ManageTakeCareService: React.FC = () => {
                     (record.status === 'accepted' && record.technicianID) &&
                     <div className="item" 
                         onClick={() => {
-                            setActionMethod({orderId: record.id, actionType: 'update infor', orderType: 'service', openIndex: -1})
+                            setActionMethod({orderId: record.id, actionType: 'update infor', orderType: 'package', openIndex: -1})
                         }}
                     >
                         <AiOutlineEdit size={25} className='icon'/>
@@ -114,7 +114,7 @@ const ManageTakeCareService: React.FC = () => {
                     record.status === 'user approved' &&
                     <div className="item" 
                         onClick={() => {
-                            setActionMethod({orderId: record.id, actionType: 'create order', orderType: 'service', openIndex: -1})
+                            setActionMethod({orderId: record.id, actionType: 'create order', orderType: 'package', openIndex: -1})
                         }}
                     >
                         <BiDetail size={25} className='icon'/>

@@ -69,6 +69,7 @@ export interface RentOrderList {
     nameCancelBy: string;
     contractURL: string;
     rentOrderDetailList: RentOrderDetailList[]
+    careGuideURL: string;
 }
 export interface RentOrder{
     id: string;
@@ -102,6 +103,7 @@ export interface SaleOrderList {
     reason: string;
     cancelBy: string;
     nameCancelBy: string;
+    careGuideURL: string;
     rentOrderDetailList: RentOrderDetailList[];
 }
 export interface SaleOrderResponse{

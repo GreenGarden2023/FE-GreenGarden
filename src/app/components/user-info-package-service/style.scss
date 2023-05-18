@@ -1,0 +1,31 @@
+@import 'app/styles/variable.scss';
+
+.pkg-user-info{
+    position: relative;
+    border: 1px solid $default-green;
+    border-radius: 5px;
+    margin-top: 50px;
+    padding: 15px 10px;
+    h1{
+        position: absolute;
+        top: -20px;
+        left: 10px;
+        font-size: 24px;
+        font-weight: 500;
+        color: $default-green;
+        background-color: #fff;
+        padding: 0 10px;
+    }
+    .user-info-wrapper{
+        .label{
+            color: $soft-text;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .value{
+            color: $default-green;
+            font-size: 18px;
+            font-weight: 500;
+        }
+    }
+}

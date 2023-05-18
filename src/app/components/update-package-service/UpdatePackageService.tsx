@@ -1,22 +1,20 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import './style.scss'
-import Table, { ColumnsType } from 'antd/es/table'
-import { Button, Col, DatePicker, DatePickerProps, Form, Input, Modal, Row, Select } from 'antd'
-import { useNavigate } from 'react-router-dom';
-import useSelector from 'app/hooks/use-selector';
-import useDispatch from 'app/hooks/use-dispatch';
-import { setNoti } from 'app/slices/notification';
-import GridConfig from '../grid-config/GridConfig';
-import { useForm, Controller } from 'react-hook-form';
-import locale from 'antd/es/date-picker/locale/vi_VN';
-import CONSTANT from 'app/utils/constant';
-import utilDateTime from 'app/utils/date-time';
+import { Button, Col, DatePicker, DatePickerProps, Form, Input, Modal, Row, Select } from 'antd';
+import { Package, PackageService, PackageServiceHandle } from 'app/models/package'
+import React, { useEffect, useMemo } from 'react'
+import PackageDetail from '../package-detail/PackageDetail';
+import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup';
+import CONSTANT from 'app/utils/constant';
+import GridConfig from '../grid-config/GridConfig';
 import ErrorMessage from '../message.tsx/ErrorMessage';
-import { Package, PackageServiceHandle } from 'app/models/package';
+import locale from 'antd/es/date-picker/locale/vi_VN';
+import utilDateTime from 'app/utils/date-time';
+import dayjs from 'dayjs'
 import takeCareComboService from 'app/services/take-care-combo.service';
-import PackageDetail from '../package-detail/PackageDetail';
+import useDispatch from 'app/hooks/use-dispatch';
+import { setNoti } from 'app/slices/notification';
+import './style.scss';
 
 const schema = yup.object().shape({
     name: yup.string().trim().required('Họ và tên không được để trống').min(2, 'Họ và tên có ít nhất 2 ký tự').max(50, 'Họ và tên có nhiều nhất 50 ký tự'),
@@ -27,99 +25,49 @@ const schema = yup.object().shape({
     numOfMonth: yup.number().required('Số tháng chăm sóc không được để trống').min(1, 'Cần ít nhất 1 tháng chăm sóc').max(24, 'Số tháng chăm sóc tối đa là 24'),
 })
 
-const LandingPackage: React.FC = () => {
+interface UpdatePackageServiceProps{
+    pkgService: PackageService
+    onClose: () => void;
+    onSubmit: (pkgService: PackageService) => void;
+}
+
+const UpdatePackageService: React.FC<UpdatePackageServiceProps> = ({ pkgService, onClose, onSubmit }) => {
     const dispatch = useDispatch()
-    const navigate = useNavigate()
-    const { user } = useSelector(state => state.userInfor)
-
-    // data
-    const [packages, setPackages] = useState<Package[]>([])
-
-    const [packageSelect, setPackageSelect] = useState<Package>()
 
     const { setValue, control, formState: {errors, isSubmitting, isSubmitted}, handleSubmit, trigger, setError, reset } = useForm<PackageServiceHandle>({
         resolver: yupResolver(schema)
     })
-
     useEffect(() =>{
-        const init = async () =>{
-            try{
-                const res = await takeCareComboService.getAllTakeCareCombo('active')
-                setPackages(res.data)
-            }catch{
-                
-            }
-        }
-        init() 
-    }, [])
+        if(!pkgService) return;
+        const { name, email, phone, address, treeQuantity, takecareComboDetail, startDate, numOfMonths } = pkgService
 
-    const Column: ColumnsType<any> = [
-        {
-            title: 'Gói dịch vụ',
-            key: 'name',
-            dataIndex: 'name'
-        },
-        {
-            title: 'Đơn giá',
-            key: 'price',
-            dataIndex: 'price',
-            render: (v) => (
-                <div className="l-package-price">
-                    <span>{v}</span>/cây/tháng
-                </div>
-            )
-        },
-        {
-            title: 'Chi tiết công việc',
-            key: 'description',
-            dataIndex: 'description'
-        },
-        {
-            title: 'Cam kết của cửa hàng',
-            key: 'guarantee',
-            dataIndex: 'guarantee'
-        },
-        {
-            title: '',
-            key: '#',
-            dataIndex: '#',
-            render: (_, record) => <Button className='btn btn-create l-package-button' onClick={() => handleSendRequest(record)}>Gửi yêu cầu</Button>
-        },
-    ]
-    const DataSource = useMemo(() =>{
-        return packages.map((item, index) => ({
-            key: index + 1,
-            ...item
-        }))
-    }, [packages])
-
-    const handleSendRequest = (pkg: Package) =>{
-        if(!user.id){
-            return navigate('/login')
-        }
-        if(user.roleName !== 'Customer'){
-            return dispatch(setNoti({type: 'info', message: 'Bạn không thể sử dụng chức năng này'}))
-        }
-        setPackageSelect(pkg)
-
-        const { fullName, mail, phone, address } = user
-        setValue('name', fullName)
-        setValue('email', mail)
+        setValue('id', pkgService.id)
+        setValue('name', name)
+        setValue('email', email)
         setValue('phone', phone)
         setValue('isAtShop', true)
         setValue('address', address)
-        setValue('treeQuantity', 1)
-        setValue('numOfMonth', 1)
-        setValue('takecareComboId', pkg.id)
-    }
+        setValue('treeQuantity', treeQuantity)
+        setValue('numOfMonth', numOfMonths)
+        setValue('takecareComboId', takecareComboDetail.takecareComboID)
+        setValue('startDate', utilDateTime.dayjsToLocalStringTemp(dayjs(startDate)))
 
-    const handleCloseModal = () =>{
-        setPackageSelect(undefined)
-        reset()
-    }
+    }, [pkgService, setValue, trigger])
+
+    const PackageDetailSelect = useMemo(() =>{
+        const { takecareComboDescription, takecareComboGuarantee, takecareComboID, takecareComboName, takecareComboPrice } = pkgService.takecareComboDetail
+        const pkg: Package = {
+            id: takecareComboID,
+            description: takecareComboDescription,
+            guarantee: takecareComboGuarantee,
+            name: takecareComboName,
+            price: takecareComboPrice,
+            status: true
+        }
+        return pkg
+    }, [pkgService.takecareComboDetail])
 
     const handleSubmitForm = async (data: PackageServiceHandle) =>{
-        // validate startDate
         if(!data.startDate){
             setError('startDate', {
                 type: 'pattern',
@@ -127,13 +75,20 @@ const LandingPackage: React.FC = () => {
             })
             return;
         }
+
         try{
-            await takeCareComboService.createTakeCareComboService(data)
-            dispatch(setNoti({type: 'success', message: `Đã gửi yêu cầu chăm sóc cây cho gói chăm sóc "${packageSelect?.name}" thành công`}))
+            const res = await takeCareComboService.updateTakeCareComboService(data)
+            onSubmit(res.data)
+            dispatch(setNoti({type: 'success', message: `Cập nhật thông tin gói chăm sóc (${pkgService.code}) thành công`}))
             handleCloseModal()
         }catch{
 
         }
+    }
+
+    const handleCloseModal = () =>{
+        onClose()
+        reset()
     }
 
     const onChange: DatePickerProps['onChange'] = (date, dateString) => {
@@ -147,28 +102,22 @@ const LandingPackage: React.FC = () => {
     };
 
     return (
-        <div className='l-package-wrapper'>
-            <div className="l-package-box container-wrapper">
-                <Table columns={Column}  dataSource={DataSource} bordered pagination={false} scroll={{x: 480}} />
-            </div>
-            {
-                packageSelect && 
-                <Modal
-                    title={`Xác nhận thông tin`}
-                    open
-                    onCancel={handleCloseModal}
-                    footer={false}
-                    width={1000}
-                    className='m-confirm-info'
-                >
-                    <PackageDetail pkg={packageSelect} />
-                    <Form
-                        labelAlign='left'
-                        layout='vertical'
-                        onFinish={handleSubmit(handleSubmitForm)}
-                        className='m-package-form'
-                    >
-                        <h1>Thông tin của bạn</h1>
+        <Modal
+            open
+            title={`Cập nhật thông tin gói chăm sóc (${pkgService.code})`}
+            onCancel={onClose}
+            footer={false}
+            width={1000}
+        >
+            {PackageDetailSelect && <PackageDetail pkg={PackageDetailSelect} />}
+            <Form
+                labelAlign='left'
+                layout='vertical'
+                onFinish={handleSubmit(handleSubmitForm)}
+            >
+                <div className="form-update-pkg-service">
+                    <h1>Thông tin khách hàng</h1>
+                    <div className="user-info-wrapper">
                         <GridConfig>
                             <Row gutter={[24, 0]}>
                                 <Col span={12}>
@@ -270,23 +219,24 @@ const LandingPackage: React.FC = () => {
                                             disabledDate={(current) => current && current.valueOf()  < Date.now().valueOf()}
                                             style={{width: '100%'}}
                                             onChange={onChange}
+                                            defaultValue={dayjs(pkgService.startDate, 'YYYY/MM/DD')}
                                         />
                                         {errors.startDate && <ErrorMessage message={errors.startDate.message} />}
                                     </Form.Item>
                                 </Col>
                             </Row>
                         </GridConfig>
-                        <div className='btn-form-wrapper'>
-                            <Button htmlType='button' disabled={isSubmitting} type='default' className='btn-cancel' size='large' onClick={handleCloseModal}>Hủy bỏ</Button>
-                            <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large'>
-                                Gửi yêu cầu
-                            </Button>
-                        </div>
-                    </Form>
-                </Modal>
-            }
-        </div>
+                    </div>
+                </div>
+                <div className='btn-form-wrapper' style={{marginTop: '15px'}}>
+                    <Button htmlType='button' disabled={isSubmitting} type='default' className='btn-cancel' size='large' onClick={handleCloseModal}>Hủy bỏ</Button>
+                    <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large'>
+                        Cập nhật
+                    </Button>
+                </div>
+            </Form>
+        </Modal>
     )
 }
 
-export default LandingPackage
+export default UpdatePackageService

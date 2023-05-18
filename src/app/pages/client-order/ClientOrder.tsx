@@ -34,6 +34,7 @@ import { setTitle } from 'app/slices/window-title';
 import OrderStatusComp from 'app/components/status/OrderStatusComp';
 import { FaLayerGroup } from 'react-icons/fa';
 import LoadingView from 'app/components/loading-view/LoadingView';
+import ClientPackageOrder from 'app/components/client-package-order/ClientPackageOrder';
 
 type OrderPage = 'rent' | 'sale' | 'service' | 'package'
 
@@ -890,6 +891,10 @@ const ClientOrder: React.FC = () =>{
                                         }}
                                     />
                                 </section>
+                            }
+                            {
+                                pageType === 'package' &&
+                                <ClientPackageOrder />
                             }
                         </>
                     }

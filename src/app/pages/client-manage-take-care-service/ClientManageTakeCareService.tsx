@@ -20,6 +20,7 @@ import { setNoti } from 'app/slices/notification'
 import CONSTANT from 'app/utils/constant'
 import LoadingView from 'app/components/loading-view/LoadingView'
 import NoProduct from 'app/components/no-product/NoProduct'
+import ClientPackageService from 'app/components/client-package-service/ClientPackageService'
 
 type TPageType = 'service' | 'package'
 
@@ -34,6 +35,7 @@ const ClientManageTakeCareService: React.FC = () => {
     const [pageType, setPageType] = useState<TPageType>('service')
 
     useEffect(() =>{
+        if(pageType === 'package') return ;
         const init = async () =>{
             setLoading(true)
             try{
@@ -45,7 +47,7 @@ const ClientManageTakeCareService: React.FC = () => {
             setLoading(false)
         }
         init()
-    }, [dispatch])
+    }, [dispatch, pageType])
 
     const Column: ColumnsType<any> = [
         {
@@ -209,9 +211,14 @@ const ClientManageTakeCareService: React.FC = () => {
                             <>
                                 {
                                     services.length === 0 ? <NoProduct /> :
-                                    <div className="default-layout">
-                                        <Table columns={Column} dataSource={DataSource} scroll={{x: 480}} />
-                                    </div>
+                                    <>
+                                        {
+                                            pageType === 'service' ? 
+                                            <div className="default-layout">
+                                                <Table columns={Column} dataSource={DataSource} scroll={{x: 480}} />
+                                            </div> : <ClientPackageService />
+                                        }
+                                    </>
                                 }
                             </>
                         }

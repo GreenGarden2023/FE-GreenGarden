@@ -4,7 +4,7 @@ import { Col, Row } from 'antd'
 import { MdDateRange, MdOutlineDriveFileRenameOutline } from 'react-icons/md'
 import { OrderStatus } from 'app/models/general-type';
 import MoneyFormat from 'app/components/money/MoneyFormat';
-import { AiOutlinePhone } from 'react-icons/ai';
+import { AiOutlineDownload, AiOutlinePhone } from 'react-icons/ai';
 import { CiLocationOn } from 'react-icons/ci';
 import { HiOutlineStatusOnline } from 'react-icons/hi';
 import { FaMoneyBillWave } from 'react-icons/fa';
@@ -29,11 +29,12 @@ interface UserInforOrderProps{
     reason?: string;
     nameCancelBy?: string;
     columnNumber?: number;
-    contract?: string
+    contract?: string;
+    careGuideURL?: string;
 }
 
-const UserInforOrder: React.FC<UserInforOrderProps> = ({name, phone, address, createOrderDate, startDate, 
-    endDate, status, isTransport, transportFee, totalOrder, remainMoney, deposit, reason, nameCancelBy, columnNumber, contract}) => {
+const UserInforOrder: React.FC<UserInforOrderProps> = ({name, phone, address, createOrderDate, startDate, careGuideURL,
+    endDate, status, isTransport, transportFee, totalOrder, remainMoney, deposit, reason, nameCancelBy, columnNumber, contract }) => {
 
     // const ColumnNumber = useMemo(() =>{
     //     if(!columnNumber) return 8;
@@ -248,11 +249,25 @@ const UserInforOrder: React.FC<UserInforOrderProps> = ({name, phone, address, cr
                                 <Col xs={24} sm={24} md={12} lg={12} xl={8}>
                                     <div className="item">
                                         <div className="label">
-                                            <FaMoneyBillWave color='#5cb9d8' size={20} />
+                                            <AiOutlineDownload color='#5cb9d8' size={20} />
                                             <span>Hợp đồng thuê</span>
                                         </div>
                                         <div className="content">
                                             <Link to={contract} target='_blank' className='download-link' >Tải xuống</Link>
+                                        </div>
+                                    </div>
+                                </Col>
+                            }
+                            {
+                                careGuideURL && 
+                                <Col xs={24} sm={24} md={12} lg={12} xl={8}>
+                                    <div className="item">
+                                        <div className="label">
+                                            <AiOutlineDownload color='#5cb9d8' size={20} />
+                                            <span>HD chăm sóc</span>
+                                        </div>
+                                        <div className="content">
+                                            <Link to={careGuideURL} target='_blank' className='download-link' >Tải xuống</Link>
                                         </div>
                                     </div>
                                 </Col>
