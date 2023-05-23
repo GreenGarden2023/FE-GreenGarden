@@ -1,4 +1,5 @@
-import { TServicePkgStatus } from "./general-type"
+import { TPackageOrderStatus, TServicePkgStatus } from "./general-type"
+import { Paging } from "./paging"
 
 export interface Package{
     id: string
@@ -60,4 +61,26 @@ export interface PackageServiceStatusHandle{
 export interface PackageServiceAssignHandle{
     takecareComboServiceId: string;
     technicianID: string
+}
+
+export interface PackageOrder{
+    id: string
+    orderCode: string
+    createDate: Date
+    serviceStartDate: Date
+    serviceEndDate: Date
+    deposit: number
+    totalPrice: number
+    remainAmount: number
+    technicianId: string
+    userId: string
+    status: TPackageOrderStatus
+    description: string
+    cancelBy: string
+    takecareComboService: PackageService
+}
+
+export interface PackageGetAll{
+    paging: Paging
+    takecareComboOrderList: PackageOrder[]
 }

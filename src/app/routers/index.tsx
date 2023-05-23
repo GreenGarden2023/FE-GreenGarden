@@ -49,6 +49,9 @@ import ManageRequest from 'app/pages/manage-request/ManageRequest';
 import ManageTakeCarePackage from 'app/pages/manage-take-care-package/ManageTakeCarePackage';
 import TakeCareOrderPackage from 'app/pages/take-care-order-packagae/TakeCareOrderPackage';
 import ManagePackage from 'app/pages/manage-package/ManagePackage';
+import ManagePackageRequest from 'app/pages/manage-package-request/ManagePackageRequest';
+import ManagePackageOrder from 'app/pages/manage-package-order/ManagePackageOrder';
+import ManagePackageOrderDetail from 'app/pages/manage-package-order-detail/ManagePackageOrderDetail';
 
 const Routers: React.FC = () =>{
     const dispatch = useDispatch();
@@ -149,9 +152,15 @@ const Routers: React.FC = () =>{
                     <Route path='sale-order' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageSaleOrder /></AdminRoute></AuthGuard>} />
                     <Route path='rent-order/:groupId/:orderId' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageRentOrderGroup /></AdminRoute></AuthGuard>} />
                     <Route path='manage-shipping-fee' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_SHIPPING_FEE} ><AdminRoute><ManageShippingFee /></AdminRoute></AuthGuard>} />
+                    {/* technician */}
                     <Route path='manage-request' element={<AuthGuard rolesAuth={CONSTANT.TAKE_CARE_ORDER} ><AdminRoute><ManageRequest /></AdminRoute></AuthGuard>} />
                     <Route path='take-care-order-assigned' element={<AuthGuard rolesAuth={CONSTANT.TAKE_CARE_ORDER} ><AdminRoute><TechManageServiceOrder /></AdminRoute></AuthGuard>} />
                     <Route path='take-care-order-assigned/:orderId' element={<AuthGuard rolesAuth={CONSTANT.TAKE_CARE_ORDER} ><AdminRoute><TechManageServiceOrderDetail /></AdminRoute></AuthGuard>} />
+                    
+                    <Route path='manage-package-order' element={<AuthGuard rolesAuth={CONSTANT.TAKE_CARE_ORDER} ><AdminRoute><ManagePackageOrder /></AdminRoute></AuthGuard>} />
+                    <Route path='manage-package-order/:orderId' element={<AuthGuard rolesAuth={CONSTANT.TAKE_CARE_ORDER} ><AdminRoute><ManagePackageOrderDetail /></AdminRoute></AuthGuard>} />
+                    <Route path='manage-package-request' element={<AuthGuard rolesAuth={CONSTANT.TAKE_CARE_ORDER} ><AdminRoute><ManagePackageRequest /></AdminRoute></AuthGuard>} />
+                    
                     {/* package */}
                     <Route path='manage-package' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManagePackage /></AdminRoute></AuthGuard>} />
                     <Route path='manage-take-care-service' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageTakeCareService /></AdminRoute></AuthGuard>} />

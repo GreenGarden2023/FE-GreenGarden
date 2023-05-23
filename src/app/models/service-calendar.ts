@@ -18,12 +18,12 @@ export interface CreateServiceResponse{
 }
 export interface CalendarInitial {
     serviceOrderId: string
-    serviceDate: Date
+    serviceDate: string
 }
   
 export interface CalendarUpdate {
     serviceCalendarId: string
-    nextServiceDate: Date
+    nextServiceDate?: string
     images: string[]
     sumary: string
 }

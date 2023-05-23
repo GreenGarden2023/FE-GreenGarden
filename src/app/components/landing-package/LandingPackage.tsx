@@ -17,6 +17,8 @@ import ErrorMessage from '../message.tsx/ErrorMessage';
 import { Package, PackageServiceHandle } from 'app/models/package';
 import takeCareComboService from 'app/services/take-care-combo.service';
 import PackageDetail from '../package-detail/PackageDetail';
+import MoneyFormat from '../money/MoneyFormat';
+import dayjs from 'dayjs'
 
 const schema = yup.object().shape({
     name: yup.string().trim().required('Họ và tên không được để trống').min(2, 'Họ và tên có ít nhất 2 ký tự').max(50, 'Họ và tên có nhiều nhất 50 ký tự'),
@@ -37,7 +39,7 @@ const LandingPackage: React.FC = () => {
 
     const [packageSelect, setPackageSelect] = useState<Package>()
 
-    const { setValue, control, formState: {errors, isSubmitting, isSubmitted}, handleSubmit, trigger, setError, reset } = useForm<PackageServiceHandle>({
+    const { setValue, control, formState: {errors, isSubmitting, isSubmitted}, handleSubmit, trigger, setError, reset, getValues } = useForm<PackageServiceHandle>({
         resolver: yupResolver(schema)
     })
 
@@ -65,7 +67,7 @@ const LandingPackage: React.FC = () => {
             dataIndex: 'price',
             render: (v) => (
                 <div className="l-package-price">
-                    <span>{v}</span>/cây/tháng
+                    <MoneyFormat value={v} color='Light Blue' />/cây/tháng
                 </div>
             )
         },
@@ -77,7 +79,8 @@ const LandingPackage: React.FC = () => {
         {
             title: 'Cam kết của cửa hàng',
             key: 'guarantee',
-            dataIndex: 'guarantee'
+            dataIndex: 'guarantee',
+            render: (v) => <p className='manage-guarantee'>{v}</p>
         },
         {
             title: '',
@@ -111,6 +114,10 @@ const LandingPackage: React.FC = () => {
         setValue('treeQuantity', 1)
         setValue('numOfMonth', 1)
         setValue('takecareComboId', pkg.id)
+
+        const dateNow = new Date()
+        dateNow.setDate(dateNow.getDate() + 3)
+        setValue('startDate', utilDateTime.dayjsToLocalStringTemp(dayjs(dateNow)))
     }
 
     const handleCloseModal = () =>{
@@ -146,6 +153,20 @@ const LandingPackage: React.FC = () => {
         // console.log(utilDateTime.dayjsToLocalStringTemp(date));
     };
 
+    const disabledDate = (current: dayjs.Dayjs) =>{
+        const dateNow = new Date()
+        dateNow.setDate(dateNow.getDate() + 2)
+
+        return current && current.valueOf() < dateNow.valueOf()
+    }
+
+    const DateRecommend = useMemo(() =>{
+        const dateNow = new Date()
+        dateNow.setDate(dateNow.getDate() + 3)
+
+        return dayjs(dateNow)
+    }, [])
+
     return (
         <div className='l-package-wrapper'>
             <div className="l-package-box container-wrapper">
@@ -161,7 +182,7 @@ const LandingPackage: React.FC = () => {
                     width={1000}
                     className='m-confirm-info'
                 >
-                    <PackageDetail pkg={packageSelect} />
+                    <PackageDetail pkg={packageSelect} price={(getValues('numOfMonth') * getValues('treeQuantity')) * (packageSelect ? packageSelect.price : 0)} />
                     <Form
                         labelAlign='left'
                         layout='vertical'
@@ -237,7 +258,7 @@ const LandingPackage: React.FC = () => {
                                                 }else{
                                                     setValue('treeQuantity', 0)
                                                 }
-                                                isSubmitted && trigger('treeQuantity')
+                                                trigger('treeQuantity')
                                             }} />)}
                                         />
                                         {errors.treeQuantity && <ErrorMessage message={errors.treeQuantity.message} />}
@@ -255,7 +276,7 @@ const LandingPackage: React.FC = () => {
                                                 }else{
                                                     setValue('numOfMonth', 0)
                                                 }
-                                                isSubmitted && trigger('numOfMonth')
+                                                trigger('numOfMonth')
                                             }} />)}
                                         />
                                         {errors.numOfMonth && <ErrorMessage message={errors.numOfMonth.message} />}
@@ -267,9 +288,10 @@ const LandingPackage: React.FC = () => {
                                             placeholder='Chọn ngày bắt đầu chăm sóc'
                                             locale={locale}
                                             format={CONSTANT.DATE_FORMAT_LIST}
-                                            disabledDate={(current) => current && current.valueOf()  < Date.now().valueOf()}
+                                            disabledDate={disabledDate}
                                             style={{width: '100%'}}
                                             onChange={onChange}
+                                            defaultValue={DateRecommend}
                                         />
                                         {errors.startDate && <ErrorMessage message={errors.startDate.message} />}
                                     </Form.Item>

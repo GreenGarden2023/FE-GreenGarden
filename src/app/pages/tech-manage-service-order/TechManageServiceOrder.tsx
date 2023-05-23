@@ -230,7 +230,7 @@ const TechManageServiceOrder: React.FC = () => {
 
     return (
         <div className='tmso-wrapper'>
-            <HeaderInfor title='Quản lý những yêu cầu chăm sóc cây của bạn' />
+            <HeaderInfor title='Đơn chăm sóc tự chọn' />
             <Filtering 
                 isOrderToDay
                 isNextDay

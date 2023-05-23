@@ -372,7 +372,6 @@ const TechManageServiceOrderDetail: React.FC = () => {
                     orderCode={serviceOrder?.orderCode || ''}
                     serviceCalendar={calendars.filter(x => x.id === actionMethod.orderId)[0]}
                     onClose={handleCloseModal}
-                
                 />
             }
         </div>

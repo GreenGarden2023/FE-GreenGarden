@@ -216,7 +216,7 @@ const ManageRequest: React.FC = () => {
 
     return (
         <div className='mr-wrapper'>
-            <HeaderInfor title='Yêu cầu chăm sóc' />
+            <HeaderInfor title='Yêu cầu chăm sóc cây tự chọn' />
             <Searching 
                 isOrderCode
                 defaultUrl={`/panel/manage-request?page=1`}

@@ -245,7 +245,7 @@ const ManageTakeCareOrder: React.FC = () => {
             key: 'transportFee',
             dataIndex: 'transportFee',
             align:'right',
-            width: 200,
+            width: 170,
             render: (v) => <MoneyFormat value={v} color='Default'  />
         },
         {
@@ -253,7 +253,7 @@ const ManageTakeCareOrder: React.FC = () => {
             key: 'deposit',
             dataIndex: 'deposit',
             align:'right',
-            width: 200,
+            width: 170,
             render: (v) => <MoneyFormat value={v} color='Orange'  />
         },
         
@@ -262,7 +262,7 @@ const ManageTakeCareOrder: React.FC = () => {
             key: 'discountAmount',
             dataIndex: 'discountAmount',
             align:'right',
-            width: 200,
+            width: 170,
             render: (v) => <MoneyFormat value={v} color='Yellow'  />
         },
         {
@@ -270,7 +270,7 @@ const ManageTakeCareOrder: React.FC = () => {
             key: 'totalPrice',
             dataIndex: 'totalPrice',
             align:'right',
-            width: 200,
+            width: 170,
             render: (v) => <MoneyFormat value={v} color='Light Blue'  />
         },
         {
@@ -475,7 +475,7 @@ const ManageTakeCareOrder: React.FC = () => {
                         className='table' 
                         columns={ColumnServiceOrder} 
                         dataSource={DataSourceServiceOrder} 
-                        scroll={{ y: 680, x: 3000 }}
+                        scroll={{ y: 680, x: 2800 }}
                         loading={loading}
                         pagination={{
                             current: paging.curPage,

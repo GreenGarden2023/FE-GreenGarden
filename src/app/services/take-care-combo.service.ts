@@ -2,6 +2,7 @@ import { TServicePkgStatus, TStatusPkg } from "app/models/general-type"
 import { Package, PackageHandle, PackageService, PackageServiceAssignHandle, PackageServiceHandle, PackageServiceStatusHandle } from "app/models/package"
 import { Response } from "app/models/response"
 import golbalAxios from "app/utils/http-client"
+import queryString from "query-string"
 
 const getAllTakeCareCombo = async (status: TStatusPkg) =>{
     const res = await golbalAxios.get<Response<Package[]>>(`/takecare-combo/get-all-takecare-combo?status=${status}`)
@@ -40,6 +41,11 @@ const getAllTakeCareComboService = async (status: TServicePkgStatus) =>{
     const res = await golbalAxios.get<Response<PackageService[]>>(`/takecare-combo-service/get-all-takecare-combo-service?status=${status}`)
     return res.data
 }
+const getAllTakeCareComboServiceByTech = async (status: TServicePkgStatus, technicianId: string) =>{
+    const params = { status, technicianId }
+    const res = await golbalAxios.get<Response<PackageService[]>>(`/takecare-combo-service/get-all-takecare-combo-service-by-tech?${queryString.stringify(params)}`)
+    return res.data
+}
 const changeTakeCareComboServiceStatus = async (body: PackageServiceStatusHandle) =>{
     const res = await golbalAxios.post<Response<PackageService>>('/takecare-combo-service/change-takecare-combo-service-status', body)
     return res.data
@@ -52,6 +58,10 @@ const updateTakeCareComboService = async (body: PackageServiceHandle) =>{
     const res = await golbalAxios.post<Response<PackageService>>('/takecare-combo-service/update-takecare-combo-service', body)
     return res.data
 }
+const cancelTakeCareComboService = async (takecareComboServiceId: string, cancelReason: string) =>{
+    const res = await golbalAxios.post<Response<PackageService>>('/takecare-combo-service/cancel-takecare-combo-service', {takecareComboServiceId, cancelReason})
+    return res.data
+}
 
 const takeCareComboService = {
     getAllTakeCareCombo,
@@ -61,10 +71,12 @@ const takeCareComboService = {
     // -----
     createTakeCareComboService,
     getATakeCareComboService,
+    getAllTakeCareComboServiceByTech,
     getAllTakeCareComboService,
     changeTakeCareComboServiceStatus,
     assignTakeCareComboServiceTechnician,
     updateTakeCareComboService,
+    cancelTakeCareComboService
 }
 
 export default takeCareComboService

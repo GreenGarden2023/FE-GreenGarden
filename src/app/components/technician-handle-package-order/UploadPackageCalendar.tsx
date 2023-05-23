@@ -1,29 +1,64 @@
 import { Button, DatePicker, DatePickerProps, Form, Image, Input, Modal } from 'antd'
-import locale from 'antd/es/date-picker/locale/vi_VN'
 import useDispatch from 'app/hooks/use-dispatch'
-import { ServiceOrderDetail } from 'app/models/service'
+import { PackageOrder } from 'app/models/package'
 import { CalendarUpdate, ServiceCalendar } from 'app/models/service-calendar'
-import fileService from 'app/services/file.service'
-import serviceCalendar from 'app/services/service-calendar.service'
-import uploadService from 'app/services/upload.service'
-import { setNoti } from 'app/slices/notification'
-import CONSTANT from 'app/utils/constant'
 import utilDateTime from 'app/utils/date-time'
+import React, { useMemo, useRef, useState } from 'react'
 import dayjs, { Dayjs } from 'dayjs'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { AiOutlineCloudUpload } from 'react-icons/ai'
-import { GrFormClose, GrFormNext, GrFormPrevious } from 'react-icons/gr'
 import Slider from "react-slick"
-import './style.scss'
+import { GrFormClose, GrFormNext, GrFormPrevious } from 'react-icons/gr'
+import CONSTANT from 'app/utils/constant'
+import locale from 'antd/es/date-picker/locale/vi_VN'
+import fileService from 'app/services/file.service'
+import { setNoti } from 'app/slices/notification'
+import uploadService from 'app/services/upload.service'
+import takeComboOrderService from 'app/services/take-combo-order.service'
 
-interface UploadCalendarProps{
-    serviceCalendarDetail: ServiceCalendar
-    serviceOrderDetail: ServiceOrderDetail
+interface UploadPackageCalendarProps{
+    pkgOrder: PackageOrder
+    serviceCalendar: ServiceCalendar
     onClose: () => void
     onSubmit: (prev: ServiceCalendar, next?: ServiceCalendar) => void
 }
 
-const UploadCalendar: React.FC<UploadCalendarProps> = ({ serviceCalendarDetail, serviceOrderDetail, onClose, onSubmit }) => {
+const settings = {
+    dots: false,
+    speed: 500,
+    slidesToShow: 5,
+    slidesToScroll: 1,
+    infinite: false,
+    prevArrow: <GrFormPrevious />,
+    nextArrow: <GrFormNext />,
+    responsive: [
+        {
+          breakpoint: 1024,
+          settings: {
+            slidesToShow: 3,
+            slidesToScroll: 3,
+            infinite: true,
+            dots: true
+          }
+        },
+        {
+          breakpoint: 600,
+          settings: {
+            slidesToShow: 2,
+            slidesToScroll: 2,
+            initialSlide: 2
+          }
+        },
+        {
+          breakpoint: 480,
+          settings: {
+            slidesToShow: 2,
+            slidesToScroll: 1
+          }
+        }
+      ]
+};
+
+const UploadPackageCalendar: React.FC<UploadPackageCalendarProps> = ({pkgOrder, serviceCalendar, onClose, onSubmit}) => {
     const dispatch = useDispatch()
 
     const ref = useRef<HTMLInputElement>(null);
@@ -31,24 +66,11 @@ const UploadCalendar: React.FC<UploadCalendarProps> = ({ serviceCalendarDetail, 
     const [sumary, setSumary] = useState('')
     const [date, setDate] = useState<Dayjs | null>(null)
     const [loading, setLoading] = useState(false)
-
+    
     const IsEndDate = useMemo(() =>{
-        return (dayjs(new Date()).valueOf() >= dayjs(serviceOrderDetail.serviceEndDate).valueOf()) ||
-        (dayjs(serviceCalendarDetail.serviceDate).valueOf() >= dayjs(serviceOrderDetail.serviceEndDate).valueOf())
-    }, [serviceOrderDetail.serviceEndDate, serviceCalendarDetail.serviceDate])
-
-    useEffect(() =>{
-
-        const currentDate = new Date(serviceCalendarDetail.serviceDate)
-
-        if(IsEndDate){
-            setDate(null)
-            return;
-        }
-
-        currentDate.setDate(currentDate.getDate() + 1)
-        setDate(dayjs(currentDate))
-    }, [serviceCalendarDetail.serviceDate, serviceOrderDetail.serviceEndDate, IsEndDate])
+        return (dayjs(new Date()).valueOf() >= dayjs(pkgOrder.serviceEndDate).valueOf()) ||
+        (dayjs(serviceCalendar.serviceDate).valueOf() >= dayjs(pkgOrder.serviceEndDate).valueOf())
+    }, [pkgOrder.serviceEndDate, serviceCalendar.serviceDate])
 
     const handleUploadFile = async (e: React.ChangeEvent<HTMLInputElement>) =>{
         const files = e.target.files
@@ -71,7 +93,6 @@ const UploadCalendar: React.FC<UploadCalendarProps> = ({ serviceCalendarDetail, 
         images.splice(index, 1)
         setImages([...images])
     }
-
     const handleChangeDateUpdateCalendar: DatePickerProps['onChange'] = (date, dateString) =>{
         setDate(date)
     }
@@ -97,19 +118,17 @@ const UploadCalendar: React.FC<UploadCalendarProps> = ({ serviceCalendarDetail, 
         return true
     }
 
-    
-
     const handleUploadCalendar = async () =>{
         if(!isValidBeforeSubmit()) return;
         setLoading(true)
         try{
             const body: CalendarUpdate = {
                 images,
-                nextServiceDate: !IsEndDate ? utilDateTime.dayjsToLocalString(dayjs(date)) : null,
-                serviceCalendarId: serviceCalendarDetail.id,
+                nextServiceDate: !IsEndDate ? utilDateTime.dayjsToLocalStringTemp(dayjs(date)) : undefined,
+                serviceCalendarId: serviceCalendar.id,
                 sumary
             }
-            const res = await serviceCalendar.createServiceCalendar({calendarUpdate: body})
+            const res = await takeComboOrderService.uploadCalendar(body)
 
             onSubmit(res.data.previousCalendar, res.data.nextCalendar)
             dispatch(setNoti({type: 'success', message: 'Cập nhật lịch chăm sóc thành công'}))
@@ -119,52 +138,16 @@ const UploadCalendar: React.FC<UploadCalendarProps> = ({ serviceCalendarDetail, 
         }
         setLoading(false)
     }
-
-    const settings = {
-        dots: false,
-        speed: 500,
-        slidesToShow: 5,
-        slidesToScroll: 1,
-        infinite: false,
-        prevArrow: <GrFormPrevious />,
-        nextArrow: <GrFormNext />,
-        responsive: [
-            {
-              breakpoint: 1024,
-              settings: {
-                slidesToShow: 3,
-                slidesToScroll: 3,
-                infinite: true,
-                dots: true
-              }
-            },
-            {
-              breakpoint: 600,
-              settings: {
-                slidesToShow: 2,
-                slidesToScroll: 2,
-                initialSlide: 2
-              }
-            },
-            {
-              breakpoint: 480,
-              settings: {
-                slidesToShow: 2,
-                slidesToScroll: 1
-              }
-            }
-          ]
-    };
-
     return (
         <Modal
             open
-            title={`Cập nhật báo cáo cho ngày chăm sóc "${utilDateTime.dateToString(serviceCalendarDetail.serviceDate.toString())}"`}
+            title={`Cập nhật báo cáo cho ngày chăm sóc (${utilDateTime.dateToString(serviceCalendar.serviceDate.toString())})`}
             onCancel={onClose}
             footer={false}
             width={1000}
         >
             <Form
+                labelAlign='left'
                 layout='vertical'
                 onFinish={handleUploadCalendar}
             >
@@ -198,12 +181,11 @@ const UploadCalendar: React.FC<UploadCalendarProps> = ({ serviceCalendarDetail, 
                         <DatePicker
                             locale={locale} 
                             format={CONSTANT.DATE_FORMAT_LIST}
-                            disabledDate={(current) => current && (current.valueOf()  <= dayjs(serviceCalendarDetail.serviceDate).valueOf() ||
-                            current.valueOf() > dayjs(serviceOrderDetail.serviceEndDate).valueOf())}
+                            disabledDate={current => utilDateTime.disableDateCalendar(current, serviceCalendar.serviceDate, pkgOrder.serviceEndDate)}
                             onChange={handleChangeDateUpdateCalendar}
                             style={{width: 250}}
                             value={date}
-                            disabled={dayjs(new Date()).valueOf() >= dayjs(serviceOrderDetail.serviceEndDate).valueOf()}
+                            disabled={dayjs(new Date()).valueOf() >= dayjs(pkgOrder.serviceEndDate).valueOf()}
                         />
                     </Form.Item>
                 }
@@ -218,4 +200,4 @@ const UploadCalendar: React.FC<UploadCalendarProps> = ({ serviceCalendarDetail, 
     )
 }
 
-export default UploadCalendar
+export default UploadPackageCalendar

@@ -88,20 +88,6 @@ const ServiceReportDetail: React.FC<ServiceReportDetailProps> = ({orderCode, ser
                                     }
                                 </Slider>
                             }
-                            {/* {
-                                (serviceCalendar && serviceCalendar.images.length <= 4) &&
-                                <Image.PreviewGroup>
-                                    {
-                                        serviceCalendar.images.map((x, index) => (
-                                            <Image 
-                                                src={x}
-                                                key={index}
-                                                className='image-item'
-                                            />
-                                        ))
-                                    }
-                                </Image.PreviewGroup>
-                            } */}
                         </div>
                     </>
                 }

@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 
-const dateToString = (date: string) =>{
+const dateToString = (date: string | Date) =>{
     const d = new Date(date)
     const result = dayjs(d).format('DD/MM/YYYY')
     return result
@@ -45,6 +45,17 @@ const plusDate = (date: Date | string, plusNumber: number) =>{
     return current
 }
 
+const disableDateCalendar = (current: dayjs.Dayjs, serviceDateToday: Date, serviceDateEnd: Date) =>{
+    const calendarToday = new Date(serviceDateToday)
+    calendarToday.setDate(calendarToday.getDate() + 1)
+
+    const calendarEnd = new Date(serviceDateEnd)
+    calendarEnd.setDate(calendarEnd.getDate() + 1)
+
+
+    return current && (current.valueOf() < calendarToday.valueOf() || current.valueOf() > calendarEnd.valueOf())
+}
+
 const utilDateTime = {
     dateToString,
     isDisplayExtendRentOrder,
@@ -52,7 +63,8 @@ const utilDateTime = {
     dateTimeToString,
     dayjsToLocalString,
     plusDate,
-    dayjsToLocalStringTemp
+    dayjsToLocalStringTemp,
+    disableDateCalendar
 }
 
 export default utilDateTime;

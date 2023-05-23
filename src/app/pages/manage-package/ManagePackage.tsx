@@ -53,7 +53,8 @@ const ManagePackage: React.FC = () => {
         {
             title: 'Cam kết',
             key: 'guarantee',
-            dataIndex: 'guarantee'
+            dataIndex: 'guarantee',
+            render: (v) => <p className='manage-guarantee'>{v}</p>
         },
         {
             title: 'Trạng thái',

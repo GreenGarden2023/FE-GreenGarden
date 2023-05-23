@@ -2,6 +2,7 @@ import { Popover, Table } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import AssignServicePackage from 'app/components/assign-service-package/AssignServicePackage'
 import ConfirmmationServicePackage from 'app/components/confirmation-service-package/ConfirmmationServicePackage'
+import CreatePackageOrder from 'app/components/create-package-order/CreatePackageOrder'
 import DetailPackageService from 'app/components/detail-package-service/DetailPackageService'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import TechnicianName from 'app/components/renderer/technician/TechnicianName'
@@ -219,6 +220,14 @@ const ManageTakeCarePackage: React.FC = () => {
         setPkgServices([...pkgServices])
     }
 
+    const handleCreateOrder = () =>{
+        // const [pkgService] = pkgServices.filter(x => x.id === actionMethod?.orderId)
+
+        // pkgService.status = ''
+
+        setPkgServices([...pkgServices])
+    }
+
     return (
         <div className='mtcp-wrapper'>
             <HeaderInfor title='Quản lý yêu cầu chăm sóc theo gói' />
@@ -251,6 +260,10 @@ const ManageTakeCarePackage: React.FC = () => {
             {
                 (actionMethod?.actionType === 'update infor' && PkgServiceSelect) &&
                 <UpdatePackageService pkgService={PkgServiceSelect} onClose={handleClose} onSubmit={handleUpdatePkgRequest} />
+            }
+            {
+                (actionMethod?.actionType === 'create order' && PkgServiceSelect) &&
+                <CreatePackageOrder pkgService={PkgServiceSelect} onClose={handleClose} onSubmit={handleCreateOrder} />
             }
         </div>
     )
