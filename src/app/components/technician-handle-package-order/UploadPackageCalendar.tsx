@@ -131,7 +131,7 @@ const UploadPackageCalendar: React.FC<UploadPackageCalendarProps> = ({pkgOrder, 
             const res = await takeComboOrderService.uploadCalendar(body)
 
             onSubmit(res.data.previousCalendar, res.data.nextCalendar)
-            dispatch(setNoti({type: 'success', message: 'Cập nhật lịch chăm sóc thành công'}))
+            dispatch(setNoti({type: 'success', message: 'Đăng tải báo cáo và cập nhật lịch chăm sóc thành công'}))
             onClose()
         }catch(e){
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))

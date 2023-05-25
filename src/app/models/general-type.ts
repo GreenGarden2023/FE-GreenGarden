@@ -15,6 +15,6 @@ export type TakeCareStatus = 'pending' | 'done'
 // ---- package
 export type TStatusPkg = 'active' | 'disabled' | 'all'
 // service
-export type TServicePkgStatus = 'pending' | 'accepted' | 'rejected' | 'taking care' | 'all'
+export type TServicePkgStatus = 'pending' | 'accepted' | 'rejected' | 'taking care' | 'reprocess' | 'cancel' | 'completed' | 'all'
 // order
 export type TPackageOrderStatus = 'unpaid' | 'ready' | 'paid' | 'completed' | 'cancel' | 'all'

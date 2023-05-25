@@ -1,4 +1,5 @@
 import { OrderStatus, ServiceStatus } from "./general-type"
+import { TakecareComboOrder } from "./package"
 import { Paging } from "./paging"
 import { User } from "./user"
 
@@ -75,6 +76,7 @@ export interface Service {
     nameCancelBy: string
     reason: string
     serviceDetailList: ServiceDetailList[]
+    takecareComboOrder: TakecareComboOrder
 }
   
 export interface ServiceDetailList {
@@ -171,6 +173,7 @@ export interface ServiceRequest{
     nameCancelBy: string;
     reason: string;
     serviceOrderID: string;
+    takecareComboOrder: TakecareComboOrder
 }
 
 export interface ServiceRequestResponse{

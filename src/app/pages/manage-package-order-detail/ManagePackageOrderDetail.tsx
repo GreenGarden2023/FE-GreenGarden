@@ -8,6 +8,7 @@ import { ServiceCalendar } from 'app/models/service-calendar';
 import takeComboOrderService from 'app/services/take-combo-order.service';
 import React, { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom';
+import './style.scss'
 
 const ManagePackageOrderDetail: React.FC = () => {
     const { orderId } = useParams();
@@ -63,19 +64,19 @@ const ManagePackageOrderDetail: React.FC = () => {
     }, [pkgOrder])
 
     const handleCreateFirstCalendar = () =>{
-        setActionMethod({orderId: '', actionType: 'create calendar', openIndex: -1, orderType: 'service'})
+        setActionMethod({orderId: '', actionType: 'create calendar', openIndex: -1, orderType: 'package'})
     }
 
     const handleCloseModal = () =>{
         setActionMethod(undefined)
     }
 
-    const createFirstCalendar = (pkgOrderCreate: PackageOrder) =>{
-        setPkgOrder(pkgOrderCreate)
+    const createFirstCalendar = (serviceCalendar: ServiceCalendar) =>{
+        setServiceCalendars([serviceCalendar])
     }
 
     return (
-        <div>
+        <div className='manage-package-order-detail'>
             <section className="default-layout">
                 {
                     PkgDetail && <PackageDetail pkg={PkgDetail} />
@@ -86,15 +87,19 @@ const ManagePackageOrderDetail: React.FC = () => {
                     pkgOrder && <UserInfoPackageOrder pkgOrder={pkgOrder} />
                 }
             </section>
-            <section className="default-layout">
-                <h3>Bạn chưa có lịch chăm sóc nào. Hãy tạo mới 1 lịch chăm sóc</h3>
-                <button onClick={handleCreateFirstCalendar}>Tạo mới 1 lịch chăm sóc</button>
-            </section>
-            <section className="default-layout">
-                {
-                    (pkgOrder && serviceCalendars.length !== 0) && <TablePackageCalendar pkgOrder={pkgOrder} serviceCalendars={serviceCalendars} />
-                }
-            </section>
+            {
+                (pkgOrder && pkgOrder.status !== 'unpaid' && serviceCalendars.length === 0) &&
+                <section className="default-layout first-calendar">
+                    <h3>Bạn chưa có lịch chăm sóc nào. Hãy tạo mới 1 lịch chăm sóc</h3>
+                    <button className='btn btn-create' onClick={handleCreateFirstCalendar}>Tạo mới 1 lịch chăm sóc</button>
+                </section>
+            }
+            {
+                (pkgOrder && serviceCalendars.length !== 0) &&
+                <section className="default-layout">
+                    <TablePackageCalendar pkgOrder={pkgOrder} serviceCalendars={serviceCalendars} />
+                </section>
+            }
             {
                 (actionMethod?.actionType === 'create calendar' && pkgOrder) &&
                 <CreatePackageCalendar pkgOrder={pkgOrder} onClose={handleCloseModal} onSubmit={createFirstCalendar} />

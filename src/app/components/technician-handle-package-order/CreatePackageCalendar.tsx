@@ -7,13 +7,13 @@ import dayjs, { Dayjs } from 'dayjs'
 import utilDateTime from 'app/utils/date-time';
 import useDispatch from 'app/hooks/use-dispatch';
 import { setNoti } from 'app/slices/notification';
-import { CalendarInitial } from 'app/models/service-calendar';
+import { CalendarInitial, ServiceCalendar } from 'app/models/service-calendar';
 import takeComboOrderService from 'app/services/take-combo-order.service';
 
 interface CreatePackageCalendarProps{
     pkgOrder: PackageOrder
     onClose: () => void;
-    onSubmit: (pkgOrder: PackageOrder) => void;
+    onSubmit: (serviceCalendar: ServiceCalendar) => void;
 }
 
 const CreatePackageCalendar: React.FC<CreatePackageCalendarProps> = ({ pkgOrder, onClose, onSubmit }) => {
@@ -44,7 +44,7 @@ const CreatePackageCalendar: React.FC<CreatePackageCalendarProps> = ({ pkgOrder,
             }
             const res = await takeComboOrderService.createFirstCalendar(data)
             if(res.isSuccess){
-                onSubmit(pkgOrder)
+                onSubmit(res.data)
                 dispatch(setNoti({type: 'success', message: 'Tạo mới ngày chăm sóc đầu tiên thành công'}))
                 onClose()
             }

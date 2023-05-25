@@ -66,6 +66,7 @@ const MANAGE_ORDER: Role[] = ['Manager']
 const MANAGE_SHIPPING_FEE: Role[] = ['Admin']
 const MANAGE_USERS: Role[] = ['Admin']
 const TAKE_CARE_ORDER: Role[] = ['Technician']
+const MANAGE_REVENUE: Role[] = ['Admin']
 
 const PAYMENT_MESSAGE = {
     PAID_DEPOSIT: 'Đơn hàng này đã thanh toán tiền cọc',
@@ -108,6 +109,7 @@ const CONSTANT = {
     MANAGE_PRODUCT_ITEM,
     MANAGE_SIZE,
     MANAGE_ORDER,
+    MANAGE_REVENUE,
     PAYMENT_MESSAGE,
     MANAGE_SHIPPING_FEE,
     TAKE_CARE_ORDER,

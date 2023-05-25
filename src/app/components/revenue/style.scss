@@ -1,0 +1,44 @@
+@import 'app/styles/variable.scss';
+
+.rev-first{
+    h1{
+        width: fit-content;
+        margin: 0 auto 20px auto;
+        font-size: 30px;
+        color: $default-green;
+        position: relative;
+        &::after{
+            position: absolute;
+            content: '';
+            height: 3px;
+            width: 500px;
+            background-color: $color-link;
+            bottom: -10px;
+            left: calc(50% - 250px);
+        }
+    }
+    .rev-f-wrapper{
+        display: flex;
+        gap: 10px;
+    }
+    .bg-purple{
+        background-color: #4767c9;
+    }
+    .rev-f-item{
+        width: 20%;
+        border-radius: 5px;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+    .rev-f-icon{
+        color: #fff;
+        font-size: 36px;
+    }
+    .rev-f-text{
+        color: #fff;
+        font-size: 30px;
+    }
+}

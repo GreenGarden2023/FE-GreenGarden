@@ -52,6 +52,8 @@ import ManagePackage from 'app/pages/manage-package/ManagePackage';
 import ManagePackageRequest from 'app/pages/manage-package-request/ManagePackageRequest';
 import ManagePackageOrder from 'app/pages/manage-package-order/ManagePackageOrder';
 import ManagePackageOrderDetail from 'app/pages/manage-package-order-detail/ManagePackageOrderDetail';
+import ClientManagePackageOrderDetail from 'app/pages/client-manage-package-order-detail/ClientManagePackageOrderDetail';
+import ManageRevenue from 'app/pages/manage-revenue/ManageRevenue';
 
 const Routers: React.FC = () =>{
     const dispatch = useDispatch();
@@ -139,7 +141,11 @@ const Routers: React.FC = () =>{
                 <Route path='/take-care-service' element={<ClientTakeCareService />} />
                 <Route path='/take-care-service/me' element={<AuthGuard rolesAuth={['Customer']} ><ClientManageTakeCareService /></AuthGuard>} />
                 <Route path='/take-care-service/me/:serviceId' element={<AuthGuard rolesAuth={['Customer']} ><ClientTakeCareServiceConfirm /></AuthGuard>} />
+                {/* tự chọn */}
                 <Route path='/order/service/:orderId' element={<AuthGuard rolesAuth={['Customer']} ><ClientManageTakeCareServiceDetail /></AuthGuard>} />
+                {/* theo gói */}
+                <Route path='/order/package/:orderId' element={<AuthGuard rolesAuth={['Customer']} ><ClientManagePackageOrderDetail /></AuthGuard>} />
+
                 <Route path='/checkout-success' element={<CheckoutSuccess />} />
 
                 <Route path='panel' >
@@ -167,6 +173,9 @@ const Routers: React.FC = () =>{
                     <Route path='take-care-order' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageTakeCareOrder /></AdminRoute></AuthGuard>} />
                     <Route path='manage-take-care-package' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><ManageTakeCarePackage /></AdminRoute></AuthGuard>} />
                     <Route path='take-care-order-package' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_ORDER} ><AdminRoute><TakeCareOrderPackage /></AdminRoute></AuthGuard>} />
+
+                    {/* revenue */}
+                    <Route path='manage-revenue' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_REVENUE} ><AdminRoute><ManageRevenue /></AdminRoute></AuthGuard>} />
 
                     <Route path='users' element={<AuthGuard rolesAuth={CONSTANT.MANAGE_USERS} ><AdminRoute><UserPage /></AdminRoute></AuthGuard>} />
                 </Route>

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import CurrencyFormat from 'react-currency-format'
 import './style.scss';
 
-type Color = 'Orange' | 'Green' | 'Blue' | 'Light Blue' | 'Yellow' | 'Default'
+type Color = 'Orange' | 'Green' | 'Blue' | 'Light Blue' | 'Yellow' | 'White' | 'Default'
 
 interface MoneyFormatProps{
   value: string | number
@@ -20,6 +20,7 @@ const MoneyFormat: React.FC<MoneyFormatProps> = ({value, isHighlight = false, co
       case 'Light Blue': return '#2db7f5'
       case 'Blue' : return '#108ee9'
       case 'Yellow': return '#FFC125'
+      case 'White': return '#FFF'
       default: return '#707070'
     }
   }, [color])

@@ -6,6 +6,7 @@ import CreatePackageOrder from 'app/components/create-package-order/CreatePackag
 import DetailPackageService from 'app/components/detail-package-service/DetailPackageService'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import TechnicianName from 'app/components/renderer/technician/TechnicianName'
+import PackageServiceStatusComp from 'app/components/status/PackageServiceStatusComp'
 import UpdatePackageService from 'app/components/update-package-service/UpdatePackageService'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
 import { PackageService } from 'app/models/package'
@@ -72,7 +73,7 @@ const ManageTakeCarePackage: React.FC = () => {
             key: 'status',
             dataIndex: 'status',
             width: 200,
-            // render: (v) => (<ServiceStatusComp status={v} />)
+            render: (v) => (<PackageServiceStatusComp status={v} />)
         },
         {
             title: 'Người chăm sóc',
@@ -129,7 +130,7 @@ const ManageTakeCarePackage: React.FC = () => {
                     <span>Chi tiết dịch vụ</span>
                 </div>
                 {
-                    record.status === 'pending' &&
+                    (record.status === 'pending' || record.status === 'reprocess') &&
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.id, actionType: 'accept service', orderType: 'service', openIndex: -1})
                     }}>
@@ -138,7 +139,7 @@ const ManageTakeCarePackage: React.FC = () => {
                     </div>
                 }
                 {
-                    record.status === 'pending' &&
+                    (record.status === 'pending' || record.status === 'reprocess') &&
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.id, actionType: 'reject service', orderType: 'service', openIndex: -1})
                     }}>
@@ -221,9 +222,9 @@ const ManageTakeCarePackage: React.FC = () => {
     }
 
     const handleCreateOrder = () =>{
-        // const [pkgService] = pkgServices.filter(x => x.id === actionMethod?.orderId)
+        const [pkgService] = pkgServices.filter(x => x.id === actionMethod?.orderId)
 
-        // pkgService.status = ''
+        pkgService.status = 'taking care'
 
         setPkgServices([...pkgServices])
     }

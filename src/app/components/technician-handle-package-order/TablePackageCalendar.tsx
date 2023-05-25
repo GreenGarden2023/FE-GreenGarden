@@ -18,9 +18,10 @@ import dayjs from 'dayjs'
 interface TablePackageCalendarProps{
     pkgOrder: PackageOrder
     serviceCalendars: ServiceCalendar[]
+    isClient?: boolean
 }
 
-const TablePackageCalendar: React.FC<TablePackageCalendarProps> = ({ pkgOrder, serviceCalendars }) => {
+const TablePackageCalendar: React.FC<TablePackageCalendarProps> = ({ pkgOrder, serviceCalendars, isClient }) => {
     console.log(serviceCalendars)
     const [calendars, setCalendars] = useState<ServiceCalendar[]>(serviceCalendars)
     console.log(calendars)
@@ -82,17 +83,14 @@ const TablePackageCalendar: React.FC<TablePackageCalendarProps> = ({ pkgOrder, s
     const contextCalendar = (record) =>{
         return (
             <div className='context-menu-wrapper'>
+                <div className="item" onClick={() => {
+                    setActionMethod({orderId: record.id, actionType: 'detail', orderType: 'service', openIndex: -1})
+                }}>
+                    <BiDetail size={25} className='icon'/>
+                    <span>Chi tiết báo cáo</span>
+                </div>
                 {
-                    <div className="item" onClick={() => {
-                        setActionMethod({orderId: record.id, actionType: 'detail', orderType: 'service', openIndex: -1})
-                    }}>
-                        <BiDetail size={25} className='icon'/>
-                        <span>Chi tiết báo cáo</span>
-                    </div>
-                }
-                {
-                    // 
-                    (record.status === 'pending' && dayjs(new Date()).valueOf() >= dayjs(record.serviceDate).valueOf()) &&
+                    (record.status === 'pending' && dayjs(new Date()).valueOf() >= dayjs(record.serviceDate).valueOf() && !isClient) &&
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.id, actionType: 'update calendar', orderType: 'service', openIndex: -1})
                     }}>

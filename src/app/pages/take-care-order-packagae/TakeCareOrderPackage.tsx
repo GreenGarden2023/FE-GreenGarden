@@ -11,6 +11,7 @@ import TransactionDetail from 'app/components/modal/transaction-detail/Transacti
 import MoneyFormat from 'app/components/money/MoneyFormat'
 import TechnicianName from 'app/components/renderer/technician/TechnicianName'
 import Transport from 'app/components/renderer/transport/Transport'
+import PackageServiceOrderStatusComp from 'app/components/status/PackageServiceOrderStatusComp'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
 import { PackageOrder } from 'app/models/package'
 import { Paging } from 'app/models/paging'
@@ -101,7 +102,7 @@ const TakeCareOrderPackage: React.FC = () => {
             key: 'status',
             dataIndex: 'status',
             width: 200,
-            // render: (v) => (<OrderStatusComp status={v} />)
+            render: (v) => (<PackageServiceOrderStatusComp status={v} />)
         },
         {
             title: 'Nơi chăm sóc',

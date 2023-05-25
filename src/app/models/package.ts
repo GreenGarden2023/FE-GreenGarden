@@ -38,6 +38,7 @@ export interface PackageService{
     isAtShop: boolean
     numOfMonths: number
     status: TServicePkgStatus
+    takecareComboOrder: TakecareComboOrder
 }
 
 export interface PackageServiceHandle{
@@ -83,4 +84,20 @@ export interface PackageOrder{
 export interface PackageGetAll{
     paging: Paging
     takecareComboOrderList: PackageOrder[]
+}
+
+export interface TakecareComboOrder {
+    id: string
+    orderCode: string
+    createDate: Date
+    serviceStartDate: Date
+    serviceEndDate: Date
+    deposit: number
+    totalPrice: number
+    remainAmount: number
+    technicianId: string
+    userId: string
+    status: TPackageOrderStatus
+    description: string
+    cancelBy: string
 }

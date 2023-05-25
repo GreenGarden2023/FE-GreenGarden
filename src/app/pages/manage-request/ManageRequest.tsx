@@ -198,12 +198,13 @@ const ManageRequest: React.FC = () => {
 
         const { id, address, createDate, districtID, email, endDate, isTransport, name, phone,
         rewardPointUsed, rules, serviceCode, serviceDetailList, startDate, status, technician, technicianName,
-        transportFee, user, userCurrentPoint, cancelBy, nameCancelBy, reason, serviceOrderID } = request
+        transportFee, user, userCurrentPoint, cancelBy, nameCancelBy, reason, serviceOrderID, takecareComboOrder } = request
 
         const data: Service = {
             address, cancelBy, createDate, districtID, email, endDate, id, isTransport, name, nameCancelBy,
             phone, reason, rewardPointUsed, rules, serviceCode, serviceDetailList, serviceOrderID, startDate,
-            status, technicianID: technician.technicianID, technicianName, transportFee, userCurrentPoint, userId: user.id
+            status, technicianID: technician.technicianID, technicianName, transportFee, userCurrentPoint, userId: user.id,
+            takecareComboOrder
         }
 
         return data

@@ -1,9 +1,9 @@
 import { Response } from "app/models/response";
-import { CreateFirstCalendarResponse, CreateServiceCalendar, CreateServiceResponse, ServiceCalendar } from "app/models/service-calendar";
+import { CreateServiceCalendar, CreateServiceResponse, ServiceCalendar } from "app/models/service-calendar";
 import golbalAxios from "../utils/http-client";
 
 const initialServiceCalendar = async (data: CreateServiceCalendar) =>{
-    const res = await golbalAxios.post<Response<CreateFirstCalendarResponse>>('/service-calendar/create-service-calendar', data)
+    const res = await golbalAxios.post<Response<ServiceCalendar>>('/service-calendar/create-service-calendar', data)
     return res.data
 }
 

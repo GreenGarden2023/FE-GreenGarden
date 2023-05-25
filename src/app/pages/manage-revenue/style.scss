@@ -1,0 +1,51 @@
+@import 'app/styles/variable.scss';
+
+.rev-wrapper{
+    .rev-select{
+        display: flex;
+        gap: 20px;
+    }
+    .rev-item{
+        width: 25%;
+        border: 2px solid #becbbe;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        border-radius: 5px;
+        padding: 10px;
+        text-align: center;
+        cursor: pointer;
+        &.active{
+            background-color: $default-green;
+            border-color: $default-green;
+            .rev-text{
+                color: #fff;
+            }
+            .rev-icon{
+                color: #fff;
+            }
+        }
+    }
+    .rev-text{
+        font-weight: 500;
+        font-size: 26px;
+        color: #5b665b;
+    }
+    .rev-icon{
+        font-size: 56px;
+        color: #5b665b;
+    }
+    .rev-date-time{
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        gap: 20px;
+    }
+    .rev-date-time-block{
+        p{
+            color: $soft-text;
+        }
+    }
+    .rev-date{
+        margin-top: 5px;
+        height: 40px;
+    }
+}

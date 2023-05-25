@@ -1,0 +1,14 @@
+@import 'app/styles/variable.scss';
+
+.manage-package-order-detail{
+    .first-calendar{
+        display: flex;
+        gap: 10px;
+        flex-direction: column;
+        align-items: center;
+        h3{
+            color: $default-green;
+            font-size: 28px;
+        }
+    }
+}

@@ -4,7 +4,6 @@ import { Paging } from "app/models/paging"
 import { Response } from "app/models/response"
 import { CalendarUpdate, CreateServiceResponse, ServiceCalendar } from "app/models/service-calendar"
 import { CalendarInitial } from "app/models/service-calendar"
-import { CreateFirstCalendarResponse } from "app/models/service-calendar"
 import golbalAxios from "app/utils/http-client"
 import queryString from "query-string"
 
@@ -60,7 +59,7 @@ const orderPaymentMomo = async (orderId: string, amount: number, paymentType: 'w
 // ----------------------------------------------------------------------------------------------------------------------------
 const baseUrlCalendar = '/takecare-service-calendar'
 const createFirstCalendar = async (calendarInitial: CalendarInitial) =>{
-    const res = await golbalAxios.post<Response<CreateFirstCalendarResponse>>(`${baseUrlCalendar}/create-service-calendar`, { calendarInitial })
+    const res = await golbalAxios.post<Response<ServiceCalendar>>(`${baseUrlCalendar}/create-service-calendar`, { calendarInitial })
     return res.data
 }
 const uploadCalendar = async (calendarUpdate: CalendarUpdate) =>{

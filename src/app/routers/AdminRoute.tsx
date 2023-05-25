@@ -152,7 +152,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
        CONSTANT.MANAGE_ORDER.includes(roleName as Role) ? getItem('Đơn chăm sóc', '13', <BiCategoryAlt size={18} />, childrenRequest) : null,
        CONSTANT.TAKE_CARE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/manage-package-order'>ĐCS theo gói</Link>, '18', <MdOutlineInventory2 size={18} />) : null,
        CONSTANT.TAKE_CARE_ORDER.includes(roleName as Role) ? getItem(<Link to='/panel/manage-package-request'>YCCS theo gói</Link>, '19', <MdOutlineInventory2 size={18} />) : null,
-
+       CONSTANT.MANAGE_REVENUE.includes(roleName as Role) ? getItem(<Link to='/panel/manage-revenue'>Doanh thu</Link>, '20', <MdOutlineInventory2 size={18} />) : null,
     ];
 
     const handleLogout = () =>{

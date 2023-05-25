@@ -5,6 +5,8 @@ import { Col, Row } from 'antd'
 import utilDateTime from 'app/utils/date-time'
 import './style.scss'
 import MoneyFormat from '../money/MoneyFormat'
+import PackageServiceOrderStatusComp from '../status/PackageServiceOrderStatusComp'
+import PackageServiceStatusComp from '../status/PackageServiceStatusComp'
 
 interface UserInfoPackageServiceProps{
     pkgService: PackageService
@@ -59,7 +61,9 @@ const UserInfoPackageService: React.FC<UserInfoPackageServiceProps> = ({ pkgServ
                         </Col>
                         <Col span={8}>
                             <p className='label'>Trạng thái yêu cầu</p>
-                            <p className='value'>{pkgService.status}</p>
+                            <p className='value' style={{marginTop: '5px'}}>
+                                <PackageServiceStatusComp status={pkgService.status} />
+                            </p>
                         </Col>
                     </Row>
                 </GridConfig>
@@ -139,7 +143,9 @@ export const UserInfoPackageOrder: React.FC<UserInfoPackageOrderProps> = ({pkgOr
                         </Col>
                         <Col span={8}>
                             <p className='label'>Trạng thái đơn hàng</p>
-                            <p className='value'>{pkgOrder.status}</p>
+                            <p className='value' style={{marginTop: '5px'}}>
+                                <PackageServiceOrderStatusComp status={pkgOrder.status} />
+                            </p>
                         </Col>
                     </Row>
                 </GridConfig>

@@ -44,16 +44,32 @@ const PaymentPackageOrder: React.FC<PaymentPackageOrderProps> = ({ pkgOrder, onC
     }
 
     const handleSubmit = async () =>{
+        if(amount < 1000){
+            dispatch(setNoti({type: 'warning', message: `Số tiền thanh toán ít nhất 1000VNĐ`}))
+            return;
+        }
+
+        if(pkgOrder.remainAmount - amount < 1000 && pkgOrder.remainAmount - amount !== 0){
+            dispatch(setNoti({type: 'warning', message: `Số tiền còn lại phải >= 1000VND`}))
+            return;
+        }
+
         setLoadingAction(true)
         try{
             const res = await takeComboOrderService.orderPaymentCash(pkgOrder.id, amount, 'normal')
-            if(res.isSuccess){
+
+            if(!res.isSuccess) return;
+
+            if(amount === pkgOrder.remainAmount){
                 dispatch(setNoti({type: 'success', message: `Thanh toán đủ cho đơn hàng (${pkgOrder.orderCode}) thành công`}))
                 pkgOrder.status = 'paid'
-                pkgOrder.remainAmount = pkgOrder.remainAmount - amount
-                onSubmit(pkgOrder)
-                onClose()
+            }else{
+                dispatch(setNoti({type: 'success', message: `Thanh toán ${amount}VNĐ cho đơn hàng (${pkgOrder.orderCode}) thành công`}))
             }
+
+            pkgOrder.remainAmount = pkgOrder.remainAmount - amount
+            onSubmit(pkgOrder)
+            onClose()
         }catch{
 
         }

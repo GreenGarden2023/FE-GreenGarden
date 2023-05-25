@@ -3,15 +3,20 @@ import React, { useEffect, useMemo, useState } from 'react'
 import takeCareComboService from 'app/services/take-care-combo.service';
 import { Popover, Table } from 'antd';
 import utilDateTime from 'app/utils/date-time';
-import ServiceStatusComp from '../status/ServiceStatusComp';
 import TechnicianName from '../renderer/technician/TechnicianName';
 import { GrMore } from 'react-icons/gr';
 import { PaymentControlState } from 'app/models/payment';
 import { BiCommentDetail, BiDetail } from 'react-icons/bi';
 import { MdCancelPresentation } from 'react-icons/md';
 import { ColumnsType } from 'antd/es/table';
+import PackageServiceStatusComp from '../status/PackageServiceStatusComp';
+import ClientPackageDetail from '../client-package-detail/ClientPackageDetail';
+import ConfirmmationServicePackage from '../confirmation-service-package/ConfirmmationServicePackage';
+import { useNavigate } from 'react-router-dom';
 
 const ClientPackageService: React.FC = () => {
+    const navigate = useNavigate()
+
     const [pkgServices, setPkgServices] = useState<PackageService[]>([])
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
 
@@ -31,14 +36,14 @@ const ClientPackageService: React.FC = () => {
         return (
             <div className='context-menu-wrapper'>
                 <div className="item" onClick={() => {
-                    // handleAction({orderId: record.id, actionType: 'detail', orderType: 'service', openIndex: -1})
+                    setActionMethod({orderId: record.id, actionType: 'detail', orderType: 'service', openIndex: -1})
                     // navigate(`/take-care-service/me/${record.id}`)
                 }}>
                     <BiDetail size={25} className='icon'/>
                     <span>Chi tiết yêu cầu</span>
                 </div>
                 {
-                    record.status === 'processing' &&
+                    (record.status === 'pending' || record.status === 'reprocess') &&
                     <div className="item" onClick={() => {
                         setActionMethod({orderId: record.id, actionType: 'cancel', orderType: 'service', openIndex: -1})
                     }}>
@@ -47,9 +52,10 @@ const ClientPackageService: React.FC = () => {
                     </div>
                 }
                 {
-                    record.serviceOrderID !== '00000000-0000-0000-0000-000000000000' &&
+                    (record.takecareComboOrder) &&
                     <div className="item" onClick={() => {
-                        // navigate(`/order/service/${record.serviceOrderID}`)
+                        // console.log(record.takecareComboOrder.id)
+                        navigate(`/order/package/${record.takecareComboOrder.id}`)
                         // handleAction({orderId: record.id, actionType: 'detail', orderType: 'service', openIndex: -1})
                     }}>
                         <BiCommentDetail size={25} className='icon'/>
@@ -89,7 +95,7 @@ const ClientPackageService: React.FC = () => {
             key: 'status',
             dataIndex: 'status',
             width: 200,
-            render: (v) => (<ServiceStatusComp status={v} />)
+            render: (v) => (<PackageServiceStatusComp status={v} />)
         },
         {
             title: 'Người chăm sóc',
@@ -135,6 +141,22 @@ const ClientPackageService: React.FC = () => {
         }))
     }, [pkgServices])
 
+    const PkgServiceSelect = useMemo(() =>{
+        const [item] = pkgServices.filter(x => x.id === actionMethod?.orderId)
+        return item
+    }, [pkgServices, actionMethod])
+
+    const handleCloseModal = () =>{
+        setActionMethod(undefined)
+    }
+
+    const handleCancelService = () =>{
+        const [pkgService] = pkgServices.filter(x => x.id === actionMethod?.orderId)
+
+        pkgService.status = 'cancel'
+        setPkgServices([...pkgServices])
+    }
+
     return (
         <section className="default-layout">
             <Table
@@ -143,6 +165,14 @@ const ClientPackageService: React.FC = () => {
                 pagination={false}
                 scroll={{x: 480}}
             />
+            {
+                (actionMethod?.actionType === 'detail' && PkgServiceSelect) &&
+                <ClientPackageDetail pkgService={PkgServiceSelect} onClose={handleCloseModal} />
+            }
+            {
+                (actionMethod?.actionType === 'cancel' && PkgServiceSelect) &&
+                <ConfirmmationServicePackage pkgService={PkgServiceSelect} handler='Reject' onClose={handleCloseModal} onSubmit={handleCancelService}  />
+            }
         </section>
     )
 }

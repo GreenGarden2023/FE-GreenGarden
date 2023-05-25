@@ -4,6 +4,7 @@ import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import MoneyFormat from 'app/components/money/MoneyFormat';
 import TechnicianName from 'app/components/renderer/technician/TechnicianName';
 import Transport from 'app/components/renderer/transport/Transport';
+import PackageServiceOrderStatusComp from 'app/components/status/PackageServiceOrderStatusComp';
 import UserInforTable from 'app/components/user-infor/UserInforTable';
 import useSelector from 'app/hooks/use-selector';
 import { PackageOrder } from 'app/models/package'
@@ -95,7 +96,7 @@ const ManagePackageOrder:React.FC = () => {
             key: 'status',
             dataIndex: 'status',
             width: 200,
-            // render: (v) => (<OrderStatusComp status={v} />)
+            render: (v) => (<PackageServiceOrderStatusComp status={v} />)
         },
         {
             title: 'Nơi chăm sóc',
