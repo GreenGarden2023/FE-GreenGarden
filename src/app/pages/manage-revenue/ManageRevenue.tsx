@@ -11,10 +11,13 @@ import CONSTANT from 'app/utils/constant'
 import utilDateTime from 'app/utils/date-time'
 import RevenueFirst from 'app/components/revenue/RevenueFirst'
 import { RevenueRenderProps } from 'app/models/revenue'
+import RevenueSecond from 'app/components/revenue/RevenueSecond'
+import RevenueThird from 'app/components/revenue/RevenueThird'
+import RevenueFour from 'app/components/revenue/RevenueFour'
 
 const start = new Date()
+start.setMonth(start.getMonth() - 1)
 const end = new Date()
-end.setMonth(end.getMonth() + 1)
 
 const ManageRevenue: React.FC = () => {
 
@@ -84,6 +87,15 @@ const ManageRevenue: React.FC = () => {
             <section className="default-layout">
                 {
                     revType === 1 && <RevenueFirst {...RevDateRange} />
+                }
+                {
+                    revType === 2 && <RevenueSecond {...RevDateRange} />
+                }
+                {
+                    revType === 3 && <RevenueThird {...RevDateRange} />
+                }
+                {
+                    revType === 4 && <RevenueFour {...RevDateRange} />
                 }
             </section>
         </div>

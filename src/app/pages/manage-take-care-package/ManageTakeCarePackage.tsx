@@ -6,9 +6,11 @@ import CreatePackageOrder from 'app/components/create-package-order/CreatePackag
 import DetailPackageService from 'app/components/detail-package-service/DetailPackageService'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import TechnicianName from 'app/components/renderer/technician/TechnicianName'
+import Searching from 'app/components/search-and-filter/search/Searching'
 import PackageServiceStatusComp from 'app/components/status/PackageServiceStatusComp'
 import UpdatePackageService from 'app/components/update-package-service/UpdatePackageService'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
+import useSelector from 'app/hooks/use-selector'
 import { PackageService } from 'app/models/package'
 import { PaymentControlState } from 'app/models/payment'
 import { UserGetByRole } from 'app/models/user'
@@ -22,20 +24,36 @@ import { GrMore } from 'react-icons/gr'
 import { MdCancelPresentation } from 'react-icons/md'
 
 const ManageTakeCarePackage: React.FC = () => {
+    const { search } = useSelector(state => state.SearchFilter)
+
     const [pkgServices, setPkgServices] = useState<PackageService[]>([])
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
 
     useEffect(() =>{
-        const init = async () =>{
-            try{
-                const res = await takeCareComboService.getAllTakeCareComboService('all')
-                setPkgServices(res.data)
-            }catch{
 
+        if(search.isSearching && search.orderCode){
+            const init = async () =>{
+                try{
+                    const res = await takeCareComboService.getTakeCareComboServiceByCode(search.orderCode || '')
+                    setPkgServices([res.data])
+                }catch{
+    
+                }
             }
+            init() 
+        }else{
+            const init = async () =>{
+                try{
+                    const res = await takeCareComboService.getAllTakeCareComboService('all')
+                    setPkgServices(res.data)
+                }catch{
+    
+                }
+            }
+            init() 
         }
-        init() 
-    }, [])
+
+    }, [search.isSearching, search.orderCode])
 
     const Column: ColumnsType<any> = [
         {
@@ -232,6 +250,10 @@ const ManageTakeCarePackage: React.FC = () => {
     return (
         <div className='mtcp-wrapper'>
             <HeaderInfor title='Quản lý yêu cầu chăm sóc theo gói' />
+            <Searching 
+                isOrderCode
+                defaultUrl='/panel/manage-take-care-package'
+            />
             <section className="default-layout">
                 <Table 
                     columns={Column}

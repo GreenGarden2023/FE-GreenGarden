@@ -15,6 +15,7 @@ import { PaymentControlState } from 'app/models/payment'
 import { BiDetail } from 'react-icons/bi'
 import { MdCancelPresentation, MdOutlinePayment, MdOutlinePayments } from 'react-icons/md'
 import PackageServiceOrderStatusComp from '../status/PackageServiceOrderStatusComp'
+import ClientCancelPackageOrder from './ClientCancelPackageOrder'
 
 const ClientPackageOrder: React.FC = () => {
     const [searchParams] = useSearchParams();
@@ -172,7 +173,7 @@ const ClientPackageOrder: React.FC = () => {
                 {
                     record.status === 'unpaid' &&
                     <div className="item" onClick={() => {
-                        setActionMethod({orderId: record.orderId, actionType: 'deposit', orderType: 'service', openIndex: -1})
+                        handlePaymentMomo({orderId: record.orderId, actionType: 'deposit', orderType: 'service', openIndex: -1})
                     }} >
                         <MdOutlinePayments size={25} className='icon'/>
                         <span>Thanh toán cọc bằng Momo</span>
@@ -181,7 +182,7 @@ const ClientPackageOrder: React.FC = () => {
                 {
                     (record.status === 'unpaid' || record.status === 'ready') && 
                     <div className="item" onClick={() => {
-                        setActionMethod({orderId: record.orderId, actionType: 'remaining', orderType: 'service', openIndex: -1})
+                        handlePaymentMomo({orderId: record.orderId, actionType: 'remaining', orderType: 'service', openIndex: -1})
                     }} >
                         <MdOutlinePayment size={25} className='icon'/>
                         <span>Thanh toán đơn hàng bằng Momo</span>
@@ -200,6 +201,40 @@ const ClientPackageOrder: React.FC = () => {
         )
     }
 
+    const PkgSelect = useMemo(() =>{
+        const [order] = pkgOrders.filter(x => x.id === actionMethod?.orderId)
+
+        return order
+    }, [pkgOrders, actionMethod])
+
+    const handlePaymentMomo = async (data: PaymentControlState) =>{
+        const [order] = pkgOrders.filter(x => x.id === data.orderId)
+        
+        try{
+            if(data.actionType === 'deposit'){
+                const res = await takeComboOrderService.depositPaymentMomo(data.orderId)
+                window.open(res.data.payUrl, '_blank')
+            }else{
+                const res = await takeComboOrderService.orderPaymentMomo(data.orderId, order.remainAmount, 'whole')
+                window.open(res.data.payUrl, '_blank')
+            }
+        }catch{
+
+        }
+        setActionMethod(data)
+    }
+
+    const handleCloseModal = () =>{
+        setActionMethod(undefined)
+    }
+
+    const handleCancelOrder = (pkgOrder: PackageOrder) =>{
+        const index = pkgOrders.findIndex(x => x.id === pkgOrder.id)
+
+        pkgOrders[index] = pkgOrder
+        setPkgOrders([...pkgOrders])
+    }
+
     return (
         <section className='default-layout'>
             <Table
@@ -215,6 +250,10 @@ const ClientPackageOrder: React.FC = () => {
                     }
                 }}
             />
+            {
+                (actionMethod?.actionType === 'cancel' && PkgSelect) &&
+                <ClientCancelPackageOrder pkgOrder={PkgSelect} onClose={handleCloseModal} onSubmit={handleCancelOrder} />
+            }
         </section>
     )
 }

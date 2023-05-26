@@ -60,7 +60,7 @@ const ClientOrder: React.FC = () =>{
 
     const [shipping, setShipping] = useState<ShippingFee[]>([])
 
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(false)
 
     const [isMobile, setIsMobile] = useState(true)
 

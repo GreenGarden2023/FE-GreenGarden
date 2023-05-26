@@ -1,4 +1,4 @@
-import { Breadcrumb, Col, Divider, Image, Row, Tag } from 'antd';
+import { Breadcrumb, Button, Col, Divider, Image, Row, Tag } from 'antd';
 import LandingFooter from 'app/components/footer/LandingFooter';
 import LandingHeader from 'app/components/header/LandingHeader';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -48,6 +48,8 @@ const ClientProductItemDetail: React.FC = () => {
     const [quanSale, setQuanSale] = useState(1)
     const [feedback, setFeedback] = useState<FeedbackGet[]>([])
     const [loading, setLoading] = useState(true)
+    const [loadRent, setLoadRent] = useState(false)
+    const [loadSale, setLoadSale] = useState(false)
 
     useEffect(() =>{
         if(!productItemId || !sizeSelect || !proItem) return;
@@ -187,6 +189,7 @@ const ClientProductItemDetail: React.FC = () => {
         
 
         if(cartType === 'Sale'){
+            setLoadSale(true)
             try{
                 const index = newData.saleItems.findIndex(x => x.productItemDetailID === productItemDetailID)
                 if(index >= 0){
@@ -208,7 +211,9 @@ const ClientProductItemDetail: React.FC = () => {
             }catch(err){
                 dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
+            setLoadSale(false)
         }else{
+            setLoadRent(true)
             try{
                 const index = newData.rentItems.findIndex(x => x.productItemDetailID === productItemDetailID)
                 if(index >= 0){
@@ -232,6 +237,7 @@ const ClientProductItemDetail: React.FC = () => {
             }catch{
                 dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
+            setLoadRent(false)
         }
     }
     return (
@@ -359,10 +365,10 @@ const ClientProductItemDetail: React.FC = () => {
                                                                                         </div>
                                                                                     </div>
                                                                                     <div className="atc">
-                                                                                        <button onClick={() => handleAddCart('Rent', proItemSelectBySize.id)}>
+                                                                                        <Button loading={loadRent} onClick={() => handleAddCart('Rent', proItemSelectBySize.id)}>
                                                                                             <AiOutlineShoppingCart size={40} />
                                                                                             <span>Thêm vào giỏ hàng</span>
-                                                                                        </button>
+                                                                                        </Button>
                                                                                     </div>
                                                                                 </>
                                                                             }
@@ -391,10 +397,10 @@ const ClientProductItemDetail: React.FC = () => {
                                                                                         </div>
                                                                                     </div>
                                                                                     <div className="atc">
-                                                                                        <button onClick={() => handleAddCart('Sale', proItemSelectBySize.id)}>
+                                                                                        <Button loading={loadSale} onClick={() => handleAddCart('Sale', proItemSelectBySize.id)}>
                                                                                             <AiOutlineShoppingCart size={40} />
                                                                                             <span>Thêm vào giỏ hàng</span>
-                                                                                        </button>
+                                                                                        </Button>
                                                                                     </div>
                                                                                 </>
                                                                             }

@@ -1,6 +1,7 @@
 import { TPackageOrderStatus } from "app/models/general-type"
 import { PackageGetAll, PackageOrder } from "app/models/package"
 import { Paging } from "app/models/paging"
+import { Payment } from "app/models/payment"
 import { Response } from "app/models/response"
 import { CalendarUpdate, CreateServiceResponse, ServiceCalendar } from "app/models/service-calendar"
 import { CalendarInitial } from "app/models/service-calendar"
@@ -15,6 +16,10 @@ const createOrder = async (takecareComboServiceId: string) =>{
 }
 const getOrderById = async (orderID: string) =>{
     const res = await golbalAxios.get<Response<PackageOrder>>(`${baseUrl}/get-order-by-id?orderID=${orderID}`)
+    return res.data
+}
+const getOrderByOrderCode = async (orderCode: string) =>{
+    const res = await golbalAxios.get<Response<PackageOrder>>(`${baseUrl}/get-order-by-order-code?orderCode=${orderCode}`)
     return res.data
 }
 const getAllOrders = async (paging: Partial<Paging>, status: TPackageOrderStatus) =>{
@@ -44,7 +49,7 @@ const depositPaymentCash = async (orderId: string) =>{
     return res.data
 }
 const depositPaymentMomo = async (orderId: string) =>{
-    const res = await golbalAxios.post<Response<null>>(`${baseUrlPayment}/deposit-payment-momo`, { orderId })
+    const res = await golbalAxios.post<Response<Payment>>(`${baseUrlPayment}/deposit-payment-momo`, { orderId })
     return res.data
 }
 const orderPaymentCash = async (orderId: string, amount: number, paymentType: 'whole' | 'normal') =>{
@@ -52,7 +57,7 @@ const orderPaymentCash = async (orderId: string, amount: number, paymentType: 'w
     return res.data
 }
 const orderPaymentMomo = async (orderId: string, amount: number, paymentType: 'whole' | 'normal') =>{
-    const res = await golbalAxios.post<Response<null>>(`${baseUrlPayment}/order-payment-momo`, { orderId, amount, paymentType })
+    const res = await golbalAxios.post<Response<Payment>>(`${baseUrlPayment}/order-payment-momo`, { orderId, amount, paymentType })
     return res.data
 }
 
@@ -84,6 +89,7 @@ const getServiceCalendarByUser = async (UserID: string, StartDate: string, EndDa
 const takeComboOrderService = {
     createOrder,
     getOrderById,
+    getOrderByOrderCode,
     getAllOrders,
     updateOrderStatus,
     cancelOrder,

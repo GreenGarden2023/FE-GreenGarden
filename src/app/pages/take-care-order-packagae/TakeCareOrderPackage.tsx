@@ -11,8 +11,10 @@ import TransactionDetail from 'app/components/modal/transaction-detail/Transacti
 import MoneyFormat from 'app/components/money/MoneyFormat'
 import TechnicianName from 'app/components/renderer/technician/TechnicianName'
 import Transport from 'app/components/renderer/transport/Transport'
+import Searching from 'app/components/search-and-filter/search/Searching'
 import PackageServiceOrderStatusComp from 'app/components/status/PackageServiceOrderStatusComp'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
+import useSelector from 'app/hooks/use-selector'
 import { PackageOrder } from 'app/models/package'
 import { Paging } from 'app/models/paging'
 import { PaymentControlState } from 'app/models/payment'
@@ -31,6 +33,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 const TakeCareOrderPackage: React.FC = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
+    const { search } = useSelector(state => state.SearchFilter)
 
     // data
     const [pkgOrders, setPkgOrders] = useState<PackageOrder[]>([])
@@ -47,17 +50,30 @@ const TakeCareOrderPackage: React.FC = () => {
             return navigate('/panel/take-care-order-package?page=1', { replace: true })
         }
 
-        const init = async () =>{
-            try{
-                const res = await takeComboOrderService.getAllOrders({curPage: Number(currentPage), pageSize: paging.pageSize}, 'all')
-                setPkgOrders(res.data.takecareComboOrderList)
-                setPaging(res.data.paging)
-            }catch{
-
+        if(search.isSearching && search.orderCode){
+            const init = async () =>{
+                try{
+                    const res = await takeComboOrderService.getOrderByOrderCode(search.orderCode || '')
+                    setPkgOrders([res.data])
+                }catch{
+    
+                }
             }
+            init()
+        }else{
+            const init = async () =>{
+                try{
+                    const res = await takeComboOrderService.getAllOrders({curPage: Number(currentPage), pageSize: paging.pageSize}, 'all')
+                    setPkgOrders(res.data.takecareComboOrderList)
+                    setPaging(res.data.paging)
+                }catch{
+    
+                }
+            }
+            init()
         }
-        init()
-    }, [navigate, paging.pageSize, searchParams])
+
+    }, [navigate, paging.pageSize, searchParams, search.isSearching, search.orderCode])
 
     const ColumnServiceOrder: ColumnsType<any> = [
         {
@@ -258,6 +274,10 @@ const TakeCareOrderPackage: React.FC = () => {
     return (
         <div className='tcop-wrapper'>
             <HeaderInfor title='Quản lý đơn hàng chăm sóc theo gói' />
+            <Searching
+                isOrderCode
+                defaultUrl='/panel/take-care-order-package?page=1'
+            />
             <section className="default-layout">
                 <Table 
                     columns={ColumnServiceOrder} 

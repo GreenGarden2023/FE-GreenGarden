@@ -482,13 +482,10 @@ const LandingHeader: React.FC = () => {
               </Form.Item>
             </Col>
             <Col span={24}>
-              <Form.Item label='Điểm tích lũy'>
-                <Controller
-                  control={control}
-                  name="currentPoint"
-                  render={({ field }) => <Input disabled {...field} />}
-                />
-              </Form.Item>
+              <div className="point-wrapper">
+                <span className="point-text">Điểm tích lũy</span>
+                <span className="point">{userState.user.currentPoint} ({userState.user.currentPoint * 1000} VNĐ)</span>
+              </div>
             </Col>
           </Row>
           <Form.Item className="btn-box">

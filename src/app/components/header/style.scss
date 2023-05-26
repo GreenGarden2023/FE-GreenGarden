@@ -111,6 +111,18 @@
         }
     }
 }
+.point-wrapper{
+    display: flex;
+    gap: 10px;
+    .point-text{
+        color: $soft-text;
+        text-decoration: underline;
+    }
+    .point{
+        font-weight: 500;
+        color: $default-green;
+    }
+}
 @keyframes show-menu-mobile {
     from{
         left: -768px

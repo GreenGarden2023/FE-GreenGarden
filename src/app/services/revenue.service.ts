@@ -1,5 +1,5 @@
 import { Response } from "app/models/response"
-import { FRevenue } from "app/models/revenue"
+import { FRevenue, SRevenue, TRevenue } from "app/models/revenue"
 import golbalAxios from "app/utils/http-client"
 import queryString from "query-string"
 
@@ -12,8 +12,26 @@ const getRevenueFirst = async (fromDate: string, toDate: string) =>{
     return res.data
 }
 
+const getRevenueSecond = async (fromDate: string, toDate: string) =>{
+    const res = await golbalAxios.get<Response<SRevenue[]>>(`/revenue/get-best-product-detail-by-date-range?${convertParams(fromDate, toDate)}`)
+    return res.data
+}
+
+const getRevenueThird = async (fromDate: string, toDate: string) =>{
+    const res = await golbalAxios.get<Response<TRevenue>>(`/revenue/get-rent-revenue-by-date-range?${convertParams(fromDate, toDate)}`)
+    return res.data
+}
+
+const getRevenueFour = async (fromDate: string, toDate: string) =>{
+    const res = await golbalAxios.get<Response<TRevenue>>(`/revenue/get-sale-revenue-by-date-range?${convertParams(fromDate, toDate)}`)
+    return res.data
+}
+
 const revenueService = {
-    getRevenueFirst
+    getRevenueFirst,
+    getRevenueSecond,
+    getRevenueThird,
+    getRevenueFour
 }
 
 export default revenueService

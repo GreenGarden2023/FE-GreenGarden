@@ -37,6 +37,10 @@ const getATakeCareComboService = async (takecareComboServiceID: string) =>{
     const res = await golbalAxios.get<Response<PackageService>>(`/takecare-combo-service/get-a-takecare-combo-service?takecareComboServiceID=${takecareComboServiceID}`)
     return res.data
 }
+const getTakeCareComboServiceByCode = async (code: string) =>{
+    const res = await golbalAxios.get<Response<PackageService>>(`/takecare-combo-service/get-takecare-combo-service-by-code?code=${code}`)
+    return res.data
+}
 const getAllTakeCareComboService = async (status: TServicePkgStatus) =>{
     const res = await golbalAxios.get<Response<PackageService[]>>(`/takecare-combo-service/get-all-takecare-combo-service?status=${status}`)
     return res.data
@@ -71,6 +75,7 @@ const takeCareComboService = {
     // -----
     createTakeCareComboService,
     getATakeCareComboService,
+    getTakeCareComboServiceByCode,
     getAllTakeCareComboServiceByTech,
     getAllTakeCareComboService,
     changeTakeCareComboServiceStatus,
