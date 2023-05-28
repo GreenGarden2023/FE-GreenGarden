@@ -2,7 +2,7 @@ import { Popover } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
 import DetailPackageService from 'app/components/detail-package-service/DetailPackageService'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
-import TechnicianName from 'app/components/renderer/technician/TechnicianName'
+import Transport from 'app/components/renderer/transport/Transport'
 import PackageServiceStatusComp from 'app/components/status/PackageServiceStatusComp'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
 import useSelector from 'app/hooks/use-selector'
@@ -39,6 +39,7 @@ const ManagePackageRequest:React.FC = () => {
             title: 'Mã dịch vụ',
             key: 'code',
             dataIndex: 'code',
+            render: (v) => <p style={{maxWidth: 100}}>{v}</p>
         },
         {
             title: 'Thông tin khách hàng',
@@ -73,23 +74,22 @@ const ManagePackageRequest:React.FC = () => {
             render: (v) => (<PackageServiceStatusComp status={v} />)
         },
         {
-            title: 'Người chăm sóc',
-            key: 'technicianName',
-            dataIndex: 'technicianName',
-            render: (v) => (<TechnicianName name={v} minWidth={100} />)
-        },
-        {
-            title: 'Tổng số cây',
+            title: 'Số lượng cây',
             key: 'treeQuantity',
             dataIndex: 'treeQuantity',
             render: (v) => <p style={{minWidth: 80}}>{v}</p>
+        },
+        {
+            title: 'Nơi chăm sóc',
+            key: 'isAtShop',
+            dataIndex: 'isAtShop',
+            render: (v) => (<Transport isTransport={v} isRequest minWidth={120} />)
         },
         {
             title: 'Xử lý',
             key: 'action',
             dataIndex: 'action',
             align: 'center',
-            fixed: 'left',
             render: (_, record, index) => (
                     <Popover
                         content={() => contextService(record)} 
@@ -147,7 +147,7 @@ const ManagePackageRequest:React.FC = () => {
                 <Table
                     columns={Column}
                     dataSource={DataSource}
-                    scroll={{x: 2000}}
+                    scroll={{x: 480 }}
                 />
             </section>
             {

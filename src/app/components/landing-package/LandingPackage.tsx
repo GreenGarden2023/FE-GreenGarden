@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import './style.scss'
 import Table, { ColumnsType } from 'antd/es/table'
-import { Button, Col, DatePicker, DatePickerProps, Form, Input, Modal, Row, Select } from 'antd'
+import { Button, Col, DatePicker, DatePickerProps, Divider, Form, Input, Modal, Row, Select } from 'antd'
 import { useNavigate } from 'react-router-dom';
 import useSelector from 'app/hooks/use-selector';
 import useDispatch from 'app/hooks/use-dispatch';
@@ -59,7 +59,8 @@ const LandingPackage: React.FC = () => {
         {
             title: 'Gói dịch vụ',
             key: 'name',
-            dataIndex: 'name'
+            dataIndex: 'name',
+            render: (v) => <p className='pkg-name'>{v}</p>
         },
         {
             title: 'Đơn giá',
@@ -74,7 +75,8 @@ const LandingPackage: React.FC = () => {
         {
             title: 'Chi tiết công việc',
             key: 'description',
-            dataIndex: 'description'
+            dataIndex: 'description',
+            render: (v) => <p className='pkg-desc'>{v}</p>
         },
         {
             title: 'Cam kết của cửa hàng',
@@ -170,7 +172,13 @@ const LandingPackage: React.FC = () => {
     return (
         <div className='l-package-wrapper'>
             <div className="l-package-box container-wrapper">
-                <Table columns={Column}  dataSource={DataSource} bordered pagination={false} scroll={{x: 480}} />
+                <Table 
+                    columns={Column} 
+                    dataSource={DataSource} 
+                    bordered 
+                    pagination={false} 
+                    scroll={{x: 480}} 
+                />
             </div>
             {
                 packageSelect && 
@@ -183,6 +191,7 @@ const LandingPackage: React.FC = () => {
                     className='m-confirm-info'
                 >
                     <PackageDetail pkg={packageSelect} price={(getValues('numOfMonth') * getValues('treeQuantity')) * (packageSelect ? packageSelect.price : 0)} />
+                    <Divider></Divider>
                     <Form
                         labelAlign='left'
                         layout='vertical'
@@ -192,7 +201,7 @@ const LandingPackage: React.FC = () => {
                         <h1>Thông tin của bạn</h1>
                         <GridConfig>
                             <Row gutter={[24, 0]}>
-                                <Col span={12}>
+                                <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                                     <Form.Item label="Họ và tên" required>
                                         <Controller
                                             control={control}
@@ -202,7 +211,7 @@ const LandingPackage: React.FC = () => {
                                         {errors.name && <ErrorMessage message={errors.name.message} />}
                                     </Form.Item>
                                 </Col>
-                                <Col span={12}>
+                                <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                                     <Form.Item label="Email" required>
                                         <Controller
                                             control={control}
@@ -212,7 +221,7 @@ const LandingPackage: React.FC = () => {
                                         {errors.email && <ErrorMessage message={errors.email.message} />}
                                     </Form.Item>
                                 </Col>
-                                <Col span={12}>
+                                <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                                     <Form.Item label="Số điện thoại" required>
                                         <Controller
                                             control={control}
@@ -222,7 +231,7 @@ const LandingPackage: React.FC = () => {
                                         {errors.phone && <ErrorMessage message={errors.phone.message} />}
                                     </Form.Item>
                                 </Col>
-                                <Col span={12}>
+                                <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                                     <Form.Item label="Chọn nơi chăm sóc cây">
                                         <Controller
                                             control={control}
@@ -236,7 +245,7 @@ const LandingPackage: React.FC = () => {
                                         />
                                     </Form.Item>
                                 </Col>
-                                <Col span={12}>
+                                <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                                     <Form.Item label="Địa chỉ" required>
                                         <Controller
                                             control={control}
@@ -246,7 +255,7 @@ const LandingPackage: React.FC = () => {
                                         {errors.address && <ErrorMessage message={errors.address.message} />}
                                     </Form.Item>
                                 </Col>
-                                <Col span={12}>
+                                <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                                     <Form.Item label="Số lượng cây" required>
                                         <Controller
                                             control={control}
@@ -264,7 +273,7 @@ const LandingPackage: React.FC = () => {
                                         {errors.treeQuantity && <ErrorMessage message={errors.treeQuantity.message} />}
                                     </Form.Item>
                                 </Col>
-                                <Col span={12}>
+                                <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                                     <Form.Item label="Số tháng chăm sóc" required>
                                         <Controller
                                             control={control}
@@ -282,7 +291,7 @@ const LandingPackage: React.FC = () => {
                                         {errors.numOfMonth && <ErrorMessage message={errors.numOfMonth.message} />}
                                     </Form.Item>
                                 </Col>
-                                <Col span={12}>
+                                <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                                     <Form.Item label="Ngày bắt đầu chăm sóc" required>
                                         <DatePicker
                                             placeholder='Chọn ngày bắt đầu chăm sóc'

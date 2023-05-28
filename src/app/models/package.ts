@@ -38,6 +38,9 @@ export interface PackageService{
     isAtShop: boolean
     numOfMonths: number
     status: TServicePkgStatus
+    cancelBy: string;
+    nameCancelBy: string;
+    reason: string;
     takecareComboOrder: TakecareComboOrder
 }
 
@@ -78,6 +81,8 @@ export interface PackageOrder{
     status: TPackageOrderStatus
     description: string
     cancelBy: string
+    nameCancelBy: string;
+    reason: string;
     takecareComboService: PackageService
 }
 

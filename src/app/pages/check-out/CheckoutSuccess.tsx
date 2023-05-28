@@ -8,13 +8,46 @@ import './style.scss'
 import { MdOutlineInventory2 } from 'react-icons/md';
 import { IoBagCheckOutline, IoReturnDownBackSharp } from 'react-icons/io5';
 import useSelector from 'app/hooks/use-selector';
+import CONSTANT from 'app/utils/constant';
+import useDispatch from 'app/hooks/use-dispatch';
+import { setLoading, setUser } from 'app/slices/user-infor';
+import authService from 'app/services/auth.service';
+import { setNoti } from 'app/slices/notification';
 
 const CheckoutSuccess: React.FC = () => {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
+
     const { rentItems, saleItems } = useSelector(state => state.CartStore)
 
     useEffect(() =>{
         pagingPath.scrollTop()
+
+        const tokenInLocal = localStorage.getItem(CONSTANT.STORAGE.ACCESS_TOKEN)
+        if(!tokenInLocal) return;
+
+        const getUserDetailInit = async () =>{
+            try{
+                dispatch(setLoading({loading: true}))
+                const res = await authService.getUserDetail();
+                const resData = {
+                    ...res.data,
+                    token: tokenInLocal,
+                    role: res.data.roleName,
+                    loading: false
+                }
+                dispatch(setUser({user: resData, token: tokenInLocal, loading: false}))
+            }catch(err: any){
+                if(err.response.status === 401){
+                    localStorage.removeItem(CONSTANT.STORAGE.ACCESS_TOKEN)
+                    return navigate('/login');
+                }
+                dispatch(setLoading({loading: false}))
+                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE})) 
+            }
+        }
+        getUserDetailInit();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return (

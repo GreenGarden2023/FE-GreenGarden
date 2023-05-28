@@ -66,6 +66,10 @@ const cancelTakeCareComboService = async (takecareComboServiceId: string, cancel
     const res = await golbalAxios.post<Response<PackageService>>('/takecare-combo-service/cancel-takecare-combo-service', {takecareComboServiceId, cancelReason})
     return res.data
 }
+const rejectTakeCareComboService = async (takecareComboServiceId: string, rejectReason: string) =>{
+    const res = await golbalAxios.post<Response<PackageService>>('/takecare-combo-service/reject-takecare-combo-service', {takecareComboServiceId, rejectReason})
+    return res.data
+}
 
 const takeCareComboService = {
     getAllTakeCareCombo,
@@ -81,7 +85,8 @@ const takeCareComboService = {
     changeTakeCareComboServiceStatus,
     assignTakeCareComboServiceTechnician,
     updateTakeCareComboService,
-    cancelTakeCareComboService
+    cancelTakeCareComboService,
+    rejectTakeCareComboService
 }
 
 export default takeCareComboService

@@ -1,20 +1,18 @@
 import { Popover } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
-import HeaderInfor from 'app/components/header-infor/HeaderInfor'
-import MoneyFormat from 'app/components/money/MoneyFormat';
-import TechnicianName from 'app/components/renderer/technician/TechnicianName';
+import HeaderInfor from 'app/components/header-infor/HeaderInfor';
 import Transport from 'app/components/renderer/transport/Transport';
 import PackageServiceOrderStatusComp from 'app/components/status/PackageServiceOrderStatusComp';
 import UserInforTable from 'app/components/user-infor/UserInforTable';
 import useSelector from 'app/hooks/use-selector';
-import { PackageOrder } from 'app/models/package'
+import { PackageOrder } from 'app/models/package';
 import { Paging } from 'app/models/paging';
 import { PaymentControlState } from 'app/models/payment';
 import takeComboOrderService from 'app/services/take-combo-order.service';
 import CONSTANT from 'app/utils/constant';
 import utilDateTime from 'app/utils/date-time';
 import pagingPath from 'app/utils/paging-path';
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react';
 import { BiCommentDetail } from 'react-icons/bi';
 import { GrMore } from 'react-icons/gr';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
@@ -58,7 +56,7 @@ const ManagePackageOrder:React.FC = () => {
             title: 'Mã đơn hàng',
             key: 'orderCode',
             dataIndex: 'orderCode',
-            fixed: 'left'
+            render: (v) => <p style={{maxWidth: 100}}>{v}</p>
         },
         {
             title: 'Thông tin khách hàng',
@@ -81,17 +79,6 @@ const ManagePackageOrder:React.FC = () => {
             render: (v) => (utilDateTime.dateToString(v))
         },
         {
-            title: 'Người chăm sóc',
-            key: 'technicianName',
-            dataIndex: 'technicianName',
-            render: (v) => <TechnicianName name={v} />
-        },
-        {
-            title: 'Số lượng cây',
-            key: 'treeQuantity',
-            dataIndex: 'treeQuantity',
-        },
-        {
             title: 'Trạng thái',
             key: 'status',
             dataIndex: 'status',
@@ -99,42 +86,22 @@ const ManagePackageOrder:React.FC = () => {
             render: (v) => (<PackageServiceOrderStatusComp status={v} />)
         },
         {
+            title: 'Số lượng cây',
+            key: 'treeQuantity',
+            dataIndex: 'treeQuantity',
+            render: (v) => <p style={{minWidth: 80}}>{v}</p>
+        },
+        {
             title: 'Nơi chăm sóc',
             key: 'isAtShop',
             dataIndex: 'isAtShop',
-            render: (v) => (<Transport isTransport={v} isRequest />)
-        },
-        {
-            title: 'Tiền cọc',
-            key: 'deposit',
-            dataIndex: 'deposit',
-            align:'right',
-            width: 180,
-            render: (v) => <MoneyFormat value={v} color='Orange'  />
-        },
-        {
-            title: 'Tổng tiền',
-            key: 'totalPrice',
-            dataIndex: 'totalPrice',
-            align:'right',
-            width: 180,
-            render: (v) => <MoneyFormat value={v} color='Light Blue'  />
-        },
-        {
-            title: 'Tiền còn thiếu',
-            key: 'remainAmount',
-            dataIndex: 'remainAmount',
-            align:'right',
-            width: 200,
-            fixed: 'right',
-            render: (v) => <MoneyFormat value={v} color='Blue' isHighlight />
+            render: (v) => (<Transport isTransport={v} isRequest minWidth={120} />)
         },
         {
             title: 'Xử lý',
             key: 'action',
             dataIndex: 'action',
             align: 'center',
-            fixed: 'right',
             render: (_, record, index) => (
                     <Popover
                         content={() => contextService(record)} 
@@ -149,7 +116,7 @@ const ManagePackageOrder:React.FC = () => {
                             }
                         }}
                     >
-                        <GrMore size={25} cursor='pointer' color='#00a76f' />
+                        <GrMore size={25} cursor='pointer' color='#00a76f' style={{minWidth: 80}} />
                     </Popover>
             )
         },
@@ -191,7 +158,7 @@ const ManagePackageOrder:React.FC = () => {
                 <Table
                     columns={ColumnServiceOrder} 
                     dataSource={DataSourceServiceOrder} 
-                    scroll={{ y: 680, x: 2200 }}
+                    scroll={{ x: 480 }}
                     pagination={{
                         current: paging.curPage,
                         pageSize: paging.pageSize,

@@ -362,6 +362,10 @@ const LandingHeader: React.FC = () => {
                               <FaUserCircle size={20} />
                               <span>{userState.user.fullName}</span>
                             </div>
+                            <div className="menu-item" onClick={handleLogout}>
+                              <GiExitDoor size={20} />
+                              <span>Đăng xuất</span>
+                            </div>
                           </>
                         }
                     </div>

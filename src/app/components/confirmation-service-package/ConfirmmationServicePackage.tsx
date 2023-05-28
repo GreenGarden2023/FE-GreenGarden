@@ -1,5 +1,6 @@
 import { Button, Form, Input, Modal } from 'antd';
 import useDispatch from 'app/hooks/use-dispatch';
+import useSelector from 'app/hooks/use-selector';
 import { PackageService } from 'app/models/package';
 import takeCareComboService from 'app/services/take-care-combo.service';
 import { setNoti } from 'app/slices/notification';
@@ -8,11 +9,14 @@ import React, { useState } from 'react'
 interface ConfirmmationServicePackageProps{
     handler: 'Accept' | 'Reject'
     pkgService: PackageService
+    isClient?: boolean;
     onClose: () => void;
-    onSubmit: () => void;
+    onSubmit: (pkgService: PackageService) => void;
 }
 
-const ConfirmmationServicePackage: React.FC<ConfirmmationServicePackageProps> = ({ handler, pkgService, onClose, onSubmit }) => {
+const ConfirmmationServicePackage: React.FC<ConfirmmationServicePackageProps> = ({ handler, pkgService, isClient, onClose, onSubmit }) => {
+    const { user } = useSelector(state => state.userInfor)
+
     const dispatch = useDispatch();
     const [actionLoading, setActionLoading] = useState(false)
     const [reason, setReason] = useState('')
@@ -23,12 +27,23 @@ const ConfirmmationServicePackage: React.FC<ConfirmmationServicePackageProps> = 
             if(handler === 'Accept'){
                 await takeCareComboService.changeTakeCareComboServiceStatus({takecareComboServiceId: pkgService.id, status: 'accepted'})
                 dispatch(setNoti({type: 'success', message: `Chấp nhận yêu cầu dịch vụ chăm sóc (${pkgService.code}) thành công`}))
+                pkgService.status = 'accepted'
             }else{
-                await takeCareComboService.cancelTakeCareComboService(pkgService.id, reason)
-                dispatch(setNoti({type: 'success', message: `Từ chối yêu cầu dịch vụ chăm sóc (${pkgService.code}) thành công`}))
+                if(isClient){
+                    await takeCareComboService.cancelTakeCareComboService(pkgService.id, reason)
+                    dispatch(setNoti({type: 'success', message: `Hủy yêu cầu dịch vụ chăm sóc (${pkgService.code}) thành công`}))
+                    pkgService.status = 'cancel'
+                }else{
+                    await takeCareComboService.rejectTakeCareComboService(pkgService.id, reason)
+                    dispatch(setNoti({type: 'success', message: `Từ chối yêu cầu dịch vụ chăm sóc (${pkgService.code}) thành công`}))
+                    pkgService.status = 'rejected'
+                }
+
+                pkgService.reason = reason
+                pkgService.nameCancelBy = user.fullName
                 setReason('')
             }
-            onSubmit()
+            onSubmit(pkgService)
             onClose()
         }catch{
 

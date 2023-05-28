@@ -27,3 +27,10 @@
         color: $default-green;
     }
 }
+@media screen and (max-width: 480px) {
+    .m-package-info{
+        h1{
+            font-size: 26px;
+        }
+    }
+}

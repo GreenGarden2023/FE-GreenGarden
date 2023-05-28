@@ -19,52 +19,66 @@ const UserInfoPackageService: React.FC<UserInfoPackageServiceProps> = ({ pkgServ
             <div className="user-info-wrapper">
                 <GridConfig>
                     <Row gutter={[24, 12]}>
-                        <Col span={8}>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
                             <p className='label'>Họ & tên</p>
                             <p className='value'>{pkgService.name}</p>
                         </Col>
-                        <Col span={8}>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
                             <p className='label'>Số điện thoại</p>
                             <p className='value'>{pkgService.phone}</p>
                         </Col>
-                        <Col span={8}>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
                             <p className='label'>Email</p>
                             <p className='value'>{pkgService.email}</p>
                         </Col>
-                        <Col span={8}>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
                             <p className='label'>Ngày tạo yêu cầu</p>
                             <p className='value'>{utilDateTime.dateToString(pkgService.createDate)}</p>
                         </Col>
-                        <Col span={8}>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
                             <p className='label'>Ngày bắt đầu</p>
                             <p className='value'>{utilDateTime.dateToString(pkgService.startDate)}</p>
                         </Col>
-                        <Col span={8}>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
                             <p className='label'>Ngày kết thúc</p>
                             <p className='value'>{utilDateTime.dateToString(pkgService.endDate)}</p>
                         </Col>
-                        <Col span={8}>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
                             <p className='label'>Số lượng cây</p>
                             <p className='value'>{pkgService.treeQuantity}</p>
                         </Col>
-                        <Col span={8}>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
                             <p className='label'>Số tháng</p>
                             <p className='value'>{pkgService.numOfMonths}</p>
                         </Col>
-                        <Col span={8}>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
                             <p className='label'>Người chăm sóc</p>
                             <p className='value'>{pkgService.technicianName}</p>
                         </Col>
-                        <Col span={8}>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
                             <p className='label'>Nơi chăm sóc</p>
                             <p className='value'>{pkgService.isAtShop ? 'Tại cửa hàng' : 'Tại nhà'}</p>
                         </Col>
-                        <Col span={8}>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
                             <p className='label'>Trạng thái yêu cầu</p>
                             <p className='value' style={{marginTop: '5px'}}>
                                 <PackageServiceStatusComp status={pkgService.status} />
                             </p>
                         </Col>
+                        {
+                            (pkgService.status === 'cancel' || pkgService.status === 'rejected') && 
+                            <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
+                                <p className='label'>Người hủy yêu cầu</p>
+                                <p className='value'>{pkgService.nameCancelBy}</p>
+                            </Col>
+                        }
+                        {
+                            pkgService.reason &&
+                            <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
+                                <p className='label'>Lý do</p>
+                                <p className='value'>{pkgService.reason}</p>
+                            </Col>
+                        }
                     </Row>
                 </GridConfig>
             </div>
@@ -83,70 +97,84 @@ export const UserInfoPackageOrder: React.FC<UserInfoPackageOrderProps> = ({pkgOr
             <div className="user-info-wrapper">
                 <GridConfig>
                     <Row gutter={[24, 12]}>
-                        <Col span={8}>
-                            <p className='label'>Họ & tên</p>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
+                            <p className='label'>Họ & tên:</p>
                             <p className='value'>{pkgOrder.takecareComboService.name}</p>
                         </Col>
-                        <Col span={8}>
-                            <p className='label'>Số điện thoại</p>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
+                            <p className='label'>Số điện thoại:</p>
                             <p className='value'>{pkgOrder.takecareComboService.phone}</p>
                         </Col>
-                        <Col span={8}>
-                            <p className='label'>Email</p>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
+                            <p className='label'>Email:</p>
                             <p className='value'>{pkgOrder.takecareComboService.email}</p>
                         </Col>
-                        <Col span={8}>
-                            <p className='label'>Ngày tạo đơn hàng</p>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
+                            <p className='label'>Ngày tạo đơn hàng:</p>
                             <p className='value'>{utilDateTime.dateToString(pkgOrder.createDate)}</p>
                         </Col>
-                        <Col span={8}>
-                            <p className='label'>Ngày bắt đầu chăm sóc</p>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
+                            <p className='label'>Ngày bắt đầu chăm sóc:</p>
                             <p className='value'>{utilDateTime.dateToString(pkgOrder.serviceStartDate)}</p>
                         </Col>
-                        <Col span={8}>
-                            <p className='label'>Ngày kết thúc chăm sóc</p>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
+                            <p className='label'>Ngày kết thúc chăm sóc:</p>
                             <p className='value'>{utilDateTime.dateToString(pkgOrder.serviceEndDate)}</p>
                         </Col>
-                        <Col span={8}>
-                            <p className='label'>Tiền cọc</p>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
+                            <p className='label'>Tiền cọc:</p>
                             <p className='value'>
                                 <MoneyFormat value={pkgOrder.deposit} color='Orange' />
                             </p>
                         </Col>
-                        <Col span={8}>
-                            <p className='label'>Tổng tiền</p>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
+                            <p className='label'>Tổng tiền:</p>
                             <p className='value'>
                                 <MoneyFormat value={pkgOrder.totalPrice} color='Light Blue' />
                             </p>
                         </Col>
-                        <Col span={8}>
-                            <p className='label'>Tiền còn thiếu</p>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
+                            <p className='label'>Tiền còn thiếu:</p>
                             <p className='value'>
                                 <MoneyFormat value={pkgOrder.remainAmount} color='Blue' />
                             </p>
                         </Col>
-                        <Col span={8}>
-                            <p className='label'>Số lượng cây</p>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
+                            <p className='label'>Số lượng cây:</p>
                             <p className='value'>{pkgOrder.takecareComboService.treeQuantity}</p>
                         </Col>
-                        <Col span={8}>
-                            <p className='label'>Số tháng</p>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
+                            <p className='label'>Số tháng:</p>
                             <p className='value'>{pkgOrder.takecareComboService.numOfMonths}</p>
                         </Col>
-                        <Col span={8}>
-                            <p className='label'>Người chăm sóc</p>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
+                            <p className='label'>Người chăm sóc:</p>
                             <p className='value'>{pkgOrder.takecareComboService.technicianName}</p>
                         </Col>
-                        <Col span={8}>
-                            <p className='label'>Nơi chăm sóc</p>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
+                            <p className='label'>Nơi chăm sóc:</p>
                             <p className='value'>{pkgOrder.takecareComboService.isAtShop ? 'Tại cửa hàng' : 'Tại nhà'}</p>
                         </Col>
-                        <Col span={8}>
-                            <p className='label'>Trạng thái đơn hàng</p>
+                        <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
+                            <p className='label'>Trạng thái đơn hàng:</p>
                             <p className='value' style={{marginTop: '5px'}}>
                                 <PackageServiceOrderStatusComp status={pkgOrder.status} />
                             </p>
                         </Col>
+                        {
+                            pkgOrder.status === 'cancel' && 
+                            <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
+                                <p className='label'>Người hủy đơn hàng:</p>
+                                <p className='value'>{pkgOrder.nameCancelBy}</p>
+                            </Col>
+                        }
+                        {
+                            pkgOrder.reason &&
+                            <Col xs={24} sm={12} md={8} lg={8} xl={8} className='flex-item'>
+                                <p className='label'>Lý do:</p>
+                                <p className='value'>{pkgOrder.reason}</p>
+                            </Col>
+                        }
                     </Row>
                 </GridConfig>
             </div>

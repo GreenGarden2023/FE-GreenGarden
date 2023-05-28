@@ -110,7 +110,6 @@ const ManageTakeCarePackage: React.FC = () => {
             key: 'action',
             dataIndex: 'action',
             align: 'center',
-            fixed: 'left',
             render: (_, record, index) => (
                     <Popover
                         content={() => contextService(record)} 
@@ -216,10 +215,10 @@ const ManageTakeCarePackage: React.FC = () => {
         setPkgServices([...pkgServices])
     }
 
-    const handleRejectRequest = () =>{
-        const [pkgService] = pkgServices.filter(x => x.id === actionMethod?.orderId)
+    const handleRejectRequest = (pkgSer: PackageService) =>{
+        const index = pkgServices.findIndex(x => x.id === pkgSer.id)
 
-        pkgService.status = 'rejected'
+        pkgServices[index] = pkgSer
         setPkgServices([...pkgServices])
     }
 
@@ -258,7 +257,7 @@ const ManageTakeCarePackage: React.FC = () => {
                 <Table 
                     columns={Column}
                     dataSource={DataSource}
-                    scroll={{x: 2000}}
+                    scroll={{y: 680, x: 1800}}
                 />
             </section>
             {

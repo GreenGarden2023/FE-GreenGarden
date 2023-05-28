@@ -171,7 +171,7 @@ const ClientPackageService: React.FC = () => {
             }
             {
                 (actionMethod?.actionType === 'cancel' && PkgServiceSelect) &&
-                <ConfirmmationServicePackage pkgService={PkgServiceSelect} handler='Reject' onClose={handleCloseModal} onSubmit={handleCancelService}  />
+                <ConfirmmationServicePackage pkgService={PkgServiceSelect} handler='Reject' isClient onClose={handleCloseModal} onSubmit={handleCancelService}  />
             }
         </section>
     )
