@@ -387,6 +387,11 @@ const ManageSaleOrder: React.FC = () => {
     const updateOrderStatus = (orderStatus: OrderStatus) =>{
         const [order] = saleOrders.filter(x => x.id === actionMethod?.orderId)
         order.status = orderStatus
+
+        if(orderStatus === 'completed'){
+            order.remainMoney = 0
+        }
+
         setSaleOrders([...saleOrders])
         handleCancel()
     }
@@ -527,6 +532,7 @@ const ManageSaleOrder: React.FC = () => {
                 <FinishOrder
                     orderId={saleOrders.filter(x => x.id === actionMethod.orderId)[0].id}
                     orderCode={saleOrders.filter(x => x.id === actionMethod.orderId)[0].orderCode}
+                    remain={saleOrders.filter(x => x.id === actionMethod.orderId)[0].remainMoney}
                     type='sale'
                     onClose={handleCancel}
                     onSubmit={() => updateOrderStatus('completed')}

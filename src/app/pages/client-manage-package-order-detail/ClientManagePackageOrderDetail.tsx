@@ -55,7 +55,8 @@ const ClientManagePackageOrderDetail: React.FC = () => {
             guarantee: takecareComboGuarantee,
             name: takecareComboName,
             price: takecareComboPrice,
-            status: true
+            status: true,
+            careGuide: pkgOrder.takecareComboService.careGuide
         }
 
         return pkg;
@@ -68,7 +69,7 @@ const ClientManagePackageOrderDetail: React.FC = () => {
                 <div className="container-wrapper">
                     <section className="default-layout">
                         {
-                            PkgDetail && <PackageDetail pkg={PkgDetail} />
+                            PkgDetail && <PackageDetail isCareGuide pkg={PkgDetail} />
                         }
                         {
                             pkgOrder && <UserInfoPackageOrder pkgOrder={pkgOrder} />

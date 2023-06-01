@@ -20,11 +20,12 @@ const ClientPackageDetail: React.FC<ClientPackageDetailProps> = ({ pkgService, o
             guarantee: takecareComboGuarantee,
             name: takecareComboName,
             price: takecareComboPrice,
-            status: true
+            status: true,
+            careGuide: pkgService.careGuide
         }
 
         return pkg;
-    }, [pkgService.takecareComboDetail])
+    }, [pkgService.takecareComboDetail, pkgService.careGuide])
 
     return (
         <Modal
@@ -35,7 +36,7 @@ const ClientPackageDetail: React.FC<ClientPackageDetailProps> = ({ pkgService, o
             width={1000}
         >
             {
-                PkgDetail && <PackageDetail pkg={PkgDetail} />
+                PkgDetail && <PackageDetail pkg={PkgDetail} isCareGuide />
             }
             <UserInfoPackageService pkgService={pkgService} />
             <div className='btn-form-wrapper' style={{marginTop: '10px'}}>

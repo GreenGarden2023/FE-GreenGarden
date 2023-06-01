@@ -16,12 +16,13 @@ interface SearchingProps{
     isStatus?: boolean;
     statusType?: 'rent' | 'sale' | 'service'
     isProductName?: boolean;
+    isEmail?: boolean;
     defaultUrl: string;
     // onSearch: (data: SearchResult) => void;
     // onDefault: () => void;
 }
 
-const Searching: React.FC<SearchingProps> = ({ isOrderCode, isPhone, isStatus, statusType, isProductName, defaultUrl }) => {
+const Searching: React.FC<SearchingProps> = ({ isOrderCode, isPhone, isStatus, statusType, isProductName, isEmail, defaultUrl }) => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
@@ -29,6 +30,7 @@ const Searching: React.FC<SearchingProps> = ({ isOrderCode, isPhone, isStatus, s
     const [phoneSearch, setPhoneSearch] = useState('')
     const [statusSearch, setStatusSearch] = useState<OrderStatus>('')
     const [productNameSearch, setProductNameSearch] = useState('')
+    const [emailSearch, setEmailSearch] = useState('')
 
     useEffect(() =>{
         dispatch(setSearch(false))
@@ -45,7 +47,8 @@ const Searching: React.FC<SearchingProps> = ({ isOrderCode, isPhone, isStatus, s
             orderCode: orderCodeSearch.trim(),
             phone: phoneSearch.trim(),
             productName: productNameSearch.trim(),
-            status: statusSearch
+            status: statusSearch,
+            email: emailSearch
         }))
     }
 
@@ -55,6 +58,7 @@ const Searching: React.FC<SearchingProps> = ({ isOrderCode, isPhone, isStatus, s
         setPhoneSearch('')
         setStatusSearch('')
         setProductNameSearch('')
+        setEmailSearch('')
         // clear store and navigate to defaultUrl
         dispatch(setSearch(false))
         navigate(defaultUrl)
@@ -134,6 +138,15 @@ const Searching: React.FC<SearchingProps> = ({ isOrderCode, isPhone, isStatus, s
                                 <div className='product-name'>
                                     <p className='mb-5'>Tìm kiếm theo tên</p>
                                     <Input placeholder='Cây thiết mộc lan' value={productNameSearch} onChange={(e) => setProductNameSearch(e.target.value)} />
+                                </div>
+                            </Col>
+                        }
+                         {
+                            isEmail &&
+                            <Col xs={24} sm={24} md={12} lg={8} xl={8} xxl={6}>
+                                <div className='product-name'>
+                                    <p className='mb-5'>Tìm kiếm theo email</p>
+                                    <Input placeholder='manager@gmail.com' value={emailSearch} onChange={(e) => setEmailSearch(e.target.value)} />
                                 </div>
                             </Col>
                         }

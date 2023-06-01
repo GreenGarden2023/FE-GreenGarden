@@ -45,7 +45,7 @@ const RevenueThird: React.FC<RevenueRenderProps> = ({ startDate, endDate }) => {
                                     <div className="rev-s-content">
                                         <p className="rev-s-name">{item.productItemDetail.product.productItem.productItemName} - {item.productItemDetail.size.sizeName}</p>
                                         <p className="rev-s-quantity">
-                                            Số lượng thuê {item.quantity} cây
+                                            Số lượng thuê: {item.quantity} cây
                                         </p>
                                         <p className="rev-s-total">
                                             <span className='rev-s-title-total'>Doanh thu</span>

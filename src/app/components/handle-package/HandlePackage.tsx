@@ -46,13 +46,14 @@ const HandlePackage: React.FC<HandlePackageProps> = ({ data, onClose, onSubmit }
             return;
         }
 
-        const { id, name, price, description, guarantee, status } = data
+        const { id, name, price, description, guarantee, status, careGuide } = data
         setValue('id', id)
         setValue('name', name)
         setValue('price', price)
         setValue('description', description)
         setValue('guarantee', guarantee)
         setValue('status', status)
+        setValue('careGuide', careGuide)
 
     }, [data, setValue])
 
@@ -139,6 +140,16 @@ const HandlePackage: React.FC<HandlePackageProps> = ({ data, onClose, onSubmit }
                                     render={({ field }) => (<Input.TextArea autoSize={{minRows: 4, maxRows: 6}} {...field} />)}
                                 />
                                 {errors.guarantee && <ErrorMessage message={errors.guarantee.message} />}
+                            </Form.Item>
+                        </Col>
+                        <Col span={24}>
+                            <Form.Item label='Hướng dẫn chăm sóc' required>
+                                <Controller 
+                                    control={control}
+                                    name='careGuide'
+                                    render={({ field }) => (<Input.TextArea autoSize={{minRows: 4, maxRows: 6}} {...field} />)}
+                                />
+                                {/* {errors.guarantee && <ErrorMessage message={errors.guarantee.message} />} */}
                             </Form.Item>
                         </Col>
                     </Row>

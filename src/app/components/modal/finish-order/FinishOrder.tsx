@@ -1,6 +1,8 @@
 import { Button, Modal } from 'antd';
+import MoneyFormat from 'app/components/money/MoneyFormat';
 import useDispatch from 'app/hooks/use-dispatch';
 import orderService from 'app/services/order.service';
+import paymentService from 'app/services/payment.service';
 import serviceService from 'app/services/service.service';
 import { setNoti } from 'app/slices/notification';
 import CONSTANT from 'app/utils/constant';
@@ -11,11 +13,12 @@ interface FinishOrderProps{
     orderCode: string;
     serviceId?: string;
     type: 'rent' | 'sale' | 'service'
+    remain?: number
     onClose: () => void;
     onSubmit: () => void;
 }
 
-const FinishOrder: React.FC<FinishOrderProps> = ({ orderId, orderCode, serviceId, type, onClose, onSubmit }) => {
+const FinishOrder: React.FC<FinishOrderProps> = ({ orderId, orderCode, serviceId, type, remain, onClose, onSubmit }) => {
     const dispatch = useDispatch();
     
     const [loading, setLoading] = useState(false)
@@ -26,6 +29,9 @@ const FinishOrder: React.FC<FinishOrderProps> = ({ orderId, orderCode, serviceId
         switch(type){
             case 'sale':
                 try{
+                    if(remain !== 0){
+                        await paymentService.paymentCash(orderId, remain || 0, 'sale', 'whole')
+                    }
                     await orderService.updateSaleOrderStatus(orderId, 'completed')
                     dispatch(setNoti({type: 'success', message: `Cập nhật trạng thái hoàn thành cho đơn hàng ${orderCode}`}))
                     onSubmit()
@@ -60,8 +66,17 @@ const FinishOrder: React.FC<FinishOrderProps> = ({ orderId, orderCode, serviceId
             open
             title={`Xác nhận đã hoàn thành đơn hàng "${orderCode}"`}
             onCancel={onClose}
+            width={800}
             footer={false}
         >
+            {
+                (remain !== undefined && remain !== 0) &&
+                <div style={{display: 'flex', gap: '5px'}}>
+                    <p>Xác nhận thanh toán </p>
+                    <MoneyFormat value={remain} color='Blue' />
+                    <p>và hoàn tất đơn hàng?</p>
+                </div>
+            }
             <div className='btn-form-wrapper mt-10'>
                 <Button htmlType='button' disabled={loading} type='default' className='btn-cancel' size='large' onClick={onClose} >Hủy bỏ</Button>
                 <Button htmlType='submit' loading={loading} type='primary' className='btn-update' size='large' onClick={handleSubmitForm}>

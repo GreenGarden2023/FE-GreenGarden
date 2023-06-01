@@ -2,6 +2,7 @@ import { Popover } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 import HeaderInfor from 'app/components/header-infor/HeaderInfor';
 import Transport from 'app/components/renderer/transport/Transport';
+import Searching from 'app/components/search-and-filter/search/Searching';
 import PackageServiceOrderStatusComp from 'app/components/status/PackageServiceOrderStatusComp';
 import UserInforTable from 'app/components/user-infor/UserInforTable';
 import useSelector from 'app/hooks/use-selector';
@@ -154,6 +155,10 @@ const ManagePackageOrder:React.FC = () => {
     return (
         <div>
             <HeaderInfor title='Đơn chăm sóc theo gói' />
+            <Searching
+                isOrderCode
+                defaultUrl='/panel/manage-package-order?page=1'
+            />
             <section className="default-layout">
                 <Table
                     columns={ColumnServiceOrder} 

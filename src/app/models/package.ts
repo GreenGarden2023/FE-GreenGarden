@@ -8,6 +8,7 @@ export interface Package{
     description: string
     guarantee: string
     status: boolean
+    careGuide?: string
 }
 
 export interface PackageHandle extends Partial<Package>{}
@@ -42,6 +43,7 @@ export interface PackageService{
     nameCancelBy: string;
     reason: string;
     takecareComboOrder: TakecareComboOrder
+    careGuide: string;
 }
 
 export interface PackageServiceHandle{
@@ -84,6 +86,7 @@ export interface PackageOrder{
     nameCancelBy: string;
     reason: string;
     takecareComboService: PackageService
+    careGuide: string
 }
 
 export interface PackageGetAll{

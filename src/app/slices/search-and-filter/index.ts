@@ -6,6 +6,7 @@ interface SearchProps{
     phone?: string;
     status?: OrderStatus;
     productName?: string;
+    email?: string;
     isSearching: boolean;
 }
 interface FilterProps{
@@ -110,7 +111,7 @@ const setSearchValuesCR: CR<SearchProps> = (state, action) =>{
             endDate: undefined,
             role: undefined,
             startDate: undefined,
-            takeCareStatus: undefined
+            takeCareStatus: undefined,
         }
     }
 }

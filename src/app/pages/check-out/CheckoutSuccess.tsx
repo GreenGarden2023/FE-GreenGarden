@@ -69,7 +69,7 @@ const CheckoutSuccess: React.FC = () => {
                                 ((rentItems && rentItems.length !== 0) || (saleItems && saleItems.length !== 0)) &&
                                 <button className="btn btn-continue-payment" onClick={() => navigate('/cart')}>
                                     <IoBagCheckOutline size={20} />
-                                    <span>Tiếp tục thanh toán</span>
+                                    <span>Tiếp tục đặt hàng</span>
                                 </button>
                             }
                         </div>

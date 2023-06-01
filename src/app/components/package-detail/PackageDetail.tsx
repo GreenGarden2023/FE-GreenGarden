@@ -6,9 +6,10 @@ import MoneyFormat from '../money/MoneyFormat';
 interface PackageDetailProps{
     pkg: Package;
     price?: number;
+    isCareGuide?: boolean;
 }
 
-const PackageDetail: React.FC<PackageDetailProps> = ({ pkg, price }) => {
+const PackageDetail: React.FC<PackageDetailProps> = ({ pkg, price, isCareGuide }) => {
     return (
         <div className="m-package-info">
             <h1>Thông tin gói chăm sóc</h1>
@@ -28,6 +29,13 @@ const PackageDetail: React.FC<PackageDetailProps> = ({ pkg, price }) => {
                 <span className="label-text">Cam kết của cửa hàng:</span>
                 <span className="value-text">{pkg.guarantee}</span>
             </div>
+            {
+                isCareGuide ?
+                <div className="item">
+                    <span className="label-text">Hướng dẫn chăm sóc:</span>
+                    <span className="value-text">{pkg.careGuide}</span>
+                </div> : undefined
+            }
             {
                 price ?
                 <div className="item">

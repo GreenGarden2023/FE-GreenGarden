@@ -28,13 +28,19 @@ const updateUserByAdmin = async (data: CreateUserByAdmin) =>{
     const res = await golbalAxios.post<Response<User>>('/user/update-user-by-admin', data)
     return res.data
 }
+const getUserByMail = async (paging: Partial<PagingProps>, mail: string) =>{
+    const params = queryString.stringify({...paging, mail})
+    const res = await golbalAxios.get<Response<UserReponse>>(`/user/get-user-by-mail?${params}`)
+    return res.data
+}
 
 const userService = {
     getListAccountByAdmin,
     updateUserStatus,
     updateUser,
     createUserByAdmin,
-    updateUserByAdmin
+    updateUserByAdmin,
+    getUserByMail
 }
 
 export default userService

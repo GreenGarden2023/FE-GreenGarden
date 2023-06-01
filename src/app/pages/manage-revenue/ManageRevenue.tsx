@@ -58,7 +58,7 @@ const ManageRevenue: React.FC = () => {
                     </div>
                     <div className={`rev-item ${revType === 2 ? 'active' : ''}`} onClick={() => handleSetRevType(2)}>
                         <MdAlignVerticalTop className='rev-icon' />
-                        <p className='rev-text'>Thống kê các cây bán chạy nhất theo khoảng ngày</p>
+                        <p className='rev-text'>Thống kê các cây có doanh thu theo khoảng ngày</p>
                     </div>
                     <div className={`rev-item ${revType === 3 ? 'active' : ''}`} onClick={() => handleSetRevType(3)}>
                         <BsGraphUp className='rev-icon' />

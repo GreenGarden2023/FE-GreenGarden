@@ -15,11 +15,14 @@ import { AiOutlineEdit } from 'react-icons/ai'
 import AdminUpdateUser from 'app/components/modal/admin-update-user/AdminUpdateUser'
 import { ShippingFee } from 'app/models/shipping-fee'
 import shippingFeeService from 'app/services/shipping-fee.service'
+import Searching from 'app/components/search-and-filter/search/Searching'
+import useSelector from 'app/hooks/use-selector'
 
 const UserPage: React.FC = () => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
+    const { search } = useSelector(state => state.SearchFilter)
 
     const [shipping, setShipping] = useState<ShippingFee[]>([])
 
@@ -48,17 +51,31 @@ const UserPage: React.FC = () => {
             return navigate('/panel/users?page=1', { replace: true })
         }
 
-        const init = async () =>{
-            try{
-                const res = await userService.getListAccountByAdmin({curPage: Number(currentPage), pageSize: paging.pageSize})
-                setUsers(res.data.users)
-                setPaging(res.data.paging)
-            }catch{
-                dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+        if(search.isSearching && search.email){
+            const init = async () =>{
+                try{
+                    const res = await userService.getUserByMail({curPage: Number(currentPage), pageSize: paging.pageSize}, search.email || '')
+                    setUsers(res.data.users)
+                    setPaging(res.data.paging)
+                }catch{
+                    dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+                }
             }
+            init()
+        }else{
+            const init = async () =>{
+                try{
+                    const res = await userService.getListAccountByAdmin({curPage: Number(currentPage), pageSize: paging.pageSize})
+                    setUsers(res.data.users)
+                    setPaging(res.data.paging)
+                }catch{
+                    dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
+                }
+            }
+            init()
         }
-        init()
-    }, [navigate, searchParams, paging.pageSize, dispatch])
+
+    }, [navigate, searchParams, paging.pageSize, dispatch, search.isSearching, search.email])
 
     const Column: ColumnsType<any> = [
         {
@@ -76,6 +93,11 @@ const UserPage: React.FC = () => {
             title: 'Họ tên',
             key: 'fullName',
             dataIndex: 'fullName',
+        },
+        {
+            title: 'Email',
+            key: 'mail',
+            dataIndex: 'mail',
         },
         {
             title: 'Vai trò',
@@ -152,6 +174,10 @@ const UserPage: React.FC = () => {
     return (
         <div className='manage-user-wrapper'>
             <HeaderInfor title='Quản lý người dùng' />
+            <Searching 
+                isEmail
+                defaultUrl='/panel/users?page=1'
+            />
             <section className="default-layout">
                 <button style={{marginLeft: 'auto'}} className='btn btn-create' onClick={() => setAction(1)}>Thêm tài khoản</button>
             </section>
