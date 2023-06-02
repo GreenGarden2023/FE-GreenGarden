@@ -1,26 +1,24 @@
 import { Popover, Segmented } from 'antd'
 import Table, { ColumnsType } from 'antd/es/table'
+import ClientPackageService from 'app/components/client-package-service/ClientPackageService'
 import LandingFooter from 'app/components/footer/LandingFooter'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import LandingHeader from 'app/components/header/LandingHeader'
+import CancelOrder from 'app/components/modal/cancel-order/CancelOrder'
 import TechnicianName from 'app/components/renderer/technician/TechnicianName'
+import ServiceStatusComp from 'app/components/status/ServiceStatusComp'
+import useDispatch from 'app/hooks/use-dispatch'
 import { PaymentControlState } from 'app/models/payment'
 import { Service, ServiceDetailList } from 'app/models/service'
 import serviceService from 'app/services/service.service'
+import { setNoti } from 'app/slices/notification'
+import CONSTANT from 'app/utils/constant'
 import utilDateTime from 'app/utils/date-time'
 import React, { useEffect, useMemo, useState } from 'react'
 import { BiCommentDetail, BiDetail } from 'react-icons/bi'
 import { GrMore } from 'react-icons/gr'
 import { MdCancelPresentation } from 'react-icons/md'
 import { useNavigate } from 'react-router-dom'
-import CancelOrder from 'app/components/modal/cancel-order/CancelOrder'
-import ServiceStatusComp from 'app/components/status/ServiceStatusComp'
-import useDispatch from 'app/hooks/use-dispatch'
-import { setNoti } from 'app/slices/notification'
-import CONSTANT from 'app/utils/constant'
-import LoadingView from 'app/components/loading-view/LoadingView'
-import NoProduct from 'app/components/no-product/NoProduct'
-import ClientPackageService from 'app/components/client-package-service/ClientPackageService'
 
 type TPageType = 'service' | 'package'
 
@@ -30,21 +28,18 @@ const ClientManageTakeCareService: React.FC = () => {
 
     const [services, setServices] = useState<Service[]>([])
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
-    const [loading, setLoading] = useState(true)
 
     const [pageType, setPageType] = useState<TPageType>('service')
 
     useEffect(() =>{
         if(pageType === 'package') return ;
         const init = async () =>{
-            setLoading(true)
             try{
                 const res = await serviceService.getUserServiceRequest()
                 setServices(res.data)
             }catch{
                 dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
             }
-            setLoading(false)
         }
         init()
     }, [dispatch, pageType])
@@ -181,6 +176,7 @@ const ClientManageTakeCareService: React.FC = () => {
         if(value === 'service'){
             setPageType('service')
         }else if(value === 'package'){
+            console.log(value)
             setPageType('package')
         }
     }
@@ -207,20 +203,20 @@ const ClientManageTakeCareService: React.FC = () => {
                             ]} />
                         </section>
                         {
-                            loading ? <LoadingView loading /> :
-                            <>
-                                {
-                                    services.length === 0 ? <NoProduct /> :
-                                    <>
-                                        {
                                             pageType === 'service' ? 
                                             <div className="default-layout">
                                                 <Table columns={Column} dataSource={DataSource} scroll={{x: 480}} />
                                             </div> : <ClientPackageService />
-                                        }
-                                    </>
-                                }
-                            </>
+                            // loading ? <LoadingView loading /> :
+                            // <>
+                            //     {
+                            //         // services.length === 0 ? <NoProduct /> :
+                            //         // <>
+                            //         //     {
+                            //         //     }
+                            //         // </>
+                            //     }
+                            // </>
                         }
                     </div>
                 </div>

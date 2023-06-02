@@ -3,6 +3,7 @@ import Table, { ColumnsType } from 'antd/es/table'
 import DetailPackageService from 'app/components/detail-package-service/DetailPackageService'
 import HeaderInfor from 'app/components/header-infor/HeaderInfor'
 import Transport from 'app/components/renderer/transport/Transport'
+import Searching from 'app/components/search-and-filter/search/Searching'
 import PackageServiceStatusComp from 'app/components/status/PackageServiceStatusComp'
 import UserInforTable from 'app/components/user-infor/UserInforTable'
 import useSelector from 'app/hooks/use-selector'
@@ -16,6 +17,7 @@ import { GrMore } from 'react-icons/gr'
 
 const ManagePackageRequest:React.FC = () => {
     const { user } = useSelector(state => state.userInfor)
+    const { search } = useSelector(state => state.SearchFilter)
 
     const [pkgServices, setPkgServices] = useState<PackageService[]>([])
     const [actionMethod, setActionMethod] = useState<PaymentControlState>()
@@ -23,16 +25,28 @@ const ManagePackageRequest:React.FC = () => {
     useEffect(() =>{
         if(!user.id) return;
 
-        const init = async () =>{
-            try{
-                const res = await takeCareComboService.getAllTakeCareComboServiceByTech('all', user.id)
-                setPkgServices(res.data)
-            }catch{
-
+        if(search.isSearching && search.orderCode){
+            const init = async () =>{
+                try{
+                    const res = await takeCareComboService.getAllTakeCareComboServiceByTech('all', user.id, search.orderCode)
+                    setPkgServices(res.data)
+                }catch{
+    
+                }
             }
+            init() 
+        }else{
+            const init = async () =>{
+                try{
+                    const res = await takeCareComboService.getAllTakeCareComboServiceByTech('all', user.id)
+                    setPkgServices(res.data)
+                }catch{
+    
+                }
+            }
+            init() 
         }
-        init() 
-    }, [user.id])
+    }, [user.id, search.isSearching, search.orderCode])
 
     const Column: ColumnsType<any> = [
         {
@@ -143,6 +157,10 @@ const ManagePackageRequest:React.FC = () => {
     return (
         <div>
             <HeaderInfor title='Yêu cầu chăm sóc cây theo gói' />
+            <Searching 
+                isOrderCode
+                defaultUrl='/panel/manage-package-request'
+            />
             <section className="default-layout">
                 <Table
                     columns={Column}

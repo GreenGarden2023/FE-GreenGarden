@@ -22,6 +22,7 @@ const ManagePackageOrder:React.FC = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const { user } = useSelector(state => state.userInfor)
+    const { search } = useSelector(state => state.SearchFilter)
 
     // data
     const [pkgOrders, setPkgOrders] = useState<PackageOrder[]>([])
@@ -40,17 +41,31 @@ const ManagePackageOrder:React.FC = () => {
 
         if(!user.id) return;
 
-        const init = async () =>{
-            try{
-                const res = await takeComboOrderService.getAllOrdersByTechnician({curPage: Number(currentPage), pageSize: paging.pageSize}, 'all', user.id)
-                setPkgOrders(res.data.takecareComboOrderList)
-                setPaging(res.data.paging)
-            }catch{
-
+        if(search.isSearching && search.orderCode){
+            const init = async () =>{
+                try{
+                    const res = await takeComboOrderService.getAllOrdersByTechnician({curPage: Number(currentPage), pageSize: paging.pageSize, searchText: search.orderCode}, 'all', user.id)
+                    setPkgOrders(res.data.takecareComboOrderList)
+                    setPaging(res.data.paging)
+                }catch{
+    
+                }
             }
+            init()
+        }else{
+            const init = async () =>{
+                try{
+                    const res = await takeComboOrderService.getAllOrdersByTechnician({curPage: Number(currentPage), pageSize: paging.pageSize}, 'all', user.id)
+                    setPkgOrders(res.data.takecareComboOrderList)
+                    setPaging(res.data.paging)
+                }catch{
+    
+                }
+            }
+            init()
         }
-        init()
-    }, [navigate, searchParams, user.id, paging.pageSize])
+
+    }, [navigate, searchParams, user.id, paging.pageSize, search.isSearching, search.orderCode])
 
     const ColumnServiceOrder: ColumnsType<any> = [
         {

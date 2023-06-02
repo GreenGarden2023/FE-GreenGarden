@@ -55,7 +55,7 @@ const UserPage: React.FC = () => {
             const init = async () =>{
                 try{
                     const res = await userService.getUserByMail({curPage: Number(currentPage), pageSize: paging.pageSize}, search.email || '')
-                    setUsers(res.data.users)
+                    setUsers(res.data.userList)
                     setPaging(res.data.paging)
                 }catch{
                     dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
