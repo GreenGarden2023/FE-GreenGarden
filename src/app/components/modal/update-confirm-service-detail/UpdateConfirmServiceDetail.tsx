@@ -431,7 +431,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                 <span>Tổng tiền thanh toán</span>
                             </div>
                             <div className="right">
-                                <MoneyFormat value={OrderPreview().totalPricePayment || 0} isHighlight color='Blue' />
+                                <MoneyFormat value={(OrderPreview().totalPricePayment && OrderPreview().totalPricePayment > 0) ? OrderPreview().totalPricePayment : 0} isHighlight color='Blue' />
                             </div>
                         </div>
                     </Col>
@@ -442,7 +442,7 @@ const UpdateConfirmServiceDetail: React.FC<UpdateConfirmServiceDetailProps> = ({
                                 <span>Tiền cọc</span>
                             </div>
                             <div className="right">
-                                <MoneyFormat value={OrderPreview().deposit || 0} isHighlight color='Orange' />
+                                <MoneyFormat value={(OrderPreview().deposit && OrderPreview().deposit > 0) ? OrderPreview().deposit : 0} isHighlight color='Orange' />
                             </div>
                         </div>
                     </Col>

@@ -3,9 +3,11 @@ import UserInforOrder from 'app/components/user-infor/user-infor-order/UserInfor
 import useDispatch from 'app/hooks/use-dispatch';
 import useSelector from 'app/hooks/use-selector';
 import { OrderType } from 'app/models/general-type';
+import authService from 'app/services/auth.service';
 import orderService from 'app/services/order.service';
 import serviceService from 'app/services/service.service';
 import { setNoti } from 'app/slices/notification';
+import { setUser } from 'app/slices/user-infor';
 import CONSTANT from 'app/utils/constant';
 import React, { useMemo, useState } from 'react'
 
@@ -35,6 +37,26 @@ const CancelOrder: React.FC<CancelOrderProps> = ({ orderId, orderCode, orderType
                 onSubmit(reason, fullName)
                 onClose()
                 setLoading(false)
+
+                // recall api get info user
+                const tokenInLocal = localStorage.getItem(CONSTANT.STORAGE.ACCESS_TOKEN)
+                if(!tokenInLocal) return;
+
+                const getUserDetailInit = async () =>{
+                    try{
+                        const res = await authService.getUserDetail();
+                        const resData = {
+                            ...res.data,
+                            token: tokenInLocal,
+                            role: res.data.roleName,
+                            loading: false
+                        }
+                        dispatch(setUser({user: resData, token: tokenInLocal, loading: false}))
+                    }catch(err: any){
+                        
+                    }
+                }
+                getUserDetailInit();
                 return;
             }
 
@@ -42,6 +64,25 @@ const CancelOrder: React.FC<CancelOrderProps> = ({ orderId, orderCode, orderType
             dispatch(setNoti({type: 'success', message: `Hủy đơn hàng "${orderCode}" thành công`}))
             onSubmit(reason, fullName)
             onClose()
+            // recall api get info user
+            const tokenInLocal = localStorage.getItem(CONSTANT.STORAGE.ACCESS_TOKEN)
+            if(!tokenInLocal) return;
+
+            const getUserDetailInit = async () =>{
+                try{
+                    const res = await authService.getUserDetail();
+                    const resData = {
+                        ...res.data,
+                        token: tokenInLocal,
+                        role: res.data.roleName,
+                        loading: false
+                    }
+                    dispatch(setUser({user: resData, token: tokenInLocal, loading: false}))
+                }catch(err: any){
+                     
+                }
+            }
+            getUserDetailInit();
         }catch{
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
@@ -60,7 +101,7 @@ const CancelOrder: React.FC<CancelOrderProps> = ({ orderId, orderCode, orderType
             open
             title={Title}
             onCancel={onClose}
-            width={800}
+            width={1000}
             footer={false}
         >
             <Form

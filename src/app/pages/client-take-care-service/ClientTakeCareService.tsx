@@ -28,6 +28,8 @@ import { ShippingFee } from 'app/models/shipping-fee'
 import shippingFeeService from 'app/services/shipping-fee.service'
 import LoadingView from 'app/components/loading-view/LoadingView'
 import GridConfig from 'app/components/grid-config/GridConfig'
+import authService from 'app/services/auth.service'
+import { setUser } from 'app/slices/user-infor'
 
 
 const schema = yup.object().shape({
@@ -202,6 +204,26 @@ const ClientTakeCareService: React.FC = () => {
             dispatch(setNoti({type: 'success', message: 'Đã gửi yêu cầu chăm sóc cây thành công'}))
             setModalState({openModal: 0})
             setTreesSelect([])
+
+            // recall api get info user
+            const tokenInLocal = localStorage.getItem(CONSTANT.STORAGE.ACCESS_TOKEN)
+            if(!tokenInLocal) return;
+
+            const getUserDetailInit = async () =>{
+                try{
+                    const res = await authService.getUserDetail();
+                    const resData = {
+                        ...res.data,
+                        token: tokenInLocal,
+                        role: res.data.roleName,
+                        loading: false
+                    }
+                    dispatch(setUser({user: resData, token: tokenInLocal, loading: false}))
+                }catch(err: any){
+                     
+                }
+            }
+            getUserDetailInit();
         }catch{
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }

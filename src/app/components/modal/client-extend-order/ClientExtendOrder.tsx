@@ -23,6 +23,8 @@ import { FaMoneyBillAlt } from 'react-icons/fa'
 import { GrFormSubtract } from 'react-icons/gr'
 import * as yup from 'yup'
 import './style.scss'
+import { setUser } from 'app/slices/user-infor'
+import authService from 'app/services/auth.service'
 
 const schema = yup.object().shape({
     recipientAddress: yup.string().when("isTransport", {
@@ -242,6 +244,26 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
                 dispatch(setNoti({type: 'success', message: 'Gia hạn đơn hàng thành công'}))
                 onExtend(res.data.id)
                 onClose()
+
+                // recall api get info user
+                const tokenInLocal = localStorage.getItem(CONSTANT.STORAGE.ACCESS_TOKEN)
+                if(!tokenInLocal) return;
+
+                const getUserDetailInit = async () =>{
+                    try{
+                        const res = await authService.getUserDetail();
+                        const resData = {
+                            ...res.data,
+                            token: tokenInLocal,
+                            role: res.data.roleName,
+                            loading: false
+                        }
+                        dispatch(setUser({user: resData, token: tokenInLocal, loading: false}))
+                    }catch(err: any){
+                         
+                    }
+                }
+                getUserDetailInit();
             }else{
                 dispatch(setNoti({type: 'info', message: 'Đã có sự thay đổi về giá. Quý khách vui lòng tải lại trang để đặt hàng'}))
             }
@@ -315,22 +337,24 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
     const MaxPointCanUse = () => {
         const { isTransport } = getValues()
         const { currentPoint } = userSate.user
-
+        
         const { totalPriceOrder, transportFee } = OrderPreview()
-
+        
         if(totalPriceOrder <= CONSTANT.MIN_ORDER) return 0
-
+        
         let result = 0
-
+        
         // tại nhà
         if(isTransport){
             const total = totalPriceOrder + transportFee - CONSTANT.MIN_ORDER
             result = Math.floor(total / CONSTANT.MONEY_RATE) * 10
         }else{
             const total = totalPriceOrder - 50000
-            result = Math.floor(total / CONSTANT.MONEY_RATE) * 10
+            // result = Math.floor(total / CONSTANT.MONEY_RATE) * 10
+            result = (total / CONSTANT.MONEY_RATE) * 10
         }
-
+        
+        // console.log(currentPoint, result)
         return currentPoint > result ? result : currentPoint
     }
     const clearPoint = () =>{
@@ -549,7 +573,7 @@ const ClientExtendOrder: React.FC<ClientExtendOrderProps> = ({rentOrderList, shi
                                 </Col>
                                 <Col span={24} >
                                     <div className='btn-form-wrapper'>
-                                        <Button htmlType='button' disabled={isSubmitting} type='default' size='large' className='btn-cancel'>Hủy</Button>
+                                        <Button htmlType='button' disabled={isSubmitting} type='default' size='large' className='btn-cancel' onClick={onClose}>Hủy</Button>
                                         <Button htmlType='submit' loading={isSubmitting} type='primary' className='btn-update' size='large'>
                                             Gia hạn
                                         </Button>
