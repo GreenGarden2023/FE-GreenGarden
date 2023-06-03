@@ -275,6 +275,7 @@ const ManageTakeCareService: React.FC = () => {
     }
     const handleCreateServiceOrder = async() =>{
         const [service] = serviceOrders.filter(x => x.id === actionMethod?.orderId)
+        setLoadingAction(true)
         try{
             await orderService.createServiceOrder(service.id)
             dispatch(setNoti({type: 'success', message: `Tạo mới đơn hàng thành công cho dịch vụ ${service.serviceCode}`}))
@@ -284,6 +285,7 @@ const ManageTakeCareService: React.FC = () => {
         }catch{
             dispatch(setNoti({type: 'error', message: CONSTANT.ERROS_MESSAGE.RESPONSE_VI}))
         }
+        setLoadingAction(false)
     }
 
     return (

@@ -20,6 +20,7 @@ const AssignServicePackage: React.FC<AssignServicePackageProps> = ({ pkgService,
 
     const [users, setUsers] = useState<UserGetByRole[]>([])
     const [userSelected, setUserSelected] = useState(pkgService.technicianId !== '00000000-0000-0000-0000-000000000000' ? pkgService.technicianId : '')
+    const [loadingAction, setLoadingAction] = useState(false)
 
     useEffect(() =>{
         const init = async () =>{
@@ -43,6 +44,7 @@ const AssignServicePackage: React.FC<AssignServicePackageProps> = ({ pkgService,
     }, [dispatch])
 
     const handleSubmitForm = async () =>{
+        setLoadingAction(true)
         try{
             await takeCareComboService.assignTakeCareComboServiceTechnician({
                 takecareComboServiceId: pkgService.id,
@@ -55,6 +57,7 @@ const AssignServicePackage: React.FC<AssignServicePackageProps> = ({ pkgService,
         }catch{
 
         }
+        setLoadingAction(false)
     }
     const handleChange = (e: RadioChangeEvent) => {
         setUserSelected(e.target.value)
@@ -86,8 +89,8 @@ const AssignServicePackage: React.FC<AssignServicePackageProps> = ({ pkgService,
                     </Space>
                 </Radio.Group>
                 <div className='btn-form-wrapper mt-10'>
-                    <Button htmlType='button'  type='default' className='btn-cancel' size='large' onClick={onClose} >Hủy bỏ</Button>
-                    <Button htmlType='submit'  type='primary' className='btn-update' size='large' onClick={handleSubmitForm}>
+                    <Button htmlType='button' disabled={loadingAction} type='default' className='btn-cancel' size='large' onClick={onClose} >Hủy bỏ</Button>
+                    <Button htmlType='submit' loading={loadingAction} type='primary' className='btn-update' size='large' onClick={handleSubmitForm}>
                         Phân công
                     </Button>
                 </div>

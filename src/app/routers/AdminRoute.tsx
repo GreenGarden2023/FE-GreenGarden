@@ -77,10 +77,10 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
         if(saleOrder.includes(affix)){
             return ['6']
         }
-        const serviceOrder = ['take-care-order']
-        if(serviceOrder.includes(affix)){
-            return ['7']
-        }
+        // const serviceOrder = ['take-care-order']
+        // if(serviceOrder.includes(affix)){
+        //     return ['7']
+        // }
         const takeCareService = ['manage-take-care-service']
         if(takeCareService.includes(affix)){
             return ['8']
@@ -104,16 +104,61 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
             return ['12']
         }
 
+        const takeCareOrder = ['take-care-order']
+        if(takeCareOrder.includes(affix)){
+            return ['14']
+        }
+        const manageTakeCarePackage = ['manage-take-care-package']
+        if(manageTakeCarePackage.includes(affix)){
+            return ['15']
+        }
+        const takeCareOrderPackage = ['take-care-order-package']
+        if(takeCareOrderPackage.includes(affix)){
+            return ['16']
+        }
+        const managePackage = ['manage-package']
+        if(managePackage.includes(affix)){
+            return ['17']
+        }
+        const managePackageOrder = ['manage-package-order']
+        if(managePackageOrder.includes(affix)){
+            return ['18']
+        }
+        const managePackageRequest = ['manage-package-request']
+        if(managePackageRequest.includes(affix)){
+            return ['19']
+        }
+        const manageRevenue = ['manage-revenue']
+        if(manageRevenue.includes(affix)){
+            return ['20']
+        }
     }, [location])
 
-    const [openKey, setOpenKey] = useState<string[]>([])
+    const DefaultSelectedKey = () => {
+        const affix = location.pathname.split('/')[2]
+        
+        const manageOrder = ['rent-order', 'sale-order']
+        const manageRequest = ['manage-take-care-service', 'take-care-order', 'manage-take-care-package', 'take-care-order-package']
+        
+        if(manageOrder.includes(affix)){
+            return ['4']
+        }
+        if(manageRequest.includes(affix)){
+            return ['13']
+        }
+
+        return []
+    }
+
+
+    const [openKey, setOpenKey] = useState<string[]>(DefaultSelectedKey())
 
     useEffect(() =>{
         const affix = location.pathname.split('/')[2]
-
+        
         const manageOrder = ['rent-order', 'sale-order']
-        const manageRequest = ['manage-take-care-service', 'take-care-order', 'manage-take-care-package', 'take-care-package']
-
+        const manageRequest = ['manage-take-care-service', 'take-care-order', 'manage-take-care-package', 'take-care-order-package']
+        
         if(manageOrder.includes(affix)){
             setOpenKey(['4'])
         }else if(manageRequest.includes(affix)){
@@ -123,6 +168,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({children}) => {
         }
     }, [location])
 
+    
     // const pushOpenKey = (key: string) =>{
     //     setOpenKey([...openKey, key])
     // }

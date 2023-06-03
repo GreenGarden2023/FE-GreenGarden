@@ -488,7 +488,7 @@ const LandingHeader: React.FC = () => {
             <Col span={24}>
               <div className="point-wrapper">
                 <span className="point-text">Điểm tích lũy</span>
-                <span className="point">{userState.user.currentPoint} ({userState.user.currentPoint * 1000} VNĐ)</span>
+                <span className="point">{userState.user.currentPoint} ({currencyFormat(userState.user.currentPoint * 1000)})</span>
               </div>
             </Col>
           </Row>
@@ -517,5 +517,14 @@ const LandingHeader: React.FC = () => {
     </>
   );
 };
+
+const currencyFormat = (currency: number) =>{
+  const formattedCurrency = currency.toLocaleString('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+      minimumFractionDigits: 0
+  });
+  return formattedCurrency
+}
 
 export default LandingHeader;
